@@ -8,8 +8,8 @@
 #include <sys/types.h> 
 #include <signal.h>    
 
-#include "../objects/Object.h"
-#include "../objects/ObjectFactory.h"
+#include "Object.h"
+#include "ObjectFactory.h"
 
 using namespace std;
 
@@ -17,8 +17,14 @@ auto_ptr<Object> object;
 
 void sighup_handler(int sig_num)
 {
-    object->Save();
+    object->Stop();
     exit(0);
+}
+
+void sigusr1_handler(int sig_num )
+{
+    signal(SIGUSR1, sigusr1_handler);
+    object->LoadFeedData();
 }
 
 int main(int argc,char *argv[]) {
@@ -29,6 +35,7 @@ int main(int argc,char *argv[]) {
     }
 
     signal(SIGHUP, sighup_handler);
+    signal(SIGUSR1, sigusr1_handler);
 
     int id=atoi(argv[1]);
     int type=atoi(argv[2]);
@@ -44,6 +51,7 @@ int main(int argc,char *argv[]) {
         default: 
             exit(0);
     }
+   
 
     cout << "About to ObjectFactory::createObject: id=" << id << ", type=" << type << endl;
 

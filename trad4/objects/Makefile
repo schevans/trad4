@@ -5,7 +5,7 @@ CXXFLAGS = -Wall -c
 
 COMPILE = $(CXX) $(CXXFLAGS)
 
-OBJECTS = Object.o
+OBJECTS = Object.o CalcObject.o FeedObject.o
 
 all : $(OBJECTS)
 

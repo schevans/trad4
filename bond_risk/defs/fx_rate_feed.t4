@@ -1,0 +1,8 @@
+
+pub
+    double rate
+
+static
+    int ccy1
+    int ccy2
+
