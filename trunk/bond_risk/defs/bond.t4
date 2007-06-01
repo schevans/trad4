@@ -1,0 +1,16 @@
+
+sub
+    discount_rate discount_rate
+
+pub
+    double price
+
+static
+    double coupon
+    int start_date
+    int maturity_date
+    int coupons_per_year
+    int ccy
+
+
+

@@ -1,0 +1,14 @@
+
+sub
+    bond bond
+
+pub
+    double pv
+    double pnl
+    double dv01
+
+static
+    int quantity
+    int trade_date
+    double trade_price
+

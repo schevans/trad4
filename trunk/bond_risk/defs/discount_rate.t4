@@ -1,0 +1,10 @@
+
+sub
+    interest_rate_feed interest_rate_feed
+
+pub
+    double rate[DISCOUNT_RATE_LEN]
+
+static
+    int ccy
+

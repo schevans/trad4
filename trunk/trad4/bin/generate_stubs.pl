@@ -66,20 +66,16 @@ sub generate_all() {
 
     load_defs( "$defs_root/$name.t4" );
 
-    if ( $is_feed == 0 ) {
+    generate_h_base( );
 
-        generate_h_base( );
+    if ( ! -f "$obj_root/$h_filename" ) {
+        generate_h( );
+    }
 
-        if ( ! -f "$obj_root/$h_filename" ) {
-            generate_h( );
-        }
+    generate_cpp_base();
 
-        generate_cpp_base();
-
-        if ( ! -f "$obj_root/$cpp_filename" ) {
-            generate_cpp();
-        }
-
+    if ( ! -f "$obj_root/$cpp_filename" ) {
+        generate_cpp();
     }
 
     generate_pub_struct();
@@ -107,12 +103,11 @@ sub generate_h() {
     my ( $var, $type );
 
     open H_FILE, ">$obj_root/$h_filename" or die "Can't open $obj_root/$h_filename for writing. Exiting";
+
     print H_FILE "#ifndef __$cap_name"."__\n";
     print H_FILE "#define __$cap_name"."__\n";
     print H_FILE "\n";
-    print H_FILE "#include \"Object.h\"\n";
     print H_FILE "#include \"$cpp_base_name.h\"\n";
-#    print H_FILE "#include \"common.h\"\n";
     print H_FILE "\n";
     print H_FILE "\n";
     print H_FILE "\n";
@@ -121,9 +116,15 @@ sub generate_h() {
     print H_FILE "public:\n";
     print H_FILE "\n";
     print H_FILE "    $cpp_name( int id );\n";
-    print H_FILE "    virtual ~$cpp_name();\n";
+    print H_FILE "    virtual ~$cpp_name() {}\n";
     print H_FILE "\n";
-    print H_FILE "    virtual bool Calculate();\n";
+
+    if ( $is_feed ) {
+        print H_FILE "    virtual bool LoadFeedData();\n";
+    }
+    else {
+        print H_FILE "    virtual bool Calculate();\n";
+    }
     print H_FILE "\n";
     print H_FILE "};\n";
     print H_FILE "\n";
@@ -145,7 +146,14 @@ sub generate_h_base()
     print H_FILE "#ifndef __$cap_base_name"."__\n";
     print H_FILE "#define __$cap_base_name"."__\n";
     print H_FILE "\n";
-    print H_FILE "#include \"Object.h\"\n";
+
+    if ( $is_feed ) {
+        print H_FILE "#include \"FeedObject.h\"\n";
+    }
+    else {
+        print H_FILE "#include \"CalcObject.h\"\n";
+    }
+        
     print H_FILE "#include \"common.h\"\n";
     print H_FILE "\n";
 
@@ -161,19 +169,32 @@ sub generate_h_base()
 
     print H_FILE "\n";
     print H_FILE "\n";
-    print H_FILE "class $cpp_base_name : public Object {\n";
+
+    if ( $is_feed ) {
+        print H_FILE "class $cpp_base_name : public FeedObject {\n";
+    }
+    else {
+        print H_FILE "class $cpp_base_name : public CalcObject {\n";
+    }
+
     print H_FILE "\n";
     print H_FILE "public:\n";
     print H_FILE "\n";
     print H_FILE "    virtual ~$cpp_base_name() {}\n";
     print H_FILE "\n";
-    print H_FILE "    virtual bool AttachToSubscriptions();\n";
-    print H_FILE "    virtual void SetObjectStatus( object_status status );\n";
-    print H_FILE "    virtual bool Calculate() = 0;\n";
-    print H_FILE "    virtual bool NeedRefresh();\n";
-    print H_FILE "    virtual bool Save();\n";
     print H_FILE "    virtual bool Load();\n";
     print H_FILE "    virtual int Type();\n";
+    print H_FILE "    virtual void SetObjectStatus( object_status status );\n";
+
+    if ( ! $is_feed ) {
+
+        print H_FILE "    virtual bool AttachToSubscriptions();\n";
+        print H_FILE "    virtual bool Calculate() = 0;\n";
+        print H_FILE "    virtual bool NeedRefresh();\n";
+        print H_FILE "    virtual bool Save();\n";
+
+    }
+
     print H_FILE "\n";
 
     foreach $tuple ( @pub ) {
@@ -235,6 +256,30 @@ sub generate_cpp() {
     print CPP_FILE "\n";
     print CPP_FILE "using namespace std;\n";
     print CPP_FILE "\n";
+
+    if ( $is_feed ) {
+
+        print CPP_FILE "bool $cpp_name\:\:LoadFeedData()\n";
+        print CPP_FILE "{\n";
+        print CPP_FILE "    cout << \"$cpp_name\:\:LoadFeedData()\" << endl;\n";
+        print CPP_FILE "\n";
+        print CPP_FILE "    Notify();\n";
+        print CPP_FILE "    return true;\n";
+        print CPP_FILE "}\n";
+    
+    }
+    else {
+
+        print CPP_FILE "bool $cpp_name\:\:Calculate()\n";
+        print CPP_FILE "{\n";
+        print CPP_FILE "    cout << \"$cpp_name\:\:Calculate()\" << endl;\n";
+        print CPP_FILE "\n";
+        print CPP_FILE "    Notify();\n";
+        print CPP_FILE "    return true;\n";
+        print CPP_FILE "}\n";
+
+    }
+    print CPP_FILE "\n";
     print CPP_FILE "$cpp_name\:\:$cpp_name( int id )\n";
     print CPP_FILE "{\n";
     print CPP_FILE "    cout << \"$cpp_name\:\:$cpp_name: \"<< id << endl;\n";
@@ -242,11 +287,6 @@ sub generate_cpp() {
     print CPP_FILE "    _pub = (pub_$name*)CreateShmem(sizeof(pub_$name));\n";
     print CPP_FILE "\n";
     print CPP_FILE "    Init( id );\n";
-    print CPP_FILE "}\n";
-    print CPP_FILE "\n";
-    print CPP_FILE "bool $cpp_name\:\:Calculate()\n";
-    print CPP_FILE "{\n";
-    print CPP_FILE "    return true;\n";
     print CPP_FILE "}\n";
     print CPP_FILE "\n";
 
@@ -270,91 +310,97 @@ sub generate_cpp_base() {
     print CPP_FILE "\n";
     print CPP_FILE "using namespace std;\n";
     print CPP_FILE "\n";
-    print CPP_FILE "bool $cpp_base_name\:\:AttachToSubscriptions()\n";
-    print CPP_FILE "{\n";
 
-    if ( @sub ) {
+    if ( ! $is_feed ) {
 
-        foreach $tuple ( @sub ) {
+        print CPP_FILE "bool $cpp_base_name\:\:AttachToSubscriptions()\n";
+        print CPP_FILE "{\n";
 
-            ( $type, $var ) = split / /, $tuple; 
+        if ( @sub ) {
 
-            print CPP_FILE "    _sub$var = (pub_$type*)AttachToSubscription( $var );\n";
+            foreach $tuple ( @sub ) {
+
+                ( $type, $var ) = split / /, $tuple; 
+
+                print CPP_FILE "    _sub$var = (pub_$type*)AttachToSubscription( $var );\n";
+                print CPP_FILE "\n";
+
+            }
+
+            print CPP_FILE "    if ( ";
+
+            foreach $tuple ( @sub ) {
+
+                ( $type, $var ) = split / /, $tuple; 
+
+                print CPP_FILE "_sub$var && ";
+
+            }
+
+            print CPP_FILE " 1 )\n";
+            print CPP_FILE "        return true;\n";
+            print CPP_FILE "    else\n";
+            print CPP_FILE "        return false;\n";
             print CPP_FILE "\n";
 
         }
+        else {
+            print CPP_FILE "        return true;\n";
+        }
 
-        print CPP_FILE "    if ( ";
+
+        print CPP_FILE "}\n";
+        print CPP_FILE "\n";
+        print CPP_FILE "bool $cpp_base_name\:\:NeedRefresh()\n";
+        print CPP_FILE "{\n";
+      
+        print CPP_FILE "    return ( ";
 
         foreach $tuple ( @sub ) {
 
             ( $type, $var ) = split / /, $tuple; 
 
-            print CPP_FILE "_sub$var && ";
+            print CPP_FILE "_sub$var->last_published > *(int*)_pub || ";
 
         }
 
-        print CPP_FILE " 1 )\n";
-        print CPP_FILE "        return true;\n";
-        print CPP_FILE "    else\n";
-        print CPP_FILE "        return false;\n";
+        print CPP_FILE " 0 );\n";
+
+        print CPP_FILE "}\n";
+        print CPP_FILE "\n";
+        print CPP_FILE "bool $cpp_base_name\:\:Save()\n";
+        print CPP_FILE "{\n";
+        print CPP_FILE "    fstream save_file(_data_file_name.c_str(), ios::out);\n";
+        print CPP_FILE "\n";
+        print CPP_FILE "    save_file <<\n";
+
+        foreach $tuple ( @common, @sub, @static ) {
+
+            ( $type, $var ) = split / /, $tuple; 
+
+            print CPP_FILE "        $var << \",\" <<\n";
+
+        }
+
+        foreach $tuple ( @pub ) {
+
+            ( $type, $var ) = split / /, $tuple; 
+
+            print CPP_FILE "        ((pub_$name*)_pub)->$var << \",\" <<\n";
+
+        }
+
+
+        print CPP_FILE "    endl;\n";
+        print CPP_FILE "\n";
+        print CPP_FILE "    save_file.close();\n";
+        print CPP_FILE "\n";
+        print CPP_FILE "    return true;\n";
+        print CPP_FILE "}\n";
         print CPP_FILE "\n";
 
-    }
-    else {
-        print CPP_FILE "        return true;\n";
-    }
+    } 
 
-
-    print CPP_FILE "}\n";
-    print CPP_FILE "\n";
-    print CPP_FILE "bool $cpp_base_name\:\:NeedRefresh()\n";
-    print CPP_FILE "{\n";
-  
-    print CPP_FILE "    return ( ";
-
-    foreach $tuple ( @sub ) {
-
-        ( $type, $var ) = split / /, $tuple; 
-
-        print CPP_FILE "_sub$var->last_published > *(int*)_pub || ";
-
-    }
-
-    print CPP_FILE " 0 );\n";
-
-    print CPP_FILE "}\n";
-    print CPP_FILE "\n";
-    print CPP_FILE "bool $cpp_base_name\:\:Save()\n";
-    print CPP_FILE "{\n";
-    print CPP_FILE "    fstream save_file(_data_file_name.c_str(), ios::out);\n";
-    print CPP_FILE "\n";
-    print CPP_FILE "    save_file <<\n";
-
-    foreach $tuple ( @common, @sub, @static ) {
-
-        ( $type, $var ) = split / /, $tuple; 
-
-        print CPP_FILE "        $var << \",\" <<\n";
-
-    }
-
-    foreach $tuple ( @pub ) {
-
-        ( $type, $var ) = split / /, $tuple; 
-
-        print CPP_FILE "        ((pub_$name*)_pub)->$var << \",\" <<\n";
-
-    }
-
-
-    print CPP_FILE "    endl;\n";
-    print CPP_FILE "\n";
-    print CPP_FILE "    save_file.close();\n";
-    print CPP_FILE "\n";
-    print CPP_FILE "    return true;\n";
-    print CPP_FILE "}\n";
-    print CPP_FILE "\n";
     print CPP_FILE "bool $cpp_base_name\:\:Load()\n";
     print CPP_FILE "{\n";
     print CPP_FILE "    fstream load_file(_data_file_name.c_str(), ios::in);\n";
@@ -413,8 +459,17 @@ sub generate_cpp_base() {
     elsif (  $name =~ "bond" ) {
         print CPP_FILE "    return 3;\n";
     }
+    elsif (  $name =~ "outright_trade" ) {
+        print CPP_FILE "    return 4;\n";
+    }
+    elsif (  $name =~ "repo_trade" ) {
+        print CPP_FILE "    return 5;\n";
+    }
+    elsif (  $name =~ "fx_rate_feed" ) {
+        print CPP_FILE "    return 6;\n";
+    }
     else {
-        die "Type $type not catered for here";
+        die "Type $name not catered for here";
     }
     print CPP_FILE "}\n";
     print CPP_FILE "\n";

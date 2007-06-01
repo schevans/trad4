@@ -1,0 +1,17 @@
+
+sub
+    fx_rate_feed fx_rate_feed
+    bond bond
+
+pub
+    double mtm_pnl
+    double margin  
+
+static
+    int start_date
+    int end_date
+    int notional
+    int cash_ccy
+    double rate
+    double cash
+

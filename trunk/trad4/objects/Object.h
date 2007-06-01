@@ -13,18 +13,20 @@ class Object {
 
 public:
 
-    virtual ~Object() {};
+    virtual ~Object() {}
 
-    void Run();
-    void Init( int id );
     void* CreateShmem( size_t pub_size );
-    void* AttachToObjLoc();
-    void* AttachToSubscription( int sub_id );
+    bool AttachToObjLoc();
+    bool Notify();
+
+    virtual void Run() = 0;
+    virtual void Init( int id ) = 0;
+    virtual bool LoadFeedData() = 0;
+    virtual bool Stop() = 0;
 
     virtual void SetObjectStatus( object_status status ) = 0;
-    virtual bool AttachToSubscriptions() = 0;
-    virtual bool Save() = 0;
     virtual bool Load() = 0;
+    virtual int Type() = 0;
 
 
 protected:
@@ -39,7 +41,6 @@ protected:
     obj_loc* _obj_loc;
 
     void* _pub;
-private:
 
 };
 
