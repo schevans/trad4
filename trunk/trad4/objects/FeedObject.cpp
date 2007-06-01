@@ -7,6 +7,7 @@
 #include <sys/shm.h>
 //#include <unistd.h> 
 #include <fstream>
+#include <sstream>
 
 #include "FeedObject.h"
 
@@ -16,19 +17,23 @@ void FeedObject::Init( int id )
 {
     _id = id;
 
-    char* data_dir;
-    data_dir = getenv( "DATA_DIR" );
+    string data_dir( getenv( "DATA_DIR" ) );
+//    data_dir = getenv( "DATA_DIR" );
 
-    if ( data_dir == NULL )
+    if ( data_dir.empty() )
     {
         cout << "DATA_DIR not set. Exiting" << endl;
         exit(1);
     }
 
-    char file[20];
-    sprintf(file, "%d.%d.t4o", _id, Type() );
+cout << "DDD: " << data_dir << endl;
 
-    _data_file_name = strcat( data_dir, file );
+    ostringstream stream;
+    stream << data_dir << _id << "." << Type() << ".t4o";
+
+    _data_file_name = stream.str();
+
+cout << "_data_file_name: " << _data_file_name << endl;
 
     SetObjectStatus( STARTING );
 
@@ -42,12 +47,13 @@ cout << "Setting _obj_loc->shmid[" << _id << "] = " << _shmid << endl;
  
     _obj_loc->shmid[_id] = _shmid;
 
-    LoadFeedData();
 }
 
 void FeedObject::Run() 
 {
     cout << "FeedObject::Run()" << endl;
+
+    LoadFeedData();
 
     SetObjectStatus( RUNNING );
 
