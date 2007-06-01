@@ -14,6 +14,10 @@ public:
 
     virtual bool LoadFeedData();
 
+private:
+
+    std::string _feed_file;
+
 };
 
 #endif
