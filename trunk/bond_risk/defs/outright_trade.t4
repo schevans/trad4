@@ -1,6 +1,6 @@
 
 sub
-    bond bond
+    int bond
 
 pub
     double pv

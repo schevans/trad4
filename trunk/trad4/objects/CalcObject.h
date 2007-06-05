@@ -23,7 +23,6 @@ public:
     virtual bool Stop();
     virtual bool LoadFeedData();
 
-    virtual void SetObjectStatus( object_status status ) = 0;
     virtual bool AttachToSubscriptions() = 0;
     virtual bool Save() = 0;
     virtual bool Load() = 0;

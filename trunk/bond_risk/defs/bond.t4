@@ -1,6 +1,6 @@
 
 sub
-    discount_rate discount_rate
+    int discount_rate
 
 pub
     double price

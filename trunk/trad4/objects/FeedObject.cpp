@@ -29,13 +29,13 @@ void FeedObject::Init( int id )
 cout << "DDD: " << data_dir << endl;
 
     ostringstream stream;
-    stream << data_dir << _id << "." << Type() << ".t4o";
+    stream << data_dir << _id << "." << GetType() << ".t4o";
 
     _data_file_name = stream.str();
 
 cout << "_data_file_name: " << _data_file_name << endl;
 
-    SetObjectStatus( STARTING );
+    SetStatus( STARTING );
 
     cout << "Loading static.." << endl;
     Load();
@@ -55,7 +55,7 @@ void FeedObject::Run()
 
     LoadFeedData();
 
-    SetObjectStatus( RUNNING );
+    SetStatus( RUNNING );
 
     while (1) {
         sleep ( 10000 );

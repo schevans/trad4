@@ -26,9 +26,9 @@ bool InterestRateFeed::LoadFeedData()
         cout << record << endl;
 
         tok = strtok( record, "," );
-        ((pub_interest_rate_feed*)_pub)->asof[counter] = atoi(tok);
+        ((interest_rate_feed*)_pub)->asof[counter] = atoi(tok);
         tok = strtok( NULL, "," );
-        ((pub_interest_rate_feed*)_pub)->rate[counter] = atof(tok);
+        ((interest_rate_feed*)_pub)->rate[counter] = atof(tok);
 
         counter++;
     }
@@ -45,7 +45,7 @@ InterestRateFeed::InterestRateFeed( int id )
 {
     cout << "InterestRateFeed::InterestRateFeed: "<< id << endl;
 
-    _pub = (pub_interest_rate_feed*)CreateShmem(sizeof(pub_interest_rate_feed));
+//    _pub = (interest_rate_feed*)CreateShmem(sizeof(interest_rate_feed));
 
     Init( id );
 

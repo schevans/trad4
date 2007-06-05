@@ -19,7 +19,6 @@ public:
     void Init( int id );
     virtual bool Stop();
 
-    virtual void SetObjectStatus( object_status status ) = 0;
     virtual bool LoadFeedData() = 0;
 
 };

@@ -26,7 +26,8 @@ if ( $name =~ /feed/ ) {
 
 sub generate_cpp_base();
 sub generate_h_base();
-sub generate_pub_struct();
+sub generate_viewer();
+sub generate_struct();
 sub load_defs($);
 sub generate_all();
 sub trim($);
@@ -42,8 +43,9 @@ my $cpp_base_filename = lower2camel_case ($name )."Base.cpp";
 my $h_filename = "$cpp_name".".h";
 my $h_base_filename = "$cpp_base_name".".h";
 my $table_filename = "$name.table";
-my $pub_struct = "pub_".$name;
-my $pub_struct_filename = "pub_$name.h";
+my $struct_filename = "$name.h";
+my $viewer = lower2camel_case ($name )."Viewer";
+my $viewer_filename = "$viewer.cpp";
 
 my $cap_name = $name;
 $cap_name =~ s/^(\S+)/\U$1\E/g;
@@ -54,11 +56,15 @@ my $defs_root=$ENV{INSTANCE_ROOT}."/defs";
 my $gen_root=$ENV{INSTANCE_ROOT}."/gen";
 my $obj_root=$ENV{INSTANCE_ROOT}."/objects";
 
-my ( @sub, @pub, @mem_pub, @static, @common );
+my ( @sub, @pub, @mem_pub, @static, @common, @header );
 
-@common = ( "std::string _name",
-            "int _sleep_time",
-            "int _log_level" );
+@common = ( "char* name",
+            "int sleep_time" );
+
+@header = ( "time_t last_published",
+            "object_status status",
+            "int pid",
+            "int type" );
 
 generate_all();
 
@@ -78,7 +84,11 @@ sub generate_all() {
         generate_cpp();
     }
 
-    generate_pub_struct();
+    generate_struct();
+
+#    if ( ! $is_feed ) {
+#        generate_viewer();
+#    }
 
     if ( $is_feed ) {
         print "Generated $name\n";
@@ -157,13 +167,13 @@ sub generate_h_base()
     print H_FILE "#include \"common.h\"\n";
     print H_FILE "\n";
 
-    print H_FILE "#include \"pub_$name.h\"\n";
+    print H_FILE "#include \"$name.h\"\n";
 
     foreach $tuple ( @sub ) {
 
         ( $type, $var ) = split / /, $tuple; 
 
-        print H_FILE "#include \"pub_$type.h\"\n";
+        print H_FILE "#include \"$var.h\"\n";
 
     }
 
@@ -180,11 +190,11 @@ sub generate_h_base()
     print H_FILE "\n";
     print H_FILE "public:\n";
     print H_FILE "\n";
+    print H_FILE "    $cpp_base_name();\n";
     print H_FILE "    virtual ~$cpp_base_name() {}\n";
     print H_FILE "\n";
     print H_FILE "    virtual bool Load();\n";
-    print H_FILE "    virtual int Type();\n";
-    print H_FILE "    virtual void SetObjectStatus( object_status status );\n";
+    print H_FILE "    virtual int Type() { return (($name*)_pub)->type; }\n";
 
     if ( ! $is_feed ) {
 
@@ -197,39 +207,32 @@ sub generate_h_base()
 
     print H_FILE "\n";
 
-    foreach $tuple ( @pub ) {
+    print H_FILE "    std::string GetName() { return _name; }\n";
+    print H_FILE "    void SetName( std::string name ) { _name = name; }\n";
+    print H_FILE "\n";
+    print H_FILE "    virtual int GetSleepTime() { return (($name*)_pub)->sleep_time; }\n";
+    print H_FILE "    void SetSleepTime( int sleep_time ) { (($name*)_pub)->sleep_time = sleep_time; }\n";
+    print H_FILE "\n";
+
+    foreach $tuple ( @sub, @static, @pub ) {
 
         ( $type, $var ) = split / /, $tuple; 
 
         my $camel_var = lower2camel_case( $var );
 
-        print H_FILE "    $type GetPub$camel_var() { return ((pub_$name*)_pub)->$var; }\n";
-        print H_FILE "    void SetPub$camel_var( $type $var ) { ((pub_$name*)_pub)->$var = $var; }\n";
+        print H_FILE "    $type Get$camel_var() { return (($name*)_pub)->$var; }\n";
+        print H_FILE "    void Set$camel_var( $type $var ) { (($name*)_pub)->$var = $var; }\n";
         print H_FILE "\n";
 
     }
 
-    print H_FILE "\n";
-    print H_FILE "\n";
     print H_FILE "protected:\n";
-    print H_FILE "\n";
-    print H_FILE "    // Static\n";
-
-    foreach $tuple ( @static ) {
-
-        print H_FILE "    $tuple;\n";
-
-    }
-
-    print H_FILE "\n";
-    print H_FILE "    // Sub";
 
     foreach $tuple ( @sub ) {
 
         ( $type, $var ) = split / /, $tuple; 
 
-        print H_FILE "\n    pub_$type* _sub$var;";
-        print H_FILE "\n    int $var;";
+        print H_FILE "\n    $var* _sub_$var;";
 
     }
 
@@ -284,7 +287,7 @@ sub generate_cpp() {
     print CPP_FILE "{\n";
     print CPP_FILE "    cout << \"$cpp_name\:\:$cpp_name: \"<< id << endl;\n";
     print CPP_FILE "\n";
-    print CPP_FILE "    _pub = (pub_$name*)CreateShmem(sizeof(pub_$name));\n";
+    print CPP_FILE "    _pub = ($name*)CreateShmem(sizeof($name));\n";
     print CPP_FILE "\n";
     print CPP_FILE "    Init( id );\n";
     print CPP_FILE "}\n";
@@ -311,6 +314,17 @@ sub generate_cpp_base() {
     print CPP_FILE "using namespace std;\n";
     print CPP_FILE "\n";
 
+    print CPP_FILE "$cpp_base_name\:\:$cpp_base_name()\n";
+    print CPP_FILE "{\n";
+    print CPP_FILE "cout << \"$cpp_base_name\:\:$cpp_base_name()\" << endl;\n";
+    print CPP_FILE "    _pub = ($name*)CreateShmem(sizeof($name));\n";
+
+    print CPP_FILE "    (($name*)_pub)->type = ".type2num( $name ).";;\n";
+    print CPP_FILE "\n";
+    print CPP_FILE "}\n";
+    print CPP_FILE "\n";
+
+
     if ( ! $is_feed ) {
 
         print CPP_FILE "bool $cpp_base_name\:\:AttachToSubscriptions()\n";
@@ -322,7 +336,7 @@ sub generate_cpp_base() {
 
                 ( $type, $var ) = split / /, $tuple; 
 
-                print CPP_FILE "    _sub$var = (pub_$type*)AttachToSubscription( $var );\n";
+                print CPP_FILE "    _sub_$var = ($var*)AttachToSubscription( Get".lower2camel_case( $var )."() );\n";
                 print CPP_FILE "\n";
 
             }
@@ -333,7 +347,7 @@ sub generate_cpp_base() {
 
                 ( $type, $var ) = split / /, $tuple; 
 
-                print CPP_FILE "_sub$var && ";
+                print CPP_FILE "_sub_$var && ";
 
             }
 
@@ -360,7 +374,7 @@ sub generate_cpp_base() {
 
             ( $type, $var ) = split / /, $tuple; 
 
-            print CPP_FILE "_sub$var->last_published > *(int*)_pub || ";
+            print CPP_FILE "_sub_$var->last_published > *(int*)_pub || ";
 
         }
 
@@ -374,19 +388,13 @@ sub generate_cpp_base() {
         print CPP_FILE "\n";
         print CPP_FILE "    save_file <<\n";
 
-        foreach $tuple ( @common, @sub, @static ) {
+        foreach $tuple ( @common, @sub, @static, @pub ) {
 
-            ( $type, $var ) = split / /, $tuple; 
+            ( $type, $var ) = split / /, $tuple;
 
-            print CPP_FILE "        $var << \",\" <<\n";
+            my $camel_var = lower2camel_case( $var );
 
-        }
-
-        foreach $tuple ( @pub ) {
-
-            ( $type, $var ) = split / /, $tuple; 
-
-            print CPP_FILE "        ((pub_$name*)_pub)->$var << \",\" <<\n";
+            print CPP_FILE "        Get$camel_var() << \",\" <<\n";
 
         }
 
@@ -414,63 +422,22 @@ sub generate_cpp_base() {
     print CPP_FILE "    char* tok;\n";
     print CPP_FILE "\n";
     print CPP_FILE "    tok = strtok( record, \",\" );\n";
-    print CPP_FILE "\n";
 
-    foreach $tuple ( @common, @sub, @static ) {
+    foreach $tuple ( @common, @sub, @static, @pub ) {
 
-        ( $type, $var ) = split / /, $tuple; 
+        ( $type, $var ) = split / /, $tuple;
 
-        print CPP_FILE "    $var = ".type2atoX($type)."(tok);\n"; 
+        my $camel_var = lower2camel_case( $var );
+
+        print CPP_FILE "    Set$camel_var( ".type2atoX($type)."(tok) );\n";
         print CPP_FILE "    tok = strtok( NULL, \",\" );\n";
-    }
-
-    foreach $tuple ( @pub ) {
-
-        ( $type, $var ) = split / /, $tuple; 
-
-        print CPP_FILE "    ((pub_$name*)_pub)->$var = ".type2atoX($type)."(tok);\n";
 
     }
 
-
-    print CPP_FILE "\n";
-    print CPP_FILE "\n";
-    print CPP_FILE "\n";
     print CPP_FILE "\n";
     print CPP_FILE "    load_file.close();\n";
     print CPP_FILE "\n";
     print CPP_FILE "    return true;\n";
-    print CPP_FILE "}\n";
-    print CPP_FILE "\n";
-    print CPP_FILE "void $cpp_base_name\:\:SetObjectStatus( object_status status )\n";
-    print CPP_FILE "{\n";
-    print CPP_FILE "    ((pub_$name*)_pub)->status = status;\n";
-    print CPP_FILE "}\n";
-    print CPP_FILE "\n";
-    print CPP_FILE "int $cpp_base_name\:\:Type()\n";
-    print CPP_FILE "{\n";
-
-    if ( $name =~ "interest_rate_feed" ) {
-        print CPP_FILE "    return 1;\n";
-    }
-    elsif ( $name =~ "discount_rate" ) {
-        print CPP_FILE "    return 2;\n";
-    }
-    elsif (  $name =~ "bond" ) {
-        print CPP_FILE "    return 3;\n";
-    }
-    elsif (  $name =~ "outright_trade" ) {
-        print CPP_FILE "    return 4;\n";
-    }
-    elsif (  $name =~ "repo_trade" ) {
-        print CPP_FILE "    return 5;\n";
-    }
-    elsif (  $name =~ "fx_rate_feed" ) {
-        print CPP_FILE "    return 6;\n";
-    }
-    else {
-        die "Type $name not catered for here";
-    }
     print CPP_FILE "}\n";
     print CPP_FILE "\n";
 
@@ -478,20 +445,52 @@ sub generate_cpp_base() {
 
 }
 
-sub generate_pub_struct()
+sub generate_struct()
 {
-    open PUB_STRUCT_FILE, ">$gen_root/objects/$pub_struct_filename" or die "Can't open $gen_root/objects/$h_filename for writing. Exiting";
+    open PUB_STRUCT_FILE, ">$gen_root/objects/$struct_filename" or die "Can't open $gen_root/objects/$h_filename for writing. Exiting";
 
     print PUB_STRUCT_FILE "\n";
-    print PUB_STRUCT_FILE "#ifndef __$pub_struct"."__\n";
-    print PUB_STRUCT_FILE "#define __$pub_struct"."__\n";
+    print PUB_STRUCT_FILE "#ifndef __$name"."__\n";
+    print PUB_STRUCT_FILE "#define __$name"."__\n";
     print PUB_STRUCT_FILE "\n";
     print PUB_STRUCT_FILE "#include <sys/types.h>\n";
     print PUB_STRUCT_FILE "\n";
     print PUB_STRUCT_FILE "typedef struct {\n";
-    print PUB_STRUCT_FILE "    time_t last_published;\n";
-    print PUB_STRUCT_FILE "    object_status status;\n";
-    print PUB_STRUCT_FILE "    int pid;\n";
+
+    print PUB_STRUCT_FILE "    // Header\n";
+
+    foreach $tuple ( @header, @common ) {
+
+        ( $type, $var ) = split / /, $tuple; 
+
+        print PUB_STRUCT_FILE "    $type $var;\n";
+
+    }
+
+    print PUB_STRUCT_FILE "\n";
+    print PUB_STRUCT_FILE "    // Sub\n";
+
+    foreach $tuple ( @sub ) {
+
+        ( $type, $var ) = split / /, $tuple; 
+
+        print PUB_STRUCT_FILE "    int $var;\n";
+
+    }
+
+    print PUB_STRUCT_FILE "\n";
+    print PUB_STRUCT_FILE "    // Static\n";
+
+    foreach $tuple ( @static ) {
+
+        ( $type, $var ) = split / /, $tuple; 
+
+        print PUB_STRUCT_FILE "    $type $var;\n";
+
+    }
+
+    print PUB_STRUCT_FILE "\n";
+    print PUB_STRUCT_FILE "    // Pub\n";
 
     foreach $tuple ( @pub, @mem_pub ) {
 
@@ -501,7 +500,8 @@ sub generate_pub_struct()
 
     }
 
-    print PUB_STRUCT_FILE "} pub_$name;\n";
+
+    print PUB_STRUCT_FILE "} $name;\n";
     print PUB_STRUCT_FILE "\n";
     print PUB_STRUCT_FILE "#endif\n";
 
@@ -536,9 +536,7 @@ sub load_defs($) {
 
         if ( $doing =~ /sub/ ) {
 
-            $line = trim( $line );
-            $line =~ s/ / _/;
-            push @sub, $line;
+            push @sub, trim( $line );
 
         }
         elsif ( $doing =~ /pub/ ) {
@@ -546,21 +544,18 @@ sub load_defs($) {
             $line =~ s/^ *//;
  
             if ( $line =~ '\[' ) {
-                push @mem_pub, $line;
+                push @mem_pub, trim( $line );
             }
             else {
-                push @pub, $line;
+                push @pub, trim( $line );
             }
         }
         elsif ( $doing =~ /static/ ) {
 
-            $line =~ s/^ *//;
-            $line =~ s/ / _/;
-            push @static, $line;
+            push @static, trim( $line );
         }
         else {
-            print "Error\n";
-            exit 0;
+            die "Error";
         }
 
     }
@@ -624,14 +619,39 @@ sub type2atoX($) {
     elsif ( $type =~ /double/ ) {
         return "atof";
     }
-    elsif ( $type =~ /string/ ) {
+    elsif ( $type =~ /string|char/ ) {
         return "";
     }
     elsif ( $type =~ /object_status/ ) {
         return "(object_status)atoi";
     }
     else {
-        return "atoi";
+        die "Odd type: $type";
     }
 }
 
+sub type2num($) {
+    my $type = shift;
+    
+    if ( $type =~ /interest_rate_feed/ ) {
+        return 1;
+    }
+    elsif ( $type =~ /discount_rate/ ) {
+        return 2;
+    }
+    elsif ( $type =~ /bond/ ) {
+        return 3;
+    }
+    elsif ( $type =~ /outright_trade/ ) {
+        return 4
+    }
+    elsif ( $type =~ /repo_trade/ ) {
+        return 5;
+    }
+    elsif ( $type =~ /fx_rate_feed/ ) {
+        return 6;
+    }
+    else {
+        die "Unknown type here";
+    }
+}
