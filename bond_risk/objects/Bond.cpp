@@ -13,17 +13,17 @@ bool Bond::Calculate()
     _coupon_date_vec.clear();
     _payment_vec.clear();
 
-    int days_between_coupons = (int)YEAR_BASIS / _coupons_per_year;
-    float coupon_rate_per_period = ( _coupon / 100 ) / _coupons_per_year;
+    int days_between_coupons = (int)YEAR_BASIS / GetCouponsPerYear();
+    float coupon_rate_per_period = ( GetCoupon() / 100 ) / GetCouponsPerYear();
 
-    int working_date = _start_date;
+    int working_date = GetStartDate();
 
     while ( working_date < TODAY )
     {
         working_date = working_date + days_between_coupons;
     }
 
-    while ( working_date < _maturity_date )
+    while ( working_date < GetMaturityDate()  )
     {
         _coupon_date_vec.push_back( working_date );
 
@@ -57,7 +57,7 @@ bool Bond::Calculate()
 
     }
 
-    ((pub_bond*)_pub)->price = price;
+    SetPrice( price ); 
 
 
     Notify();
@@ -68,7 +68,7 @@ Bond::Bond( int id )
 {
     cout << "Bond::Bond: "<< id << endl;
 
-    _pub = (pub_bond*)CreateShmem(sizeof(pub_bond));
+//    _pub = (bond*)CreateShmem(sizeof(bond));
 
     Init( id );
 }

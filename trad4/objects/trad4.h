@@ -29,6 +29,13 @@ typedef struct {
     int shmid[MAX_OBJECTS];
 } obj_loc;
 
+typedef struct {
+    time_t last_published;
+    object_status status;
+    int pid;
+    int type;
+} object_header;
+
 
 #define DBG cout << __FILE__ << ": " << __LINE__ << endl;
 

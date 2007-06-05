@@ -20,7 +20,7 @@ bool DiscountRate::Calculate()
 
     unsigned int indx;
 
-    vector<float> discount_rate;
+    vector<float> local_discount_rate;
 
     float normalised_interest_rate;
     float year_fraction;
@@ -33,7 +33,7 @@ bool DiscountRate::Calculate()
 
         discount_factor = exp( -normalised_interest_rate * year_fraction );
 
-        discount_rate.push_back( discount_factor );
+        local_discount_rate.push_back( discount_factor );
     }
 
     for (indx = 0; indx < INTEREST_RATE_LEN - 1 ; indx++)
@@ -41,17 +41,17 @@ bool DiscountRate::Calculate()
         current_period_start = _sub_interest_rate_feed->asof[indx];
         current_period_end = _sub_interest_rate_feed->asof[indx+1];
 
-        cout << "Grad calc[" << indx << "]: ( " << discount_rate[indx] << " - " << discount_rate[indx+1] << ") / (" << _sub_interest_rate_feed->asof[indx] << " - " << _sub_interest_rate_feed->asof[indx+1] << " )" <<  endl;
+        //cout << "Grad calc[" << indx << "]: ( " << local_discount_rate[indx] << " - " << local_discount_rate[indx+1] << ") / (" << _sub_interest_rate_feed->asof[indx] << " - " << _sub_interest_rate_feed->asof[indx+1] << " )" <<  endl;
 
-        gradient = (( discount_rate[indx] - discount_rate[indx+1] ) / ( _sub_interest_rate_feed->asof[indx] - _sub_interest_rate_feed->asof[indx+1] ) );
-        y_intercept = discount_rate[indx] - gradient * _sub_interest_rate_feed->asof[indx];
+        gradient = (( local_discount_rate[indx] - local_discount_rate[indx+1] ) / ( _sub_interest_rate_feed->asof[indx] - _sub_interest_rate_feed->asof[indx+1] ) );
+        y_intercept = local_discount_rate[indx] - gradient * _sub_interest_rate_feed->asof[indx];
 
-        cout << current_period_start << " to " << current_period_end << ", start_rate= "<< discount_rate[indx] << ", end_rate= << " << discount_rate[indx+1] << " gradient: " << gradient << " y-inter:" << y_intercept << endl;
+        //cout << current_period_start << " to " << current_period_end << ", start_rate= "<< local_discount_rate[indx] << ", end_rate= << " << local_discount_rate[indx+1] << " gradient: " << gradient << " y-inter:" << y_intercept << endl;
 
         for ( int i = current_period_start ; i <= current_period_end ; i++ )
         {
-            cout << "\tDate " << i << " index  " << i - DATE_RANGE_START << " rate: " <<(  i*gradient + y_intercept ) << endl;
-            ((pub_discount_rate*)_pub)->rate[i - DATE_RANGE_START] = (  i*gradient + y_intercept );
+            //cout << "\tDate " << i << " index  " << i - DATE_RANGE_START << " rate: " <<(  i*gradient + y_intercept ) << endl;
+            ((discount_rate*)_pub)->rate[i - DATE_RANGE_START] = (  i*gradient + y_intercept );
 
         }
 
@@ -65,7 +65,7 @@ DiscountRate::DiscountRate( int id )
 {
     cout << "DiscountRate::DiscountRate: "<< id << endl;
 
-    _pub = (pub_discount_rate*)CreateShmem(sizeof(pub_discount_rate));
+//    _pub = (discount_rate*)CreateShmem(sizeof(discount_rate));
 
     Init( id );
 }

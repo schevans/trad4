@@ -23,24 +23,23 @@ public:
     virtual void Init( int id ) = 0;
     virtual bool LoadFeedData() = 0;
     virtual bool Stop() = 0;
+    virtual int GetSleepTime() = 0;
 
-    virtual void SetObjectStatus( object_status status ) = 0;
+    void SetStatus( object_status status ) { ((object_header*)_pub)->status = status; }
     virtual bool Load() = 0;
-    virtual int Type() = 0;
+    virtual int GetType() { return ((object_header*)_pub)->type; }
 
 
 protected:
 
     int _id;
-    std::string _name;
-    int _shmid;
-    int _sleep_time;
-    int _log_level;
     std::string _data_file_name;
-
     obj_loc* _obj_loc;
-
     void* _pub;
+    int _shmid;
+
+    // XXX 
+    std::string _name;
 
 };
 

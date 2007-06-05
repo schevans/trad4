@@ -26,11 +26,11 @@ void CalcObject::Init( int id )
     }
 
     char file[20];
-    sprintf(file, "%d.%d.t4o", _id, Type() );
+    sprintf(file, "%d.%d.t4o", _id, GetType() );
 
     _data_file_name = strcat( data_dir, file );
 
-    SetObjectStatus( STARTING );
+    SetStatus( STARTING );
 
     cout << "Loading static.." << endl;
     Load();
@@ -52,12 +52,12 @@ void CalcObject::Run() {
     cout << "Attaching to subscriptions..." << endl;
 
     while ( ! AttachToSubscriptions() ) {
+        SetStatus( BLOCKED );
         cout << _name << " can't attach." << endl;
-        sleep(_sleep_time);
-        SetObjectStatus( BLOCKED );
+        sleep(GetSleepTime());
     }
 
-    SetObjectStatus( RUNNING );
+    SetStatus( RUNNING );
 
     while ( 1 ) {
 
@@ -69,7 +69,7 @@ cout << _name << ": Need refresh.." << endl;
             Calculate();
         }
 
-        sleep(_sleep_time);
+        sleep(GetSleepTime());
 
     }
 
@@ -93,7 +93,14 @@ cout << "sub shmid: " << sub_shmid << endl;
             exit(1);
         }
 
-        return shm;
+        if ( ((object_header*)(shm))->status != RUNNING ) {
+
+            return 0;
+        }
+        else {
+            return shm;
+        }
+
     }
     else
     {
