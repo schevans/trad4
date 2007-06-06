@@ -9,9 +9,9 @@ my $filename = $ARGV[0];
 
 my ( $prefix, $type, $suffix ) = split /\./, $filename;
 
-my $id =~ s/^.*/[0-9]*/
+#my $id =~ s/^.*/[0-9]*/;
 
-print "$filename:  $id, $type, $suffix\n";
+print "$filename:  $prefix, $id, $type, $suffix\n";
 
 system( "$ENV{TRAD4_ROOT}/bin/object $id $type" );
 

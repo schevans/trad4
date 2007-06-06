@@ -117,7 +117,7 @@ bool CalcObject::LoadFeedData()
 bool CalcObject::Stop()
 {
     cout << "Stopping " << _name << endl;
-    _obj_loc->shmid[_id] = 0;
+    SetStatus( STOPPED );
     Save();
 
     return true;
