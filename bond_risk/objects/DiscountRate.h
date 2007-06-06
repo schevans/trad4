@@ -9,7 +9,7 @@ class DiscountRate : public DiscountRateBase {
 
 public:
 
-    DiscountRate( int id );
+    DiscountRate( int id ) { _id = id; }
     virtual ~DiscountRate() {}
 
     virtual bool Calculate();

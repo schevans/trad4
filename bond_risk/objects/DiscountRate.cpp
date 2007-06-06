@@ -29,6 +29,7 @@ bool DiscountRate::Calculate()
     for (indx = 0; indx < INTEREST_RATE_LEN ; indx++)
     {
         normalised_interest_rate = _sub_interest_rate_feed->rate[indx] / 100;
+
         year_fraction = ( _sub_interest_rate_feed->asof[indx] - 10000 ) / YEAR_BASIS;
 
         discount_factor = exp( -normalised_interest_rate * year_fraction );
@@ -61,12 +62,4 @@ bool DiscountRate::Calculate()
     return true;
 }
 
-DiscountRate::DiscountRate( int id )
-{
-    cout << "DiscountRate::DiscountRate: "<< id << endl;
-
-//    _pub = (discount_rate*)CreateShmem(sizeof(discount_rate));
-
-    Init( id );
-}
 

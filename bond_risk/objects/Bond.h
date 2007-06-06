@@ -12,7 +12,7 @@ class Bond : public BondBase {
 
 public:
 
-    Bond( int id );
+    Bond( int id ) { _id = id; }
     virtual ~Bond() {}
 
     virtual bool Calculate();

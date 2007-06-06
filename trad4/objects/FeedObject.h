@@ -16,7 +16,6 @@ public:
     virtual ~FeedObject() {}
 
     void Run();
-    void Init( int id );
     virtual bool Stop();
 
     virtual bool LoadFeedData() = 0;

@@ -9,7 +9,7 @@ class InterestRateFeed : public InterestRateFeedBase {
 
 public:
 
-    InterestRateFeed( int id );
+    InterestRateFeed( int id ) { _id = id; }
     virtual ~InterestRateFeed() {}
 
     virtual bool LoadFeedData();

@@ -190,11 +190,11 @@ sub generate_h_base()
     print H_FILE "\n";
     print H_FILE "public:\n";
     print H_FILE "\n";
-    print H_FILE "    $cpp_base_name();\n";
     print H_FILE "    virtual ~$cpp_base_name() {}\n";
     print H_FILE "\n";
     print H_FILE "    virtual bool Load();\n";
-    print H_FILE "    virtual int Type() { return (($name*)_pub)->type; }\n";
+    print H_FILE "    virtual int Type() { return ".type2num( $name )."; }\n";
+    print H_FILE "    virtual int SizeOfStruct() { return sizeof($name); }\n";
 
     if ( ! $is_feed ) {
 
@@ -283,15 +283,6 @@ sub generate_cpp() {
 
     }
     print CPP_FILE "\n";
-    print CPP_FILE "$cpp_name\:\:$cpp_name( int id )\n";
-    print CPP_FILE "{\n";
-    print CPP_FILE "    cout << \"$cpp_name\:\:$cpp_name: \"<< id << endl;\n";
-    print CPP_FILE "\n";
-    print CPP_FILE "    _pub = ($name*)CreateShmem(sizeof($name));\n";
-    print CPP_FILE "\n";
-    print CPP_FILE "    Init( id );\n";
-    print CPP_FILE "}\n";
-    print CPP_FILE "\n";
 
     close CPP_FILE;
 }
@@ -312,16 +303,6 @@ sub generate_cpp_base() {
     print CPP_FILE "#include \"$h_base_filename\"\n";
     print CPP_FILE "\n";
     print CPP_FILE "using namespace std;\n";
-    print CPP_FILE "\n";
-
-    print CPP_FILE "$cpp_base_name\:\:$cpp_base_name()\n";
-    print CPP_FILE "{\n";
-    print CPP_FILE "cout << \"$cpp_base_name\:\:$cpp_base_name()\" << endl;\n";
-    print CPP_FILE "    _pub = ($name*)CreateShmem(sizeof($name));\n";
-
-    print CPP_FILE "    (($name*)_pub)->type = ".type2num( $name ).";;\n";
-    print CPP_FILE "\n";
-    print CPP_FILE "}\n";
     print CPP_FILE "\n";
 
 

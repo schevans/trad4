@@ -13,42 +13,6 @@
 
 using namespace std;
 
-void FeedObject::Init( int id )
-{
-    _id = id;
-
-    string data_dir( getenv( "DATA_DIR" ) );
-//    data_dir = getenv( "DATA_DIR" );
-
-    if ( data_dir.empty() )
-    {
-        cout << "DATA_DIR not set. Exiting" << endl;
-        exit(1);
-    }
-
-cout << "DDD: " << data_dir << endl;
-
-    ostringstream stream;
-    stream << data_dir << _id << "." << GetType() << ".t4o";
-
-    _data_file_name = stream.str();
-
-cout << "_data_file_name: " << _data_file_name << endl;
-
-    SetStatus( STARTING );
-
-    cout << "Loading static.." << endl;
-    Load();
-    cout << "Done loading static.." << endl;
-
-    AttachToObjLoc();
-   
-cout << "Setting _obj_loc->shmid[" << _id << "] = " << _shmid << endl;
- 
-    _obj_loc->shmid[_id] = _shmid;
-
-}
-
 void FeedObject::Run() 
 {
     cout << "FeedObject::Run()" << endl;
