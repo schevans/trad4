@@ -23,8 +23,6 @@ bool InterestRateFeed::LoadFeedData()
     while ( load_file >> record ) 
     {
 
-        cout << record << endl;
-
         tok = strtok( record, "," );
         ((interest_rate_feed*)_pub)->asof[counter] = atoi(tok);
         tok = strtok( NULL, "," );
