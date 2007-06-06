@@ -12,11 +12,76 @@
 #include <sys/shm.h>
 //#include <unistd.h> 
 #include <fstream>
+#include <sstream>
 
 #include "Object.h"
 
 using namespace std;
 
+void Object::Init() 
+{
+    cout << "Object::Init()" << endl;
+
+    AttachToObjLoc();
+
+    if ( _obj_loc->shmid[_id] ) 
+    {
+        cout << "Shmid found for this object" << endl;
+
+        int shmid = _obj_loc->shmid[_id];
+
+        void* shm;
+
+        if ((shm = shmat(shmid, NULL, 0)) == (char *) -1) {
+            perror("shmat");
+            exit(1);
+        }
+
+        if ( ((object_header*)(shm))->status == RUNNING ) {
+
+            cout << "Object already running" << endl;
+            exit(0);
+        }
+        else {
+            cout << "Object has status " << ((object_header*)(shm))->status << endl;
+
+            _pub = shm;
+        }
+
+    }
+    else
+    {
+cout << "Creating shmem" << endl;
+        _pub = CreateShmem(SizeOfStruct());
+        _obj_loc->shmid[_id] = _shmid;
+    }
+
+    SetStatus( STARTING );
+
+DBG
+    string data_dir( getenv( "DATA_DIR" ));
+
+    if ( data_dir.empty() )
+    {
+        cout << "DATA_DIR not set. Exiting" << endl;
+        exit(1);
+    }
+
+    ostringstream stream;
+    stream << data_dir << _id << "." << Type() << ".t4o";
+
+    _data_file_name = stream.str();
+
+DBG
+
+DBG
+    cout << "Loading static.." << endl;
+    Load();
+    cout << "Done loading static.." << endl;
+DBG
+
+
+}
 
 void* Object::CreateShmem( size_t pub_size )
 {

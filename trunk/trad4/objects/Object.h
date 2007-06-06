@@ -20,14 +20,15 @@ public:
     bool Notify();
 
     virtual void Run() = 0;
-    virtual void Init( int id ) = 0;
+    virtual void Init();
     virtual bool LoadFeedData() = 0;
     virtual bool Stop() = 0;
     virtual int GetSleepTime() = 0;
+    virtual int SizeOfStruct() = 0;
+    virtual int Type() = 0;
 
     void SetStatus( object_status status ) { ((object_header*)_pub)->status = status; }
     virtual bool Load() = 0;
-    virtual int GetType() { return ((object_header*)_pub)->type; }
 
 
 protected:

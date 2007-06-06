@@ -12,40 +12,6 @@
 
 using namespace std;
 
-void CalcObject::Init( int id )
-{
-    _id = id;
-
-    char* data_dir;
-    data_dir = getenv( "DATA_DIR" );
-
-    if ( data_dir == NULL )
-    {
-        cout << "DATA_DIR not set. Exiting" << endl;
-        exit(1);
-    }
-
-    char file[20];
-    sprintf(file, "%d.%d.t4o", _id, GetType() );
-
-    _data_file_name = strcat( data_dir, file );
-
-    SetStatus( STARTING );
-
-    cout << "Loading static.." << endl;
-    Load();
-    cout << "Done loading static.." << endl;
-
-    AttachToObjLoc();
-
-cout << "_obj_loc2: " << _obj_loc << endl;
-
-
-
-    _obj_loc->shmid[_id] = _shmid;
-
-}
-
 void CalcObject::Run() {
     cout << "CalcObject::Run()" << endl;
 

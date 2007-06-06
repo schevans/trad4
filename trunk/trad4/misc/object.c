@@ -52,12 +52,15 @@ int main(int argc,char *argv[]) {
             exit(0);
     }
    
-
-    cout << "About to ObjectFactory::createObject: id=" << id << ", type=" << type << endl;
+    cout << "Creating object.." << endl;
 
     object = ObjectFactory::createObject( id, type );
 
-    cout << "About to object->Run()" << endl;
+    cout << "Initing object.." << endl;
+
+    object->Init();
+
+    cout << "Running object.." << endl;
 
     object->Run();
 

@@ -12,6 +12,25 @@ bool InterestRateFeed::LoadFeedData()
 {
     cout << "InterestRateFeed::LoadFeedData()" << endl;
 
+    if ( _feed_file.empty() )
+    {
+
+        string feed_data_dir( getenv( "DATA_DIR" ) );
+
+        if ( feed_data_dir.empty() )
+        {
+            cout << "DATA_DIR not set. Exiting" << endl;
+            exit(1);
+        }
+
+        ostringstream stream;
+        stream << feed_data_dir << _id << "." << Type() << ".t4d";
+        cout << "SS" << feed_data_dir << endl;
+
+        _feed_file = stream.str();
+
+    }
+
     fstream load_file(_feed_file.c_str(), ios::in);
 
     char record[MAX_OB_FILE_LEN];
@@ -37,33 +56,5 @@ bool InterestRateFeed::LoadFeedData()
 
     Notify();
     return true;
-}
-
-InterestRateFeed::InterestRateFeed( int id )
-{
-    cout << "InterestRateFeed::InterestRateFeed: "<< id << endl;
-
-//    _pub = (interest_rate_feed*)CreateShmem(sizeof(interest_rate_feed));
-
-    Init( id );
-
-    string data_dir( getenv( "DATA_DIR" ) );
-
-    if ( data_dir.empty() )
-    {
-        cout << "DATA_DIR not set. Exiting" << endl;
-        exit(1);
-    }
-
-    ostringstream stream;
-    stream << data_dir << _id << "." << Type() << ".t4d";
-
-    _feed_file = stream.str();
-
-
-cout << "data_file_name: " << _feed_file << endl;
-
-
-
 }
 

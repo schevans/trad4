@@ -64,12 +64,4 @@ bool Bond::Calculate()
     return true;
 }
 
-Bond::Bond( int id )
-{
-    cout << "Bond::Bond: "<< id << endl;
-
-//    _pub = (bond*)CreateShmem(sizeof(bond));
-
-    Init( id );
-}
 
