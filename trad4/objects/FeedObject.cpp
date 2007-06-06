@@ -66,6 +66,6 @@ void FeedObject::Run()
 bool FeedObject::Stop() 
 {
     cout << "Stopping " << _name << endl;
-    _obj_loc->shmid[_id] = 0;
+    SetStatus( STOPPED );
     return true;
 }

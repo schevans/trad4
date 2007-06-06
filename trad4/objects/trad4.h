@@ -34,6 +34,8 @@ typedef struct {
     object_status status;
     int pid;
     int type;
+    char* name;
+    int sleep_time;
 } object_header;
 
 
