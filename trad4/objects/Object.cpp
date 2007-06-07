@@ -51,7 +51,7 @@ void Object::Init()
     }
     else
     {
-cout << "Creating shmem" << endl;
+        cout << "Creating shmem" << endl;
         _pub = CreateShmem(SizeOfStruct());
         _obj_loc->shmid[_id] = _shmid;
     }
@@ -59,8 +59,8 @@ cout << "Creating shmem" << endl;
     SetStatus( STARTING );
 
     ((object_header*)_pub)->type = Type(); 
-cout << "TYPE2: " << Type() << endl;
-DBG
+    ((object_header*)_pub)->pid = getpid(); 
+
     string data_dir( getenv( "DATA_DIR" ));
 
     if ( data_dir.empty() )
@@ -72,17 +72,12 @@ DBG
     ostringstream stream;
     stream << data_dir << _id << "." << Type() << ".t4o";
 
-cout << "Type: " << Type() << endl;
-
     _data_file_name = stream.str();
-cout << "_data_file_name:" << _data_file_name << endl;
-DBG
 
-DBG
     cout << "Loading static.." << endl;
     Load();
     cout << "Done loading static.." << endl;
-DBG
+
 
 
 }
