@@ -58,6 +58,8 @@ cout << "Creating shmem" << endl;
 
     SetStatus( STARTING );
 
+    ((object_header*)_pub)->type = Type(); 
+
 DBG
     string data_dir( getenv( "DATA_DIR" ));
 
