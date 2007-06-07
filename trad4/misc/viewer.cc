@@ -11,6 +11,8 @@ using namespace std;
 
 #include "../objects/trad4.h"
 
+#include "time.h"
+
 class ObjectViewer : public Gtk::Window
 {
 
@@ -44,7 +46,7 @@ protected:
         Gtk::TreeModelColumn<Glib::ustring> _col_name;
         Gtk::TreeModelColumn<Glib::ustring> _col_status;
         Gtk::TreeModelColumn<int> _col_sleep_time;
-        Gtk::TreeModelColumn<int> _col_last_published;
+        Gtk::TreeModelColumn<Glib::ustring> _col_last_published;
         Gtk::TreeModelColumn<int> _col_shmid;
         Gtk::TreeModelColumn<int> _col_pid;
     };
@@ -65,6 +67,7 @@ protected:
 
     obj_loc* _obj_loc;
 
+    std::string TimeToString( time_t time );
 };
 
 
@@ -158,7 +161,7 @@ ObjectViewer::ObjectViewer()
 
             _object_headers[id] = ((object_header*)tmp);
 
-            row[_columns._col_last_published] = _object_headers[id]->last_published;
+            row[_columns._col_last_published] = TimeToString( _object_headers[id]->last_published );
             row[_columns._col_type] = _type_vec[_object_headers[id]->type];
             row[_columns._col_name] = _object_headers[id]->name;
             row[_columns._col_sleep_time] = _object_headers[id]->sleep_time;
@@ -199,19 +202,25 @@ bool ObjectViewer::Refresh( int timer_number)
         row = my_rows[i];
         id  = row[_columns._col_id];
 
-        row[_columns._col_last_published] = _object_headers[id]->last_published;
+        row[_columns._col_last_published] = TimeToString( _object_headers[id]->last_published );
         row[_columns._col_type] = _type_vec[_object_headers[id]->type];
         row[_columns._col_name] = _object_headers[id]->name;
         row[_columns._col_sleep_time] = _object_headers[id]->sleep_time;
         row[_columns._col_shmid] = _obj_loc->shmid[id];
         row[_columns._col_status] = _status_vec[_object_headers[id]->status];
+        row[_columns._col_pid] = _object_headers[id]->pid;
 
     }
     
     return true;
 }
 
+std::string ObjectViewer::TimeToString( time_t time )
+{
+    string temp_time = ctime(&time);
 
+    return temp_time.substr( 11, 8 );
+}
 
 #include <gtkmm/main.h>
 
