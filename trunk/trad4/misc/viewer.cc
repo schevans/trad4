@@ -161,11 +161,10 @@ ObjectViewer::ObjectViewer()
             row[_columns._col_last_published] = _object_headers[id]->last_published;
             row[_columns._col_type] = _type_vec[_object_headers[id]->type];
             row[_columns._col_name] = _object_headers[id]->name;
-
-cout << "Name: " << _object_headers[id]->name << endl;
             row[_columns._col_sleep_time] = _object_headers[id]->sleep_time;
             row[_columns._col_shmid] = _obj_loc->shmid[id];
             row[_columns._col_status] = _status_vec[_object_headers[id]->status];
+            row[_columns._col_pid] = _object_headers[id]->pid;
             row[_columns._col_id] = id;
 
             my_rows.push_back( row );
