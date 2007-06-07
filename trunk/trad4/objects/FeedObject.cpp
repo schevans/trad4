@@ -29,7 +29,7 @@ void FeedObject::Run()
 
 bool FeedObject::Stop() 
 {
-    cout << "Stopping " << _name << endl;
+    cout << "Stopping " << GetName() << endl;
     SetStatus( STOPPED );
     return true;
 }
