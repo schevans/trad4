@@ -58,7 +58,7 @@ my $obj_root=$ENV{INSTANCE_ROOT}."/objects";
 
 my ( @sub, @pub, @mem_pub, @static, @common, @header );
 
-@common = ( "char* name",
+@common = ( "char name[OBJECT_NAME_LEN]",
             "int sleep_time" );
 
 @header = ( "time_t last_published",
@@ -207,8 +207,8 @@ sub generate_h_base()
 
     print H_FILE "\n";
 
-    print H_FILE "    std::string GetName() { return _name; }\n";
-    print H_FILE "    void SetName( std::string name ) { _name = name; }\n";
+    print H_FILE "    std::string GetName() { return (($name*)_pub)->name; }\n";
+    print H_FILE "    void SetName( std::string name );\n";
     print H_FILE "\n";
     print H_FILE "    virtual int GetSleepTime() { return (($name*)_pub)->sleep_time; }\n";
     print H_FILE "    void SetSleepTime( int sleep_time ) { (($name*)_pub)->sleep_time = sleep_time; }\n";
@@ -369,7 +369,10 @@ sub generate_cpp_base() {
         print CPP_FILE "\n";
         print CPP_FILE "    save_file <<\n";
 
-        foreach $tuple ( @common, @sub, @static, @pub ) {
+        print CPP_FILE "        GetName() << \",\" <<\n";
+        print CPP_FILE "        GetSleepTime() << \",\" <<\n";
+
+        foreach $tuple ( @sub, @static, @pub ) {
 
             ( $type, $var ) = split / /, $tuple;
 
@@ -404,7 +407,13 @@ sub generate_cpp_base() {
     print CPP_FILE "\n";
     print CPP_FILE "    tok = strtok( record, \",\" );\n";
 
-    foreach $tuple ( @common, @sub, @static, @pub ) {
+    print CPP_FILE "    SetName( (tok) );\n";
+    print CPP_FILE "    tok = strtok( NULL, \",\" );\n";
+
+    print CPP_FILE "    SetSleepTime( atoi(tok) );\n";
+    print CPP_FILE "    tok = strtok( NULL, \",\" );\n";
+
+    foreach $tuple ( @sub, @static, @pub ) {
 
         ( $type, $var ) = split / /, $tuple;
 
@@ -421,6 +430,13 @@ sub generate_cpp_base() {
     print CPP_FILE "    return true;\n";
     print CPP_FILE "}\n";
     print CPP_FILE "\n";
+    print CPP_FILE "void $cpp_base_name\:\:SetName( std::string name )\n";
+    print CPP_FILE "{\n";
+    print CPP_FILE "    for ( int i = 0 ; i < OBJECT_NAME_LEN ; i++ )\n";
+    print CPP_FILE "    {\n";
+    print CPP_FILE "        (($name*)_pub)->name[i] = name[i];\n";
+    print CPP_FILE "    }\n";
+    print CPP_FILE "}\n";
 
     close CPP_FILE;
 

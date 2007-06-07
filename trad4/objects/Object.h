@@ -23,6 +23,7 @@ public:
     virtual void Init();
     virtual bool LoadFeedData() = 0;
     virtual bool Stop() = 0;
+    virtual std::string GetName() = 0;
     virtual int GetSleepTime() = 0;
     virtual int SizeOfStruct() = 0;
     virtual int Type() = 0;
@@ -38,9 +39,6 @@ protected:
     obj_loc* _obj_loc;
     void* _pub;
     int _shmid;
-
-    // XXX 
-    std::string _name;
 
 };
 

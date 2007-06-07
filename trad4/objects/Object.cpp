@@ -59,7 +59,7 @@ cout << "Creating shmem" << endl;
     SetStatus( STARTING );
 
     ((object_header*)_pub)->type = Type(); 
-
+cout << "TYPE2: " << Type() << endl;
 DBG
     string data_dir( getenv( "DATA_DIR" ));
 
@@ -72,8 +72,10 @@ DBG
     ostringstream stream;
     stream << data_dir << _id << "." << Type() << ".t4o";
 
-    _data_file_name = stream.str();
+cout << "Type: " << Type() << endl;
 
+    _data_file_name = stream.str();
+cout << "_data_file_name:" << _data_file_name << endl;
 DBG
 
 DBG

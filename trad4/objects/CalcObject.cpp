@@ -19,7 +19,7 @@ void CalcObject::Run() {
 
     while ( ! AttachToSubscriptions() ) {
         SetStatus( BLOCKED );
-        cout << _name << " can't attach." << endl;
+        cout << GetName() << " can't attach." << endl;
         sleep(GetSleepTime());
     }
 
@@ -27,11 +27,11 @@ void CalcObject::Run() {
 
     while ( 1 ) {
 
-cout << _name << ": Looping.." << endl;
+cout << GetName() << ": Looping.." << endl;
 
         if ( NeedRefresh() )
         {
-cout << _name << ": Need refresh.." << endl;
+cout << GetName() << ": Need refresh.." << endl;
             Calculate();
         }
 
@@ -82,7 +82,7 @@ bool CalcObject::LoadFeedData()
 
 bool CalcObject::Stop()
 {
-    cout << "Stopping " << _name << endl;
+    cout << "Stopping " << GetName() << endl;
     SetStatus( STOPPED );
     Save();
 

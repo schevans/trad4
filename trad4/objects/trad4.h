@@ -12,6 +12,8 @@
 #define MAX_OB_FILE_LEN 100
 #define MAX_OB_FILE_NAME 20
 
+#define OBJECT_NAME_LEN 32
+
 enum log_level {
     NONE,
 };
@@ -34,7 +36,7 @@ typedef struct {
     object_status status;
     int pid;
     int type;
-    char* name;
+    char name[OBJECT_NAME_LEN];
     int sleep_time;
 } object_header;
 
