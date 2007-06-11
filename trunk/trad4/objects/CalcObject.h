@@ -23,6 +23,7 @@ public:
     virtual bool LoadFeedData();
 
     virtual bool AttachToSubscriptions() = 0;
+    virtual bool CheckSubscriptions() = 0;
     virtual bool Save() = 0;
     virtual bool Load() = 0;
     virtual bool NeedRefresh() = 0;

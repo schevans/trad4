@@ -24,6 +24,8 @@ void Object::Init()
 
     AttachToObjLoc();
 
+    _shmem_created = false;
+
     if ( _obj_loc->shmid[_id] ) 
     {
         cout << "Shmid found for this object" << endl;
@@ -34,13 +36,13 @@ void Object::Init()
 
         if ((shm = shmat(shmid, NULL, 0)) == (char *) -1) {
             perror("shmat");
-            exit(1);
+            ExitOnError();
         }
 
         if ( ((object_header*)(shm))->status == RUNNING ) {
 
             cout << "Object already running" << endl;
-            exit(0);
+            ExitOnError();
         }
         else {
             cout << "Object has status " << ((object_header*)(shm))->status << endl;
@@ -66,7 +68,7 @@ void Object::Init()
     if ( data_dir.empty() )
     {
         cout << "DATA_DIR not set. Exiting" << endl;
-        exit(1);
+        ExitOnError();
     }
 
     ostringstream stream;
@@ -89,15 +91,17 @@ void* Object::CreateShmem( size_t pub_size )
 
     if ((_shmid = shmget(IPC_PRIVATE, pub_size, IPC_CREAT | 0600)) == -1)
     {
-        perror("shmget: shmget failed"); exit(1);
+        perror("shmget: shmget failed"); ExitOnError();
     }
 
     void* shm;
 
     if ((shm = shmat(_shmid, NULL, 0)) == (char *) -1) {
         perror("shmat");
-        exit(1);
+        ExitOnError();
     }
+
+    _shmem_created = true;
 
     return shm;
 
@@ -110,7 +114,7 @@ bool Object::AttachToObjLoc()
     if ( obj_loc_file == NULL )
     {
         cout << "OBJ_LOC_FILE not set. Exiting" << endl;
-        exit(1);
+        ExitOnError();
     }
 
     fstream in_file(obj_loc_file, ios::in);
@@ -118,7 +122,7 @@ bool Object::AttachToObjLoc()
     if ( ! in_file ) 
     {
         cout << "obj_loc not running. Exiting." << endl;
-        exit (1);
+        ExitOnError();
     }
 
     char shmid_char[20]; //XXX
@@ -127,19 +131,28 @@ bool Object::AttachToObjLoc()
 
     cout << "Attaching to obj_loc shmid: " << shmid_char << endl;
 
-    int shmid = atoi(shmid_char);
+    _obj_loc_shmid = atoi(shmid_char);
 
     void* shm;
 
-    if ((shm = shmat(shmid, NULL, 0)) == (char *) -1) {
+    if ((shm = shmat(_obj_loc_shmid, NULL, 0)) == (char *) -1) {
         perror("shmat");
-        exit(1);
+        ExitOnError();
     }
 
     _obj_loc = (obj_loc*)shm;
 
 cout << "_obj_loc: " << _obj_loc << endl;
 
+    return true;
+}
+
+bool Object::DetachFromObjLoc()
+{
+    if (shmdt( _obj_loc ) == -1) {
+        perror("shmdt");
+    }
+    
     return true;
 }
 
@@ -154,3 +167,19 @@ bool Object::Notify()
     return true;
 }
 
+void Object::ExitOnError()
+{
+    cout << "Object::ExitOnError()" << endl;
+
+    if ( _shmem_created )
+    {
+        if (shmctl(_shmid, IPC_RMID, 0) == -1) {
+            perror("shmctl IPC_RMID: ");
+        }
+        _obj_loc->shmid[_id] = 0;
+    }
+
+    DetachFromObjLoc();
+    
+    exit(1);
+}

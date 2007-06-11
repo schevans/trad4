@@ -199,6 +199,7 @@ sub generate_h_base()
     if ( ! $is_feed ) {
 
         print H_FILE "    virtual bool AttachToSubscriptions();\n";
+        print H_FILE "    virtual bool CheckSubscriptions();\n";
         print H_FILE "    virtual bool Calculate() = 0;\n";
         print H_FILE "    virtual bool NeedRefresh();\n";
         print H_FILE "    virtual bool Save();\n";
@@ -346,6 +347,44 @@ sub generate_cpp_base() {
 
         print CPP_FILE "}\n";
         print CPP_FILE "\n";
+        print CPP_FILE "bool $cpp_base_name\:\:CheckSubscriptions()\n";
+        print CPP_FILE "{\n";
+
+        if ( @sub ) {
+
+            print CPP_FILE "    if ( ";
+
+            foreach $tuple ( @sub ) {
+
+                ( $type, $var ) = split / /, $tuple; 
+
+                print CPP_FILE "_sub_$var->status != RUNNING || ";
+
+            }
+
+            print CPP_FILE " 0 )\n";
+            print CPP_FILE "        SetStatus(STALE);\n";
+
+            print CPP_FILE "    else if ( ";
+
+            foreach $tuple ( @sub ) {
+
+                ( $type, $var ) = split / /, $tuple; 
+
+                print CPP_FILE "_sub_$var->status == RUNNING && ";
+
+            }
+
+            print CPP_FILE " 1 )\n";
+
+            print CPP_FILE "        SetStatus(RUNNING);\n";
+        }
+
+        print CPP_FILE "\n";
+        print CPP_FILE "    return true;\n";
+        print CPP_FILE "}\n";
+
+        print CPP_FILE "\n";
         print CPP_FILE "bool $cpp_base_name\:\:NeedRefresh()\n";
         print CPP_FILE "{\n";
       
@@ -397,21 +436,24 @@ sub generate_cpp_base() {
     print CPP_FILE "{\n";
     print CPP_FILE "    fstream load_file(_data_file_name.c_str(), ios::in);\n";
     print CPP_FILE "\n";
-    print CPP_FILE "    char record[MAX_OB_FILE_LEN];\n";
+    print CPP_FILE "    if ( load_file.is_open() )\n";
+    print CPP_FILE "    {\n";
     print CPP_FILE "\n";
-    print CPP_FILE "    load_file >> record;\n";
+    print CPP_FILE "        char record[MAX_OB_FILE_LEN];\n";
     print CPP_FILE "\n";
-    print CPP_FILE "    cout << record << endl;\n";
+    print CPP_FILE "        load_file >> record;\n";
     print CPP_FILE "\n";
-    print CPP_FILE "    char* tok;\n";
+    print CPP_FILE "        cout << record << endl;\n";
     print CPP_FILE "\n";
-    print CPP_FILE "    tok = strtok( record, \",\" );\n";
+    print CPP_FILE "        char* tok;\n";
+    print CPP_FILE "\n";
+    print CPP_FILE "        tok = strtok( record, \",\" );\n";
 
-    print CPP_FILE "    SetName( (tok) );\n";
-    print CPP_FILE "    tok = strtok( NULL, \",\" );\n";
+    print CPP_FILE "        SetName( (tok) );\n";
+    print CPP_FILE "        tok = strtok( NULL, \",\" );\n";
 
-    print CPP_FILE "    SetSleepTime( atoi(tok) );\n";
-    print CPP_FILE "    tok = strtok( NULL, \",\" );\n";
+    print CPP_FILE "        SetSleepTime( atoi(tok) );\n";
+    print CPP_FILE "        tok = strtok( NULL, \",\" );\n";
 
     foreach $tuple ( @sub, @static, @pub ) {
 
@@ -419,13 +461,21 @@ sub generate_cpp_base() {
 
         my $camel_var = lower2camel_case( $var );
 
-        print CPP_FILE "    Set$camel_var( ".type2atoX($type)."(tok) );\n";
-        print CPP_FILE "    tok = strtok( NULL, \",\" );\n";
+        print CPP_FILE "        Set$camel_var( ".type2atoX($type)."(tok) );\n";
+        print CPP_FILE "        tok = strtok( NULL, \",\" );\n";
 
     }
+    print CPP_FILE "\n";
+    print CPP_FILE "        load_file.close();\n";
 
     print CPP_FILE "\n";
-    print CPP_FILE "    load_file.close();\n";
+    print CPP_FILE "    }\n";
+    print CPP_FILE "    else\n";
+    print CPP_FILE "    {\n";
+    print CPP_FILE "        cout << \"Could not open file \" << _data_file_name << \". Exiting.\" << endl;\n";
+    print CPP_FILE "        ExitOnError();\n";
+    print CPP_FILE "    }\n";
+    print CPP_FILE "\n";
     print CPP_FILE "\n";
     print CPP_FILE "    return true;\n";
     print CPP_FILE "}\n";
