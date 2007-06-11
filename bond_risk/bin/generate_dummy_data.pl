@@ -15,8 +15,10 @@ sub generate_object($$);
 my $current_id = 20;
 
 
-my @discount_rate_ids;
+my %discount_rate_ids;
 my @interest_rate_ids;
+my %bond_ccys;
+my %fx_rates;
 
 
 my @coup_pys = ( 1, 2, 4 );
@@ -33,22 +35,20 @@ my $interest_rate_file=$dummy_data_root."/dummy_interest_rate.sql";
 my @bond_ids;
 
 generate_interest_rates();
-#generate_discount_rates();
-#generate_fx_rates();
-#generate_bonds( 400 );
-#generate_outright_trades( 2000 );
-#generate_repo_trades( 2000 );
+generate_discount_rates();
+generate_fx_rates();
+generate_bonds( 10 );
+generate_outright_trades( 10 );
+generate_repo_trades( 10 );
 
 sub generate_interest_rates() {
 
     my $id = 1;
-    my $file = "$dummy_data_root/$id.1.t4o";
-    my $data_file = "$dummy_data_root/$id.1.t4d";
-
-    open FILE, ">$file" or die "Can't open $file";
+    my $FILE = open_file( $id, 1 ); 
     print FILE "LIBOR-USD,5,1,\n";
-    close FILE;
+    close $FILE;
 
+    my $data_file = "$dummy_data_root/$id.1.t4d";
     open FILE, ">$data_file" or die "Can't open $data_file";
 
     print FILE "10000,2.6\n";
@@ -66,13 +66,11 @@ sub generate_interest_rates() {
     push @interest_rate_ids, $id;
 
     $id = 2;
-    $file = "$dummy_data_root/$id.1.t4o";
+    $FILE = open_file( $id, 1 ); 
+    print $FILE "LIBOR-GBP,5,1,\n";
+    close $FILE;
+
     $data_file = "$dummy_data_root/$id.1.t4d";
-
-    open FILE, ">$file" or die "Can't open $file";
-    print FILE "LIBOR-GBP,5,1,\n";
-    close FILE;
-
     open FILE, ">$data_file" or die "Can't open $data_file";
 
     print FILE "10000,5.2\n";
@@ -90,13 +88,11 @@ sub generate_interest_rates() {
     push @interest_rate_ids, $id;
 
     $id = 3;
-    $file = "$dummy_data_root/$id.1.t4o";
+    $FILE = open_file( $id, 1 ); 
+    print $FILE "LIBOR-EUR,5,1,\n";
+    close $FILE;
+
     $data_file = "$dummy_data_root/$id.1.t4d";
-
-    open FILE, ">$file" or die "Can't open $file";
-    print FILE "LIBOR-EUR,5,1,\n";
-    close FILE;
-
     open FILE, ">$data_file" or die "Can't open $data_file";
 
     print FILE "10000,3.6\n";
@@ -119,33 +115,33 @@ sub generate_interest_rates() {
 
 sub generate_discount_rates() {
 
-    open FILE, ">$discount_rate_file" or die "Can't open $discount_rate_file";
+    my $FILE;
 
-    print FILE "delete from discount_rate;\n";
-    
     my $id = get_next_id();
     my $name = "DISCO-USD";
     my $ccy = 1;
-    print FILE "insert into object select $id, number, \"$name\", 5, 1 from object_type where name = \"discount_rate\"\;\n";
-    print FILE "insert into discount_rate values ( $id, $ccy, $interest_rate_ids[$ccy-1] );\n";
 
-    push @discount_rate_ids, $id;
+    $FILE = open_file( $id, 2 );
+    print $FILE "DISCO-USD,5,$interest_rate_ids[$ccy-1],$ccy,";
+    close $FILE;
+
+    $discount_rate_ids{$ccy} = $id;
 
     $id = get_next_id();
-    $name = "DISCO-GBP";
     $ccy = 2;
-    print FILE "insert into object select $id, number, \"$name\", 5, 1 from object_type where name = \"discount_rate\"\;\n";
-    print FILE "insert into discount_rate values ( $id, $ccy, $interest_rate_ids[$ccy-1] );\n";
+    $FILE = open_file( $id, 2 );
+    print $FILE "DISCO-GBP,5,$interest_rate_ids[$ccy-1],$ccy,";
+    close $FILE;
 
-    push @discount_rate_ids, $id;
+    $discount_rate_ids{$ccy} = $id;
 
     $id = get_next_id();
-    $name = "DISCO-EUR";
     $ccy = 3;
-    print FILE "insert into object select $id, number, \"$name\", 5, 1 from object_type where name = \"discount_rate\"\;\n";
-    print FILE "insert into discount_rate values ( $id, $ccy, ".$interest_rate_ids[$ccy-1]." );\n";
+    $FILE = open_file( $id, 2 );
+    print $FILE "DISCO-EUR,5,$interest_rate_ids[$ccy-1],$ccy,";
+    close $FILE;
 
-    push @discount_rate_ids, $id;
+    $discount_rate_ids{$ccy} = $id;
 
     close FILE;
 }
@@ -153,117 +149,118 @@ sub generate_discount_rates() {
 
 sub generate_fx_rates() {
 
-    open FILE, ">$fx_rate_file" or die "Can't open $fx_rate_file";
+    my $FILE;
 
-    print FILE "delete from fx_rate;\n";
-    
     my $id = 4;
-    my $name = "USD-GBP";
-    print FILE "insert into object select $id, number, \"$name\", 5, 1 from object_type where name = \"fx_rate\"\;\n";
-    print FILE "insert into fx_rate values ( $id, 1, 2, 0, 0.509242756 )\;\n";
+    $FILE = open_file( $id, 6 );
+    print $FILE "USD-GBP,5,1,2,0.509242756,\n";
+    close $FILE;
+    $fx_rates{12} = $id;
 
     $id = 5;
-    $name = "GBP-EUR";
-    print FILE "insert into object select $id, number, \"$name\", 5, 1 from object_type where name = \"fx_rate\"\;\n";
-    print FILE "insert into fx_rate values ( $id, 2, 3, 0, 1.4734749 )\;\n";
+    $FILE = open_file( $id, 6 );
+    print $FILE "GBP-EUR,5,2,3,1.4734749,\n";
+    close $FILE;
+    $fx_rates{23} = $id;
 
     $id = 6;
-    $name = "EUR-USD";
-    print FILE "insert into object select $id, number, \"$name\", 5, 1 from object_type where name = \"fx_rate\"\;\n";
-    print FILE "insert into fx_rate values ( $id, 3, 1, 0, 1.3327 )\;\n";
+    $FILE = open_file( $id, 6 );
+    print $FILE "EUR-USD,5,3,1,1.3327,\n";
+    close $FILE;
+    $fx_rates{31} = $id;
 
     $id = 7;
-    $name = "GBP-USD";
-    print FILE "insert into object select $id, number, \"$name\", 5, 1 from object_type where name = \"fx_rate\"\;\n";
-    print FILE "insert into fx_rate values ( $id, 2, 1, 0, 1.0/0.509242756 )\;\n";
+    $FILE = open_file( $id, 6 );
+    print $FILE "GBP-USD,5,2,1,".(1.0/0.509242756).",\n";
+    close $FILE;
+    $fx_rates{21} = $id;
 
     $id = 8;
-    $name = "EUR-GBP";
-    print FILE "insert into object select $id, number, \"$name\", 5, 1 from object_type where name = \"fx_rate\"\;\n";
-    print FILE "insert into fx_rate values ( $id, 3, 2, 0, 1.0/1.4734749 )\;\n";
+    $FILE = open_file( $id, 6 );
+    print $FILE "EUR-GBP,5,3,2,".(1.0/1.4734749).",\n";
+    close $FILE;
+    $fx_rates{32} = $id;
 
     $id = 10;
-    $name = "USD-EUR";
-    print FILE "insert into object select $id, number, \"$name\", 5, 1 from object_type where name = \"fx_rate\"\;\n";
-    print FILE "insert into fx_rate values ( $id, 1, 3, 0, 1.0/1.3327 )\;\n";
+    $FILE = open_file( $id, 6 );
+    print $FILE "USD-EUR,5,1,3,".(1.0/1.3327).",\n";
+    close $FILE;
+    $fx_rates{13} = $id;
 
     $id = 11;
-    $name = "USD-USD";
-    print FILE "insert into object select $id, number, \"$name\", 5, 1 from object_type where name = \"fx_rate\"\;\n";
-    print FILE "insert into fx_rate values ( $id, 1, 1, 0, 1.0 )\;\n";
+    $FILE = open_file( $id, 6 );
+    print $FILE "USD-USD,5,1,1,1.0,\n";
+    close $FILE;
+    $fx_rates{11} = $id;
 
     $id = 12;
-    $name = "GBP-GBP";
-    print FILE "insert into object select $id, number, \"$name\", 5, 1 from object_type where name = \"fx_rate\"\;\n";
-    print FILE "insert into fx_rate values ( $id, 2, 2, 0, 1.0 )\;\n";
+    $FILE = open_file( $id, 6 );
+    print $FILE "GBP-GBP,5,2,2,1.0,\n";
+    close $FILE;
+    $fx_rates{22} = $id;
 
     $id = 13;
-    $name = "EUR-EUR";
-    print FILE "insert into object select $id, number, \"$name\", 5, 1 from object_type where name = \"fx_rate\"\;\n";
-    print FILE "insert into fx_rate values ( $id, 3, 3, 0, 1.0 )\;\n";
+    $FILE = open_file( $id, 6 );
+    print $FILE "EUR-EUR,5,3,3,1.0,\n";
+    close $FILE;
+    $fx_rates{33} = $id;
 
-    close FILE;
 }
 
 sub generate_bonds($) {
     my $num_bonds = shift;
 
-
-    open FILE, ">/home/steve/src/trad4/instance/trad_bond_risk/gen/dummy_data/dummy_bonds.sql" or die "Can't open /home/steve/src/trad4/instance/trad_bond_risk/gen/dummy_data/dummy_bonds.sql";
-
-    print FILE "delete from bond;\n";
+    my $FILE;
+    my ( $id, $name, $ccy );
 
     for ( my $i = 0 ; $i < $num_bonds ; $i++ ) {
 
-        my $id = get_next_id();
+        $id = get_next_id();
 
-        my $name = $chars[ int(rand( @chars )) ].$chars[ int(rand( @chars )) ].int( rand(999999999));
+        $name = $chars[ int(rand( @chars )) ].$chars[ int(rand( @chars )) ].int( rand(999999999));
 
-        print FILE "insert into object select $id, number, \"$name\", 5, 1 from object_type where name = \"bond\"\;\n";
-                                
-        print FILE "insert into bond values ( $id, ".
-                                sprintf("%.2f", (rand( 8 - 2 ) + 2)).", ".
-                                int( 6000 + rand(  8000 - 6000 )).", ".
-                                int( 18000 + rand( 20000 - 18000 )).", ".
-                                $coup_pys[ int( rand( @coup_pys )) ].", ".
-                                $currencies[ int( rand( @currencies )) ].", ".
-                                $discount_rate_ids[ int( rand( @discount_rate_ids )) ].", ".
-                                "null )\;\n";
+        $ccy = $currencies[ int( rand( @currencies )) ];
+
+        $FILE = open_file( $id, 3 );
+        print $FILE "$name,5,".
+            $discount_rate_ids{$ccy}.",".
+            sprintf("%.2f", (rand( 8 - 2 ) + 2)).",".
+            int( 6000 + rand(  8000 - 6000 )).",".
+            int( 18000 + rand( 20000 - 18000 )).",".
+            $coup_pys[ int( rand( @coup_pys )) ].",".
+            $ccy.",".
+            "0,\n";
 
         push @bond_ids, $id;
+        $bond_ccys{$id} = $ccy;
+
+        close $FILE;
     }
 
-    close FILE;
 }
                  
 sub generate_outright_trades($) {
     my $num_objects = shift;
 
-    open FILE, ">$outright_trades_file" or die "Can't open $outright_trades_file";
-
-    print FILE "delete from outright_trade;\n";
+    my ( $FILE, $id, $name );
 
     for ( my $i = 0 ; $i < $num_objects ; $i++ ) {
 
-        my $id = get_next_id();
+        $id = get_next_id();
 
-        my $name = "C".int( rand(999999));
+        $name = "C".int( rand(999999));
 
-        print FILE "insert into object select $id, number, \"$name\", 5, 1 from object_type where name = \"outright_trade\"\;\n";
+        $FILE = open_file( $id, 4 );
 
-        print FILE "insert into outright_trade values ( $id, ".
-                                1000 * int( rand( 1000  )).", ".
-                                int( 8000 + rand(  99999 - 8000 )).", ".
-                                sprintf("%.2f", 95.0 + (rand( 10 ))).", ".
-                                $bond_ids[ int( rand( @bond_ids )) ].", ".
-                                "null, ".
-                                "null, ".
-                                "null )\;\n";
+        print $FILE "$name,5,".
+            $bond_ids[ int( rand( @bond_ids )) ].",".
+            1000 * int( rand( 1000  )).",".
+            int( 8000 + rand(  99999 - 8000 )).",".
+            sprintf("%.2f", 95.0 + (rand( 10 ))).",".
+            "0,0,0,\n";
 
+        close $FILE;
     }
-
-    close FILE;
-
 
 
 }
@@ -271,42 +268,32 @@ sub generate_outright_trades($) {
 sub generate_repo_trades($) {
     my $num_objects = shift;
 
-    open FILE, ">$repo_trades_file" or die "Can't open $repo_trades_file";
-
-    print FILE "delete from repo_trade;\n";
-
     for ( my $i = 0 ; $i < $num_objects ; $i++ ) {
 
         my $id = get_next_id();
 
         my $name = "R".int( rand(999999));
 
-        print FILE "insert into object select $id, number, \"$name\", 5, 1 from object_type where name = \"repo_trade\"\;\n";
-
         my $cash_ccy = $currencies[ int( rand( @currencies )) ];
         my $notional = 10000 * int( rand( 100  ));
         my $bond = $bond_ids[ int( rand( @bond_ids )) ];
+        my $bond_ccy = $bond_ccys{$bond};
+        my $fx_rate_key = "$bond_ccy$cash_ccy";
+        my $fx_rate_id = $fx_rates{$fx_rate_key};
 
-        print FILE "insert into repo_trade select $id, ".
-                                int( 8000 + rand(  99999 - 8000 )).", ".
-                                int( 16000 + rand(  18000 - 16000 )).", ".
-                                $notional.", ".
-                                $cash_ccy.", ".
-                                sprintf("%.2f", (rand( 8 - 2 ) + 2)).", ".
-                                $notional * int( sprintf("%.2f", 95.0 + (rand( 10 )))).", ".
-        
-                                "fx.id, ".
+        my $FILE = open_file( $id, 5 );
+    
+        print $FILE "$name,5,$fx_rate_id,$bond,".
+            int( 8000 + rand(  99999 - 8000 )).",".
+            int( 16000 + rand(  18000 - 16000 )).",".
+            "$notional,$cash_ccy,".
+            sprintf("%.2f", (rand( 8 - 2 ) + 2)).",".
+            $notional * int( sprintf("%.2f", 95.0 + (rand( 10 )))).",".
+            "0,0,0,\n";
 
-                                "$bond, ".
-                                "null, ".
-                                "null ".
-
-                                
-                                " from bond b, fx_rate fx where fx.ccy1 = $cash_ccy and b.id = $bond and b.ccy = fx.ccy2\;\n";
-
+        close $FILE;
     }
 
-    close FILE;
 
 }
 
@@ -316,4 +303,14 @@ sub get_next_id() {
 
 }
 
+sub open_file($$) {
+    my $id = shift;
+    my $type = shift;
 
+    my $file = "$dummy_data_root/$id.$type.t4o";
+
+    open FILE, ">$file" or die "Can't open $file";
+    
+    return *FILE;
+
+}
