@@ -25,7 +25,6 @@ bool InterestRateFeed::LoadFeedData()
 
         ostringstream stream;
         stream << feed_data_dir << _id << "." << Type() << ".t4d";
-        cout << "SS" << feed_data_dir << endl;
 
         _feed_file = stream.str();
 
@@ -33,26 +32,34 @@ bool InterestRateFeed::LoadFeedData()
 
     fstream load_file(_feed_file.c_str(), ios::in);
 
-    char record[MAX_OB_FILE_LEN];
-
-    char* tok;
-
-    int counter(0);
-
-    while ( load_file >> record ) 
+    if ( load_file.is_open() ) 
     {
 
-        tok = strtok( record, "," );
-        ((interest_rate_feed*)_pub)->asof[counter] = atoi(tok);
-        tok = strtok( NULL, "," );
-        ((interest_rate_feed*)_pub)->rate[counter] = atof(tok);
+        char record[MAX_OB_FILE_LEN];
 
-        counter++;
+        char* tok;
+
+        int counter(0);
+
+        while ( load_file >> record ) 
+        {
+
+            tok = strtok( record, "," );
+            ((interest_rate_feed*)_pub)->asof[counter] = atoi(tok);
+            tok = strtok( NULL, "," );
+            ((interest_rate_feed*)_pub)->rate[counter] = atof(tok);
+
+            counter++;
+        }
+
+    }        
+    else 
+    {
+        cout << "Can't open " << _feed_file << ". Exiting." << endl;
+        ExitOnError();
     }
 
     load_file.close();
-    
-
 
     Notify();
     return true;
