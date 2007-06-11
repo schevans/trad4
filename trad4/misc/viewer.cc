@@ -142,7 +142,8 @@ ObjectViewer::ObjectViewer()
     _status_vec.push_back("STARTING");
     _status_vec.push_back("RUNNING");
     _status_vec.push_back("BLOCKED");
-    _status_vec.push_back("DISABLED");
+    _status_vec.push_back("FAILED");
+    _status_vec.push_back("STALE");
 
     for ( int id = 1 ; id < MAX_OBJECTS ; id++ )
     {

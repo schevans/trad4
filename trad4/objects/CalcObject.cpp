@@ -27,7 +27,9 @@ void CalcObject::Run() {
 
     while ( 1 ) {
 
-cout << GetName() << ": Looping.." << endl;
+//cout << GetName() << ": Looping.." << endl;
+    
+        CheckSubscriptions();
 
         if ( NeedRefresh() )
         {
@@ -44,9 +46,9 @@ cout << GetName() << ": Need refresh.." << endl;
 
 void* CalcObject::AttachToSubscription( int sub_id )
 {
-cout << "CalcObject::AttachToSubscription" << endl;
-cout << _obj_loc << endl;
-    int sub_shmid = _obj_loc->shmid[sub_id];
+    cout << "CalcObject::AttachToSubscription: " << sub_id << endl;
+
+    int sub_shmid( _obj_loc->shmid[sub_id ] );
 
 cout << "sub shmid: " << sub_shmid << endl;
 
@@ -54,12 +56,14 @@ cout << "sub shmid: " << sub_shmid << endl;
     {
         void* shm;
 
-        if ((shm = shmat(sub_shmid, NULL, 0)) == (char *) -1) {
+        if ((shm = shmat(sub_shmid, NULL, SHM_RDONLY)) == (char *) -1) {
             perror("shmat");
             exit(1);
         }
 
         if ( ((object_header*)(shm))->status != RUNNING ) {
+
+            cout << "Object " << sub_id << " not runing. ";
 
             return 0;
         }
@@ -85,6 +89,8 @@ bool CalcObject::Stop()
     cout << "Stopping " << GetName() << endl;
     SetStatus( STOPPED );
     Save();
+
+     shmdt( _pub );
 
     return true;
 }

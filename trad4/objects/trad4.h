@@ -24,7 +24,8 @@ enum object_status {
     STARTING,
     RUNNING,
     BLOCKED,
-    DISABLED
+    FAILED,
+    STALE
 };
 
 typedef struct {

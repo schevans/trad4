@@ -17,6 +17,7 @@ public:
 
     void* CreateShmem( size_t pub_size );
     bool AttachToObjLoc();
+    bool DetachFromObjLoc();
     bool Notify();
 
     virtual void Run() = 0;
@@ -31,15 +32,17 @@ public:
     void SetStatus( object_status status ) { ((object_header*)_pub)->status = status; }
     virtual bool Load() = 0;
 
+    virtual void ExitOnError();
 
 protected:
 
     int _id;
     std::string _data_file_name;
     obj_loc* _obj_loc;
+    int _obj_loc_shmid;
     void* _pub;
     int _shmid;
-
+    bool _shmem_created;
 };
 
 #endif
