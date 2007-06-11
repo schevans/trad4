@@ -171,6 +171,8 @@ void Object::ExitOnError()
 {
     cout << "Object::ExitOnError()" << endl;
 
+    SetStatus(FAILED);
+
     if ( _shmem_created )
     {
         if (shmctl(_shmid, IPC_RMID, 0) == -1) {
