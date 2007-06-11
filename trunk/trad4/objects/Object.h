@@ -19,6 +19,7 @@ public:
     bool AttachToObjLoc();
     bool DetachFromObjLoc();
     bool Notify();
+    void CheckSubStatus();
 
     virtual void Run() = 0;
     virtual void Init();
