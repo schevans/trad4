@@ -12,33 +12,39 @@ bool Trade::Calculate()
 {
     cout << "Trade::Calculate()" << endl;
 
-cout << _sub_risk_free_rate_feed->rate << "W" << GetTimeToMaturity() << endl;
+    if ( _sub_stock_feed->last_published > *(int*)_pub )
+    {
+        _ln_SoK = log( _sub_stock_feed->stock_price / GetStrikePrice() );
+        _v2T_2 = ( _sub_stock_feed->volatility2 * GetTimeToMaturity() ) / 2.0;
+        _v_RtT = _sub_stock_feed->volatility * sqrt( GetTimeToMaturity() );
+    }
 
-    _ln_SoK = log( _sub_stock_feed->stock_price / GetStrikePrice() );
-    _rT = _sub_risk_free_rate_feed->rate * GetTimeToMaturity();
-    _v2T_2 = ( _sub_stock_feed->volatility2 * GetTimeToMaturity() ) / 2.0;
-    _v_rtT = _sub_stock_feed->volatility * sqrt( GetTimeToMaturity() );
-    _KerT = GetStrikePrice() * exp ( -_rT );
+    if ( _sub_risk_free_rate_feed->last_published > *(int*)_pub )
+    {
+        _rT = _sub_risk_free_rate_feed->rate * GetTimeToMaturity();
+        _KerT = GetStrikePrice() * exp ( -_rT );
+    }
 
-//cout << "\n_ln_SoK: " << _ln_SoK << "\n_rT: " << _rT << "\n_v2T_2: " << _v2T_2 << "\n_v_rtT: " << _v_rtT << "\n_KerT: " << _KerT << endl;
+    cout << "\n_ln_SoK: " << _ln_SoK << "\n_rT: " << _rT << "\n_v2T_2: " << _v2T_2 << "\n_v_RtT: " << _v_RtT << "\n_KerT: " << _KerT << endl;
 
-    _d1 = ( _ln_SoK + _rT + _v2T_2 ) / _v_rtT;
-    _d2 = ( _ln_SoK + _rT - _v2T_2 ) / _v_rtT;
+    _d1 = ( _ln_SoK + _rT + _v2T_2 ) / _v_RtT;
+    _d2 = ( _ln_SoK + _rT - _v2T_2 ) / _v_RtT;
 
-//cout << "_d1: " << _d1 << "\n_d2: " << _d2 << endl;
+    //cout << "_d1: " << _d1 << "\n_d2: " << _d2 << endl;
 
     if ( GetCallOrPut() == CALL )
     {
+        _SoN_pd1 = _sub_stock_feed->stock_price * CalcCumNormDist( +_d1 );
+        _KerTN_pd2 = _KerT * CalcCumNormDist( +_d2 );
 
-//cout << "_sub_stock_feed->stock_price: " << _sub_stock_feed->stock_price << endl;
-//cout << "CalcCumNormDist( _d2 ): " << CalcCumNormDist( _d2 ) << endl;
-//cout << "CalcCumNormDist( _d1 ): " << CalcCumNormDist( _d1 ) << endl;
-
-        _price = _sub_stock_feed->stock_price * CalcCumNormDist( _d1 ) -  _KerT * CalcCumNormDist( _d2 );
+        _price = _SoN_pd1 - _KerTN_pd2;
     }
     else
     {
-        _price = _KerT * CalcCumNormDist( -_d2 ) - _sub_stock_feed->stock_price * CalcCumNormDist( -_d1 );
+        _SoN_md1 = _sub_stock_feed->stock_price * CalcCumNormDist( -_d1 );
+        _KerTN_md2 = _KerT * CalcCumNormDist( -_d2 );
+
+        _price = _KerTN_md2 - _SoN_md1;
     }
 
 //cout << "Price: " << _price << endl;
