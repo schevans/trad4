@@ -10,6 +10,10 @@ bool StockFeed::LoadFeedData()
 {
     cout << "StockFeed::LoadFeedData()" << endl;
 
+    Load();
+
+    SetVolatility2( GetVolatility() * GetVolatility() );
+
     Notify();
     return true;
 }
