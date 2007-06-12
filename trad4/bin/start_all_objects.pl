@@ -2,20 +2,24 @@
 
 my $file;
 
+my @object_types = ( split( /,/, $ENV{OBJ_TYPE_START_ORDER}) );
 
+my $object_type;
 
-my @files = `cd $ENV{DATA_DIR} && ls *.t4o`;
+foreach $object_type ( @object_types ) {
 
-foreach $file ( @files ) {
+    my @files = `cd $ENV{DATA_DIR} && ls *.$object_type.t4o`;
 
-    chomp( $file );
+    foreach $file ( @files ) {
 
-    my ( $id, $type, $suffix ) = split /\./, $file;
+        chomp( $file );
 
-    system( "$ENV{TRAD4_ROOT}/bin/object $id $type" );
+        my ( $id, $type, $suffix ) = split /\./, $file;
 
-    sleep( 1 );
+        system( "$ENV{TRAD4_ROOT}/bin/object $id $type" );
+
+        select undef, undef, undef, 0.1;
+    }
+
 }
-
-
 
