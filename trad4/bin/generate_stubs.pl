@@ -66,6 +66,20 @@ my ( @sub, @pub, @mem_pub, @static, @common, @header );
             "int pid",
             "int type" );
 
+open TYPES_FILE, "$ENV{INSTANCE_ROOT}/defs/object_types.t4s" or die "Can't open $ENV{INSTANCE_ROOT}/defs/object_types.t4s for reading";
+
+my ( $line, $num, $type );
+my %types_map;
+while ( $line = <TYPES_FILE> ) {
+
+    chomp $line;
+    ( $num, $type ) = split /,/, $line;
+    $types_map{$type} = $num;
+}
+
+close TYPES_FILE;
+
+
 generate_all();
 
 sub generate_all() {
@@ -125,7 +139,7 @@ sub generate_h() {
     print H_FILE "\n";
     print H_FILE "public:\n";
     print H_FILE "\n";
-    print H_FILE "    $cpp_name( int id );\n";
+    print H_FILE "    $cpp_name( int id ) { _id = id; }\n";
     print H_FILE "    virtual ~$cpp_name() {}\n";
     print H_FILE "\n";
 
@@ -266,6 +280,8 @@ sub generate_cpp() {
         print CPP_FILE "bool $cpp_name\:\:LoadFeedData()\n";
         print CPP_FILE "{\n";
         print CPP_FILE "    cout << \"$cpp_name\:\:LoadFeedData()\" << endl;\n";
+        print CPP_FILE "\n";
+        print CPP_FILE "    Load();\n";
         print CPP_FILE "\n";
         print CPP_FILE "    Notify();\n";
         print CPP_FILE "    return true;\n";
@@ -663,6 +679,9 @@ sub type2atoX($) {
     if ( $type =~ /int/ ) {
         return "atoi";
     }
+    elsif ( $type =~ /_enum/ ) {
+        return "($type)atoi";
+    }
     elsif ( $type =~ /double/ ) {
         return "atof";
     }
@@ -679,26 +698,12 @@ sub type2atoX($) {
 
 sub type2num($) {
     my $type = shift;
+
+    my $type_num = $types_map{$type};
+
+    if ( ! $type_num ) {
+        die "Type $type not found in $ENV{INSTANCE_ROOT}/defs/object_types.t4s";
+    }
     
-    if ( $type =~ /interest_rate_feed/ ) {
-        return 1;
-    }
-    elsif ( $type =~ /discount_rate/ ) {
-        return 2;
-    }
-    elsif ( $type =~ /bond/ ) {
-        return 3;
-    }
-    elsif ( $type =~ /outright_trade/ ) {
-        return 4
-    }
-    elsif ( $type =~ /repo_trade/ ) {
-        return 5;
-    }
-    elsif ( $type =~ /fx_rate_feed/ ) {
-        return 6;
-    }
-    else {
-        die "Unknown type here";
-    }
+    return $type_num;    
 }

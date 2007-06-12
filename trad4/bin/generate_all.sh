@@ -12,5 +12,5 @@ do
 done
 
 
-#/home/steve/src/trad4/bin/generate_common.pl
+/home/steve/src/trad4/bin/generate_common.pl
 
