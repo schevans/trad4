@@ -1,0 +1,6 @@
+
+
+pub:
+    double stock_price
+    double volatility
+    double volatility2 
