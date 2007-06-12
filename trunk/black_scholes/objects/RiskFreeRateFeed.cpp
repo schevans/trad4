@@ -10,6 +10,8 @@ bool RiskFreeRateFeed::LoadFeedData()
 {
     cout << "RiskFreeRateFeed::LoadFeedData()" << endl;
 
+    Load();
+
     Notify();
     return true;
 }
