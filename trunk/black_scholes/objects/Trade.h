@@ -20,21 +20,28 @@ private:
     double nc( double x );
     double ndf( double x );
 
-    double _price;
-
     double _d1;
     double _d2;
 
-    double _ln_SoK;
+    double _ln_SK;
     double _rT;
     double _v2T_2;
-    double _v_RtT;
+    double _vRtT;
     double _KerT;
+    double _rKerT;
+    double _Sv;
 
-    double _SoN_pd1;
-    double _SoN_md1;
+    double _SN_pd1;
+    double _SN_md1;
     double _KerTN_pd2;
     double _KerTN_md2;
+
+    double _N_pd1;
+    double _N_pd2;
+    double _N_md2;
+
+    double _SRtT;
+    double _RtT;
 
 };
 
