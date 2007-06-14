@@ -10,3 +10,9 @@ static
 
 pub
     double price
+    double delta
+    double gamma
+    double vega
+    double theta
+    double rho
+
