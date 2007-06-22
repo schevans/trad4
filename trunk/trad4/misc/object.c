@@ -13,7 +13,7 @@
 
 using namespace std;
 
-auto_ptr<Object> object;
+Object* object;
 
 void sighup_handler(int sig_num)
 {

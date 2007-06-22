@@ -63,16 +63,16 @@ void Object::Init()
     ((object_header*)_pub)->type = Type(); 
     ((object_header*)_pub)->pid = getpid(); 
 
-    string data_dir( getenv( "DATA_DIR" ));
+    _data_dir = getenv( "DATA_DIR" );
 
-    if ( data_dir.empty() )
+    if ( _data_dir.empty() )
     {
         cout << "DATA_DIR not set. Exiting" << endl;
         ExitOnError();
     }
 
     ostringstream stream;
-    stream << data_dir << _id << "." << Type() << ".t4o";
+    stream << _data_dir << _id << "." << Type() << ".t4o";
 
     _data_file_name = stream.str();
 

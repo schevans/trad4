@@ -15,11 +15,14 @@ public:
 
     virtual ~FeedObject() {}
 
-    void Run();
+    virtual void Run();
     virtual bool Stop();
 
     virtual bool LoadFeedData() = 0;
 
+    virtual bool Save() { return true; }
+    virtual bool Calculate() { return true; }
+    virtual bool AttachToSubscriptions() { return true; }
 };
 
 #endif

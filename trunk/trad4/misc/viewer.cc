@@ -176,6 +176,7 @@ ObjectViewer::ObjectViewer()
     _status_vec.push_back("BLOCKED");
     _status_vec.push_back("FAILED");
     _status_vec.push_back("STALE");
+    _status_vec.push_back("MANAGED");
 
     for ( int id = 1 ; id < MAX_OBJECTS ; id++ )
     {

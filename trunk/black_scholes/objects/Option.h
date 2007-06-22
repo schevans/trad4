@@ -1,16 +1,16 @@
-#ifndef __TRADE__
-#define __TRADE__
+#ifndef __OPTION__
+#define __OPTION__
 
-#include "TradeBase.h"
+#include "OptionBase.h"
 
 
 
-class Trade : public TradeBase {
+class Option : public OptionBase {
 
 public:
 
-    Trade( int id ) { _id = id; }
-    virtual ~Trade() {}
+    Option( int id ) { _id = id; }
+    virtual ~Option() {}
 
     virtual bool Calculate();
 

@@ -19,9 +19,13 @@ if ( @ARGV != 1 ) {
 my $name = $ARGV[0];
 
 my $is_feed=0;
+my $is_vec=0;
 
 if ( $name =~ /feed/ ) {
     $is_feed = 1;
+}
+elsif ( $name =~ /vec/ ) {
+    $is_vec = 1;
 }
 
 sub generate_cpp_base();
@@ -56,7 +60,7 @@ my $defs_root=$ENV{INSTANCE_ROOT}."/defs";
 my $gen_root=$ENV{INSTANCE_ROOT}."/gen";
 my $obj_root=$ENV{INSTANCE_ROOT}."/objects";
 
-my ( @sub, @pub, @mem_pub, @static, @common, @header );
+my ( @sub, @pub, @mem_pub, @static, @static_vec, @common, @header );
 
 @common = ( "char name[OBJECT_NAME_LEN]",
             "int sleep_time" );
@@ -171,11 +175,22 @@ sub generate_h_base()
     print H_FILE "#define __$cap_base_name"."__\n";
     print H_FILE "\n";
 
+    if ( $is_vec ) {
+        print H_FILE "#include <vector>\n";
+        print H_FILE "#include <sstream>\n";
+        print H_FILE "\n";
+    }
+
     if ( $is_feed ) {
         print H_FILE "#include \"FeedObject.h\"\n";
     }
     else {
-        print H_FILE "#include \"CalcObject.h\"\n";
+        if ( $is_vec ) {
+            print H_FILE "#include \"CalcObjectVec.h\"\n";
+        }
+        else {
+            print H_FILE "#include \"CalcObject.h\"\n";
+        }
     }
         
     print H_FILE "#include \"common.h\"\n";
@@ -198,7 +213,12 @@ sub generate_h_base()
         print H_FILE "class $cpp_base_name : public FeedObject {\n";
     }
     else {
-        print H_FILE "class $cpp_base_name : public CalcObject {\n";
+        if ( $is_vec ) {
+            print H_FILE "class $cpp_base_name : public CalcObjectVec {\n";
+        }
+        else {
+            print H_FILE "class $cpp_base_name : public CalcObject {\n";
+        }
     }
 
     print H_FILE "\n";
@@ -251,6 +271,7 @@ sub generate_h_base()
 
     }
 
+    print H_FILE "\n";
     print H_FILE "\n";
     print H_FILE "};\n";
     print H_FILE "\n";
@@ -492,6 +513,36 @@ sub generate_cpp_base() {
     print CPP_FILE "        ExitOnError();\n";
     print CPP_FILE "    }\n";
     print CPP_FILE "\n";
+
+    if ( $is_vec ) {
+
+        
+        print CPP_FILE "    ostringstream stream;\n";
+        print CPP_FILE "    stream << _data_dir << _id << \".\" << Type() << \".t4v\";\n";
+        print CPP_FILE "\n";
+        print CPP_FILE "    string temp( stream.str() );\n";
+        print CPP_FILE "\n";
+        print CPP_FILE "    fstream load_file_vec( temp.c_str(), ios::in);\n";
+        print CPP_FILE "\n";
+        print CPP_FILE "    if ( load_file_vec.is_open() )\n";
+        print CPP_FILE "    {\n";
+        print CPP_FILE "        char record[MAX_OB_FILE_LEN];\n";
+        print CPP_FILE "\n";
+        print CPP_FILE "        while( load_file_vec >> record )\n";
+        print CPP_FILE "        {\n";
+        print CPP_FILE "            _element_ids.push_back( atoi( record ));\n";
+        print CPP_FILE "        }\n";
+        print CPP_FILE "\n";
+        print CPP_FILE "    }\n";
+        print CPP_FILE "    else\n";
+        print CPP_FILE "    {\n";
+        print CPP_FILE "        cout << \"Could not open file \" << temp << \". Exiting.\" << endl;\n";
+        print CPP_FILE "        ExitOnError();\n";
+        print CPP_FILE "    }\n";
+        print CPP_FILE "\n";
+
+    }
+
     print CPP_FILE "\n";
     print CPP_FILE "    return true;\n";
     print CPP_FILE "}\n";
@@ -615,7 +666,12 @@ sub load_defs($) {
         }
         elsif ( $doing =~ /static/ ) {
 
-            push @static, trim( $line );
+            if ( $line =~ '\[' ) {
+                push @static_vec, trim( $line );
+            }
+            else {
+                push @static, trim( $line );
+            }
         }
         else {
             die "Error";

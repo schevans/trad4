@@ -61,7 +61,7 @@ cout << "sub shmid: " << sub_shmid << endl;
             exit(1);
         }
 
-        if ( ((object_header*)(shm))->status != RUNNING ) {
+        if ( ((object_header*)(shm))->status != RUNNING && ((object_header*)(shm))->status != MANAGED ) {
 
             cout << "Object " << sub_id << " not runing. ";
 
@@ -89,6 +89,8 @@ bool CalcObject::Stop()
     cout << "Stopping " << GetName() << endl;
     SetStatus( STOPPED );
     Save();
+
+    ((object_header*)(_pub))->pid = 0;
 
      shmdt( _pub );
 

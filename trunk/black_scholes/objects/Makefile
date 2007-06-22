@@ -5,7 +5,7 @@ CXXFLAGS = -Wall -I/home/steve/src/black_scholes/objects -I/home/steve/src/black
 
 COMPILE = $(CXX) $(CXXFLAGS) -c
 
-OBJECTS = RiskFreeRateFeed.o StockFeed.o Trade.o
+OBJECTS = RiskFreeRateFeed.o StockFeed.o Option.o OptionVec.o
 
 all : $(OBJECTS)
 
