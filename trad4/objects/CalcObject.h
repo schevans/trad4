@@ -16,7 +16,7 @@ public:
 
     virtual ~CalcObject() {}
 
-    void Run();
+    virtual void Run();
     void* AttachToSubscription( int sub_id );
 
     virtual bool Stop();

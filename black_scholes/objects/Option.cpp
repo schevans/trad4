@@ -4,13 +4,13 @@
 
 #include <math.h>
 
-#include "Trade.h"
+#include "Option.h"
 
 using namespace std;
 
-bool Trade::Calculate()
+bool Option::Calculate()
 {
-    cout << "Trade::Calculate()" << endl;
+    cout << "Option::Calculate()" << endl;
 
     _RtT = sqrt( GetTimeToMaturity() );
 
@@ -68,17 +68,17 @@ bool Trade::Calculate()
     return true;
 }
 
-double Trade::CalcCumNormDist( double x )
+double Option::CalcCumNormDist( double x )
 {
     return nc( x );
 }
 
-double Trade::ndf(double t)
+double Option::ndf(double t)
 {
 return 0.398942280401433*exp(-t*t/2);
 }
 
-double Trade::nc(double x)
+double Option::nc(double x)
 {
 double result;
 if (x<-7.)
@@ -95,3 +95,4 @@ if (x<=0.) result=1.-result;
 }
 return result;
 }
+

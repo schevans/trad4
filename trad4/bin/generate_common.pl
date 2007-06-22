@@ -159,13 +159,11 @@ sub generate_object_factory() {
     print H_FILE "\n";
     print H_FILE "#include \"Object.h\"\n";
     print H_FILE "\n";
-    print H_FILE "using std::auto_ptr;\n";
-    print H_FILE "\n";
     print H_FILE "class ObjectFactory {\n";
     print H_FILE "\n";
     print H_FILE "public:\n";
     print H_FILE "\n";
-    print H_FILE "    static auto_ptr<Object> createObject( int id, int type );\n";
+    print H_FILE "    static Object* createObject( int id, int type );\n";
     print H_FILE "\n";
     print H_FILE "private:\n";
     print H_FILE "\n";
@@ -196,10 +194,10 @@ sub generate_object_factory() {
     print CPP_FILE "\n";
     print CPP_FILE "using namespace std;\n";
     print CPP_FILE "\n";
-    print CPP_FILE "auto_ptr<Object> ObjectFactory::createObject( int id, int type )\n";
+    print CPP_FILE "Object* ObjectFactory::createObject( int id, int type )\n";
     print CPP_FILE "{\n";
     print CPP_FILE "\n";
-    print CPP_FILE "    Object* local_object;\n";
+    print CPP_FILE "    Object* object;\n";
     print CPP_FILE "\n";
     print CPP_FILE "    switch ( type ) {\n";
     print CPP_FILE "\n";
@@ -210,17 +208,15 @@ sub generate_object_factory() {
     
         
         print CPP_FILE "        case ".($i+1).":\n";
-        print CPP_FILE "            local_object = new ".lower2camel_case( $all_objs[$i] )."( id );\n";
+        print CPP_FILE "            object = new ".lower2camel_case( $all_objs[$i] )."( id );\n";
         print CPP_FILE "            break;\n";
 
     } 
 
-    print CPP_FILE "           default:\n";
+    print CPP_FILE "        default:\n";
     print CPP_FILE "               cout << \"Unknown type \" << type << \". Doing nothing\" << endl;\n";
     print CPP_FILE "\n";
     print CPP_FILE "    }\n";
-    print CPP_FILE "\n";
-    print CPP_FILE "    auto_ptr<Object> object( local_object );\n";
     print CPP_FILE "\n";
     print CPP_FILE "    return object;\n";
     print CPP_FILE "\n";
