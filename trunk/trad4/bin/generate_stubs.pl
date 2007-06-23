@@ -103,10 +103,10 @@ sub generate_all() {
     }
 
     generate_struct();
-
-#    if ( ! $is_feed ) {
-#        generate_viewer();
-#    }
+    
+    if ( ! $is_vec ) {
+        generate_viewer();
+    }
 
     if ( $is_feed ) {
         print "Generated $name\n";
@@ -568,6 +568,7 @@ sub generate_struct()
     print PUB_STRUCT_FILE "#define __$name"."__\n";
     print PUB_STRUCT_FILE "\n";
     print PUB_STRUCT_FILE "#include <sys/types.h>\n";
+    print PUB_STRUCT_FILE "#include \"trad4.h\"\n";
     print PUB_STRUCT_FILE "\n";
     print PUB_STRUCT_FILE "typedef struct {\n";
 
@@ -620,6 +621,302 @@ sub generate_struct()
     print PUB_STRUCT_FILE "#endif\n";
 
     close PUB_STRUCT_FILE;
+}
+
+sub generate_viewer()
+{
+    open FILE, ">$gen_root/viewer/$viewer_filename" or die "Can't open $gen_root/viewer/$viewer_filename for writing. Exiting";
+
+    my $sub_name = "_sub_$name"."s";
+
+    print FILE "\n";
+    print FILE "\n";
+    print FILE "#include <gtkmm.h>\n";
+    print FILE "#include <iostream>\n";
+    print FILE "#include <vector>\n";
+    print FILE "#include <map>\n";
+    print FILE "#include <sstream>\n";
+    print FILE "#include <fstream>\n";
+    print FILE "#include <sys/shm.h>\n";
+    print FILE "\n";
+    print FILE "#include \"common.h\"\n";
+    print FILE "#include \"$name.h\"\n";
+    print FILE "\n";
+    print FILE "using namespace std;\n";
+    print FILE "\n";
+    print FILE "#include \"trad4.h\"\n";
+    print FILE "\n";
+    print FILE "class $viewer : public Gtk::Window\n";
+    print FILE "{\n";
+    print FILE "\n";
+    print FILE "public:\n";
+    print FILE "\n";
+    print FILE "    $viewer();\n";
+    print FILE "    virtual ~$viewer();\n";
+    print FILE "\n";
+    print FILE "protected:\n";
+    print FILE "\n";
+    print FILE "    bool Refresh( int num );\n";
+    print FILE "\n";
+    print FILE "    class ModelColumns : public Gtk::TreeModel::ColumnRecord\n";
+    print FILE "    {\n";
+    print FILE "        public:\n";
+    print FILE "\n";
+    print FILE "        ModelColumns()\n";
+    print FILE "        {\n";
+
+    print FILE "            add(_col_id);\n";
+    print FILE "            add(_col_name);\n";
+    print FILE "            add(_col_sleep_time);\n";
+    print FILE "            add(_col_last_published);\n";
+    print FILE "            add(_col_status);\n";
+    print FILE "            add(_col_pid);\n";
+
+    foreach $tuple ( @sub, @static, @pub ) {
+
+        ( $type, $var ) = split / /, $tuple;
+
+        print FILE "            add(_col_$var);\n";
+
+    }
+
+    print FILE "        }\n";
+    print FILE "\n";
+
+    print FILE "        Gtk::TreeModelColumn<int> _col_id;\n";
+    print FILE "        Gtk::TreeModelColumn<Glib::ustring> _col_name;\n";
+    print FILE "        Gtk::TreeModelColumn<int> _col_sleep_time;\n";
+    print FILE "        Gtk::TreeModelColumn<int> _col_last_published;\n";
+    print FILE "        Gtk::TreeModelColumn<Glib::ustring> _col_status;\n";
+    print FILE "        Gtk::TreeModelColumn<int> _col_pid;\n";
+
+    foreach $tuple ( @sub, @static, @pub ) {
+
+        ( $type, $var ) = split / /, $tuple;
+
+        print FILE "        Gtk::TreeModelColumn<$type> _col_$var;\n";
+
+    }
+
+    print FILE "    };\n";
+    print FILE "\n";
+    print FILE "    ModelColumns _columns;\n";
+    print FILE "\n";
+    print FILE "    Gtk::VBox _vBox;\n";
+    print FILE "\n";
+    print FILE "    Gtk::ScrolledWindow _scrolledWindow;\n";
+    print FILE "    Gtk::TreeView _treeView;\n";
+    print FILE "    Glib::RefPtr<Gtk::ListStore> _refTreeModel;\n";
+    print FILE "\n";
+    print FILE "    vector<Gtk::TreeModel::Row> my_rows;\n";
+    print FILE "    vector<Glib::ustring> _status_vec;\n";
+    print FILE "\n";
+    print FILE "    vector<$name*> $sub_name;\n";
+    print FILE "\n";
+    print FILE "    obj_loc* _obj_loc;\n";
+    print FILE "\n";
+    print FILE "    std::string TimeToString( time_t time );\n";
+    print FILE "};\n";
+    print FILE "\n";
+    print FILE "$viewer\:\:$viewer()\n";
+    print FILE "{\n";
+    print FILE "\n";
+    print FILE "    set_title(\"$viewer\");\n";
+    print FILE "    set_border_width(5);\n";
+    print FILE "    set_default_size(650, 400);\n";
+    print FILE "\n";
+    print FILE "    add(_vBox);\n";
+    print FILE "\n";
+    print FILE "    sigc::slot<bool> my_slot = sigc::bind(sigc::mem_fun(*this, \&".$viewer."::Refresh), 0);\n";
+    print FILE "\n";
+    print FILE "    sigc::connection conn = Glib::signal_timeout().connect(my_slot, 1000);\n";
+    print FILE "\n";
+    print FILE "    _scrolledWindow.add(_treeView);\n";
+    print FILE "\n";
+    print FILE "    _scrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);\n";
+    print FILE "\n";
+    print FILE "    _vBox.pack_start(_scrolledWindow);\n";
+    print FILE "\n";
+    print FILE "\n";
+    print FILE "    _refTreeModel = Gtk::ListStore::create(_columns);\n";
+    print FILE "    _treeView.set_model(_refTreeModel);\n";
+    print FILE "\n";
+    print FILE "    Gtk::TreeModel::Row row;\n";
+    print FILE "\n";
+    print FILE "    char* obj_loc_file_name = getenv( \"OBJ_LOC_FILE\" );\n";
+    print FILE "\n";
+    print FILE "    if ( obj_loc_file_name == NULL )\n";
+    print FILE "    {\n";
+    print FILE "        cout << \"OBJ_LOC_FILE not set. Exiting\" << endl;\n";
+    print FILE "        exit(1);\n";
+    print FILE "    }\n";
+    print FILE "\n";
+    print FILE "    fstream obj_loc_file(obj_loc_file_name, ios::in);\n";
+    print FILE "\n";
+    print FILE "    if ( ! obj_loc_file.is_open() )\n";
+    print FILE "    {\n";
+    print FILE "        cout << \"obj_loc not running. Exiting.\" << endl;\n";
+    print FILE "        exit (1);\n";
+    print FILE "    }\n";
+    print FILE "\n";
+    print FILE "    char shmid_char[OBJ_LOC_SHMID_LEN];\n";
+    print FILE "\n";
+    print FILE "    obj_loc_file >> shmid_char;\n";
+    print FILE "\n";
+    print FILE "    cout << \"Attaching to obj_loc shmid: \" << shmid_char << endl;\n";
+    print FILE "\n";
+    print FILE "    int shmid = atoi(shmid_char);\n";
+    print FILE "\n";
+    print FILE "    obj_loc_file.close();\n";
+    print FILE "\n";
+    print FILE "    void* shm;\n";
+    print FILE "\n";
+    print FILE "    if ((shm = shmat(shmid, NULL, SHM_RDONLY)) == (char *) -1) {\n";
+    print FILE "        perror(\"shmat\");\n";
+    print FILE "        exit(1);\n";
+    print FILE "    }\n";
+    print FILE "\n";
+    print FILE "    _obj_loc = (obj_loc*)shm;\n";
+    print FILE "\n";
+    print FILE "    _status_vec.push_back(\"UNKNOWN\");\n";
+    print FILE "    _status_vec.push_back(\"STOPPED\");\n";
+    print FILE "    _status_vec.push_back(\"STARTING\");\n";
+    print FILE "    _status_vec.push_back(\"RUNNING\");\n";
+    print FILE "    _status_vec.push_back(\"BLOCKED\");\n";
+    print FILE "    _status_vec.push_back(\"FAILED\");\n";
+    print FILE "    _status_vec.push_back(\"STALE\");\n";
+    print FILE "    _status_vec.push_back(\"MANAGED\");\n";
+    print FILE "\n";
+    print FILE "\n";
+    print FILE "    void* tmp;\n";
+    print FILE "    $name* local_$name;\n";
+    print FILE "\n";
+    print FILE "    for ( int id = 1 ; id < MAX_OBJECTS ; id++ )\n";
+    print FILE "    {\n";
+    print FILE "        if ( _obj_loc->shmid[id] != 0 )\n";
+    print FILE "        {\n";
+    print FILE "            if (( tmp = shmat(_obj_loc->shmid[id], NULL, SHM_RDONLY)) == (char *) -1) {\n";
+    print FILE "                perror(\"shmat\");\n";
+    print FILE "                exit(1);\n";
+    print FILE "            }\n";
+    print FILE "\n";
+    print FILE "            if ( ((object_header*)tmp)->type == ".type2num( $name )." )\n";
+    print FILE "            {\n";
+    print FILE "                row = *(_refTreeModel->append());\n";
+    print FILE "\n";
+    print FILE "                local_$name = (($name*)tmp);\n";
+    print FILE "\n";
+
+    print FILE "                row[_columns._col_id] = id;\n";
+    print FILE "                row[_columns._col_name] = local_$name->name;\n";
+    print FILE "                row[_columns._col_sleep_time] = local_$name->sleep_time;\n";
+    print FILE "                row[_columns._col_last_published] = local_$name->last_published;\n";
+    print FILE "                row[_columns._col_status] = _status_vec[local_$name->status];\n";
+    print FILE "                row[_columns._col_pid] = local_$name->pid;;\n";
+
+    foreach $tuple ( @static, @sub, @pub ) {
+
+        ( $type, $var ) = split / /, $tuple;
+
+        print FILE "                row[_columns._col_$var] = local_$name->$var;\n";
+
+    }
+
+
+    print FILE "\n";
+    print FILE "                $sub_name.push_back(($name*)tmp);\n";
+    print FILE "\n";
+    print FILE "                my_rows.push_back( row );\n";
+    print FILE "\n";
+    print FILE "            }\n";
+    print FILE "            else\n";
+    print FILE "            {\n";
+    print FILE "                shmdt( tmp );\n";
+    print FILE "            }\n";
+    print FILE "        }\n";
+    print FILE "    }\n";
+    print FILE "\n";
+
+    print FILE "    _treeView.append_column(\"Id\", _columns._col_id);\n";
+    print FILE "    _treeView.append_column(\"Name\", _columns._col_name);\n";
+    print FILE "    _treeView.append_column(\"Sleep Time\", _columns._col_sleep_time);\n";
+    print FILE "    _treeView.append_column(\"Last Published\", _columns._col_last_published);\n";
+    print FILE "    _treeView.append_column(\"Status\", _columns._col_status);\n";
+    print FILE "    _treeView.append_column(\"Pid\", _columns._col_pid);\n";
+
+    foreach $tuple ( @static, @sub, @pub ) {
+
+        ( $type, $var ) = split / /, $tuple;
+
+        print FILE "    _treeView.append_column(\"".lower2label( $var )."\", _columns._col_$var);\n";
+
+    }
+
+
+
+    print FILE "\n";
+    print FILE "    show_all_children();\n";
+    print FILE "\n";
+    print FILE "\n";
+    print FILE "}\n";
+    print FILE "\n";
+    print FILE "$viewer\:\:~$viewer()\n";
+    print FILE "{\n";
+    print FILE "}\n";
+    print FILE "\n";
+    print FILE "\n";
+    print FILE "bool $viewer\:\:Refresh( int timer_number)\n";
+    print FILE "{\n";
+    print FILE "    Gtk::TreeModel::Row row;\n";
+    print FILE "    int id;\n";
+    print FILE "\n";
+    print FILE "    for( unsigned int i = 0 ; i < my_rows.size() ; i++ )\n";
+    print FILE "    {\n";
+    print FILE "        row = my_rows[i];\n";
+    print FILE "        id  = row[_columns._col_id];\n";
+    print FILE "\n";
+    print FILE "        row[_columns._col_id] = id;\n";
+    print FILE "        row[_columns._col_name] = $sub_name"."[i]->name;\n";
+    print FILE "        row[_columns._col_sleep_time] = $sub_name"."[i]->sleep_time;\n";
+    print FILE "        row[_columns._col_last_published] = $sub_name"."[i]->last_published;;\n";
+    print FILE "        row[_columns._col_status] = _status_vec[$sub_name"."[i]->status];\n";
+    print FILE "        row[_columns._col_pid] = $sub_name"."[i]->pid;;\n";
+
+    foreach $tuple ( @static, @sub, @pub ) {
+
+        ( $type, $var ) = split / /, $tuple;
+
+	print FILE "        row[_columns._col_$var] = $sub_name"."[i]->$var;\n";
+
+    }
+
+    print FILE "\n";
+    print FILE "    }\n";
+    print FILE "\n";
+    print FILE "    return true;\n";
+    print FILE "}\n";
+    print FILE "\n";
+    print FILE "\n";
+    print FILE "\n";
+    print FILE "#include <gtkmm/main.h>\n";
+    print FILE "\n";
+    print FILE "int main(int argc, char *argv[])\n";
+    print FILE "{\n";
+    print FILE "  Gtk::Main kit(argc, argv);\n";
+    print FILE "\n";
+    print FILE "  $viewer window;\n";
+    print FILE "  Gtk::Main::run(window); \n";
+    print FILE "\n";
+    print FILE "  return 0;\n";
+    print FILE "}\n";
+
+
+
+
+
+
+    close FILE;
+
 }
 
 sub load_defs($) {

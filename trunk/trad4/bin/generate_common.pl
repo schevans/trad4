@@ -11,7 +11,7 @@ my $defs_root=$ENV{INSTANCE_ROOT}."/defs";
 my $gen_root=$ENV{INSTANCE_ROOT}."/gen";
 my $obj_root=$ENV{INSTANCE_ROOT}."/objects";
 
-my $all_headers = "-I".$ENV{INSTANCE_ROOT}."/objects -I".$ENV{INSTANCE_ROOT}."/gen/objects -I".$ENV{TRAD4_ROOT}."/objects";
+my $all_headers = "-I\$(INSTANCE_ROOT)/objects -I\$(INSTANCE_ROOT)/gen/objects -I\$(TRAD4_ROOT)/objects";
 
 open TYPES_FILE, "$ENV{INSTANCE_ROOT}/defs/object_types.t4s" or die "Can't open $ENV{INSTANCE_ROOT}/defs/object_types.t4s for reading";
 
@@ -32,7 +32,7 @@ close TYPES_FILE;
 system( "touch $ENV{INSTANCE_ROOT}/objects/common.h" );
 
 generate_gen_obj_make();
-#generate_viewer_make();
+generate_viewer_make();
 generate_obj_make();
 generate_object_factory();
 #generate_static_data();
@@ -79,17 +79,19 @@ sub generate_viewer_make() {
 
 
     print MAKE_FILE "\n";
-    print MAKE_FILE "CXX = g++\n";
+    print MAKE_FILE "CXX = gcc\n";
     print MAKE_FILE "\n";
-    print MAKE_FILE "CXXFLAGS = -Wall $all_headers\n";
+    print MAKE_FILE "CXXFLAGS = -Wall -I/usr/local/include $all_headers\n";
     print MAKE_FILE "\n";
-    print MAKE_FILE "COMPILE = \$(CXX) \$(CXXFLAGS) -c\n";
+    print MAKE_FILE "COMPILE = \$(CXX) \$(CXXFLAGS) -o\n";
     print MAKE_FILE "\n";
     print MAKE_FILE "OBJECTS = ";
 
     foreach $obj (@all_objs) {
 
-        print MAKE_FILE " $obj";
+        if ( !( $obj =~ /_vec/) ) {
+            print MAKE_FILE " $obj"."_viewer";
+        }
     }
 
     print MAKE_FILE "\n";
@@ -99,9 +101,11 @@ sub generate_viewer_make() {
 
     foreach $obj (@all_objs) {
 
-        print MAKE_FILE "$obj: ".lower2camel_case( $obj )."Viewer.cpp\n";
-        print MAKE_FILE "	gcc -o $obj ".lower2camel_case( $obj )."Viewer.cpp `pkg-config gtkmm-2.4 --libs --cflags`\n";
-    print MAKE_FILE "\n";
+        if ( ! ($obj =~ /_vec/) ) {
+            print MAKE_FILE "$obj"."_viewer: ".lower2camel_case( $obj )."Viewer.cpp\n";
+            print MAKE_FILE "	\$(COMPILE) ../../bin/$obj"."_viewer ".lower2camel_case( $obj )."Viewer.cpp `pkg-config gtkmm-2.4 --libs --cflags`\n";
+            print MAKE_FILE "\n";
+        }
     }
 
     print MAKE_FILE "\n";

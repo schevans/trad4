@@ -60,7 +60,6 @@ protected:
     Gtk::TreeView _treeView;
     Glib::RefPtr<Gtk::ListStore> _refTreeModel;
 
-    // My stuff
     vector<Gtk::TreeModel::Row> my_rows;
     vector<Glib::ustring> _status_vec;
     std::map<int, Glib::ustring> _type_map;
@@ -112,7 +111,7 @@ ObjectViewer::ObjectViewer()
         exit (1);
     }
 
-    char shmid_char[20]; //XXX
+    char shmid_char[OBJ_LOC_SHMID_LEN];
 
     obj_loc_file >> shmid_char;
 
@@ -124,7 +123,7 @@ ObjectViewer::ObjectViewer()
 
     void* shm;
 
-    if ((shm = shmat(shmid, NULL, 0)) == (char *) -1) {
+    if ((shm = shmat(shmid, NULL, SHM_RDONLY)) == (char *) -1) {
         perror("shmat");
         exit(1);
     }
@@ -188,7 +187,7 @@ ObjectViewer::ObjectViewer()
 
             void* tmp;
 
-            if (( tmp = shmat(_obj_loc->shmid[id], NULL, 0)) == (char *) -1) {
+            if (( tmp = shmat(_obj_loc->shmid[id], NULL, SHM_RDONLY)) == (char *) -1) {
                 perror("shmat");
                 exit(1);
             }
