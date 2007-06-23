@@ -1,7 +1,7 @@
 
 CXX = g++
 
-CXXFLAGS = -Wall -I/home/steve/src/black_scholes/objects -I/home/steve/src/black_scholes/gen/objects -I/home/steve/src/trad4/objects
+CXXFLAGS = -Wall -I$(INSTANCE_ROOT)/objects -I$(INSTANCE_ROOT)/gen/objects -I$(TRAD4_ROOT)/objects
 
 COMPILE = $(CXX) $(CXXFLAGS) -c
 
