@@ -37,9 +37,9 @@ my @bond_ids;
 generate_interest_rates();
 generate_discount_rates();
 generate_fx_rates();
-generate_bonds( 10 );
-generate_outright_trades( 10 );
-generate_repo_trades( 10 );
+generate_bonds( 3000 );
+generate_outright_trades( 6000 );
+generate_repo_trades( 6000 );
 
 sub generate_interest_rates() {
 
