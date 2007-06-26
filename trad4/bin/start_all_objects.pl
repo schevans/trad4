@@ -17,8 +17,6 @@ foreach $object_type ( @object_types ) {
         my ( $id, $type, $suffix ) = split /\./, $file;
 
         system( "$ENV{TRAD4_ROOT}/bin/object $id $type" );
-
-        select undef, undef, undef, 0.1;
     }
 
 }
