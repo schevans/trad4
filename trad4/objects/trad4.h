@@ -7,7 +7,7 @@
 
 #include <sys/types.h>
 
-#define MAX_OBJECTS 10000
+#define MAX_OBJECTS 20000
 
 #define MAX_OB_FILE_LEN 100
 #define MAX_OB_FILE_NAME 20
