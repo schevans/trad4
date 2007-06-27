@@ -11,4 +11,5 @@ static
     int quantity
     int trade_date
     double trade_price
+    int book
 
