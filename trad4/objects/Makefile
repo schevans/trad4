@@ -1,11 +1,11 @@
 
 CXX = g++
 
-CXXFLAGS = -Wall -c -I$(INSTANCE_ROOT)/gen/objects
+CXXFLAGS = -Wall -c -I$(INSTANCE_ROOT)/gen/objects -I.
 
 COMPILE = $(CXX) $(CXXFLAGS)
 
-OBJECTS = Object.o CalcObject.o FeedObject.o CalcObjectVec.o
+OBJECTS = Object.o CalcObject.o FeedObject.o CalcObjectVec.o CalcObjectAgg.o
 
 all : $(OBJECTS)
 
