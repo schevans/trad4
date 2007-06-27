@@ -1,0 +1,11 @@
+
+agg
+    vector<int> repo_trade
+
+static
+    int book
+
+pub
+    double mtm_pnl
+    double margin  
+
