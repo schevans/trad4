@@ -1,0 +1,12 @@
+
+agg
+    vector<int> outright_trade
+
+static
+    int book
+
+pub
+    double pv
+    double pnl
+    double dv01
+
