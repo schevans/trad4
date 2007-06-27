@@ -20,12 +20,16 @@ my $name = $ARGV[0];
 
 my $is_feed=0;
 my $is_vec=0;
+my $is_agg=0;
 
 if ( $name =~ /feed/ ) {
     $is_feed = 1;
 }
 elsif ( $name =~ /vec/ ) {
     $is_vec = 1;
+}
+elsif ( $name =~ /agg/ ) {
+    $is_agg = 1;
 }
 
 sub generate_cpp_base();
@@ -61,6 +65,8 @@ my $gen_root=$ENV{INSTANCE_ROOT}."/gen";
 my $obj_root=$ENV{INSTANCE_ROOT}."/objects";
 
 my ( @sub, @pub, @mem_pub, @static, @static_vec, @common, @header );
+
+my ( $agg_type, $agg_obj );
 
 @common = ( "char name[OBJECT_NAME_LEN]",
             "int sleep_time" );
@@ -184,13 +190,14 @@ sub generate_h_base()
     if ( $is_feed ) {
         print H_FILE "#include \"FeedObject.h\"\n";
     }
+    elsif ( $is_vec ) {
+        print H_FILE "#include \"CalcObjectVec.h\"\n";
+    }
+    elsif ( $is_agg ) {
+        print H_FILE "#include \"CalcObjectAgg.h\"\n";
+    }
     else {
-        if ( $is_vec ) {
-            print H_FILE "#include \"CalcObjectVec.h\"\n";
-        }
-        else {
-            print H_FILE "#include \"CalcObject.h\"\n";
-        }
+        print H_FILE "#include \"CalcObject.h\"\n";
     }
         
     print H_FILE "#include \"common.h\"\n";
@@ -212,13 +219,14 @@ sub generate_h_base()
     if ( $is_feed ) {
         print H_FILE "class $cpp_base_name : public FeedObject {\n";
     }
+    elsif ( $is_vec ) {
+        print H_FILE "class $cpp_base_name : public CalcObjectVec {\n";
+    }
+    elsif ( $is_agg ) {
+        print H_FILE "class $cpp_base_name : public CalcObjectAgg {\n";
+    }
     else {
-        if ( $is_vec ) {
-            print H_FILE "class $cpp_base_name : public CalcObjectVec {\n";
-        }
-        else {
-            print H_FILE "class $cpp_base_name : public CalcObject {\n";
-        }
+        print H_FILE "class $cpp_base_name : public CalcObject {\n";
     }
 
     print H_FILE "\n";
@@ -249,9 +257,25 @@ sub generate_h_base()
     print H_FILE "    void SetSleepTime( int sleep_time ) { (($name*)_pub)->sleep_time = sleep_time; }\n";
     print H_FILE "\n";
 
-    foreach $tuple ( @sub, @static, @pub ) {
+    if ( ! $is_agg ) {
 
-        ( $type, $var ) = split / /, $tuple; 
+        foreach $tuple ( @sub ) {
+
+            ( $type, $var ) = split / /, $tuple; 
+
+            my $camel_var = lower2camel_case( $var );
+
+            print H_FILE "    $type Get$camel_var() { return (($name*)_pub)->$var; }\n";
+            print H_FILE "    void Set$camel_var( $type $var ) { (($name*)_pub)->$var = $var; }\n";
+            print H_FILE "\n";
+
+        }
+
+    }
+
+    foreach $tuple ( @static, @pub ) {
+
+        ( $type, $var ) = split / /, $tuple;
 
         my $camel_var = lower2camel_case( $var );
 
@@ -260,6 +284,7 @@ sub generate_h_base()
         print H_FILE "\n";
 
     }
+
 
     print H_FILE "protected:\n";
 
@@ -339,6 +364,12 @@ sub generate_cpp_base() {
     print CPP_FILE "#include <fstream>\n";
     print CPP_FILE "\n";
     print CPP_FILE "#include \"$h_base_filename\"\n";
+    
+    if ( $is_agg ) {
+
+        print CPP_FILE "#include \"$agg_obj.h\"\n";
+
+    }
     print CPP_FILE "\n";
     print CPP_FILE "using namespace std;\n";
     print CPP_FILE "\n";
@@ -349,36 +380,75 @@ sub generate_cpp_base() {
         print CPP_FILE "bool $cpp_base_name\:\:AttachToSubscriptions()\n";
         print CPP_FILE "{\n";
 
-        if ( @sub ) {
+        if ( $is_agg ) {
 
-            foreach $tuple ( @sub ) {
-
-                ( $type, $var ) = split / /, $tuple; 
-
-                print CPP_FILE "    _sub_$var = ($var*)AttachToSubscription( Get".lower2camel_case( $var )."() );\n";
-                print CPP_FILE "\n";
-
-            }
-
-            print CPP_FILE "    if ( ";
-
-            foreach $tuple ( @sub ) {
-
-                ( $type, $var ) = split / /, $tuple; 
-
-                print CPP_FILE "_sub_$var && ";
-
-            }
-
-            print CPP_FILE " 1 )\n";
-            print CPP_FILE "        return true;\n";
-            print CPP_FILE "    else\n";
-            print CPP_FILE "        return false;\n";
+            print CPP_FILE "    void *element;\n";
             print CPP_FILE "\n";
+            print CPP_FILE "    for ( int id = 1 ; id < MAX_OBJECTS ; id++ )\n";
+            print CPP_FILE "    {\n";
+            print CPP_FILE "        if ( _obj_loc->shmid[id] != 0 )\n";
+            print CPP_FILE "        {\n";
+            print CPP_FILE "\n";
+            print CPP_FILE "            if (( element = shmat(_obj_loc->shmid[id], NULL, SHM_RDONLY)) == (char *) -1) {\n";
+            print CPP_FILE "                perror(\"shmat\");\n";
+            print CPP_FILE "                exit(1);\n";
+            print CPP_FILE "            }\n";
+            print CPP_FILE "\n";
+            print CPP_FILE "            if ( ((object_header*)(element))->type == ".type2num( $agg_obj )." )\n";
+            print CPP_FILE "            {\n";
+    
+            $tuple = $static[0];
+            ( $type, $var ) = split / /, $tuple;
+
+            print CPP_FILE "                if ( (($agg_obj*)(element))->$var == Get".lower2camel_case( $var )."() )\n";
+            print CPP_FILE "                {\n";
+            print CPP_FILE "                    _element_ids.push_back( id );\n";
+            print CPP_FILE "                    _elements_map[id] = element;\n";
+            print CPP_FILE "                }\n";
+            print CPP_FILE "                else\n";
+            print CPP_FILE "                {\n";
+            print CPP_FILE "                    shmdt( element );\n";
+            print CPP_FILE "                }\n";
+            print CPP_FILE "            }\n";
+            print CPP_FILE "            else\n";
+            print CPP_FILE "            {\n";
+            print CPP_FILE "                shmdt( element );\n";
+            print CPP_FILE "            }\n";
+            print CPP_FILE "        }\n";
+            print CPP_FILE "    }\n";
+            print CPP_FILE "\n";
+            print CPP_FILE "    return true;\n";
 
         }
         else {
-            print CPP_FILE "        return true;\n";
+
+            if ( @sub ) {
+
+                foreach $tuple ( @sub ) {
+
+                    ( $type, $var ) = split / /, $tuple; 
+
+                    print CPP_FILE "    _sub_$var = ($var*)AttachToSubscription( Get".lower2camel_case( $var )."() );\n";
+                    print CPP_FILE "\n";
+
+                }
+
+                print CPP_FILE "    if ( ";
+
+                foreach $tuple ( @sub ) {
+
+                    ( $type, $var ) = split / /, $tuple; 
+
+                    print CPP_FILE "_sub_$var && ";
+
+                }
+
+                print CPP_FILE " 1 )\n";
+                print CPP_FILE "        return true;\n";
+                print CPP_FILE "    else\n";
+                print CPP_FILE "        return false;\n";
+                print CPP_FILE "\n";
+            }
         }
 
 
@@ -387,34 +457,56 @@ sub generate_cpp_base() {
         print CPP_FILE "bool $cpp_base_name\:\:CheckSubscriptions()\n";
         print CPP_FILE "{\n";
 
-        if ( @sub ) {
+        if ( $is_agg ) {
 
-            print CPP_FILE "    if ( ";
+            print CPP_FILE "    object_status status = RUNNING;\n";
+            print CPP_FILE "\n";
+            print CPP_FILE "    vector<int>::iterator iter;\n";
+            print CPP_FILE "    for( iter = _element_ids.begin() ; iter < _element_ids.end() ; iter++ )\n";
+            print CPP_FILE "    {\n";
+            print CPP_FILE "        if ( (($agg_obj*)(_elements_map[*iter]))->status != RUNNING )\n";
+            print CPP_FILE "        {\n";
+            print CPP_FILE "            status = STALE;\n";
+            print CPP_FILE "            break;\n";
+            print CPP_FILE "        }\n";
+            print CPP_FILE "    }\n";
+            print CPP_FILE "\n";
+            print CPP_FILE "    SetStatus( status );\n";
+       
+        } 
+        else {
 
-            foreach $tuple ( @sub ) {
+            if ( @sub ) {
 
-                ( $type, $var ) = split / /, $tuple; 
+                print CPP_FILE "    if ( ";
 
-                print CPP_FILE "_sub_$var->status != RUNNING || ";
+                foreach $tuple ( @sub ) {
 
+                    ( $type, $var ) = split / /, $tuple; 
+
+                    print CPP_FILE "_sub_$var->status != RUNNING || ";
+
+                }
+
+                print CPP_FILE " 0 )\n";
+                print CPP_FILE "        SetStatus(STALE);\n";
+
+                print CPP_FILE "    else if ( ";
+
+                foreach $tuple ( @sub ) {
+
+                    ( $type, $var ) = split / /, $tuple; 
+
+                    print CPP_FILE "_sub_$var->status == RUNNING && ";
+
+                }
+
+                print CPP_FILE " 1 )\n";
+
+                print CPP_FILE "        SetStatus(RUNNING);\n";
             }
 
-            print CPP_FILE " 0 )\n";
-            print CPP_FILE "        SetStatus(STALE);\n";
 
-            print CPP_FILE "    else if ( ";
-
-            foreach $tuple ( @sub ) {
-
-                ( $type, $var ) = split / /, $tuple; 
-
-                print CPP_FILE "_sub_$var->status == RUNNING && ";
-
-            }
-
-            print CPP_FILE " 1 )\n";
-
-            print CPP_FILE "        SetStatus(RUNNING);\n";
         }
 
         print CPP_FILE "\n";
@@ -424,20 +516,43 @@ sub generate_cpp_base() {
         print CPP_FILE "\n";
         print CPP_FILE "bool $cpp_base_name\:\:NeedRefresh()\n";
         print CPP_FILE "{\n";
-      
-        print CPP_FILE "    return ( ";
+     
+        if ( $is_agg ) {
 
-        foreach $tuple ( @sub ) {
+            print CPP_FILE "    bool need_refresh(false);\n";
+            print CPP_FILE "\n";
+            print CPP_FILE "    vector<int>::iterator iter;\n";
+            print CPP_FILE "    for( iter = _element_ids.begin() ; iter < _element_ids.end() ; iter++ )\n";
+            print CPP_FILE "    {\n";
+            print CPP_FILE "        if ( (($agg_obj*)(_elements_map[*iter]))->last_published > *(int*)_pub )\n";
+            print CPP_FILE "        {\n";
+            print CPP_FILE "            need_refresh = true;\n";
+            print CPP_FILE "            break;\n";
+            print CPP_FILE "        }\n";
+            print CPP_FILE "    }\n";
+            print CPP_FILE "\n";
+            print CPP_FILE "    return need_refresh;\n";
+            print CPP_FILE "}\n";
 
-            ( $type, $var ) = split / /, $tuple; 
+        }
+        else {
+ 
+            print CPP_FILE "    return ( ";
 
-            print CPP_FILE "_sub_$var->last_published > *(int*)_pub || ";
+            foreach $tuple ( @sub ) {
+
+                ( $type, $var ) = split / /, $tuple; 
+
+                print CPP_FILE "_sub_$var->last_published > *(int*)_pub || ";
+
+            }
+
+            print CPP_FILE " 0 );\n";
+
+            print CPP_FILE "}\n";
 
         }
 
-        print CPP_FILE " 0 );\n";
-
-        print CPP_FILE "}\n";
         print CPP_FILE "\n";
         print CPP_FILE "bool $cpp_base_name\:\:Save()\n";
         print CPP_FILE "{\n";
@@ -939,7 +1054,7 @@ sub load_defs($) {
             next;
         }
 
-        if ( $line =~ /sub|pub|static/ ) {
+        if ( $line =~ /sub|pub|static|agg/ ) {
 
             $doing = $line;
             next;
@@ -970,8 +1085,13 @@ sub load_defs($) {
                 push @static, trim( $line );
             }
         }
+        elsif ( $doing =~ /agg/ ) {
+
+            ( $agg_type, $agg_obj ) = split / /, trim( $line );
+            
+        }
         else {
-            die "Error";
+            die "Error: Unknown label $doing.";
         }
 
     }
