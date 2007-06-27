@@ -5,7 +5,7 @@ CXXFLAGS = -Wall -I$(INSTANCE_ROOT)/objects -I$(INSTANCE_ROOT)/gen/objects -I$(T
 
 COMPILE = $(CXX) $(CXXFLAGS) -c
 
-OBJECTS = InterestRateFeed.o DiscountRate.o Bond.o OutrightTrade.o RepoTrade.o FxRateFeed.o
+OBJECTS = InterestRateFeed.o DiscountRate.o Bond.o OutrightTrade.o RepoTrade.o FxRateFeed.o OutrightTradeAgg.o RepoTradeAgg.o
 
 all : $(OBJECTS)
 
