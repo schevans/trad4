@@ -2,6 +2,7 @@
 pub
     int asof[INTEREST_RATE_LEN]
     double rate[INTEREST_RATE_LEN]
+    double rate_interpol[DISCOUNT_RATE_LEN]
 
 static
     int ccy

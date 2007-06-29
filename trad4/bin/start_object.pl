@@ -1,18 +1,33 @@
 #!/usr/bin/perl
 
+use strict;
+use warnings;
+
+
 if ( $#ARGV != 0 ) {
-    print "usage $basename <filename|id>\n";
+    print "usage start_object.pl <filename|id>\n";
     exit 1;
 }
 
-my $filename = $ARGV[0];
+my $arg = $ARGV[0];
 
-my ( $prefix, $type, $suffix ) = split /\./, $filename;
+my $filename;
 
-#my $id =~ s/^.*/[0-9]*/;
+if ( $arg =~ /\.t4o/ ) {
+   $filename = $arg; 
+}
+else {
+    $filename = `cd $ENV{DATA_DIR}; ls $arg.*.t4o`;
+print "FILE: X $filename X\n";
+}
 
-print "$filename:  $prefix, $id, $type, $suffix\n";
+my @array = split /\./, $filename;
+
+print "AR: @array\n";
+
+my ( $id, $type, $suffix ) = split /\./, $filename;
+
+print "$filename:  $id, $type, $suffix\n";
 
 system( "$ENV{TRAD4_ROOT}/bin/object $id $type" );
-
 

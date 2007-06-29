@@ -12,6 +12,7 @@ bool Bond::Calculate()
 
     _coupon_date_vec.clear();
     _payment_vec.clear();
+    _payment_vec_01.clear();
 
     int days_between_coupons = (int)YEAR_BASIS / GetCouponsPerYear();
     float coupon_rate_per_period = ( GetCoupon() / 100 ) / GetCouponsPerYear();
@@ -41,24 +42,31 @@ bool Bond::Calculate()
 
         _payment_vec.push_back( 100.0 * coupon_rate_per_period * _sub_discount_rate->rate[*iter - TODAY] );
 
+        _payment_vec_01.push_back( 100.0 * coupon_rate_per_period * _sub_discount_rate->rate_01[*iter - TODAY] );
+
 
     }
     _payment_vec.push_back( 100 * _sub_discount_rate->rate[_coupon_date_vec[_coupon_date_vec.size() -1] - TODAY] );
 
+    _payment_vec_01.push_back( 100 * _sub_discount_rate->rate_01[_coupon_date_vec[_coupon_date_vec.size() -1] - TODAY] );
+
     float price(0.0);
+    float price_01(0.0);
 
-    vector<float>::iterator iter_float;
-
-    for( iter_float = _payment_vec.begin() ; iter_float < _payment_vec.end() ; iter_float++ )
+    for( unsigned int i = 0 ; i < _payment_vec.size() ; i++ )
     {
+        price = price + _payment_vec[i];
 
-//cout << "Flow: " << *iter_float << " price: " << price << endl;
-        price = price + *iter_float;
+        price_01 = price_01 + _payment_vec_01[i];
 
     }
 
     SetPrice( price ); 
 
+cout << "Price: " << price << ", price_01: " << price_01 << endl;
+
+
+    SetDv01( price - price_01 );
 
     Notify();
     return true;
