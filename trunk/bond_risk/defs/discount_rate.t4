@@ -4,6 +4,7 @@ sub
 
 pub
     double rate[DISCOUNT_RATE_LEN]
+    double rate_01[DISCOUNT_RATE_LEN]
 
 static
     int ccy

@@ -2,6 +2,7 @@
 sub
     int fx_rate_feed
     int bond
+    int interest_rate_feed
 
 pub
     double mtm_pnl

@@ -61,6 +61,35 @@ bool InterestRateFeed::LoadFeedData()
 
     load_file.close();
 
+    int current_period_start;
+    int current_period_end;
+
+    double gradient;
+    double y_intercept;
+
+
+    for ( int indx = 0; indx < INTEREST_RATE_LEN - 1 ; indx++)
+    {
+        current_period_start = ((interest_rate_feed*)_pub)->asof[indx];
+        current_period_end = ((interest_rate_feed*)_pub)->asof[indx+1];
+
+        //cout << "Grad calc[" << indx << "]: ( " << local_discount_rate[indx] << " - " << local_discount_rate[indx+1] << ") / (" << _sub_interest_rate_feed->asof[indx] << " - " << _sub_interest_rate_feed->asof[indx+1] << " )" <<  endl;
+
+        gradient = (( ((interest_rate_feed*)_pub)->rate[indx] - ((interest_rate_feed*)_pub)->rate[indx+1] ) / ( ((interest_rate_feed*)_pub)->asof[indx] - ((interest_rate_feed*)_pub)->asof[indx+1] ) );
+        y_intercept = ((interest_rate_feed*)_pub)->rate[indx] - gradient * ((interest_rate_feed*)_pub)->asof[indx];
+
+        //cout << current_period_start << " to " << current_period_end << ", start_rate= "<< local_discount_rate[indx] << ", end_rate= << " << local_discount_rate[indx+1] << " gradient: " << gradient << " y-inter:" << y_intercept << endl;
+
+        for ( int i = current_period_start ; i <= current_period_end ; i++ )
+        {
+            //cout << "\tDate " << i << " index  " << i - DATE_RANGE_START << " rate: " <<(  i*gradient + y_intercept ) << endl;
+            ((interest_rate_feed*)_pub)->rate_interpol[i - DATE_RANGE_START] = (  i*gradient + y_intercept );
+
+        }
+
+    }
+
+
     Notify();
     return true;
 }

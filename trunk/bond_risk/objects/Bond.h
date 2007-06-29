@@ -22,6 +22,7 @@ private:
     // Calculate
     std::vector<int> _coupon_date_vec;
     std::vector<float> _payment_vec;
+    std::vector<float> _payment_vec_01;
 
 };
 
