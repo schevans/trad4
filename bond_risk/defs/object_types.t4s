@@ -1,0 +1,8 @@
+1,interest_rate_feed
+2,discount_rate
+3,bond
+4,outright_trade
+5,repo_trade
+6,fx_rate_feed
+7,outright_trade_agg
+8,repo_trade_agg
