@@ -33,6 +33,7 @@ elsif ( $name =~ /agg/ ) {
     $is_agg = 1;
 }
 
+sub print_licence_header($);
 sub generate_cpp_base();
 sub generate_h_base();
 sub generate_viewer();
@@ -84,6 +85,11 @@ my %types_map;
 while ( $line = <TYPES_FILE> ) {
 
     chomp $line;
+
+    if ( !$line or $line =~ /#/ ) {
+        next;
+    }
+
     ( $num, $type ) = split /,/, $line;
     $types_map{$type} = $num;
 }
@@ -139,6 +145,8 @@ sub generate_h() {
 
     open H_FILE, ">$obj_root/$h_filename" or die "Can't open $obj_root/$h_filename for writing. Exiting";
 
+    print_licence_header( H_FILE );
+
     print H_FILE "#ifndef __$cap_name"."__\n";
     print H_FILE "#define __$cap_name"."__\n";
     print H_FILE "\n";
@@ -178,6 +186,9 @@ sub generate_h_base()
     my ( $var, $type );
 
     open H_FILE, ">$gen_root/objects/$h_base_filename" or die "Can't open $gen_root/objects/$h_base_filename for writing. Exiting";
+
+    print_licence_header( H_FILE );
+
     print H_FILE "#ifndef __$cap_base_name"."__\n";
     print H_FILE "#define __$cap_base_name"."__\n";
     print H_FILE "\n";
@@ -313,6 +324,8 @@ sub generate_cpp() {
 
     open CPP_FILE, ">$obj_root/$cpp_filename" or die "Can't open $obj_root/$cpp_filename for writing. Exiting";
 
+    print_licence_header( CPP_FILE );
+
     print CPP_FILE "#include <sys/ipc.h>\n";
     print CPP_FILE "#include <sys/shm.h>\n";
     print CPP_FILE "#include <iostream>\n";
@@ -358,6 +371,8 @@ sub generate_cpp_base() {
     my ( $var, $type );
 
     open CPP_FILE, ">$gen_root/objects/$cpp_base_filename" or die "Can't open $gen_root/objects/$cpp_base_filename for writing. Exiting";
+
+    print_licence_header( CPP_FILE );
 
     print CPP_FILE "#include <sys/ipc.h>\n";
     print CPP_FILE "#include <sys/shm.h>\n";
@@ -679,6 +694,8 @@ sub generate_struct()
 {
     open PUB_STRUCT_FILE, ">$gen_root/objects/$struct_filename" or die "Can't open $gen_root/objects/$h_filename for writing. Exiting";
 
+    print_licence_header( PUB_STRUCT_FILE );
+
     print PUB_STRUCT_FILE "\n";
     print PUB_STRUCT_FILE "#ifndef __$name"."__\n";
     print PUB_STRUCT_FILE "#define __$name"."__\n";
@@ -742,6 +759,8 @@ sub generate_struct()
 sub generate_viewer()
 {
     open FILE, ">$gen_root/viewer/$viewer_filename" or die "Can't open $gen_root/viewer/$viewer_filename for writing. Exiting";
+
+    print_licence_header( FILE );
 
     my $sub_name = "_sub_$name"."s";
 
@@ -1051,7 +1070,7 @@ sub load_defs($) {
 
         chomp $line;
 
-        if ( !$line ) {
+        if ( !$line or $line =~ /#/ ) {
             next;
         }
 
@@ -1181,3 +1200,18 @@ sub type2num($) {
     
     return $type_num;    
 }
+
+sub print_licence_header($) {
+    my $FILE = shift;
+
+    open LICENCE_FILE, "$ENV{INSTANCE_ROOT}/LICENCE_HEADER" or die "Can't open $ENV{INSTANCE_ROOT}/LICENCE_HEADER.";
+
+    my $line;
+    while ( $line = <LICENCE_FILE> ) {
+        print $FILE "// $line";
+    }
+
+    close LICENCE_FILE;
+}
+ 
+

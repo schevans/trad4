@@ -8,8 +8,8 @@ sub generate_obj_make();
 sub generate_gen_obj_make();
 sub generate_viewer_make();
 sub generate_object_factory();
-sub generate_static_data();
 sub lower2camel_case($);
+sub print_licence_header($$);
 
 my $defs_root=$ENV{INSTANCE_ROOT}."/defs";
 my $gen_root=$ENV{INSTANCE_ROOT}."/gen";
@@ -26,6 +26,11 @@ my @all_objs;
 while ( $line = <TYPES_FILE> ) {
 
     chomp $line;
+
+    if ( !$line or $line =~ /#/ ) {
+        next;
+    }
+
     ( $num, $type ) = split /,/, $line;
     $types_map{$type} = $num;
     push @all_objs, $type;
@@ -39,13 +44,13 @@ generate_gen_obj_make();
 generate_viewer_make();
 generate_obj_make();
 generate_object_factory();
-#generate_static_data();
 
 
 sub generate_gen_obj_make() {
 
     open MAKE_FILE, ">$gen_root/objects/Makefile" or die "Can't open $gen_root/objects/Makefile";
 
+    print_licence_header( MAKE_FILE, "#" );
 
     print MAKE_FILE "\n";
     print MAKE_FILE "CXX = g++\n";
@@ -81,6 +86,7 @@ sub generate_viewer_make() {
 
     open MAKE_FILE, ">$gen_root/viewer/Makefile" or die "Can't open $gen_root/viewer/Makefile";
 
+    print_licence_header( MAKE_FILE, "#" );
 
     print MAKE_FILE "\n";
     print MAKE_FILE "CXX = gcc\n";
@@ -125,7 +131,8 @@ sub generate_viewer_make() {
 sub generate_obj_make() {
 
     open MAKE_FILE, ">$obj_root/Makefile" or die "Can't open $obj_root/Makefile";
-
+    
+    print_licence_header( MAKE_FILE, "#" );
 
     print MAKE_FILE "\n";
     print MAKE_FILE "CXX = g++\n";
@@ -160,6 +167,7 @@ sub generate_obj_make() {
 sub generate_object_factory() {
 
     open H_FILE, ">$gen_root/objects/ObjectFactory.h" or die "Can't open $gen_root/objects/ObjectFactory.h";
+    print_licence_header( H_FILE, "//" );
 
     print H_FILE "\n";
     print H_FILE "#ifndef __OBJECT_FACTORY_H__\n";
@@ -186,6 +194,8 @@ sub generate_object_factory() {
 
     open CPP_FILE, ">$gen_root/objects/ObjectFactory.cpp" or die "Can't open $gen_root/objects/ObjectFactory.cpp";
     
+    print_licence_header( CPP_FILE, "//" );
+
     print CPP_FILE "\n";
     print CPP_FILE "#include <iostream>\n";
     print CPP_FILE "\n";
@@ -234,25 +244,6 @@ sub generate_object_factory() {
     close CPP_FILE;
 }
 
-sub generate_static_data() {
-
-    open OBJ_TYPE_FILE, ">$gen_root/sql/object_type.sql" or die "Can't open $gen_root/sql/object_type.table";
-
-    print OBJ_TYPE_FILE "delete from object_type;\n";
-
-    my $i;
-
-    my @objs = ( @all_objs, @feed_objs );
-
-    for ( $i = 0 ; $i < @objs ; $i++ ) {
-    
-        print OBJ_TYPE_FILE "insert into object_type values ( ".($i+1).", \"$objs[$i]\" );\n";
-
-    } 
-    
-    close OBJ_TYPE_FILE;
-}
-
 sub lower2camel_case($) {
     my $lower_case = shift;
 
@@ -262,5 +253,18 @@ sub lower2camel_case($) {
     $camel_case =~ s/ //g;
 
     return $camel_case;
+}
+
+sub print_licence_header($$) {
+    my $FILE = shift;
+    my $comment_delimeter = shift;
+    open LICENCE_FILE, "$ENV{INSTANCE_ROOT}/LICENCE_HEADER" or die "Can't open $ENV{INSTANCE_ROOT}/LICENCE_HEADER.";
+
+    my $line;
+    while ( $line = <LICENCE_FILE> ) {
+        print $FILE "$comment_delimeter $line";
+    }
+
+    close LICENCE_FILE;
 }
 
