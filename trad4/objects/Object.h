@@ -1,6 +1,8 @@
 
-// Copyright Steve Evans 2007
+// Copyright (c) Steve Evans 2007
 // steve@topaz.myzen.co.uk
+// This code is licenced under the LGPL. For details see $TRAD4_ROOT/LICENCE
+
 
 #ifndef __OBJECT_H__
 #define __OBJECT_H__
