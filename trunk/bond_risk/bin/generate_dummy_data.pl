@@ -7,6 +7,7 @@ sub get_next_id();
 sub generate_interest_rates();
 sub generate_discount_rates();
 sub generate_fx_rates();
+sub generate_books();
 sub generate_bonds($);
 sub generate_outright_trades($);
 sub generate_repo_trades($);
@@ -17,9 +18,11 @@ my $current_id = 20;
 
 my %discount_rate_ids;
 my @interest_rate_ids;
+my %interest_rate_ccys;
 my %bond_ccys;
 my %fx_rates;
-
+my @outright_agg;
+my @repo_agg;
 
 my @coup_pys = ( 1, 2, 4 );
 my @currencies = ( 1, 2, 3 );
@@ -37,9 +40,10 @@ my @bond_ids;
 generate_interest_rates();
 generate_discount_rates();
 generate_fx_rates();
-generate_bonds( 3000 );
-generate_outright_trades( 6000 );
-generate_repo_trades( 6000 );
+generate_books();
+generate_bonds( 300 );
+generate_outright_trades( 600 );
+generate_repo_trades( 600 );
 
 sub generate_interest_rates() {
 
@@ -64,7 +68,8 @@ sub generate_interest_rates() {
     close FILE;
 
     push @interest_rate_ids, $id;
-
+    $interest_rate_ccys{$id} = $id;
+    
     $id = 2;
     $FILE = open_file( $id, 1 ); 
     print $FILE "LIBOR-GBP,5,1,\n";
@@ -86,6 +91,7 @@ sub generate_interest_rates() {
     close FILE;
 
     push @interest_rate_ids, $id;
+    $interest_rate_ccys{$id} = $id;
 
     $id = 3;
     $FILE = open_file( $id, 1 ); 
@@ -108,6 +114,7 @@ sub generate_interest_rates() {
     close FILE;
 
     push @interest_rate_ids, $id;
+    $interest_rate_ccys{$id} = $id;
 
     close FILE;
 }
@@ -146,6 +153,61 @@ sub generate_discount_rates() {
     close FILE;
 }
 
+sub generate_books() {
+
+    my $FILE;
+    my $id;
+
+    $id = get_next_id();
+    $FILE = open_file( $id, 7 );
+    print $FILE "OUTBK_1,5,1,0,0,0\n";
+    close $FILE;
+    push @outright_agg, 1;
+
+    $id = get_next_id();
+    $FILE = open_file( $id, 7 );
+    print $FILE "OUTBK_2,5,2,0,0,0\n";
+    close $FILE;
+    push @outright_agg, 2;
+
+    $id = get_next_id();
+    $FILE = open_file( $id, 7 );
+    print $FILE "OUTBK_3,5,3,0,0,0\n";
+    close $FILE;
+    push @outright_agg, 3;
+
+    $id = get_next_id();
+    $FILE = open_file( $id, 7 );
+    print $FILE "OUTBK_4,5,4,0,0,0\n";
+    close $FILE;
+    push @outright_agg, 4;
+
+
+    $id = get_next_id();
+    $FILE = open_file( $id, 8 );
+    print $FILE "REOPBK_1,5,1,0,0,0\n";
+    close $FILE;
+    push @repo_agg, 1;
+
+    $id = get_next_id();
+    $FILE = open_file( $id, 8 );
+    print $FILE "REOPBK_2,5,2,0,0,0\n";
+    close $FILE;
+    push @repo_agg, 2;
+
+    $id = get_next_id();
+    $FILE = open_file( $id, 8 );
+    print $FILE "REOPBK_3,5,3,0,0,0\n";
+    close $FILE;
+    push @repo_agg, 3;
+
+    $id = get_next_id();
+    $FILE = open_file( $id, 8 );
+    print $FILE "REOPBK_4,5,4,0,0,0\n";
+    close $FILE;
+    push @repo_agg, 4;
+
+}  
 
 sub generate_fx_rates() {
 
@@ -229,7 +291,7 @@ sub generate_bonds($) {
             int( 18000 + rand( 20000 - 18000 )).",".
             $coup_pys[ int( rand( @coup_pys )) ].",".
             $ccy.",".
-            "0,\n";
+            "0,0,\n";
 
         push @bond_ids, $id;
         $bond_ccys{$id} = $ccy;
@@ -257,6 +319,7 @@ sub generate_outright_trades($) {
             1000 * int( rand( 1000  )).",".
             int( 8000 + rand(  99999 - 8000 )).",".
             sprintf("%.2f", 95.0 + (rand( 10 ))).",".
+            $outright_agg[ int (rand( @outright_agg))].",".
             "0,0,0,\n";
 
         close $FILE;
@@ -278,17 +341,19 @@ sub generate_repo_trades($) {
         my $notional = 10000 * int( rand( 100  ));
         my $bond = $bond_ids[ int( rand( @bond_ids )) ];
         my $bond_ccy = $bond_ccys{$bond};
+        my $interest_rate = $interest_rate_ccys{$bond_ccy};
         my $fx_rate_key = "$bond_ccy$cash_ccy";
         my $fx_rate_id = $fx_rates{$fx_rate_key};
 
         my $FILE = open_file( $id, 5 );
     
-        print $FILE "$name,5,$fx_rate_id,$bond,".
+        print $FILE "$name,5,$fx_rate_id,$bond,$interest_rate,".
             int( 8000 + rand(  99999 - 8000 )).",".
             int( 16000 + rand(  18000 - 16000 )).",".
             "$notional,$cash_ccy,".
             sprintf("%.2f", (rand( 8 - 2 ) + 2)).",".
             $notional * int( sprintf("%.2f", 95.0 + (rand( 10 )))).",".
+            $repo_agg[ int (rand( @repo_agg))].",".
             "0,0,0,\n";
 
         close $FILE;
