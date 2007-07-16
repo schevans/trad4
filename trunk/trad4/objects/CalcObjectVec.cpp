@@ -42,7 +42,7 @@ void CalcObjectVec::Run() {
         }
         else
         {
-            if (( element = shmat(_obj_loc->shmid[element_id], NULL, SHM_RDONLY)) == (char *) -1) {
+            if (( element = shmat(_obj_loc->shmid[element_id], NULL, 0)) == (char *) -1) {
                 perror("shmat");
                 exit(1);
             }
