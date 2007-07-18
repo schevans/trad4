@@ -39,6 +39,7 @@ public:
     virtual bool Load() = 0;
 
     void* GetPub() { return _pub; }
+    int GetLastPublished() { return *(int*)_pub; }
 
     virtual void ExitOnError();
 
