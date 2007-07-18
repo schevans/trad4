@@ -30,6 +30,7 @@ public:
     virtual bool NeedRefresh() = 0;
     virtual bool Calculate() = 0;
     virtual int Type() = 0;
+    virtual int MgrType() = 0;
 
 protected:
 
