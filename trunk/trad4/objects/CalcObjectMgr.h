@@ -4,8 +4,8 @@
 // This code is licenced under the LGPL. For details see $TRAD4_ROOT/LICENCE
 
 
-#ifndef __CALC_OBJECT_VEC_H__
-#define __CALC_OBJECT_VEC_H__
+#ifndef __CALC_OBJECT_MGR_H__
+#define __CALC_OBJECT_MGR_H__
 
 #include <string>
 #include <vector>
@@ -14,11 +14,11 @@
 #include "trad4.h"
 
 
-class CalcObjectVec : public CalcObject {
+class CalcObjectMgr : public CalcObject {
 
 public:
 
-    virtual ~CalcObjectVec() {}
+    virtual ~CalcObjectMgr() {}
 
     virtual void Run();
     virtual bool Stop();

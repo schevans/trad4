@@ -9,13 +9,13 @@
 #include <fstream>
 #include <signal.h> 
 
-#include "CalcObjectVec.h"
+#include "CalcObjectMgr.h"
 #include "ObjectFactory.h"
 
 using namespace std;
 
-void CalcObjectVec::Run() {
-    cout << "CalcObjectVec::Run()" << endl;
+void CalcObjectMgr::Run() {
+    cout << "CalcObjectMgr::Run()" << endl;
 
     cout << "Attaching to subscriptions..." << endl;
 
@@ -99,7 +99,7 @@ cout << GetName() << ": Need refresh.." << endl;
 
 }
 
-bool CalcObjectVec::Stop()
+bool CalcObjectMgr::Stop()
 {
     cout << "Stopping " << GetName() << endl;
 
