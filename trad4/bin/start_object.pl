@@ -22,16 +22,11 @@ if ( $arg =~ /\.t4o/ ) {
 }
 else {
     $filename = `cd $ENV{DATA_DIR}; ls $arg.*.t4o`;
-print "FILE: X $filename X\n";
 }
 
 my @array = split /\./, $filename;
 
-print "AR: @array\n";
-
 my ( $id, $type, $suffix ) = split /\./, $filename;
-
-print "$filename:  $id, $type, $suffix\n";
 
 system( "$ENV{TRAD4_ROOT}/bin/object $id $type" );
 
