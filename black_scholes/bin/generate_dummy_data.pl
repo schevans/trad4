@@ -9,7 +9,7 @@ sub open_file($$);
 sub generate_risk_free_rate_feeds();
 sub generate_stock_feeds();
 sub generate_options($);
-sub generate_option_vectors();
+sub generate_option_managers();
 
 
 my $current_id = 20;
@@ -26,9 +26,9 @@ my %option_rfr_ids;
 generate_risk_free_rate_feeds();
 generate_stock_feeds();
 generate_options( 1000 );
-generate_option_vectors();
+generate_option_managers();
 
-sub generate_option_vectors() {
+sub generate_option_managers() {
 
     my ( $id, $FILE, $rfr, $stock, $name, $ccy, $option );
 
@@ -41,7 +41,7 @@ sub generate_option_vectors() {
             $id = get_next_id();
             $FILE = open_file( $id, 4 );
             
-            print $FILE "$name,5,$stock,$ccy\n";
+            print $FILE "$name,5,$stock,$ccy,3\n";
             close $FILE;
             
             open FILE_T4V, ">$dummy_data_root/$id.4.t4v" or die "Can't open $dummy_data_root/$id.4.t4v";
