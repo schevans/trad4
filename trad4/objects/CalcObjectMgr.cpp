@@ -54,15 +54,9 @@ void CalcObjectMgr::Run() {
 
         }
 
-// XXX
-int element_type = 3;
-
-
-cout << "Creating object.." << endl;
-        Object* object = ObjectFactory::createObject( element_id, element_type );
+        Object* object = ObjectFactory::createObject( element_id, MgrType() );
 
         object->Init();
-cout << "Done Creating object.." << endl;
 
         ((object_header*)(object->GetPub()))->last_published = 0;
 

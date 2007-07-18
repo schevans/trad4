@@ -22,12 +22,15 @@ my $name = $ARGV[0];
 my $is_feed=0;
 my $is_mgr=0;
 my $is_agg=0;
+my $mgr_type=0;
 
 if ( $name =~ /feed/ ) {
     $is_feed = 1;
 }
 elsif ( $name =~ /mgr/ ) {
     $is_mgr = 1;
+    $mgr_type = $name;
+    $mgr_type =~ s/_mgr//;
 }
 elsif ( $name =~ /agg/ ) {
     $is_agg = 1;
@@ -297,6 +300,12 @@ sub generate_h_base()
 
     }
 
+    if ( $is_mgr ) {
+
+        print H_FILE "    virtual int MgrType() { return ".$types_map{$mgr_type}."; }\n";
+        print H_FILE "\n";
+
+    }
 
     print H_FILE "protected:\n";
 
