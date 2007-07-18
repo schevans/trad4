@@ -12,18 +12,30 @@ bool Option::Calculate()
 {
     cout << "Option::Calculate()" << endl;
 
+    // We'll always need _RtT.
     _RtT = sqrt( GetTimeToMaturity() );
 
+    // Here's the question: What's updated - the stock or the risk free rate?
+    // Note - it might be both which is why both are explicidly tested for.
     if ( _sub_stock_feed->last_published > *(int*)_pub )
     {
+        // It's the stock feed, so we'll need this lot.
+        // Note that if we had volatility as a seperate object, we'd get the benifit here.
+
+        // Stock price dependancies:
         _ln_SK = log( _sub_stock_feed->stock_price / GetStrikePrice() );
+
+        // Vol dependancies:
         _v2T_2 = ( _sub_stock_feed->volatility2 * GetTimeToMaturity() ) / 2.0;
         _vRtT = _sub_stock_feed->volatility * _RtT;
+
+        // Both
         _Sv = _sub_stock_feed->stock_price * _sub_stock_feed->volatility;
     }
 
     if ( _sub_risk_free_rate_feed->last_published > *(int*)_pub )
     {
+        // Risk free rate's changed. We'll need these recalculated.
         _rT = _sub_risk_free_rate_feed->rate * GetTimeToMaturity();
         _KerT = GetStrikePrice() * exp ( -_rT );
         _rKerT = _sub_risk_free_rate_feed->rate * _KerT;
@@ -31,6 +43,7 @@ bool Option::Calculate()
 
     cout << "\n_ln_SK: " << _ln_SK << "\n_rT: " << _rT << "\n_v2T_2: " << _v2T_2 << "\n_vRtT: " << _vRtT << "\n_KerT: " << _KerT << endl;
 
+    // We'll always need both d1 & d2 recalculated - they depend on both feeds.
     _d1 = ( _ln_SK + _rT + _v2T_2 ) / _vRtT;
     _d2 = ( _ln_SK + _rT - _v2T_2 ) / _vRtT;
 
@@ -38,11 +51,13 @@ bool Option::Calculate()
 
     _N_pd1 = CalcCumNormDist( +_d1 );
     
+    // Gamma & Vega are the same for calls & puts.
     SetGamma( _N_pd1 / ( _Sv * _RtT )); 
     SetVega( _sub_stock_feed->stock_price * _N_pd1 * _RtT );
 
     if ( GetCallOrPut() == CALL )
     {
+        // We only need these three if this opton's a call.
         _N_pd2 = CalcCumNormDist( +_d2 );
         _SN_pd1 = _sub_stock_feed->stock_price * _N_pd1;
         _KerTN_pd2 = _KerT * _N_pd2;
@@ -54,6 +69,7 @@ bool Option::Calculate()
     }
     else
     {
+        // We only need these three if this opton's a put.
         _N_md2 = CalcCumNormDist( -_d2 );
         _SN_md1 = _sub_stock_feed->stock_price * CalcCumNormDist( -_d1 );
         _KerTN_md2 = _KerT * _N_md2;
@@ -64,6 +80,7 @@ bool Option::Calculate()
         SetRho( -_KerT * GetTimeToMaturity() * _N_pd2 ); 
     }
 
+    // Boilerplate - likely to be moved into OptionBase.
     Notify();
     return true;
 }

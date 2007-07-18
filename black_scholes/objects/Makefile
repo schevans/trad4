@@ -9,7 +9,7 @@ CXXFLAGS = -Wall -I$(INSTANCE_ROOT)/objects -I$(INSTANCE_ROOT)/gen/objects -I$(T
 
 COMPILE = $(CXX) $(CXXFLAGS) -c
 
-OBJECTS = RiskFreeRateFeed.o StockFeed.o Option.o OptionVec.o
+OBJECTS = RiskFreeRateFeed.o StockFeed.o Option.o OptionMgr.o
 
 all : $(OBJECTS)
 

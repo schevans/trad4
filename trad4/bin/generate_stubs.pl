@@ -20,14 +20,14 @@ if ( @ARGV != 1 ) {
 my $name = $ARGV[0];
 
 my $is_feed=0;
-my $is_vec=0;
+my $is_mgr=0;
 my $is_agg=0;
 
 if ( $name =~ /feed/ ) {
     $is_feed = 1;
 }
-elsif ( $name =~ /vec/ ) {
-    $is_vec = 1;
+elsif ( $name =~ /mgr/ ) {
+    $is_mgr = 1;
 }
 elsif ( $name =~ /agg/ ) {
     $is_agg = 1;
@@ -117,7 +117,7 @@ sub generate_all() {
 
     generate_struct();
     
-    if ( ! $is_vec ) {
+    if ( ! $is_mgr ) {
         generate_viewer();
     }
 
@@ -193,7 +193,7 @@ sub generate_h_base()
     print H_FILE "#define __$cap_base_name"."__\n";
     print H_FILE "\n";
 
-    if ( $is_vec ) {
+    if ( $is_mgr ) {
         print H_FILE "#include <vector>\n";
         print H_FILE "#include <sstream>\n";
         print H_FILE "\n";
@@ -202,8 +202,8 @@ sub generate_h_base()
     if ( $is_feed ) {
         print H_FILE "#include \"FeedObject.h\"\n";
     }
-    elsif ( $is_vec ) {
-        print H_FILE "#include \"CalcObjectVec.h\"\n";
+    elsif ( $is_mgr ) {
+        print H_FILE "#include \"CalcObjectMgr.h\"\n";
     }
     elsif ( $is_agg ) {
         print H_FILE "#include \"CalcObjectAgg.h\"\n";
@@ -231,8 +231,8 @@ sub generate_h_base()
     if ( $is_feed ) {
         print H_FILE "class $cpp_base_name : public FeedObject {\n";
     }
-    elsif ( $is_vec ) {
-        print H_FILE "class $cpp_base_name : public CalcObjectVec {\n";
+    elsif ( $is_mgr ) {
+        print H_FILE "class $cpp_base_name : public CalcObjectMgr {\n";
     }
     elsif ( $is_agg ) {
         print H_FILE "class $cpp_base_name : public CalcObjectAgg {\n";
@@ -645,7 +645,7 @@ sub generate_cpp_base() {
     print CPP_FILE "    }\n";
     print CPP_FILE "\n";
 
-    if ( $is_vec ) {
+    if ( $is_mgr ) {
 
         
         print CPP_FILE "    ostringstream stream;\n";
@@ -653,13 +653,13 @@ sub generate_cpp_base() {
         print CPP_FILE "\n";
         print CPP_FILE "    string temp( stream.str() );\n";
         print CPP_FILE "\n";
-        print CPP_FILE "    fstream load_file_vec( temp.c_str(), ios::in);\n";
+        print CPP_FILE "    fstream load_file_mgr( temp.c_str(), ios::in);\n";
         print CPP_FILE "\n";
-        print CPP_FILE "    if ( load_file_vec.is_open() )\n";
+        print CPP_FILE "    if ( load_file_mgr.is_open() )\n";
         print CPP_FILE "    {\n";
         print CPP_FILE "        char record[MAX_OB_FILE_LEN];\n";
         print CPP_FILE "\n";
-        print CPP_FILE "        while( load_file_vec >> record )\n";
+        print CPP_FILE "        while( load_file_mgr >> record )\n";
         print CPP_FILE "        {\n";
         print CPP_FILE "            _element_ids.push_back( atoi( record ));\n";
         print CPP_FILE "        }\n";

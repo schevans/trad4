@@ -30,6 +30,7 @@ private:
     double _KerT;
     double _rKerT;
     double _Sv;
+    double _RtT;
 
     double _SN_pd1;
     double _SN_md1;
@@ -40,8 +41,6 @@ private:
     double _N_pd2;
     double _N_md2;
 
-    double _SRtT;
-    double _RtT;
 
 };
 

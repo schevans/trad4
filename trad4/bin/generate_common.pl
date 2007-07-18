@@ -99,7 +99,7 @@ sub generate_viewer_make() {
 
     foreach $obj (@all_objs) {
 
-        if ( !( $obj =~ /_vec/) ) {
+        if ( !( $obj =~ /_mgr/) ) {
             print MAKE_FILE " $obj"."_viewer";
         }
     }
@@ -111,7 +111,7 @@ sub generate_viewer_make() {
 
     foreach $obj (@all_objs) {
 
-        if ( ! ($obj =~ /_vec/) ) {
+        if ( ! ($obj =~ /_mgr/) ) {
             print MAKE_FILE "$obj"."_viewer: ".lower2camel_case( $obj )."Viewer.cpp\n";
             print MAKE_FILE "	\$(COMPILE) ../../bin/$obj"."_viewer ".lower2camel_case( $obj )."Viewer.cpp `pkg-config gtkmm-2.4 --libs --cflags`\n";
             print MAKE_FILE "\n";
