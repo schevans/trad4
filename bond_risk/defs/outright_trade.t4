@@ -9,7 +9,6 @@ sub
 pub
     double pv
     double pnl
-    double dv01
 
 static
     int quantity
