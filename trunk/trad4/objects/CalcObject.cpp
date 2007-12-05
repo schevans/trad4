@@ -25,8 +25,6 @@ void CalcObject::Run() {
         sleep(GetSleepTime());
     }
 
-    SetStatus( RUNNING );
-
     while ( 1 ) {
 
 //cout << GetName() << ": Looping.." << endl;
@@ -66,7 +64,7 @@ cout << "sub shmid: " << sub_shmid << endl;
             exit(1);
         }
 
-        if ( ((object_header*)(shm))->status != RUNNING && ((object_header*)(shm))->status != MANAGED ) {
+        if ( ((object_header*)(shm))->status != RUNNING && ((object_header*)(shm))->status != MANAGED && ((object_header*)(shm))->status != STALE && ((object_header*)(shm))->status != STOPPED ) {
 
             cout << "Object " << sub_id << " not runing. ";
 
