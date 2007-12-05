@@ -95,8 +95,6 @@ bool CalcObject::Stop()
 
     ((object_header*)(_pub))->pid = 0;
 
-     shmdt( _pub );
-
     return true;
 }
 
