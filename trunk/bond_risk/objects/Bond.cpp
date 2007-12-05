@@ -74,7 +74,6 @@ cout << "Price: " << price << ", price_01: " << price_01 << endl;
 
     SetDv01( price - price_01 );
 
-    Notify();
     return true;
 }
 

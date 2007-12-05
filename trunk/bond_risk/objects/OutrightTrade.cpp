@@ -20,7 +20,6 @@ cout << "quantity=" << GetQuantity() << ", trade_price=" << GetTradePrice() << "
 
     SetPnl( ( GetQuantity() * _sub_bond->price / 100 ) - ( GetQuantity() * GetTradePrice() /100 ));
 
-    Notify();
     return true;
 }
 

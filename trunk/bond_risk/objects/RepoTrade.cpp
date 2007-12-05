@@ -38,7 +38,6 @@ bool RepoTrade::Calculate()
 
     SetMtmPnl( cash_agg - total_end_cash );
 
-    Notify();
     return true;
 }
 

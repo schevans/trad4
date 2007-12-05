@@ -16,7 +16,6 @@ bool FxRateFeed::LoadFeedData()
 
     Load();
 
-    Notify();
     return true;
 }
 

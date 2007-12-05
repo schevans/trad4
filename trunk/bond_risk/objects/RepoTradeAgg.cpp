@@ -28,7 +28,6 @@ bool RepoTradeAgg::Calculate()
     SetMtmPnl( _acc_mtm_pnl );
     SetMargin( _acc_margin );
 
-    Notify();
     return true;
 }
 
