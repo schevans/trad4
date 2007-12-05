@@ -34,5 +34,8 @@ bool FeedObject::Stop()
 {
     cout << "Stopping " << GetName() << endl;
     SetStatus( STOPPED );
+
+    ((object_header*)(_pub))->pid = 0;
+
     return true;
 }
