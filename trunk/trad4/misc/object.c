@@ -27,6 +27,7 @@ void sigusr1_handler(int sig_num )
 {
     signal(SIGUSR1, sigusr1_handler);
     object->LoadFeedData();
+    object->Notify();
 }
 
 int main(int argc,char *argv[]) {

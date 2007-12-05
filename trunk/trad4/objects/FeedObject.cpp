@@ -22,6 +22,7 @@ void FeedObject::Run()
     LoadFeedData();
 
     SetStatus( RUNNING );
+    Notify();
 
     while (1) {
         sleep ( 10000 );

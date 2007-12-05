@@ -32,7 +32,10 @@ void CalcObjectAgg::Run() {
         {
 
 cout << GetName() << ": Need refresh.." << endl;
-            Calculate();
+            if ( Calculate() )
+            {
+                Notify();
+            }
         }
 
         sleep(GetSleepTime());
