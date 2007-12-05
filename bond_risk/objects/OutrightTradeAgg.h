@@ -22,11 +22,9 @@ private:
 
     std::map<int,double> _pvs;
     std::map<int,double> _pnls;
-    std::map<int,double> _dv01s;
 
     double _acc_pv;
     double _acc_pnl;
-    double _acc_dv01;
 };
 
 #endif

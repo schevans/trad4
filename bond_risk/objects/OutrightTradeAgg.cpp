@@ -24,15 +24,10 @@ bool OutrightTradeAgg::Calculate()
         _pnls[*iter] = ((outright_trade*)(_elements_map[*iter]))->pnl;
         _acc_pnl = _acc_pnl + ((outright_trade*)(_elements_map[*iter]))->pnl;
 
-        _dv01s[*iter] = ((outright_trade*)(_elements_map[*iter]))->dv01;
-        _acc_dv01 = _acc_dv01 + ((outright_trade*)(_elements_map[*iter]))->dv01;
-
     }
 
     SetPv( _acc_pv );
     SetPnl( _acc_pnl );
-    SetDv01( _acc_dv01 );
-    
 
     Notify();
     return true;

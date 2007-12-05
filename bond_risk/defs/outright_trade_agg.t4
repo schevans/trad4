@@ -12,5 +12,4 @@ static
 pub
     double pv
     double pnl
-    double dv01
 
