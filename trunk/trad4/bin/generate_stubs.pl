@@ -188,6 +188,16 @@ sub generate_h_base()
     my $tuple;
     my ( $var, $type );
 
+    if ( ! -d "$gen_root" )
+    {
+        `mkdir $gen_root`;
+    }
+
+    if ( ! -d "$gen_root/objects" )
+    {
+        `mkdir $gen_root/objects`;
+    }
+
     open H_FILE, ">$gen_root/objects/$h_base_filename" or die "Can't open $gen_root/objects/$h_base_filename for writing. Exiting";
 
     print_licence_header( H_FILE );
@@ -767,6 +777,11 @@ sub generate_struct()
 
 sub generate_viewer()
 {
+    if ( ! -d "$gen_root/viewer" )
+    {
+        `mkdir $gen_root/viewer`;
+    }
+
     open FILE, ">$gen_root/viewer/$viewer_filename" or die "Can't open $gen_root/viewer/$viewer_filename for writing. Exiting";
 
     print_licence_header( FILE );
