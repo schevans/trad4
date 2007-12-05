@@ -29,7 +29,6 @@ bool OutrightTradeAgg::Calculate()
     SetPv( _acc_pv );
     SetPnl( _acc_pnl );
 
-    Notify();
     return true;
 }
 

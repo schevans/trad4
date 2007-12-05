@@ -94,7 +94,6 @@ bool InterestRateFeed::LoadFeedData()
     }
 
 
-    Notify();
     return true;
 }
 
