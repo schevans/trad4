@@ -8,7 +8,7 @@ COMPILE = $(CXX) $(CXXFLAGS) -c
 OBJ_LOC = ../objects
 BIN = ../bin
 
-all: object object_locator object_viewer
+all: object object_locator object_viewer reset_shmem
 
 object: object.o $(OBJ_LOC)/*.o
 	$(CXX) -I/usr/local/include  object.o $(OBJ_LOC)/*.o $(INSTANCE_ROOT)/gen/objects/*.o $(INSTANCE_ROOT)/objects/*.o -o $(BIN)/object 
@@ -21,6 +21,9 @@ object_locator: object_locator.c
 
 reset_object: reset_object.c
 	$(CXX) -I$(TRAD4_ROOT)/objects  -o $(BIN)/reset_object reset_object.c
+
+reset_shmem: reset_shmem.c
+	$(CXX) -I$(TRAD4_ROOT)/objects  -o $(BIN)/reset_shmem reset_shmem.c
 
 halt_object: halt_object.c
 	$(CXX) -I$(TRAD4_ROOT)/objects  -o $(BIN)/halt_object halt_object.c
