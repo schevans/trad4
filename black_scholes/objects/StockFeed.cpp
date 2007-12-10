@@ -19,7 +19,6 @@ bool StockFeed::LoadFeedData()
 
     SetVolatility2( GetVolatility() * GetVolatility() );
 
-    Notify();
     return true;
 }
 

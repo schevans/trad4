@@ -84,8 +84,6 @@ bool Option::Calculate()
         SetRho( -_KerT * GetTimeToMaturity() * _N_pd2 ); 
     }
 
-    // Boilerplate - likely to be moved into OptionBase.
-    Notify();
     return true;
 }
 

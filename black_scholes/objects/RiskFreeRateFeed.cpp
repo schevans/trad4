@@ -17,7 +17,6 @@ bool RiskFreeRateFeed::LoadFeedData()
 
     Load();
 
-    Notify();
     return true;
 }
 

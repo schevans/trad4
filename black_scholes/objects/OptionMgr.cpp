@@ -21,7 +21,6 @@ bool OptionMgr::Calculate()
         (*iter)->Notify();
     }
 
-    Notify();
     return true;
 }
 
