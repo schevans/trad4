@@ -19,6 +19,8 @@
 
 #define OBJECT_NAME_LEN 32
 
+#define MONITOR_SLEEP_TIME 10
+
 enum log_level {
     NONE,
 };
