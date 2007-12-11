@@ -22,7 +22,7 @@ bool DiscountRate::Calculate()
 
         ((discount_rate*)_pub)->rate[i] = exp( -_sub_interest_rate_feed->rate_interpol[i] * (( i / YEAR_BASIS)/ YEAR_BASIS ) );
 
-        ((discount_rate*)_pub)->rate_01[i] = exp( -(_sub_interest_rate_feed->rate_interpol[i] +0.0001) * (( i / YEAR_BASIS)/ YEAR_BASIS ) );
+        ((discount_rate*)_pub)->rate_01[i] = exp( -(_sub_interest_rate_feed->rate_interpol[i] -0.0001) * (( i / YEAR_BASIS)/ YEAR_BASIS ) );
     }
 
     return true;
