@@ -146,6 +146,10 @@ sub generate_h() {
     my $tuple;
     my ( $var, $type );
 
+    if ( ! -d "$obj_root" )
+    {
+        `mkdir $obj_root`;
+    }
     open H_FILE, ">$obj_root/$h_filename" or die "Can't open $obj_root/$h_filename for writing. Exiting";
 
     print_licence_header( H_FILE );
