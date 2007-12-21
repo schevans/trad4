@@ -17,7 +17,7 @@ sub generate_outright_trades($);
 sub generate_repo_trades($);
 sub generate_object($$);
 
-my $current_id = 20;
+my $current_id = 200;
 
 
 my %discount_rate_ids;
@@ -45,9 +45,9 @@ generate_interest_rates();
 generate_discount_rates();
 generate_fx_rates();
 generate_books();
-generate_bonds( 300 );
-generate_outright_trades( 600 );
-generate_repo_trades( 600 );
+generate_bonds( 3000 );
+generate_outright_trades( 6000 );
+generate_repo_trades( 6000 );
 
 sub generate_interest_rates() {
 
