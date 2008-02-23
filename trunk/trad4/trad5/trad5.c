@@ -31,6 +31,7 @@ bool discount_rate_need_refresh( int id );
 // This is only ever called from the object threads, as it's a writer.
 void set_timestamp( int id );
 
+// Provided by the user.
 void* calculate_bond( void* id );
 void* calculate_discount_rate( void* id );
 void* calculate_interest_rate_feed( void* id );
@@ -81,7 +82,7 @@ void setup_mem()
     ((interest_rate_feed*)obj_loc[1])->rate[8] = 2.2;
     ((interest_rate_feed*)obj_loc[1])->rate[9] = 2.1;
 
-cout << "New interest_rate_feed created" << endl;
+    cout << "New interest_rate_feed created" << endl;
     
     obj_loc[2] = new discount_rate;
 
@@ -95,10 +96,7 @@ cout << "New interest_rate_feed created" << endl;
     ((discount_rate*)obj_loc[2])->interest_rate_feed = 1;
     ((discount_rate*)obj_loc[2])->ccy = 0;
 
-cout << "New discount_rate created" << endl;
-
-
-//    bond* my_bond = new bond;
+    cout << "New discount_rate created" << endl;
 
     obj_loc[3] = new bond;
 
@@ -118,7 +116,7 @@ cout << "New discount_rate created" << endl;
     ((bond*)obj_loc[3])->price = 0.0;
     ((bond*)obj_loc[3])->dv01 = 0.0;
 
-cout << "New bond created" << endl;
+    cout << "New bond created" << endl;
 }
 
 void fire_object( int id )
@@ -175,12 +173,8 @@ void* calculate_interest_rate_feed( void* id )
         current_period_start = ((interest_rate_feed*)_pub)->asof[indx];
         current_period_end = ((interest_rate_feed*)_pub)->asof[indx+1];
 
-        //cout << "Grad calc[" << indx << "]: ( " << local_discount_rate[indx] << " - " << local_discount_rate[indx+1] << ") / (" << _sub_interest_rate_feed->asof[indx] << " - " << _sub_interest_rate_feed->asof[indx+1] << " )" <<  endl;
-
         gradient = (( ((interest_rate_feed*)_pub)->rate[indx] - ((interest_rate_feed*)_pub)->rate[indx+1] ) / ( ((interest_rate_feed*)_pub)->asof[indx] - ((interest_rate_feed*)_pub)->asof[indx+1] ) );
         y_intercept = ((interest_rate_feed*)_pub)->rate[indx] - gradient * ((interest_rate_feed*)_pub)->asof[indx];
-
-        //cout << current_period_start << " to " << current_period_end << ", start_rate= "<< local_discount_rate[indx] << ", end_rate= << " << local_discount_rate[indx+1] << " gradient: " << gradient << " y-inter:" << y_intercept << endl;
 
         for ( int i = current_period_start ; i <= current_period_end ; i++ )
         {
