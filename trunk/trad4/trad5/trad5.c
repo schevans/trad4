@@ -290,7 +290,7 @@ void set_timestamp( int id )
 
 void run()
 {
-    int bump_rates_counter(0);
+    int bump_rates_counter(1);
     
     while (1) 
     {
