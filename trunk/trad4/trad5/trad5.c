@@ -1,3 +1,7 @@
+// Copyright (c) Steve Evans 2007
+// steve@topaz.myzen.co.uk
+//
+
 #include <iostream>
 #include <pthread.h>
 #include <stdlib.h>
