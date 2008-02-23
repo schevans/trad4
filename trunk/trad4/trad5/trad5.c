@@ -15,14 +15,6 @@ using namespace std;
 
 void* obj_loc[NUM_OBJECTS+1];
 
-void *task(void *arg) {
-  for ( int i=0 ; i< 10 ; i++) { 
-    cout << (char *)arg;
-    cout.flush();
-  }
-  return NULL;
-}
-
 void setup_mem();
 
 void fire_object( int id );
