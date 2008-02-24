@@ -240,17 +240,14 @@ void* calculate_bond( void* id )
 
     for( iter = _coupon_date_vec.begin() ; iter < _coupon_date_vec.end() ; iter++ )
     {
-
- //       cout << "Flow: 100.0 * " << coupon_rate_per_period << " * " <<  _sub_discount_rate->rate[*iter - TODAY] << endl;
-
         _payment_vec.push_back( 100.0 * coupon_rate_per_period * _sub_discount_rate->rate[*iter - TODAY] );
-
         _payment_vec_01.push_back( 100.0 * coupon_rate_per_period * _sub_discount_rate->rate_01[*iter - TODAY] );
 
-
+        //cout << "_payment_vec: " << ( 100.0 * coupon_rate_per_period * _sub_discount_rate->rate[*iter - TODAY] ) << endl;
+        //cout << "_payment_vec_01: " << ( 100.0 * coupon_rate_per_period * _sub_discount_rate->rate_01[*iter - TODAY] ) << endl;
     }
-    _payment_vec.push_back( 100 * _sub_discount_rate->rate[_coupon_date_vec[_coupon_date_vec.size() -1] - TODAY] );
 
+    _payment_vec.push_back( 100 * _sub_discount_rate->rate[_coupon_date_vec[_coupon_date_vec.size() -1] - TODAY] );
     _payment_vec_01.push_back( 100 * _sub_discount_rate->rate_01[_coupon_date_vec[_coupon_date_vec.size() -1] - TODAY] );
 
     float price(0.0);
@@ -265,10 +262,9 @@ void* calculate_bond( void* id )
     }
 
     ((bond*)_pub)->price = ( price ); 
-
-cout << "New bond price: " << price << ", price_01: " << price_01 << endl;
-
     ((bond*)_pub)->dv01 = ( price - price_01 );
+
+    cout << "New bond price: " << price << ", dv01: " << ( price - price_01 ) << endl;
 
     set_timestamp((int)id);
 }
