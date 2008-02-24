@@ -56,6 +56,8 @@ void* calculate_interest_rate_feed( void* id );
 
 int main() {
 
+
+
     setup_mem();
 
     // Fire off the feed once and let it terminate. This will populate rate_interpol
@@ -69,7 +71,7 @@ void setup_mem()
 {
     obj_loc[1] = new interest_rate_feed;
     ((interest_rate_feed*)obj_loc[1])->last_published = 0;
-//    ((interest_rate_feed*)obj_loc[1])->object_status = 0;
+    ((interest_rate_feed*)obj_loc[1])->status = STOPPED;
     ((interest_rate_feed*)obj_loc[1])->calculator_fpointer = &calculate_interest_rate_feed;
     ((interest_rate_feed*)obj_loc[1])->need_refresh_fpointer = 0; // It's a feed.
     ((interest_rate_feed*)obj_loc[1])->type = 0;
@@ -105,7 +107,7 @@ void setup_mem()
     obj_loc[2] = new discount_rate;
 
     ((discount_rate*)obj_loc[2])->last_published = 0;
-//    ((discount_rate*)obj_loc[2])->object_status = 0;
+    ((discount_rate*)obj_loc[2])->status = STOPPED;
     ((discount_rate*)obj_loc[2])->calculator_fpointer = &calculate_discount_rate;
     ((discount_rate*)obj_loc[2])->need_refresh_fpointer = &discount_rate_need_refresh;
     ((discount_rate*)obj_loc[2])->type = 0;
@@ -120,7 +122,7 @@ void setup_mem()
     obj_loc[3] = new bond;
 
     ((bond*)obj_loc[3])->last_published = 0;
-//    ((bond*)obj_loc[3])->object_status = 0;
+    ((bond*)obj_loc[3])->status = STOPPED;
     ((bond*)obj_loc[3])->calculator_fpointer = &calculate_bond;
     ((bond*)obj_loc[3])->need_refresh_fpointer = &bond_need_refresh;
     ((bond*)obj_loc[3])->type = 0;
@@ -143,9 +145,14 @@ void fire_object( int id )
 {
     pthread_t t1;
 
-    if ( pthread_create(&t1, NULL, (*((header*)obj_loc[id])->calculator_fpointer), (void *)id) != 0 ) {
-        cout << "pthread_create() error" << endl;
-        abort();
+    if ( ((header*)obj_loc[id])->status == STOPPED )
+    {
+        ((header*)obj_loc[id])->status = RUNNING;
+
+        if ( pthread_create(&t1, NULL, (*((header*)obj_loc[id])->calculator_fpointer), (void *)id) != 0 ) {
+            cout << "pthread_create() error" << endl;
+            abort();
+        }
     }
 }
 
@@ -271,6 +278,8 @@ void* calculate_bond( void* id )
 
 void set_timestamp( int id )
 {
+    ((header*)obj_loc[id])->status = STOPPED;
+
     time_t temp;
     (void) time(&temp);
 
@@ -298,11 +307,10 @@ void run()
                 }
             }
 
-            // The sleep's just here to slow things down.
-            sleep( 1 );
+            usleep( 1 );
 
-            // Bump rates every 5 sleeps to simulate market moving.
-            if ( bump_rates_counter++ % 5 == 0 )
+            // Bump rates every few seconds to simulate market moving.
+            if ( bump_rates_counter++ % 500 == 0 )
             {
                 bump_rates();
                 fire_object( 1 );
@@ -332,7 +340,7 @@ bool discount_rate_need_refresh( int id )
 // In the final version I'll probably put the feed structs in shmem so other processes can write to them.
 void bump_rates()
 {
-    cout << "Rates bumped" << endl;
+    cout << "\nRates bumped" << endl;
 
     double peturbation = ( rand() / (double)RAND_MAX ) - 0.5;
 
