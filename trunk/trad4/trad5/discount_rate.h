@@ -6,13 +6,13 @@
 #define __discount_rate__
 
 #include <sys/types.h>
-#include "trad4.h"
 
 typedef struct {
     // Header
     time_t last_published;
     object_status status;
-    int pid;
+    void* (*calculator_fpointer)(void*);
+    bool (*need_refresh_fpointer)(int);
     int type;
     char name[OBJECT_NAME_LEN];
     int sleep_time;

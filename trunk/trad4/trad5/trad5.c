@@ -8,6 +8,7 @@
 #include <math.h>
 #include <vector>
 
+#include "trad5.h"
 #include "common.h"
 #include "bond.h"
 #include "discount_rate.h"
@@ -19,6 +20,17 @@ using namespace std;
 
 void* obj_loc[NUM_OBJECTS+1];
 
+// Temp. Don't know why this isn't being pulled in from trad5.h as other things (like DBG) are..
+typedef struct {
+    // Header
+    time_t last_published;
+    object_status status;
+    void* (*calculator_fpointer)(void*);
+    bool (*need_refresh_fpointer)(int);
+    int type;
+    char name[OBJECT_NAME_LEN];
+    int sleep_time;
+} header;
 
 void fire_object( int id );
 void run();
@@ -56,10 +68,10 @@ int main() {
 void setup_mem() 
 {
     obj_loc[1] = new interest_rate_feed;
-
     ((interest_rate_feed*)obj_loc[1])->last_published = 0;
 //    ((interest_rate_feed*)obj_loc[1])->object_status = 0;
-    ((interest_rate_feed*)obj_loc[1])->pid = 0;
+    ((interest_rate_feed*)obj_loc[1])->calculator_fpointer = &calculate_interest_rate_feed;
+    ((interest_rate_feed*)obj_loc[1])->need_refresh_fpointer = 0; // It's a feed.
     ((interest_rate_feed*)obj_loc[1])->type = 0;
 //    ((interest_rate_feed*)obj_loc[1])->name = 0;
     ((interest_rate_feed*)obj_loc[1])->sleep_time = 0;
@@ -94,7 +106,8 @@ void setup_mem()
 
     ((discount_rate*)obj_loc[2])->last_published = 0;
 //    ((discount_rate*)obj_loc[2])->object_status = 0;
-    ((discount_rate*)obj_loc[2])->pid = 0;
+    ((discount_rate*)obj_loc[2])->calculator_fpointer = &calculate_discount_rate;
+    ((discount_rate*)obj_loc[2])->need_refresh_fpointer = &discount_rate_need_refresh;
     ((discount_rate*)obj_loc[2])->type = 0;
 //    ((discount_rate*)obj_loc[2])->name = 0;
     ((discount_rate*)obj_loc[2])->sleep_time = 0;
@@ -108,7 +121,8 @@ void setup_mem()
 
     ((bond*)obj_loc[3])->last_published = 0;
 //    ((bond*)obj_loc[3])->object_status = 0;
-    ((bond*)obj_loc[3])->pid = 0;
+    ((bond*)obj_loc[3])->calculator_fpointer = &calculate_bond;
+    ((bond*)obj_loc[3])->need_refresh_fpointer = &bond_need_refresh;
     ((bond*)obj_loc[3])->type = 0;
 //    ((bond*)obj_loc[3])->name = 0;
     ((bond*)obj_loc[3])->sleep_time = 0;
@@ -127,37 +141,12 @@ void setup_mem()
 
 void fire_object( int id )
 {
-
     pthread_t t1;
 
-    switch( id ) {
-
-        case 1:
-            if ( pthread_create(&t1, NULL, calculate_interest_rate_feed, (void *)id) != 0 ) {
-                cout << "pthread_create() error" << endl;
-                abort();
-            }
-            break;
-    
-        case 2:
-            if ( pthread_create(&t1, NULL, calculate_discount_rate, (void *)id) != 0 ) {
-                cout << "pthread_create() error" << endl;
-                abort();
-            }
-            break;
-
-        case 3:
-            if ( pthread_create(&t1, NULL, calculate_bond, (void *)id) != 0 ) {
-                cout << "pthread_create() error" << endl;
-                abort();
-            }
-            break;
-        default:
-            cout << "Switch fall-through" << endl;
-            exit(1);
+    if ( pthread_create(&t1, NULL, (*((header*)obj_loc[id])->calculator_fpointer), (void *)id) != 0 ) {
+        cout << "pthread_create() error" << endl;
+        abort();
     }
-
-
 }
 
 void* calculate_interest_rate_feed( void* id )
@@ -300,21 +289,32 @@ void run()
     
     while (1) 
     {
-        if ( bond_need_refresh( 3 ) )
-            fire_object( 3 );            
+        for ( int i=1 ; i <= NUM_OBJECTS ; i++ )
+        {
+            // First check if the object *has* a need_refresh_fpointer
+            //  If it doesn't it's a feed.
+            if ( ((header*)obj_loc[i])->need_refresh_fpointer )
+            {
+                // Ok it's a CaclObject. Call the function.
+                if ( (*((header*)obj_loc[i])->need_refresh_fpointer)(i) )
+                {
+                    fire_object( i );            
+                }
+            }
 
-        if ( discount_rate_need_refresh( 2 ) ) 
-            fire_object( 2 );            
+            // The sleep's just here to slow things down.
+            sleep( 1 );
 
-        // The sleep's just here to slow things down.
-        sleep( 1 );
+            // Bump rates every 5 sleeps to simulate market moving.
+            if ( bump_rates_counter++ % 5 == 0 )
+            {
+                bump_rates();
+                fire_object( 1 );
+            }
 
-        // Bump rates every 5 sleeps to simulate market moving.
-        if ( bump_rates_counter++ % 5 == 0 )
-            bump_rates();
+        }
     }
-
-}   
+}
 
 // More-or-less lifted from BondBase::NeedRefresh()
 bool bond_need_refresh( int id )
@@ -336,16 +336,14 @@ bool discount_rate_need_refresh( int id )
 // In the final version I'll probably put the feed structs in shmem so other processes can write to them.
 void bump_rates()
 {
+    cout << "Rates bumped" << endl;
+
     double peturbation = ( rand() / (double)RAND_MAX ) - 0.5;
 
     for ( int i=0 ; i < INTEREST_RATE_LEN ; i++ )
     {
         ((interest_rate_feed*)obj_loc[1])->rate[i] =+ peturbation;
-
     }
-
-    fire_object( 1 );
-
 }
 
 

@@ -2,8 +2,8 @@
 // steve@topaz.myzen.co.uk
 
 
-#ifndef __TRAD4_H__
-#define __TRAD4_H__
+#ifndef __TRAD5_H__
+#define __TRAD5_H__
 
 #include <sys/types.h>
 
