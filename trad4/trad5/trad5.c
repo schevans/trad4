@@ -145,14 +145,11 @@ void fire_object( int id )
 {
     pthread_t t1;
 
-    if ( ((header*)obj_loc[id])->status == STOPPED )
-    {
-        ((header*)obj_loc[id])->status = RUNNING;
+    ((header*)obj_loc[id])->status = RUNNING;
 
-        if ( pthread_create(&t1, NULL, (*((header*)obj_loc[id])->calculator_fpointer), (void *)id) != 0 ) {
-            cout << "pthread_create() error" << endl;
-            abort();
-        }
+    if ( pthread_create(&t1, NULL, (*((header*)obj_loc[id])->calculator_fpointer), (void *)id) != 0 ) {
+        cout << "pthread_create() error" << endl;
+        abort();
     }
 }
 
@@ -278,14 +275,14 @@ void* calculate_bond( void* id )
 
 void set_timestamp( int id )
 {
-    ((header*)obj_loc[id])->status = STOPPED;
-
     time_t temp;
     (void) time(&temp);
 
     // I know this looks strange but we 'know' the first element in the struct (pointed to
     //  by obj_loc[id]) is an int, regardless of the type of the struct.
     *(int*)obj_loc[id] = temp;
+
+    ((header*)obj_loc[id])->status = STOPPED;
 }
 
 void run()
@@ -307,10 +304,8 @@ void run()
                 }
             }
 
-            usleep( 1 );
-
             // Bump rates every few seconds to simulate market moving.
-            if ( bump_rates_counter++ % 500 == 0 )
+            if ( bump_rates_counter++ % 50000000 == 0 )
             {
                 bump_rates();
                 fire_object( 1 );
@@ -324,7 +319,7 @@ void run()
 bool bond_need_refresh( int id )
 {
     // This will be generated - doesn't matter if it's illegeble.
-    return ( *(int*)obj_loc[id] < *(int*)obj_loc[((bond*)obj_loc[id])->discount_rate] );
+    return ( ((header*)obj_loc[id])->status == STOPPED ) && ( *(int*)obj_loc[id] < *(int*)obj_loc[((bond*)obj_loc[id])->discount_rate] );
 }
 
 
@@ -332,7 +327,7 @@ bool bond_need_refresh( int id )
 bool discount_rate_need_refresh( int id )
 {
     // This will be generated - doesn't matter if it's illegeble.
-    return ( *(int*)obj_loc[id] < *(int*)obj_loc[((discount_rate*)obj_loc[id])->interest_rate_feed] );
+    return ( ((header*)obj_loc[id])->status == STOPPED ) && ( *(int*)obj_loc[id] < *(int*)obj_loc[((discount_rate*)obj_loc[id])->interest_rate_feed] );
 }
 
 
