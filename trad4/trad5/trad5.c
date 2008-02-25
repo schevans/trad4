@@ -312,7 +312,7 @@ void run()
         }
 
         // Bump rates every few seconds to simulate market moving.
-        if ( bump_rates_counter++ % 2000000 == 0 )
+        if ( bump_rates_counter++ % 20000000 == 0 )
         {
             bump_rates();
             fire_object( 1 );
