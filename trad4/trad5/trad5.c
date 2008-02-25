@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <vector>
+#include <sys/time.h>
 
 #include "trad5.h"
 #include "common.h"
@@ -275,12 +276,16 @@ void* calculate_bond( void* id )
 
 void set_timestamp( int id )
 {
-    time_t temp;
-    (void) time(&temp);
+    timeval time;
+    gettimeofday( &time, NULL );
+    int sec = time.tv_sec;
+    int mil = time.tv_usec;
+
+    int timestamp = (( sec - 1203000000 ) * 1000 ) + ( mil / 1000 );
 
     // I know this looks strange but we 'know' the first element in the struct (pointed to
     //  by obj_loc[id]) is an int, regardless of the type of the struct.
-    *(int*)obj_loc[id] = temp;
+    *(int*)obj_loc[id] = timestamp;
 
     ((header*)obj_loc[id])->status = STOPPED;
 }
@@ -304,14 +309,15 @@ void run()
                 }
             }
 
-            // Bump rates every few seconds to simulate market moving.
-            if ( bump_rates_counter++ % 50000000 == 0 )
-            {
-                bump_rates();
-                fire_object( 1 );
-            }
-
         }
+
+        // Bump rates every few seconds to simulate market moving.
+        if ( bump_rates_counter++ % 2000000 == 0 )
+        {
+            bump_rates();
+            fire_object( 1 );
+        }
+
     }
 }
 
