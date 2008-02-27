@@ -1,7 +1,7 @@
 # Copyright (c) Steve Evans 2008
 # steve@topaz.myzen.co.uk
 
-CXX = g++
+CXX = g++ -O3
 
 CXXFLAGS = -O3
 
