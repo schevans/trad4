@@ -40,14 +40,15 @@ enum object_status {
 //} obj_loc;
 
 typedef struct {
+    // Header
     time_t last_published;
     object_status status;
-    int pid;
+    void* (*calculator_fpointer)(void*);
+    bool (*need_refresh_fpointer)(int);
     int type;
     char name[OBJECT_NAME_LEN];
     int sleep_time;
 } object_header;
-
 
 #define DBG cout << __FILE__ << ": " << __LINE__ << endl;
 
