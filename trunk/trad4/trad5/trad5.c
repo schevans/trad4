@@ -21,18 +21,6 @@ using namespace std;
 
 void* obj_loc[NUM_OBJECTS+1];
 
-// Temp. Don't know why this isn't being pulled in from trad5.h as other things (like DBG) are..
-typedef struct {
-    // Header
-    time_t last_published;
-    object_status status;
-    void* (*calculator_fpointer)(void*);
-    bool (*need_refresh_fpointer)(int);
-    int type;
-    char name[OBJECT_NAME_LEN];
-    int sleep_time;
-} header;
-
 void fire_object( int id );
 void run();
 
@@ -146,9 +134,9 @@ void fire_object( int id )
 {
     pthread_t t1;
 
-    ((header*)obj_loc[id])->status = RUNNING;
+    ((object_header*)obj_loc[id])->status = RUNNING;
 
-    if ( pthread_create(&t1, NULL, (*((header*)obj_loc[id])->calculator_fpointer), (void *)id) != 0 ) {
+    if ( pthread_create(&t1, NULL, (*((object_header*)obj_loc[id])->calculator_fpointer), (void *)id) != 0 ) {
         cout << "pthread_create() error" << endl;
         abort();
     }
@@ -287,7 +275,7 @@ void set_timestamp( int id )
     //  by obj_loc[id]) is an int, regardless of the type of the struct.
     *(int*)obj_loc[id] = timestamp;
 
-    ((header*)obj_loc[id])->status = STOPPED;
+    ((object_header*)obj_loc[id])->status = STOPPED;
 }
 
 void run()
@@ -300,10 +288,10 @@ void run()
         {
             // First check if the object *has* a need_refresh_fpointer
             //  If it doesn't it's a feed.
-            if ( ((header*)obj_loc[i])->need_refresh_fpointer )
+            if ( ((object_header*)obj_loc[i])->need_refresh_fpointer )
             {
                 // Ok it's a CaclObject. Call the function.
-                if ( (*((header*)obj_loc[i])->need_refresh_fpointer)(i) )
+                if ( (*((object_header*)obj_loc[i])->need_refresh_fpointer)(i) )
                 {
                     fire_object( i );            
                 }
@@ -325,7 +313,7 @@ void run()
 bool bond_need_refresh( int id )
 {
     // This will be generated - doesn't matter if it's illegeble.
-    return ( ((header*)obj_loc[id])->status == STOPPED ) && ( *(int*)obj_loc[id] < *(int*)obj_loc[((bond*)obj_loc[id])->discount_rate] );
+    return ( ((object_header*)obj_loc[id])->status == STOPPED ) && ( *(int*)obj_loc[id] < *(int*)obj_loc[((bond*)obj_loc[id])->discount_rate] );
 }
 
 
@@ -333,7 +321,7 @@ bool bond_need_refresh( int id )
 bool discount_rate_need_refresh( int id )
 {
     // This will be generated - doesn't matter if it's illegeble.
-    return ( ((header*)obj_loc[id])->status == STOPPED ) && ( *(int*)obj_loc[id] < *(int*)obj_loc[((discount_rate*)obj_loc[id])->interest_rate_feed] );
+    return ( ((object_header*)obj_loc[id])->status == STOPPED ) && ( *(int*)obj_loc[id] < *(int*)obj_loc[((discount_rate*)obj_loc[id])->interest_rate_feed] );
 }
 
 
