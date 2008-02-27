@@ -13,6 +13,11 @@
 #define MAX_OB_FILE_NAME 20
 #define MAX_OBJECT_TYPES_FILE_LEN 120
 
+#define NUM_OBJECTS 3
+
+//void* obj_loc[NUM_OBJECTS+1];
+
+
 #define OBJ_LOC_SHMID_LEN 32
 
 #define OBJECT_NAME_LEN 32
