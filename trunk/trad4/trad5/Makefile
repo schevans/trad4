@@ -3,18 +3,15 @@
 
 CXX = g++
 
-CXXFLAGS = -c -O3
+CXXFLAGS = -O3
 
 COMPILE = $(CXX) $(CXXFLAGS)
 
-OBJECTS = trad5.o bond.o discount_rate.o interest_rate_feed.o
+OBJECTS = trad5.c bond.c discount_rate.c interest_rate_feed.c
 
 trad5: $(OBJECTS)
 	$(CXX) -o trad5 $(OBJECTS) -lpthread
 
-%.o : %.c
-	$(COMPILE) $< -o $@
-
 clean :
-	rm -f $(OBJECTS) trad5
+	rm -f trad5
 
