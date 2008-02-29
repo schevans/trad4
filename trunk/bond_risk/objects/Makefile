@@ -7,7 +7,7 @@ CXXFLAGS = -c -I$(TRAD4_ROOT)/objects
 
 COMPILE = g++ -c -I$(TRAD4_ROOT)/objects
 
-OBJECTS = bond.o interest_rate_feed.o discount_rate.o 
+OBJECTS = bond.o interest_rate_feed.o discount_rate.o loader.o
 
 all : $(OBJECTS)
 

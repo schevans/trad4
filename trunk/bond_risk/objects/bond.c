@@ -2,24 +2,18 @@
 // steve@topaz.myzen.co.uk
 //
 
+
 #include <iostream>
 #include <vector>
 
 #include "trad4.h"
-#include "common.h"
 #include "bond.h"
 #include "discount_rate.h"
 
-using namespace std;
-
-//#define NUM_OBJECTS 3
-
-//extern void* obj_loc[NUM_OBJECTS+1];
-
-extern void set_timestamp( int );
-
 extern void* obj_loc[NUM_OBJECTS+1];
+extern void set_timestamp( int id );
 
+using namespace std;
 
 void* calculate_bond( void* id )
 {
@@ -51,7 +45,6 @@ void* calculate_bond( void* id )
 
         working_date = working_date + days_between_coupons;
     }
-
     _coupon_date_vec.push_back( working_date );
 
     vector<int>::iterator iter;
@@ -85,12 +78,10 @@ void* calculate_bond( void* id )
     cout << "New bond price: " << price << ", dv01: " << ( price - price_01 ) << endl;
 
     set_timestamp((int)id);
+
 }
 
-// More-or-less lifted from BondBase::NeedRefresh()
 bool bond_need_refresh( int id )
 {
-    // This will be generated - doesn't matter if it's illegeble.
-    return ( ((object_header*)obj_loc[id])->status == STOPPED ) && ( *(int*)obj_loc[id] < *(int*)obj_loc[((bond*)obj_loc[id])->discount_rate] );
+    return ( (((object_header*)obj_loc[id])->status == STOPPED ) && ( *(int*)obj_loc[id] < *(int*)obj_loc[((bond*)obj_loc[id])->discount_rate] ) ||  0 );
 }
-

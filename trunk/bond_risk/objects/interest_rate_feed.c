@@ -3,17 +3,14 @@
 //
 
 #include <iostream>
-#include <vector>
 
 #include "trad4.h"
-#include "common.h"
 #include "interest_rate_feed.h"
 
-using namespace std;
-
-extern void set_timestamp( int );
-
 extern void* obj_loc[NUM_OBJECTS+1];
+extern void set_timestamp( int id );
+
+using namespace std;
 
 void* calculate_interest_rate_feed( void* id )
 {
@@ -49,3 +46,7 @@ void* calculate_interest_rate_feed( void* id )
     set_timestamp((int)id);
 }
 
+bool interest_rate_feed_need_refresh( int id )
+{
+    return (  0 );
+}

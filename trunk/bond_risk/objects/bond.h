@@ -1,21 +1,29 @@
-// Copyright (c) Steve Evans 2008
-// steve@topaz.myzen.co.uk
-// 
 
 #ifndef __bond__
 #define __bond__
 
 #include <sys/types.h>
 
+#include "common.h"
+
+
+//void* calculate_bond( void* id );
+
+/*
+void* calculate_bond( void* id )
+{
+//ff
+}
+*/
+
 typedef struct {
     // Header
-    time_t last_published;
+    ulong last_published;
     object_status status;
     void* (*calculator_fpointer)(void*);
     bool (*need_refresh_fpointer)(int);
     int type;
     char name[OBJECT_NAME_LEN];
-    int sleep_time;
 
     // Sub
     int discount_rate;

@@ -44,7 +44,8 @@ my $gen_root=$ENV{INSTANCE_ROOT};
 my $obj_root=$ENV{INSTANCE_ROOT}."/objects";
 
 
-sub generate_header();
+sub generate_h();
+sub generate_c();
 sub load_defs($);
 
 open TYPES_FILE, "$ENV{INSTANCE_ROOT}/defs/object_types.t4s" or die "Can't open $ENV{INSTANCE_ROOT}/defs/object_types.t4s for reading";
@@ -67,72 +68,79 @@ close TYPES_FILE;
 
 load_defs( "$defs_root/$name.t4" );
 
-generate_header();
+generate_h();
 
-sub generate_header()
+if ( ! -f "$obj_root/$c_filename" ) {
+    generate_c();
+}
+
+exit 0;
+
+sub generate_h()
 {
-    open PUB_STRUCT_FILE, ">$gen_root/objects/$h_filename" or die "Can't open $gen_root/objects/$h_filename for writing. Exiting";
+    open H_FILE, ">$gen_root/objects/$h_filename" or die "Can't open $gen_root/objects/$h_filename for writing. Exiting";
 
-    #print_licence_header( PUB_STRUCT_FILE );
+    #print_licence_header( H_FILE );
 
-    print PUB_STRUCT_FILE "\n";
-    print PUB_STRUCT_FILE "#ifndef __$name"."__\n";
-    print PUB_STRUCT_FILE "#define __$name"."__\n";
-    print PUB_STRUCT_FILE "\n";
-    print PUB_STRUCT_FILE "#include <sys/types.h>\n";
-    print PUB_STRUCT_FILE "#include \"trad4.h\"\n";
-    print PUB_STRUCT_FILE "\n";
-    print PUB_STRUCT_FILE "typedef struct {\n";
+    print H_FILE "\n";
+    print H_FILE "#ifndef __$name"."__\n";
+    print H_FILE "#define __$name"."__\n";
+    print H_FILE "\n";
+    print H_FILE "#include <sys/types.h>\n";
+    print H_FILE "\n";
+    print H_FILE "#include \"common.h\"\n";
+    print H_FILE "\n";
+    print H_FILE "typedef struct {\n";
 
-    print PUB_STRUCT_FILE "    // Header\n";
+    print H_FILE "    // Header\n";
 
     foreach $tuple ( @header, @common ) {
 
         ( $type, $var ) = split / /, $tuple;
 
-        print PUB_STRUCT_FILE "    $type $var;\n";
+        print H_FILE "    $type $var;\n";
 
     }
 
-    print PUB_STRUCT_FILE "\n";
-    print PUB_STRUCT_FILE "    // Sub\n";
+    print H_FILE "\n";
+    print H_FILE "    // Sub\n";
 
     foreach $tuple ( @sub ) {
 
         ( $type, $var ) = split / /, $tuple;
 
-        print PUB_STRUCT_FILE "    int $var;\n";
+        print H_FILE "    int $var;\n";
 
     }
 
-    print PUB_STRUCT_FILE "\n";
-    print PUB_STRUCT_FILE "    // Static\n";
+    print H_FILE "\n";
+    print H_FILE "    // Static\n";
 
     foreach $tuple ( @static ) {
 
         ( $type, $var ) = split / /, $tuple;
 
-        print PUB_STRUCT_FILE "    $type $var;\n";
+        print H_FILE "    $type $var;\n";
 
     }
 
-    print PUB_STRUCT_FILE "\n";
-    print PUB_STRUCT_FILE "    // Pub\n";
+    print H_FILE "\n";
+    print H_FILE "    // Pub\n";
 
     foreach $tuple ( @pub, @mem_pub ) {
 
         ( $type, $var ) = split / /, $tuple;
 
-        print PUB_STRUCT_FILE "    $type $var;\n";
+        print H_FILE "    $type $var;\n";
 
     }
 
 
-    print PUB_STRUCT_FILE "} $name;\n";
-    print PUB_STRUCT_FILE "\n";
-    print PUB_STRUCT_FILE "#endif\n";
+    print H_FILE "} $name;\n";
+    print H_FILE "\n";
+    print H_FILE "#endif\n";
 
-    close PUB_STRUCT_FILE;
+    close H_FILE;
 }
 
 sub load_defs($) {
@@ -203,4 +211,50 @@ sub trim($) {
 
     return $str;
 }
+
+sub generate_c()
+{
+    open C_FILE, ">$gen_root/objects/$c_filename" or die "Can't open $gen_root/objects/$c_filename for writing. Exiting";
+
+    #print_licence_header( C_FILE );
+
+    print C_FILE "\n";
+    print C_FILE "#include \"trad4.h\"\n";
+    print C_FILE "#include \"$name.h\"\n";
+    print C_FILE "\n";
+    print C_FILE "extern void* obj_loc[NUM_OBJECTS+1];\n";
+    print C_FILE "\n";
+    print C_FILE "void* calculate_$name( void* id )\n";
+    print C_FILE "{\n";
+    print C_FILE "\n";
+    print C_FILE "}\n";
+    print C_FILE "\n";
+    print C_FILE "bool ".$name."_need_refresh( int id )\n";
+    print C_FILE "{\n";
+
+    print C_FILE "    return ( ";
+
+    foreach $tuple ( @sub ) {
+
+        ( $type, $var ) = split / /, $tuple;
+
+        print C_FILE "(((object_header*)obj_loc[id])->status == STOPPED ) && ( *(int*)obj_loc[id] < *(int*)obj_loc[(($name*)obj_loc[id])->$var] ) || ";  
+
+
+    }
+
+    print C_FILE " 0 );\n";
+
+
+
+
+    print C_FILE "}\n";
+
+    close C_FILE;
+}
+
+
+
+
+
 
