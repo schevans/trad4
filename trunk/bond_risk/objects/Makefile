@@ -3,16 +3,16 @@
 
 CXX = g++
 
-CXXFLAGS = -c -I$(TRAD4_ROOT)/src
+CXXFLAGS = -c -I$(TRAD4_ROOT)/objects
 
-COMPILE = g++ -c -I$(TRAD4_ROOT)/src
+COMPILE = g++ -c -I$(TRAD4_ROOT)/objects
 
 OBJECTS = bond.o interest_rate_feed.o discount_rate.o 
 
 all : $(OBJECTS)
 
 %.o : %.c
-	g++ -c -I$(TRAD4_ROOT)/src $< -o $@
+	g++ -c -I$(TRAD4_ROOT)/objects $< -o $@
 
 clean : 
 	rm -f $(OBJECTS)
