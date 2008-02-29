@@ -1,21 +1,19 @@
-# Copyright (c) Steve Evans 2007
+# Copyright (c) Steve Evans 2008
 # steve@topaz.myzen.co.uk
-# This code is licenced under the BSD licence. For details see $INSTANCE_ROOT/LICENCE
-# 
 
 CXX = g++
 
-CXXFLAGS = -Wall -I$(INSTANCE_ROOT)/objects -I$(INSTANCE_ROOT)/gen/objects -I$(TRAD4_ROOT)/objects
+CXXFLAGS = -c -I$(TRAD4_ROOT)/src
 
-COMPILE = $(CXX) $(CXXFLAGS) -c
+COMPILE = g++ -c -I$(TRAD4_ROOT)/src
 
-OBJECTS = InterestRateFeed.o DiscountRate.o Bond.o OutrightTrade.o RepoTrade.o FxRateFeed.o OutrightTradeAgg.o RepoTradeAgg.o
+OBJECTS = bond.o interest_rate_feed.o discount_rate.o 
 
 all : $(OBJECTS)
 
-%.o : %.cc
-	$(COMPILE) $< -o $@
+%.o : %.c
+	g++ -c -I$(TRAD4_ROOT)/src $< -o $@
 
-clean :
+clean : 
 	rm -f $(OBJECTS)
 

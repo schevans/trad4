@@ -1,17 +1,17 @@
+# Copyright (c) Steve Evans 2008
+# steve@topaz.myzen.co.uk
 
-CXX = g++
+CXX = g++ 
 
-CXXFLAGS = -Wall -c -I$(INSTANCE_ROOT)/gen/objects -I.
+CXXFLAGS = -O3
 
 COMPILE = $(CXX) $(CXXFLAGS)
 
-OBJECTS = Object.o CalcObject.o FeedObject.o CalcObjectMgr.o CalcObjectAgg.o
+all: trad4.o
 
-all : $(OBJECTS)
+trad4.o: trad4.c
+	g++ -c -o trad4.o trad4.c -I../../trad_bond_risk/objects
 
-%.o : %.cc
-	$(COMPILE) $< -o $@
-
-clean : 
-	rm -f $(OBJECTS)
+clean :
+	rm -f trad4.o
 
