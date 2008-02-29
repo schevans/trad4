@@ -6,15 +6,13 @@
 #include <math.h>
 
 #include "trad4.h"
-#include "common.h"
 #include "discount_rate.h"
 #include "interest_rate_feed.h"
 
-using namespace std;
-
 extern void* obj_loc[NUM_OBJECTS+1];
+extern void set_timestamp( int id );
 
-extern void set_timestamp( int );
+using namespace std;
 
 void* calculate_discount_rate( void* id )
 {
@@ -36,10 +34,8 @@ void* calculate_discount_rate( void* id )
     set_timestamp((int)id);
 }
 
-// More-or-less lifted from DiscountRateBase::NeedRefresh()
+
 bool discount_rate_need_refresh( int id )
 {
-    // This will be generated - doesn't matter if it's illegeble.
-    return ( ((object_header*)obj_loc[id])->status == STOPPED ) && ( *(int*)obj_loc[id] < *(int*)obj_loc[((discount_rate*)obj_loc[id])->interest_rate_feed] );
+    return ( (((object_header*)obj_loc[id])->status == STOPPED ) && ( *(int*)obj_loc[id] < *(int*)obj_loc[((discount_rate*)obj_loc[id])->interest_rate_feed] ) ||  0 );
 }
-

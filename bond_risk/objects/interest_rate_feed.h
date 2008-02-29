@@ -1,21 +1,19 @@
-// Copyright (c) Steve Evans 2008
-// steve@topaz.myzen.co.uk
-// 
 
 #ifndef __interest_rate_feed__
 #define __interest_rate_feed__
 
 #include <sys/types.h>
 
+#include "common.h"
+
 typedef struct {
     // Header
-    time_t last_published;
+    ulong last_published;
     object_status status;
     void* (*calculator_fpointer)(void*);
     bool (*need_refresh_fpointer)(int);
     int type;
     char name[OBJECT_NAME_LEN];
-    int sleep_time;
 
     // Sub
 
