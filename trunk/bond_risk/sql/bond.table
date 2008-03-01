@@ -1,0 +1,10 @@
+create table bond (
+    id int,
+    coupon float,
+    start_date int,
+    maturity_date int, 
+    coupons_per_year int, 
+    ccy int,
+    price float
+)
+

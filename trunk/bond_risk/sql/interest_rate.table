@@ -1,0 +1,6 @@
+
+create table interest_rate (
+    id int,
+    ccy int,
+    feed_published int
+)

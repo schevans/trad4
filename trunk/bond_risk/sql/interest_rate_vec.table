@@ -1,0 +1,7 @@
+
+create table interest_rate_vec (
+    id int,
+    asof int,
+    rate double
+)
+
