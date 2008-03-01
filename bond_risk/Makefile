@@ -25,5 +25,5 @@ clean_trad_bond_risk:
 	rm -f trad_bond_risk
 
 trad_bond_risk: $(OBJECTS)
-	$(CXX) -o trad_bond_risk $(OBJECTS) -lpthread -I../trad4/objects
+	$(CXX) -o trad_bond_risk $(OBJECTS) -lpthread -L/usr/local/lib/mysql -lmysqlclient
 
