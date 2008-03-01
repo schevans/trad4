@@ -3,12 +3,21 @@
 //
 
 #include <iostream>
+#include <sstream>
+#include <vector>
 
 #include "trad4.h"
 #include "common.h"
 #include "bond.h"
 #include "discount_rate.h"
 #include "interest_rate_feed.h"
+
+#include "mysql/mysql.h"
+
+MYSQL mysql;
+MYSQL_RES *result;
+MYSQL_ROW row;
+
 
 extern void* obj_loc[NUM_OBJECTS+1];
 
@@ -25,75 +34,158 @@ extern void* calculate_interest_rate_feed( void* id );
 
 using namespace std;
 
+void load_bond( int id );
+void load_interest_rate_feeds();
+void load_discount_rate( int id );
+
+void load_interest_rate_feeds()
+{
+    ostringstream dbstream;
+    dbstream << "select id, type, name from object where type=1";
+
+    if(mysql_query(&mysql, dbstream.str().c_str()) != 0) {
+        cout << __LINE__ << ": " << mysql_error(&mysql) << endl;
+    }
+
+    result = mysql_use_result(&mysql);
+
+    int id;
+    int type;
+    std::string name;
+    std::vector<int> interest_rates;
+
+    while (( row = mysql_fetch_row(result) )) {
+
+       id = atoi(row[0]);
+       type = atoi(row[1]);
+       name = row[2];
+
+        obj_loc[id] = new interest_rate_feed;
+        ((interest_rate_feed*)obj_loc[id])->last_published = 0;
+        ((interest_rate_feed*)obj_loc[id])->status = STOPPED;
+        ((interest_rate_feed*)obj_loc[id])->calculator_fpointer = &calculate_interest_rate_feed;
+        ((interest_rate_feed*)obj_loc[id])->need_refresh_fpointer = 0; // It's a feed.
+        ((interest_rate_feed*)obj_loc[id])->type = type;
+    //    ((interest_rate_feed*)obj_loc[id])->name = 0;
+
+        interest_rates.push_back( id );
+    }
+
+    mysql_free_result(result);
+
+    vector<int>::iterator iter;
+
+    for( iter = interest_rates.begin() ; iter < interest_rates.end() ; iter++ )
+    {
+
+        ostringstream dbstream;
+
+        dbstream << "select asof, rate from interest_rate_vec where id = " << *iter;
+
+        if(mysql_query(&mysql, dbstream.str().c_str()) != 0) {
+            cout << __LINE__ << ": " << mysql_error(&mysql) << endl;
+        }
+
+        result = mysql_use_result(&mysql);
+
+        int counter(0);
+
+        while (( row = mysql_fetch_row(result) )) {
+            ((interest_rate_feed*)obj_loc[*iter])->asof[counter] = atoi(row[0]);
+            ((interest_rate_feed*)obj_loc[*iter])->rate[counter] = atof(row[1]);
+
+            counter++;
+        }
+    }
+
+    mysql_free_result(result);
+}
+
+void load_bonds()
+{
+    ostringstream dbstream;
+    dbstream << "select o.id, type, name, b.coupon, b.start_date, b.maturity_date, b.coupons_per_year from object o, bond b where b.id = o.id and type=3";
+
+    if(mysql_query(&mysql, dbstream.str().c_str()) != 0) {
+        cout << __LINE__ << ": " << mysql_error(&mysql) << endl;
+    }
+
+    result = mysql_use_result(&mysql);
+
+    while (( row = mysql_fetch_row(result) )) {
+
+        int id = atoi(row[0]);
+
+        obj_loc[id] = new bond;
+
+        ((bond*)obj_loc[id])->last_published = 0;
+        ((bond*)obj_loc[id])->status = STOPPED;
+        ((bond*)obj_loc[id])->calculator_fpointer = &calculate_bond;
+        ((bond*)obj_loc[id])->need_refresh_fpointer = &bond_need_refresh;
+        ((bond*)obj_loc[id])->type = 0;
+    //    ((bond*)obj_loc[id])->name = 0;
+
+        ((bond*)obj_loc[id])->discount_rate = 2;
+        ((bond*)obj_loc[id])->coupon = atof(row[3]);
+        ((bond*)obj_loc[id])->start_date = atoi(row[4]);
+        ((bond*)obj_loc[id])->maturity_date = atoi(row[5]);
+        ((bond*)obj_loc[id])->coupons_per_year = atoi(row[6]);
+        ((bond*)obj_loc[id])->ccy = 0;
+        ((bond*)obj_loc[id])->price = 0.0;
+        ((bond*)obj_loc[id])->dv01 = 0.0;
+
+        cout << "New bond created" << endl;
+    }
+
+    mysql_free_result(result);
+}
+
+void load_discount_rate()
+{
+    ostringstream dbstream;
+    dbstream << "select id from object where type=2";
+
+    if(mysql_query(&mysql, dbstream.str().c_str()) != 0) {
+        cout << __LINE__ << ": " << mysql_error(&mysql) << endl;
+    }
+
+    result = mysql_use_result(&mysql);
+
+    while (( row = mysql_fetch_row(result) )) {
+
+        int id = atoi(row[0]);
+
+        obj_loc[id] = new discount_rate;
+
+        ((discount_rate*)obj_loc[id])->last_published = 0;
+        ((discount_rate*)obj_loc[id])->status = STOPPED;
+        ((discount_rate*)obj_loc[id])->calculator_fpointer = &calculate_discount_rate;
+        ((discount_rate*)obj_loc[id])->need_refresh_fpointer = &discount_rate_need_refresh;
+        ((discount_rate*)obj_loc[id])->type = 0;
+    //    ((discount_rate*)obj_loc[id])->name = 0;
+
+        ((discount_rate*)obj_loc[id])->interest_rate_feed = 1;
+        ((discount_rate*)obj_loc[id])->ccy = 0;
+
+        cout << "New discount_rate created" << endl;
+
+    }
+
+    mysql_free_result(result);
+}
 
 void load_all()
 {
-    obj_loc[1] = new interest_rate_feed;
-    ((interest_rate_feed*)obj_loc[1])->last_published = 0;
-    ((interest_rate_feed*)obj_loc[1])->status = STOPPED;
-    ((interest_rate_feed*)obj_loc[1])->calculator_fpointer = &calculate_interest_rate_feed;
-    ((interest_rate_feed*)obj_loc[1])->need_refresh_fpointer = 0; // It's a feed.
-    ((interest_rate_feed*)obj_loc[1])->type = 0;
-//    ((interest_rate_feed*)obj_loc[1])->name = 0;
+    mysql_init(&mysql);
 
-    ((interest_rate_feed*)obj_loc[1])->ccy = 0;
+    if (!mysql_real_connect(&mysql,"localhost", "root", NULL,"trad4",0,NULL,0)) {
+        cout << __LINE__ << " "  << mysql_error(&mysql) << endl;
+    }
 
-    ((interest_rate_feed*)obj_loc[1])->asof[0] = 10000;
-    ((interest_rate_feed*)obj_loc[1])->asof[1] = 11000;
-    ((interest_rate_feed*)obj_loc[1])->asof[2] = 12000;
-    ((interest_rate_feed*)obj_loc[1])->asof[3] = 13000;
-    ((interest_rate_feed*)obj_loc[1])->asof[4] = 14000;
-    ((interest_rate_feed*)obj_loc[1])->asof[5] = 15000;
-    ((interest_rate_feed*)obj_loc[1])->asof[6] = 16000;
-    ((interest_rate_feed*)obj_loc[1])->asof[7] = 17000;
-    ((interest_rate_feed*)obj_loc[1])->asof[8] = 18000;
-    ((interest_rate_feed*)obj_loc[1])->asof[9] = 20000;
-
-    ((interest_rate_feed*)obj_loc[1])->rate[0] = 2.3;
-    ((interest_rate_feed*)obj_loc[1])->rate[1] = 2.4;
-    ((interest_rate_feed*)obj_loc[1])->rate[2] = 2.5;
-    ((interest_rate_feed*)obj_loc[1])->rate[3] = 2.5;
-    ((interest_rate_feed*)obj_loc[1])->rate[4] = 2.4;
-    ((interest_rate_feed*)obj_loc[1])->rate[5] = 2.3;
-    ((interest_rate_feed*)obj_loc[1])->rate[6] = 2.2;
-    ((interest_rate_feed*)obj_loc[1])->rate[7] = 2.2;
-    ((interest_rate_feed*)obj_loc[1])->rate[8] = 2.2;
-    ((interest_rate_feed*)obj_loc[1])->rate[9] = 2.1;
-
-    cout << "New interest_rate_feed created" << endl;
-
-    obj_loc[2] = new discount_rate;
-
-    ((discount_rate*)obj_loc[2])->last_published = 0;
-    ((discount_rate*)obj_loc[2])->status = STOPPED;
-    ((discount_rate*)obj_loc[2])->calculator_fpointer = &calculate_discount_rate;
-    ((discount_rate*)obj_loc[2])->need_refresh_fpointer = &discount_rate_need_refresh;
-    ((discount_rate*)obj_loc[2])->type = 0;
-//    ((discount_rate*)obj_loc[2])->name = 0;
-
-    ((discount_rate*)obj_loc[2])->interest_rate_feed = 1;
-    ((discount_rate*)obj_loc[2])->ccy = 0;
-
-    cout << "New discount_rate created" << endl;
-    obj_loc[3] = new bond;
-
-    ((bond*)obj_loc[3])->last_published = 0;
-    ((bond*)obj_loc[3])->status = STOPPED;
-    ((bond*)obj_loc[3])->calculator_fpointer = &calculate_bond;
-    ((bond*)obj_loc[3])->need_refresh_fpointer = &bond_need_refresh;
-    ((bond*)obj_loc[3])->type = 0;
-//    ((bond*)obj_loc[3])->name = 0;
-
-    ((bond*)obj_loc[3])->discount_rate = 2;
-    ((bond*)obj_loc[3])->coupon = 2.2;
-    ((bond*)obj_loc[3])->start_date = 5000;
-    ((bond*)obj_loc[3])->maturity_date = 15000;
-    ((bond*)obj_loc[3])->coupons_per_year = 4;
-    ((bond*)obj_loc[3])->ccy = 0;
-    ((bond*)obj_loc[3])->price = 0.0;
-    ((bond*)obj_loc[3])->dv01 = 0.0;
-
-    cout << "New bond created" << endl;
+    load_interest_rate_feeds();
+    load_bonds();
+    load_discount_rate();
+    
 }
 
 
