@@ -15,8 +15,15 @@ using namespace std;
 
 void* obj_loc[NUM_OBJECTS+1];
 
+#define NUM_THREADS 10
+
+int thread_contoller[NUM_THREADS+1];
+
 void fire_object( int id );
 void run();
+
+void* thread_loop( void* thread_id );
+void start_threads();
 
 // For prototype only 
 //  Mimics the IR feed.
@@ -34,19 +41,29 @@ int main() {
     // Fire off the feed once and let it terminate. This will populate rate_interpol
     fire_object( 1 );
 
+    start_threads();
+
+sleep(1);
+
     run();
 
 }
 
 void fire_object( int id )
 {
-    pthread_t t1;
+    cout << "Firing object " << id << endl;
 
-    ((object_header*)obj_loc[id])->status = RUNNING;
+    bool fired(false);
 
-    if ( pthread_create(&t1, NULL, (*((object_header*)obj_loc[id])->calculator_fpointer), (void *)id) != 0 ) {
-        cout << "pthread_create() error" << endl;
-        abort();
+    for ( int i=0 ; i <= NUM_THREADS ; i++ )
+    {
+        if ( thread_contoller[i] == 0 )
+        {
+            ((object_header*)obj_loc[id])->status = RUNNING;
+            thread_contoller[i] = id;
+            fired = true;
+            break;
+        }
     }
 }
 
@@ -88,13 +105,50 @@ void run()
         }
 
         // Bump rates every few seconds to simulate market moving.
-        if ( bump_rates_counter++ % 20000000 == 0 )
+        if ( bump_rates_counter++ % 50000000 == 0 )
         {
             bump_rates();
             fire_object( 1 );
         }
 
     }
+}
+
+void* thread_loop( void* thread_id ) 
+{
+
+cout << "Starting thread " << (int)thread_id << endl;
+
+    while (1) {
+
+        if ( thread_contoller[(int)thread_id] != 0 )
+        {
+
+cout << "Thread #" << (int)thread_id << " working on obj id: " << thread_contoller[(int)thread_id] << endl;
+
+            (*((object_header*)obj_loc[thread_contoller[(int)thread_id]])->calculator_fpointer)((void*)(thread_contoller[(int)thread_id]));
+            thread_contoller[(int)thread_id] = 0;
+cout << "Thread #" << (int)thread_id << " done." << endl;
+        }
+
+        usleep(1000);
+
+    }
+
+}
+
+void start_threads()
+{
+    for ( int i=1 ; i <= NUM_THREADS ; i++ )
+    {
+        pthread_t t1;
+
+        if ( pthread_create(&t1, NULL, thread_loop, (void *)i) != 0 ) {
+            cout << "pthread_create() error" << endl;
+            abort();
+        }
+    }
+
 }
 
 // For prototype only - mimics the IR feed.
