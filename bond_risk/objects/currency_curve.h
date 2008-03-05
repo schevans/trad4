@@ -1,6 +1,6 @@
 
-#ifndef __discount_rate__
-#define __discount_rate__
+#ifndef __currency_curve__
+#define __currency_curve__
 
 #include <sys/types.h>
 
@@ -19,11 +19,11 @@ typedef struct {
     int interest_rate_feed;
 
     // Static
-    int ccy;
 
     // Pub
-    double rate[DISCOUNT_RATE_LEN];
-    double rate_01[DISCOUNT_RATE_LEN];
-} discount_rate;
+    double interest_rate_interpol[DISCOUNT_RATE_LEN];
+    double discount_rate[DISCOUNT_RATE_LEN];
+    double discount_rate_01[DISCOUNT_RATE_LEN];
+} currency_curve;
 
 #endif

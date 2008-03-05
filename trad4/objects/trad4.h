@@ -31,7 +31,6 @@ typedef struct {
     bool (*need_refresh_fpointer)(int);
     int type;
     char name[OBJECT_NAME_LEN];
-    int sleep_time;
 } object_header;
 
 #define DBG cout << __FILE__ << ": " << __LINE__ << endl;

@@ -6,16 +6,6 @@
 
 #include "common.h"
 
-
-//void* calculate_bond( void* id );
-
-/*
-void* calculate_bond( void* id )
-{
-//ff
-}
-*/
-
 typedef struct {
     // Header
     ulong last_published;
@@ -26,14 +16,13 @@ typedef struct {
     char name[OBJECT_NAME_LEN];
 
     // Sub
-    int discount_rate;
+    int currency_curve;
 
     // Static
     double coupon;
     int start_date;
     int maturity_date;
     int coupons_per_year;
-    int ccy;
 
     // Pub
     double price;
