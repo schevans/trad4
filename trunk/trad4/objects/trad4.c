@@ -8,14 +8,11 @@
 
 #include "trad4.h"
 
-// Temp for proto
-#include "interest_rate_feed.h"
-
 using namespace std;
 
 void* obj_loc[NUM_OBJECTS+1];
 
-#define NUM_THREADS 10
+#define NUM_THREADS 1
 
 int thread_contoller[NUM_THREADS+1];
 
@@ -24,10 +21,6 @@ void run();
 
 void* thread_loop( void* thread_id );
 void start_threads();
-
-// For prototype only 
-//  Mimics the IR feed.
-void bump_rates();
 
 // This is only ever called from the object threads, as it's a writer.
 void set_timestamp( int id );
@@ -39,7 +32,7 @@ int main() {
     load_all();
 
     // Fire off the feed once and let it terminate. This will populate rate_interpol
-    fire_object( 1 );
+//    fire_object( 1 );
 
     start_threads();
 
@@ -55,10 +48,11 @@ void fire_object( int id )
 
     bool fired(false);
 
-    for ( int i=0 ; i <= NUM_THREADS ; i++ )
+    for ( int i=1 ; i <= NUM_THREADS ; i++ )
     {
         if ( thread_contoller[i] == 0 )
         {
+cout << "Found thread " << i << " to run object " << id<< endl;
             ((object_header*)obj_loc[id])->status = RUNNING;
             thread_contoller[i] = id;
             fired = true;
@@ -85,8 +79,6 @@ void set_timestamp( int id )
 
 void run()
 {
-    int bump_rates_counter(1);
-    
     while (1) 
     {
         for ( int i=1 ; i <= NUM_OBJECTS ; i++ )
@@ -103,14 +95,7 @@ void run()
             }
 
         }
-
-        // Bump rates every few seconds to simulate market moving.
-        if ( bump_rates_counter++ % 50000000 == 0 )
-        {
-            bump_rates();
-            fire_object( 1 );
-        }
-
+sleep(1);
     }
 }
 
@@ -149,19 +134,5 @@ void start_threads()
         }
     }
 
-}
-
-// For prototype only - mimics the IR feed.
-// In the final version I'll probably put the feed structs in shmem so other processes can write to them.
-void bump_rates()
-{
-    cout << "\nRates bumped" << endl;
-
-    double peturbation = ( rand() / (double)RAND_MAX ) - 0.5;
-
-    for ( int i=0 ; i < 10 ; i++ )      // 10 = INTEREST_RATE_LEN
-    {
-        ((interest_rate_feed*)obj_loc[1])->rate[i] =+ peturbation;
-    }
 }
 

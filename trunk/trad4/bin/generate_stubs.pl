@@ -27,6 +27,7 @@ if ( $name =~ /feed/ ) {
 
 my $h_filename = "$name.h";
 my $c_filename = "$name.c";
+my $table_filename = "$name.table";
 
 my ( @sub, @pub, @mem_pub, @static, @static_vec, @common, @header );
 
@@ -44,9 +45,11 @@ my $gen_root=$ENV{INSTANCE_ROOT};
 my $obj_root=$ENV{INSTANCE_ROOT}."/objects";
 
 
-sub generate_h();
+#sub generate_h();
 sub generate_c();
 sub load_defs($);
+sub cpp2sql_type($);
+sub generate_table();
 
 open TYPES_FILE, "$ENV{INSTANCE_ROOT}/defs/object_types.t4s" or die "Can't open $ENV{INSTANCE_ROOT}/defs/object_types.t4s for reading";
 
@@ -69,6 +72,7 @@ close TYPES_FILE;
 load_defs( "$defs_root/$name.t4" );
 
 generate_h();
+generate_table();
 
 if ( ! -f "$obj_root/$c_filename" ) {
     generate_c();
@@ -253,8 +257,51 @@ sub generate_c()
     close C_FILE;
 }
 
+sub generate_table() {
+    
+    open TABLE_FILE, ">$gen_root/sql/$table_filename" or die "Can't open $gen_root/objects/$table_filename for writing. Exiting";
 
+    my $tuple;
+    my ( $column, $type );
 
+    print TABLE_FILE "create table $name (\n";
+    print TABLE_FILE "    id int";
+
+    foreach $tuple ( @static ) {
+
+        ( $type, $column ) = split / /, $tuple;
+
+        print TABLE_FILE ",\n    $column ".cpp2sql_type( $type );
+    }
+
+    foreach $tuple ( @sub ) {
+
+        ( $type, $var ) = split / /, $tuple;
+
+        print TABLE_FILE ",\n    $var int";
+    }
+
+    print TABLE_FILE "\n";
+    print TABLE_FILE ")\n";
+    print TABLE_FILE "\n";
+
+    close TABLE_FILE;
+}
+
+sub cpp2sql_type($) {
+    my $cpp_type = shift;
+
+    my $sql_type;
+
+    if ( $cpp_type =~ 'double' ) {
+        $sql_type = "float";
+    }
+    else {
+        $sql_type = "int";
+    }
+   
+    return $sql_type;
+}
 
 
 

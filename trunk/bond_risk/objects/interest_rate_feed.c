@@ -3,6 +3,10 @@
 //
 
 #include <iostream>
+#include <sstream>
+#include <fstream>
+#include <vector>
+#include "mysql/mysql.h"
 
 #include "trad4.h"
 #include "interest_rate_feed.h"
@@ -10,36 +14,102 @@
 extern void* obj_loc[NUM_OBJECTS+1];
 extern void set_timestamp( int id );
 
+extern void* calculate_interest_rate_feed( void* id );
+extern int create_shmem( void** ret_mem, size_t pub_size );
+
+bool interest_rate_feed_need_refresh( int );
+
+
+
 using namespace std;
+
+void load_interest_rate_feeds( MYSQL* mysql )
+{
+    cout << "load_interest_rate_feeds()" << endl;
+
+    MYSQL_RES *result;
+    MYSQL_ROW row;
+
+    ostringstream dbstream;
+    dbstream << "select id, name from object where type=1";
+
+DBG
+    if(mysql_query(mysql, dbstream.str().c_str()) != 0) {
+        cout << __LINE__ << ": " << mysql_error(mysql) << endl;
+    }
+
+DBG
+    result = mysql_use_result(mysql);
+
+DBG
+    int id;
+    std::string name;
+    void* tmp;
+DBG
+   std::vector<int> interest_rates;
+
+    while (( row = mysql_fetch_row(result) )) {
+
+DBG
+       id = atoi(row[0]);
+       name = row[2];
+
+        obj_loc[id] = new interest_rate_feed;
+        ((interest_rate_feed*)obj_loc[id])->last_published = 0;
+DBG
+        ((interest_rate_feed*)obj_loc[id])->status = STOPPED;
+        ((interest_rate_feed*)obj_loc[id])->calculator_fpointer = &calculate_interest_rate_feed;
+        ((interest_rate_feed*)obj_loc[id])->need_refresh_fpointer = &interest_rate_feed_need_refresh;
+        ((interest_rate_feed*)obj_loc[id])->type = 1;
+DBG
+    //    ((interest_rate_feed*)obj_loc[id])->name = 0;
+
+
+cout << "voidey: " << tmp << endl;
+
+        ((interest_rate_feed*)obj_loc[id])->shmid = create_shmem( &tmp, sizeof( interest_rate_feed_sub ) );
+cout << "voidey: " << tmp << endl;
+
+DBG
+        ((interest_rate_feed*)obj_loc[id])->sub = (interest_rate_feed_sub*)tmp;
+//        (((interest_rate_feed*)obj_loc[id])->sub)->sub = 0;
+DBG
+
+        (((interest_rate_feed*)obj_loc[id])->sub)->last_published = 0;
+DBG
+
+        interest_rates.push_back( id );
+
+    }
+
+    mysql_free_result(result);
+
+    fstream save_file("/tmp/interest_rate_feed.txt", ios::out);
+
+    vector<int>::iterator iter;
+
+    for( iter = interest_rates.begin() ; iter < interest_rates.end() ; iter++ )
+    {
+        save_file << *iter << "," << ((interest_rate_feed*)obj_loc[*iter])->shmid << endl;
+
+        for ( int i=0 ; i < INTEREST_RATE_LEN - 1 ; i++ )
+        {    
+            ((interest_rate_feed*)obj_loc[(int)id])->asof[i] = 0;
+            ((interest_rate_feed*)obj_loc[(int)id])->rate[i] = 0;
+        }
+    }
+    
+    save_file.close();
+}
 
 void* calculate_interest_rate_feed( void* id )
 {
-    cout << "InterestRateFeed::LoadFeedData()" << endl;
+    cout << "calculate_interest_rate_feed()" << endl;
 
-
-    // Hack to get this working. Otherwise lifted from trad_bond_risk.
-    void* _pub = obj_loc[(int)id];
-
-    int current_period_start;
-    int current_period_end;
-
-    double gradient;
-    double y_intercept;
-
-    for ( int indx = 0; indx < INTEREST_RATE_LEN - 1 ; indx++)
+    for ( int i=0 ; i < INTEREST_RATE_LEN - 1 ; i++ )
     {
-        current_period_start = ((interest_rate_feed*)_pub)->asof[indx];
-        current_period_end = ((interest_rate_feed*)_pub)->asof[indx+1];
-
-        gradient = (( ((interest_rate_feed*)_pub)->rate[indx] - ((interest_rate_feed*)_pub)->rate[indx+1] ) / ( ((interest_rate_feed*)_pub)->asof[indx] - ((interest_rate_feed*)_pub)->asof[indx+1] ) );
-        y_intercept = ((interest_rate_feed*)_pub)->rate[indx] - gradient * ((interest_rate_feed*)_pub)->asof[indx];
-
-        for ( int i = current_period_start ; i <= current_period_end ; i++ )
-        {
-            //cout << "\tDate " << i << " index  " << i - DATE_RANGE_START << " rate: " <<(  i*gradient + y_intercept ) << endl;
-            ((interest_rate_feed*)_pub)->rate_interpol[i - DATE_RANGE_START] = (  i*gradient + y_intercept );
-
-        }
+        ((interest_rate_feed*)obj_loc[(int)id])->asof[i] = (((interest_rate_feed*)obj_loc[(int)id])->sub)->asof[i];
+        ((interest_rate_feed*)obj_loc[(int)id])->rate[i] = (((interest_rate_feed*)obj_loc[(int)id])->sub)->rate[i];
 
     }
 
@@ -48,5 +118,7 @@ void* calculate_interest_rate_feed( void* id )
 
 bool interest_rate_feed_need_refresh( int id )
 {
-    return (  0 );
+
+    return ( (((object_header*)obj_loc[id])->status == STOPPED ) && ( *(int*)obj_loc[id] < (((interest_rate_feed*)obj_loc[id])->sub)->last_published ) ||  0 );
+
 }

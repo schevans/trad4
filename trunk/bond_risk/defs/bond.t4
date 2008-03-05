@@ -3,7 +3,7 @@
 # This code is licenced under the BSD licence. For details see $INSTANCE_ROOT/LICENCE
 
 sub
-    int discount_rate
+    int currency_curve
 
 pub
     double price
@@ -14,7 +14,6 @@ static
     int start_date
     int maturity_date
     int coupons_per_year
-    int ccy
 
 
 

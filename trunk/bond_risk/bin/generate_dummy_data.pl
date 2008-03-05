@@ -9,7 +9,7 @@ use strict;
 
 sub get_next_id();
 sub generate_interest_rates();
-sub generate_discount_rates();
+sub generate_currency_curves();
 sub generate_fx_rates();
 sub generate_books();
 sub generate_bonds($);
@@ -17,7 +17,7 @@ sub generate_outright_trades($);
 sub generate_repo_trades($);
 sub generate_object($$);
 
-my $current_id = 200;
+my $current_id = 201;
 
 
 my %discount_rate_ids;
@@ -42,80 +42,69 @@ my $interest_rate_file=$dummy_data_root."/dummy_interest_rate.sql";
 my @bond_ids;
 
 generate_interest_rates();
-generate_discount_rates();
-generate_fx_rates();
-generate_books();
-generate_bonds( 3000 );
-generate_outright_trades( 6000 );
-generate_repo_trades( 6000 );
+generate_currency_curves();
+#generate_fx_rates();
+#generate_books();
+generate_bonds( 3 );
+#generate_outright_trades( 6000 );
+#generate_repo_trades( 6000 );
 
 sub generate_interest_rates() {
 
     my $id = 1;
-    my $FILE = open_file( $id, 1 ); 
-    print FILE "LIBOR-USD,5,1,\n";
-    close $FILE;
+    my $file = "$dummy_data_root/interest_rate_feeds.sql";
+    open FILE, ">$file" or die "Can't open $file";
 
-    my $data_file = "$dummy_data_root/$id.1.t4d";
-    open FILE, ">$data_file" or die "Can't open $data_file";
+    print FILE "delete from object;\n";
+    print FILE "delete from interest_rate_feed_data;\n";
 
-    print FILE "10000,2.6\n";
-    print FILE "10010,2.7\n";
-    print FILE "10100,2.7\n";
-    print FILE "10200,2.7\n";
-    print FILE "10300,2.8\n";
-    print FILE "12000,2.8\n";
-    print FILE "13000,2.9\n";
-    print FILE "15000,2.9\n";
-    print FILE "18000,2.8\n";
-    print FILE "20000,2.8\n";
-    close FILE;
+    print FILE "insert into object values ( $id, 1, \"LIBOR-USD\");\n";
+
+    print FILE "insert into interest_rate_feed_data values ( $id, 10000,2.6 );\n";
+    print FILE "insert into interest_rate_feed_data values ( $id, 10010,2.7 );\n";
+    print FILE "insert into interest_rate_feed_data values ( $id, 10100,2.7 );\n";
+    print FILE "insert into interest_rate_feed_data values ( $id, 10200,2.7 );\n";
+    print FILE "insert into interest_rate_feed_data values ( $id, 10300,2.8 );\n";
+    print FILE "insert into interest_rate_feed_data values ( $id, 12000,2.8 );\n";
+    print FILE "insert into interest_rate_feed_data values ( $id, 13000,2.9 );\n";
+    print FILE "insert into interest_rate_feed_data values ( $id, 15000,2.9 );\n";
+    print FILE "insert into interest_rate_feed_data values ( $id, 18000,2.8 );\n";
+    print FILE "insert into interest_rate_feed_data values ( $id, 20000,2.8 );\n";
 
     push @interest_rate_ids, $id;
     $interest_rate_ccys{$id} = $id;
     
     $id = 2;
-    $FILE = open_file( $id, 1 ); 
-    print $FILE "LIBOR-GBP,5,1,\n";
-    close $FILE;
 
-    $data_file = "$dummy_data_root/$id.1.t4d";
-    open FILE, ">$data_file" or die "Can't open $data_file";
+    print FILE "insert into object values (  $id, 1, \"LIBOR-GBP\" );\n";
 
-    print FILE "10000,5.2\n";
-    print FILE "10010,5.3\n";
-    print FILE "10100,5.4\n";
-    print FILE "10200,5.4\n";
-    print FILE "10300,5.5\n";
-    print FILE "12000,5.5\n";
-    print FILE "13000,5.5\n";
-    print FILE "15000,5.4\n";
-    print FILE "18000,5.3\n";
-    print FILE "20000,5.3\n";
-    close FILE;
+    print FILE "insert into interest_rate_feed_data values ( $id, 10000,5.2 );\n";
+    print FILE "insert into interest_rate_feed_data values ( $id, 10010,5.3 );\n";
+    print FILE "insert into interest_rate_feed_data values ( $id, 10100,5.4 );\n";
+    print FILE "insert into interest_rate_feed_data values ( $id, 10200,5.4 );\n";
+    print FILE "insert into interest_rate_feed_data values ( $id, 10300,5.5 );\n";
+    print FILE "insert into interest_rate_feed_data values ( $id, 12000,5.5 );\n";
+    print FILE "insert into interest_rate_feed_data values ( $id, 13000,5.5 );\n";
+    print FILE "insert into interest_rate_feed_data values ( $id, 15000,5.4 );\n";
+    print FILE "insert into interest_rate_feed_data values ( $id, 18000,5.3 );\n";
+    print FILE "insert into interest_rate_feed_data values ( $id, 20000,5.3 );\n";
 
     push @interest_rate_ids, $id;
     $interest_rate_ccys{$id} = $id;
 
     $id = 3;
-    $FILE = open_file( $id, 1 ); 
-    print $FILE "LIBOR-EUR,5,1,\n";
-    close $FILE;
+    print FILE "insert into object values (  $id, 1, \"LIBOR-EUR\" );\n";
 
-    $data_file = "$dummy_data_root/$id.1.t4d";
-    open FILE, ">$data_file" or die "Can't open $data_file";
-
-    print FILE "10000,3.6\n";
-    print FILE "10010,3.7\n";
-    print FILE "10100,3.7\n";
-    print FILE "10200,3.7\n";
-    print FILE "10300,3.8\n";
-    print FILE "12000,3.8\n";
-    print FILE "13000,3.9\n";
-    print FILE "15000,3.9\n";
-    print FILE "18000,3.8\n";
-    print FILE "20000,3.8\n";
-    close FILE;
+    print FILE "insert into interest_rate_feed_data values ( $id, 10000,3.6 );\n";
+    print FILE "insert into interest_rate_feed_data values ( $id, 10010,3.7 );\n";
+    print FILE "insert into interest_rate_feed_data values ( $id, 10100,3.7 );\n";
+    print FILE "insert into interest_rate_feed_data values ( $id, 10200,3.7 );\n";
+    print FILE "insert into interest_rate_feed_data values ( $id, 10300,3.8 );\n";
+    print FILE "insert into interest_rate_feed_data values ( $id, 12000,3.8 );\n";
+    print FILE "insert into interest_rate_feed_data values ( $id, 13000,3.9 );\n";
+    print FILE "insert into interest_rate_feed_data values ( $id, 15000,3.9 );\n";
+    print FILE "insert into interest_rate_feed_data values ( $id, 18000,3.8 );\n";
+    print FILE "insert into interest_rate_feed_data values ( $id, 20000,3.8 );\n";
 
     push @interest_rate_ids, $id;
     $interest_rate_ccys{$id} = $id;
@@ -124,35 +113,38 @@ sub generate_interest_rates() {
 }
 
 
-sub generate_discount_rates() {
+sub generate_currency_curves() 
+{
 
-    my $FILE;
+    my $file = "$dummy_data_root/currency_curves.sql";
+    open FILE, ">$file" or die "Can't open $file";
+
+    print FILE "delete from currency_curve;\n";
 
     my $id = get_next_id();
-    my $name = "DISCO-USD";
-    my $ccy = 1;
+    my $name = "USD-CCY-CURVES";
+    my $interest_rate = 1;
 
-    $FILE = open_file( $id, 2 );
-    print $FILE "DISCO-USD,5,$interest_rate_ids[$ccy-1],$ccy,";
-    close $FILE;
+    print FILE "insert into object values (  $id, 2, \"$name\" );\n";
+    print FILE "insert into currency_curve values ( $id, $interest_rate );\n";
 
-    $discount_rate_ids{$ccy} = $id;
-
-    $id = get_next_id();
-    $ccy = 2;
-    $FILE = open_file( $id, 2 );
-    print $FILE "DISCO-GBP,5,$interest_rate_ids[$ccy-1],$ccy,";
-    close $FILE;
-
-    $discount_rate_ids{$ccy} = $id;
+    $discount_rate_ids{$interest_rate} = $id;
 
     $id = get_next_id();
-    $ccy = 3;
-    $FILE = open_file( $id, 2 );
-    print $FILE "DISCO-EUR,5,$interest_rate_ids[$ccy-1],$ccy,";
-    close $FILE;
+    $interest_rate = 2;
 
-    $discount_rate_ids{$ccy} = $id;
+    print FILE "insert into object values (  $id, 2, \"$name\" );\n";
+    print FILE "insert into currency_curve values ( $id, $interest_rate );\n";
+
+    $discount_rate_ids{$interest_rate} = $id;
+
+    $id = get_next_id();
+    $interest_rate = 3;
+
+    print FILE "insert into object values (  $id, 2, \"$name\" );\n";
+    print FILE "insert into currency_curve values ( $id, $interest_rate );\n";
+
+    $discount_rate_ids{$interest_rate} = $id;
 
     close FILE;
 }
@@ -276,32 +268,34 @@ sub generate_fx_rates() {
 sub generate_bonds($) {
     my $num_bonds = shift;
 
-    my $FILE;
+    my $file = "$dummy_data_root/bonds.sql";
+    open FILE, ">$file" or die "Can't open $file";
+
+    print FILE "delete from bond;\n";
+
     my ( $id, $name, $ccy );
 
     for ( my $i = 0 ; $i < $num_bonds ; $i++ ) {
 
         $id = get_next_id();
-
         $name = $chars[ int(rand( @chars )) ].$chars[ int(rand( @chars )) ].int( rand(999999999));
 
         $ccy = $currencies[ int( rand( @currencies )) ];
 
-        $FILE = open_file( $id, 3 );
-        print $FILE "$name,5,".
-            $discount_rate_ids{$ccy}.",".
+        print FILE "insert into object values (  $id, 3, \"$name\" );\n";
+
+        print FILE "insert into bond values (  $id, ".
             sprintf("%.2f", (rand( 8 - 2 ) + 2)).",".
             int( 6000 + rand(  8000 - 6000 )).",".
             int( 18000 + rand( 20000 - 18000 )).",".
             $coup_pys[ int( rand( @coup_pys )) ].",".
-            $ccy.",".
-            "0,0,\n";
-
+            $ccy.");\n;";
+            
         push @bond_ids, $id;
         $bond_ccys{$id} = $ccy;
 
-        close $FILE;
     }
+    close FILE;
 
 }
                  

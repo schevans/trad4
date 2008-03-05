@@ -8,7 +8,7 @@
 
 #include "trad4.h"
 #include "bond.h"
-#include "discount_rate.h"
+#include "currency_curve.h"
 
 extern void* obj_loc[NUM_OBJECTS+1];
 extern void set_timestamp( int id );
@@ -22,7 +22,7 @@ void* calculate_bond( void* id )
     // Hack to get this working. Otherwise lifted from trad_bond_risk.
     // Also had to inline the accsessors
     void* _pub = obj_loc[(int)id];
-    discount_rate* _sub_discount_rate = (discount_rate*)obj_loc[((bond*)_pub)->discount_rate];
+    currency_curve* _sub_currency_curve = (currency_curve*)obj_loc[((bond*)_pub)->currency_curve];
 
     std::vector<int> _coupon_date_vec;
     std::vector<float> _payment_vec;
@@ -30,7 +30,7 @@ void* calculate_bond( void* id )
 
 
     int days_between_coupons = (int)YEAR_BASIS /  ((bond*)_pub)->coupons_per_year;
-    float coupon_rate_per_period = ( ((bond*)_pub)->coupon / 100 ) / ((bond*)_pub)->coupons_per_year;
+    float coupon_discount_rate_per_period = ( ((bond*)_pub)->coupon / 100 ) / ((bond*)_pub)->coupons_per_year;
 
     int working_date = ((bond*)_pub)->start_date;
 
@@ -51,15 +51,15 @@ void* calculate_bond( void* id )
 
     for( iter = _coupon_date_vec.begin() ; iter < _coupon_date_vec.end() ; iter++ )
     {
-        _payment_vec.push_back( 100.0 * coupon_rate_per_period * _sub_discount_rate->rate[*iter - TODAY] );
-        _payment_vec_01.push_back( 100.0 * coupon_rate_per_period * _sub_discount_rate->rate_01[*iter - TODAY] );
+        _payment_vec.push_back( 100.0 * coupon_discount_rate_per_period * _sub_currency_curve->discount_rate[*iter - TODAY] );
+        _payment_vec_01.push_back( 100.0 * coupon_discount_rate_per_period * _sub_currency_curve->discount_rate_01[*iter - TODAY] );
 
-        //cout << "_payment_vec: " << ( 100.0 * coupon_rate_per_period * _sub_discount_rate->rate[*iter - TODAY] ) << endl;
-        //cout << "_payment_vec_01: " << ( 100.0 * coupon_rate_per_period * _sub_discount_rate->rate_01[*iter - TODAY] ) << endl;
+        //cout << "_payment_vec: " << ( 100.0 * coupon_discount_rate_per_period * _sub_currency_curve->discount_rate[*iter - TODAY] ) << endl;
+        //cout << "_payment_vec_01: " << ( 100.0 * coupon_discount_rate_per_period * _sub_currency_curve->discount_rate_01[*iter - TODAY] ) << endl;
     }
 
-    _payment_vec.push_back( 100 * _sub_discount_rate->rate[_coupon_date_vec[_coupon_date_vec.size() -1] - TODAY] );
-    _payment_vec_01.push_back( 100 * _sub_discount_rate->rate_01[_coupon_date_vec[_coupon_date_vec.size() -1] - TODAY] );
+    _payment_vec.push_back( 100 * _sub_currency_curve->discount_rate[_coupon_date_vec[_coupon_date_vec.size() -1] - TODAY] );
+    _payment_vec_01.push_back( 100 * _sub_currency_curve->discount_rate_01[_coupon_date_vec[_coupon_date_vec.size() -1] - TODAY] );
 
     float price(0.0);
     float price_01(0.0);
@@ -78,10 +78,9 @@ void* calculate_bond( void* id )
     cout << "New bond price: " << price << ", dv01: " << ( price - price_01 ) << endl;
 
     set_timestamp((int)id);
-
 }
 
 bool bond_need_refresh( int id )
 {
-    return ( (((object_header*)obj_loc[id])->status == STOPPED ) && ( *(int*)obj_loc[id] < *(int*)obj_loc[((bond*)obj_loc[id])->discount_rate] ) ||  0 );
+    return ( (((object_header*)obj_loc[id])->status == STOPPED ) && ( *(int*)obj_loc[id] < *(int*)obj_loc[((bond*)obj_loc[id])->currency_curve] ) ||  0 );
 }

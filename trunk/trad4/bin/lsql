@@ -1,0 +1,18 @@
+FILE=$1
+
+PREFIX=`echo $FILE | sed 's/\..*//'`
+SUFFIX=`echo $FILE | sed 's/.*\.//'`
+
+case $SUFFIX in
+    table)
+        TYPE="table"
+        ;;
+    *)
+        echo "Unkown suffix $SUFFIX"
+esac
+
+echo "drop $TYPE $PREFIX" | mysql -u root trad4
+
+cat $FILE | mysql -u root trad4
+
+ 

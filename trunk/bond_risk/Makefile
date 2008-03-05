@@ -7,7 +7,7 @@ CXXFLAGS = -c -I$(TRAD4_ROOT)/objects
 
 COMPILE = $(CXX) $(CXXFLAGS)
 
-OBJECTS = ../trad4/objects/trad4.o ./objects/bond.o ./objects/interest_rate_feed.o ./objects/discount_rate.o ./objects/loader.o
+OBJECTS = ../trad4/objects/trad4.o ../trad4/objects/feed.o ./objects/bond.o ./objects/interest_rate_feed.o ./objects/currency_curve.o ./objects/loader.o
 
 SUBDIRS = $(INSTANCE_ROOT)/objects objects
 

@@ -2,12 +2,6 @@
 create table object (
     id int, 
     type int,
-    name char(12),
-    status int,
-    sleep_time int,
-    last_published int,
-    shmid int,
-    pid int,
-    log_level int 
+    name char(32)
 ) 
     

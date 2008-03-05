@@ -6,9 +6,16 @@
 
 #include "common.h"
 
+
+typedef struct {
+    int asof[INTEREST_RATE_LEN];
+    double rate[INTEREST_RATE_LEN];
+    int last_published;
+} interest_rate_feed_sub;
+
 typedef struct {
     // Header
-    ulong last_published;
+    time_t last_published;
     object_status status;
     void* (*calculator_fpointer)(void*);
     bool (*need_refresh_fpointer)(int);
@@ -18,12 +25,12 @@ typedef struct {
     // Sub
 
     // Static
-    int ccy;
-
+    int shmid; 
+    interest_rate_feed_sub* sub;
     // Pub
     int asof[INTEREST_RATE_LEN];
     double rate[INTEREST_RATE_LEN];
-    double rate_interpol[DISCOUNT_RATE_LEN];
+
 } interest_rate_feed;
 
 #endif

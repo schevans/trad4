@@ -1,0 +1,6 @@
+
+FILE=$1
+
+mysql -u root trad4 < $FILE
+
+
