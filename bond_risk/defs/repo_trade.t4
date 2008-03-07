@@ -4,9 +4,8 @@
 # This code is licenced under the BSD licence. For details see $INSTANCE_ROOT/LICENCE
 
 sub
-    int fx_rate_feed
     int bond
-    int interest_rate_feed
+    int currency_curves
 
 pub
     double mtm_pnl

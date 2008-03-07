@@ -1,6 +1,6 @@
 
-#ifndef __bond__
-#define __bond__
+#ifndef __repo_trade__
+#define __repo_trade__
 
 #include <sys/types.h>
 
@@ -16,17 +16,21 @@ typedef struct {
     char name[OBJECT_NAME_LEN];
 
     // Sub
+    int bond;
     int currency_curves;
 
     // Static
-    double coupon;
     int start_date;
-    int maturity_date;
-    int coupons_per_year;
+    int end_date;
+    int notional;
+    int cash_ccy;
+    double rate;
+    double cash;
+    int book;
 
     // Pub
-    double price;
-    double dv01;
-} bond;
+    double mtm_pnl;
+    double margin;
+} repo_trade;
 
 #endif

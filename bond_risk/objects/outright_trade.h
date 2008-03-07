@@ -1,6 +1,6 @@
 
-#ifndef __currency_curve__
-#define __currency_curve__
+#ifndef __outright_trade__
+#define __outright_trade__
 
 #include <sys/types.h>
 
@@ -16,14 +16,17 @@ typedef struct {
     char name[OBJECT_NAME_LEN];
 
     // Sub
-    int interest_rate_feed;
+    int bond;
 
     // Static
+    int quantity;
+    int trade_date;
+    double trade_price;
+    int book;
 
     // Pub
-    double interest_rate_interpol[DISCOUNT_RATE_LEN];
-    double discount_rate[DISCOUNT_RATE_LEN];
-    double discount_rate_01[DISCOUNT_RATE_LEN];
-} currency_curve;
+    double pv;
+    double pnl;
+} outright_trade;
 
 #endif

@@ -9,7 +9,7 @@
 
 #define MAX_OBJECTS 20000
 
-#define NUM_OBJECTS 3
+#define NUM_OBJECTS 600
 
 #define OBJECT_NAME_LEN 32
 
