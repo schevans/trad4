@@ -1,5 +1,0 @@
-
-create table discount_rate (
-    id int,
-    ccy int
-)

@@ -27,6 +27,8 @@ if ( $name =~ /feed/ ) {
 
 my $h_filename = "$name.h";
 my $c_filename = "$name.c";
+my $loader_filename = "load_$name.c";
+my $c_wrapper_filename = "$name"."_wrapper.c";
 my $table_filename = "$name.table";
 
 my ( @sub, @pub, @mem_pub, @static, @static_vec, @common, @header );
@@ -45,8 +47,10 @@ my $gen_root=$ENV{INSTANCE_ROOT};
 my $obj_root=$ENV{INSTANCE_ROOT}."/objects";
 
 
-#sub generate_h();
+sub generate_h();
 sub generate_c();
+sub generate_loader();
+sub generate_c_wrapper();
 sub load_defs($);
 sub cpp2sql_type($);
 sub generate_table();
@@ -71,8 +75,13 @@ close TYPES_FILE;
 
 load_defs( "$defs_root/$name.t4" );
 
-generate_h();
+#generate_h();
 generate_table();
+generate_c_wrapper();
+
+if ( ! -f "$gen_root/objects/$loader_filename" ) {
+    generate_loader();
+}
 
 if ( ! -f "$obj_root/$c_filename" ) {
     generate_c();
@@ -216,20 +225,206 @@ sub trim($) {
     return $str;
 }
 
-sub generate_c()
+sub generate_loader()
 {
-    open C_FILE, ">$gen_root/objects/$c_filename" or die "Can't open $gen_root/objects/$c_filename for writing. Exiting";
+
+    open C_FILE, ">$gen_root/objects/$loader_filename" or die "Can't open $gen_root/objects/$loader_filename for writing. Exiting";
+
+    #print_licence_header( C_FILE );
+
+    print C_FILE "\n";
+    print C_FILE "#include <iostream>\n";
+    print C_FILE "#include <sstream>\n";
+    print C_FILE "\n";
+    print C_FILE "\n";
+    print C_FILE "#include \"trad4.h\"\n";
+    print C_FILE "#include \"$name.h\"\n";
+
+    foreach $tuple ( @sub ) {
+
+        ( $type, $var ) = split / /, $tuple;
+        
+        print C_FILE "#include \"$var.h\"\n";
+
+    }
+
+    print C_FILE "\n";
+    print C_FILE "#include \"mysql/mysql.h\"\n";
+    print C_FILE "\n";
+    print C_FILE "extern void* obj_loc[NUM_OBJECTS+1];\n";
+    print C_FILE "extern void* calculate_$name"."_wrapper( void* id );\n";
+    print C_FILE "extern int create_shmem( void** ret_mem, size_t pub_size );\n";
+    print C_FILE "extern bool $name"."_need_refresh( int id );\n";
+    print C_FILE "\n";
+    print C_FILE "void load_$name"."s( MYSQL* mysql )\n";
+    print C_FILE "{\n";
+    print C_FILE "    std::cout << \"load_$name"."s()\" << std::endl;\n";
+    print C_FILE "\n";
+    print C_FILE "    MYSQL_RES *result;\n";
+    print C_FILE "    MYSQL_ROW row;\n";
+    print C_FILE "\n";
+    print C_FILE "    std::ostringstream dbstream;\n";
+    print C_FILE "    dbstream << \"select o.id, o.name ";
+
+    foreach $tuple ( @static ) {
+
+        ( $type, $var ) = split / /, $tuple;
+        
+        print C_FILE ", t.$var ";
+
+    }
+
+    foreach $tuple ( @sub ) {
+
+        ( $type, $var ) = split / /, $tuple;
+        
+        print C_FILE ", t.$var ";
+
+    }
+
+    print C_FILE " from object o ";
+
+    if ( @static || @sub ) {
+        print C_FILE ", $name t ";
+    }
+
+    print C_FILE " where ";
+
+    if ( @static || @sub ) {
+        print C_FILE " o.id = t.id and ";
+
+    }
+    print C_FILE " o.type = ".$types_map{$name}."\";\n";
+
+
+    print C_FILE "\n";
+    print C_FILE "    if(mysql_query(mysql, dbstream.str().c_str()) != 0) {\n";
+    print C_FILE "        std::cout << __LINE__ << \": \" << mysql_error(mysql) << std::endl;\n";
+    print C_FILE "        exit(0);\n";
+    print C_FILE "    }\n";
+    print C_FILE "\n";
+    print C_FILE "    result = mysql_use_result(mysql);\n";
+    print C_FILE "\n";
+    print C_FILE "    while (( row = mysql_fetch_row(result) ))\n";
+    print C_FILE "    {\n";
+    print C_FILE "        int id = atoi(row[0]);\n";
+    print C_FILE "\n";
+    print C_FILE "        obj_loc[id] = new $name;\n";
+    print C_FILE "\n";
+    print C_FILE "        (($name*)obj_loc[id])->last_published = 0;\n";
+    print C_FILE "        (($name*)obj_loc[id])->status = STOPPED;\n";
+    print C_FILE "        (($name*)obj_loc[id])->calculator_fpointer = &calculate_$name"."_wrapper;\n";
+    print C_FILE "        (($name*)obj_loc[id])->need_refresh_fpointer = &$name"."_need_refresh;\n";
+    print C_FILE "        (($name*)obj_loc[id])->type = ".$types_map{$name}.";\n";
+    print C_FILE "        //(($name*)obj_loc[id])->name = 0;\n";
+    print C_FILE "        \n";
+
+    my $counter=2;
+
+    foreach $tuple ( @static ) {
+
+        ( $type, $var ) = split / /, $tuple;
+
+        print C_FILE "        (($name*)obj_loc[id])->$var = ";
+
+        if ( $type =~ /int/ ) {
+            print C_FILE "atoi(row[$counter]);\n";
+        }
+        else {
+            print C_FILE "atof(row[$counter]);\n";
+        }
+        $counter++
+    }
+
+    foreach $tuple ( @sub ) {
+
+        ( $type, $var ) = split / /, $tuple;
+
+        print C_FILE "        (($name*)obj_loc[id])->$var = ";
+
+        if ( $type =~ /int/ ) {
+            print C_FILE "atoi(row[$counter]);\n";
+        }
+        else {
+            print C_FILE "atof(row[$counter]);\n";
+        }
+        $counter++
+    }
+
+
+    print C_FILE "\n";
+    print C_FILE "        std::cout << \"New $name created.\" << std::endl;\n";
+
+    print C_FILE "    }\n";
+    print C_FILE "\n";
+    print C_FILE "    mysql_free_result(result);\n";
+    print C_FILE "}\n";
+
+    close C_FILE;
+}
+
+sub generate_c_wrapper()
+{
+    open C_FILE, ">$gen_root/objects/$c_wrapper_filename" or die "Can't open $gen_root/objects/$c_wrapper_filename for writing. Exiting";
 
     #print_licence_header( C_FILE );
 
     print C_FILE "\n";
     print C_FILE "#include \"trad4.h\"\n";
     print C_FILE "#include \"$name.h\"\n";
+
+    foreach $tuple ( @sub ) {
+
+        ( $type, $var ) = split / /, $tuple;
+        
+        print C_FILE "#include \"$var.h\"\n";
+
+    }
+
     print C_FILE "\n";
     print C_FILE "extern void* obj_loc[NUM_OBJECTS+1];\n";
     print C_FILE "\n";
-    print C_FILE "void* calculate_$name( void* id )\n";
+    print C_FILE "extern void set_timestamp( int id );\n";
+
+    print C_FILE "extern void* calculate_$name( $name* pub_$name ";
+
+    foreach $tuple ( @sub ) {
+
+        ( $type, $var ) = split / /, $tuple;
+        
+        print C_FILE ", $var* sub_$var ";
+
+    }
+
+    print C_FILE ");\n";
+    print C_FILE "\n";
+    print C_FILE "\n";
+    print C_FILE "void* calculate_$name"."_wrapper( void* id )\n";
     print C_FILE "{\n";
+    print C_FILE "    $name* pub_$name = ($name*)obj_loc[(int)id];\n";
+
+    foreach $tuple ( @sub ) {
+
+        ( $type, $var ) = split / /, $tuple;
+        
+        print C_FILE "    $var* sub_$var = ($var*)obj_loc[pub_$name->$var];\n";
+
+    }
+
+    print C_FILE "\n";
+    print C_FILE "    calculate_$name( pub_$name ";
+
+    foreach $tuple ( @sub ) {
+
+        ( $type, $var ) = split / /, $tuple;
+        
+        print C_FILE ", sub_$var ";
+
+    }
+
+    print C_FILE ");\n";
+    print C_FILE "\n";
+    print C_FILE "    set_timestamp((int)id);\n";
     print C_FILE "\n";
     print C_FILE "}\n";
     print C_FILE "\n";
@@ -238,21 +433,62 @@ sub generate_c()
 
     print C_FILE "    return ( ";
 
-    foreach $tuple ( @sub ) {
+    if ( $is_feed ) {
 
-        ( $type, $var ) = split / /, $tuple;
-
-        print C_FILE "(((object_header*)obj_loc[id])->status == STOPPED ) && ( *(int*)obj_loc[id] < *(int*)obj_loc[(($name*)obj_loc[id])->$var] ) || ";  
+        print C_FILE "(((object_header*)obj_loc[id])->status == STOPPED ) && ( *(int*)obj_loc[id] < ((($name*)obj_loc[id])->sub)->last_published ));\n";
 
 
     }
+    else {
 
-    print C_FILE " 0 );\n";
+        print C_FILE "(((object_header*)obj_loc[id])->status == STOPPED ) && ";
+
+        foreach $tuple ( @sub ) {
+
+            ( $type, $var ) = split / /, $tuple;
+
+            print C_FILE "(( *(int*)obj_loc[id] < *(int*)obj_loc[(($name*)obj_loc[id])->$var] ) || ";
+
+
+        }
+
+        print C_FILE " 0 )));\n";
+
+    }
+
 
 
 
 
     print C_FILE "}\n";
+
+    close C_FILE;
+}
+
+sub generate_c()
+{
+    open C_FILE, ">$gen_root/objects/$c_filename" or die "Can't open $gen_root/objects/$c_filename for writing. Exiting";
+
+    #print_licence_header( C_FILE );
+
+    print C_FILE "\n";
+    print C_FILE "#include \"$name"."_wrapper.c\"\n";
+    print C_FILE "\n";
+    print C_FILE "void* calculate_$name( $name* pub_$name ";
+
+    foreach $tuple ( @sub ) {
+
+        ( $type, $var ) = split / /, $tuple;
+        
+        print C_FILE ", $var* sub_$var ";
+
+    }
+
+    print C_FILE ")\n";
+    print C_FILE "{\n";
+    print C_FILE "\n";
+    print C_FILE "}\n";
+    print C_FILE "\n";
 
     close C_FILE;
 }

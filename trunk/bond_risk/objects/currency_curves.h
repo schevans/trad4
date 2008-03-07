@@ -1,6 +1,6 @@
 
-#ifndef __bond__
-#define __bond__
+#ifndef __currency_curves__
+#define __currency_curves__
 
 #include <sys/types.h>
 
@@ -16,17 +16,14 @@ typedef struct {
     char name[OBJECT_NAME_LEN];
 
     // Sub
-    int currency_curves;
+    int interest_rate_feed;
 
     // Static
-    double coupon;
-    int start_date;
-    int maturity_date;
-    int coupons_per_year;
 
     // Pub
-    double price;
-    double dv01;
-} bond;
+    double interest_rate_interpol[DISCOUNT_RATE_LEN];
+    double discount_rate[DISCOUNT_RATE_LEN];
+    double discount_rate_01[DISCOUNT_RATE_LEN];
+} currency_curves;
 
 #endif

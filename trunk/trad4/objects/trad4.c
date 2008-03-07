@@ -12,11 +12,11 @@ using namespace std;
 
 void* obj_loc[NUM_OBJECTS+1];
 
-#define NUM_THREADS 1
+#define NUM_THREADS 10
 
 int thread_contoller[NUM_THREADS+1];
 
-void fire_object( int id );
+bool fire_object( int id );
 void run();
 
 void* thread_loop( void* thread_id );
@@ -42,9 +42,9 @@ sleep(1);
 
 }
 
-void fire_object( int id )
+bool fire_object( int id )
 {
-    cout << "Firing object " << id << endl;
+    //cout << "Firing object " << id << endl;
 
     bool fired(false);
 
@@ -52,17 +52,21 @@ void fire_object( int id )
     {
         if ( thread_contoller[i] == 0 )
         {
-cout << "Found thread " << i << " to run object " << id<< endl;
             ((object_header*)obj_loc[id])->status = RUNNING;
             thread_contoller[i] = id;
             fired = true;
             break;
         }
     }
+
+    return fired;
 }
 
 void set_timestamp( int id )
 {
+
+sleep(2);
+
     timeval time;
     gettimeofday( &time, NULL );
     int sec = time.tv_sec;
@@ -70,8 +74,6 @@ void set_timestamp( int id )
 
     int timestamp = (( sec - 1203000000 ) * 1000 ) + ( mil / 1000 );
 
-    // I know this looks strange but we 'know' the first element in the struct (pointed to
-    //  by obj_loc[id]) is an int, regardless of the type of the struct.
     *(int*)obj_loc[id] = timestamp;
 
     ((object_header*)obj_loc[id])->status = STOPPED;
@@ -83,19 +85,20 @@ void run()
     {
         for ( int i=1 ; i <= NUM_OBJECTS ; i++ )
         {
-            // First check if the object *has* a need_refresh_fpointer
-            //  If it doesn't it's a feed.
-            if ( ((object_header*)obj_loc[i])->need_refresh_fpointer )
-            {
-                // Ok it's a CaclObject. Call the function.
+            if ( obj_loc[i] )
+            { 
+                //cout << "Calling need_refresh_fpointer for " << i << endl;
+
                 if ( (*((object_header*)obj_loc[i])->need_refresh_fpointer)(i) )
                 {
-                    fire_object( i );            
+                    while ( ! fire_object( i ) )
+                    {
+                        cout << "Fire object failed due to lack of spare threads. Sleeping master thread." << endl;
+                        sleep(1);
+                    }
                 }
             }
-
         }
-sleep(1);
     }
 }
 
@@ -116,7 +119,7 @@ cout << "Thread #" << (int)thread_id << " working on obj id: " << thread_contoll
 cout << "Thread #" << (int)thread_id << " done." << endl;
         }
 
-        usleep(1000);
+        sleep(1);
 
     }
 

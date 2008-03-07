@@ -1,0 +1,9 @@
+create table outright_trade (
+    id int,
+    quantity int,
+    trade_date int,
+    trade_price float,
+    book int,
+    bond int
+)
+
