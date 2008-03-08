@@ -13,8 +13,9 @@ extern void* obj_loc[NUM_OBJECTS+1];
 extern void* calculate_outright_trade_wrapper( void* id );
 extern int create_shmem( void** ret_mem, size_t pub_size );
 extern bool outright_trade_need_refresh( int id );
+extern int tier_manager[NUM_TIERS+1][NUM_OBJECTS+1];
 
-void load_outright_trades( MYSQL* mysql )
+void load_outright_trade( MYSQL* mysql )
 {
     std::cout << "load_outright_trades()" << std::endl;
 
@@ -49,6 +50,9 @@ void load_outright_trades( MYSQL* mysql )
         ((outright_trade*)obj_loc[id])->trade_price = atof(row[4]);
         ((outright_trade*)obj_loc[id])->book = atoi(row[5]);
         ((outright_trade*)obj_loc[id])->bond = atoi(row[6]);
+
+        tier_manager[4][tier_manager[4][0]] = id;
+        tier_manager[4][0]++;
 
         std::cout << "New outright_trade created." << std::endl;
     }

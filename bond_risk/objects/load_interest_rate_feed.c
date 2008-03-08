@@ -15,10 +15,11 @@ extern void* obj_loc[NUM_OBJECTS+1];
 extern void* calculate_interest_rate_feed_wrapper( void* id );
 extern int create_shmem( void** ret_mem, size_t pub_size );
 extern bool interest_rate_feed_need_refresh( int id );
+extern int tier_manager[NUM_TIERS+1][NUM_OBJECTS+1];
 
 using namespace std;
 
-void load_interest_rate_feeds( MYSQL* mysql )
+void load_interest_rate_feed( MYSQL* mysql )
 {
     cout << "load_interest_rate_feeds()" << endl;
 
@@ -61,6 +62,10 @@ void load_interest_rate_feeds( MYSQL* mysql )
 
         interest_rates.push_back( id );
 
+        tier_manager[1][tier_manager[1][0]] = id;
+        tier_manager[1][0]++;
+
+        cout << "New interest_rate_feed created." << endl;
     }
 
     mysql_free_result(result);

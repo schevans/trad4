@@ -19,6 +19,9 @@ void start_threads();
 
 extern void load_all();
 
+int tier_manager[NUM_TIERS+1][NUM_OBJECTS+1];
+
+
 int main() {
 
     load_all();
@@ -29,21 +32,64 @@ int main() {
 
     while (1)
     {
-        for ( int i=1 ; i <= NUM_OBJECTS ; i++ )
-        {
-            if ( obj_loc[i] )
-            {
-                //cout << "Calling need_refresh_fpointer for " << i << endl;
+        bool tier1_fired(false);
 
-                if ( (*((object_header*)obj_loc[i])->need_refresh_fpointer)(i) )
+        for ( int tier=1 ; tier < NUM_TIERS+1 ; tier ++ )
+        {
+
+            if ( tier != 1 )
+                cout << "Tier " << tier << " running." << endl;
+
+            for ( int i=1 ; i < tier_manager[tier][0] ; i++ )
+            {
+                if ( obj_loc[tier_manager[tier][i]] )
                 {
-                    while ( ! fire_object( i ) )
+                    //cout << "Calling need_refresh_fpointer for " << tier_manager[tier][i] << endl;
+
+                    if ( (*((object_header*)obj_loc[tier_manager[tier][i]])->need_refresh_fpointer)(tier_manager[tier][i]) )
                     {
-                        cout << "Fire object failed due to lack of spare threads. Sleeping master thread." << endl;
-                        sleep(1);
+                        while ( ! fire_object( tier_manager[tier][i] ) )
+                        {
+                            cout << "Fire object failed due to lack of spare threads. Sleeping master thread." << endl;
+                            sleep(1);
+                        }
+
+                        tier1_fired = true;
                     }
                 }
             }
+
+            if ( tier == 1 && tier1_fired == false )
+            {
+//                usleep(500);
+                break;
+            }
+
+            // Wait for all the threads to finish with this tier.
+
+            bool thread_still_runnning(true);
+
+            while ( thread_still_runnning ) 
+            {
+                thread_still_runnning = false;
+
+                for ( int i=1 ; i <= NUM_THREADS ; i++ )
+                {
+                    if ( thread_contoller[i] != 0 )
+                    {
+                        thread_still_runnning = true;
+                        break;
+                    }
+                }
+
+                if ( thread_still_runnning )
+                {
+                    usleep(50);
+                }
+            }
+
+            cout << "Tier " << tier << " complete" << endl << endl;
+
         }
     }
 }
@@ -68,7 +114,7 @@ bool fire_object( int id )
 
 void set_timestamp( int id )
 {
-    for ( int i=0 ; i < 1000000000 ; i++ );   // Simulate long calculations
+//    for ( int i=0 ; i < 1000000000 ; i++ );   // Simulate long calculations
 
     timeval time;
     gettimeofday( &time, NULL );

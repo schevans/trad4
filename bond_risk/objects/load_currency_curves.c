@@ -13,6 +13,7 @@ extern void* obj_loc[NUM_OBJECTS+1];
 extern void* calculate_currency_curves_wrapper( void* id );
 extern int create_shmem( void** ret_mem, size_t pub_size );
 extern bool currency_curves_need_refresh( int id );
+extern int tier_manager[NUM_TIERS+1][NUM_OBJECTS+1];
 
 void load_currency_curves( MYSQL* mysql )
 {
@@ -45,6 +46,9 @@ void load_currency_curves( MYSQL* mysql )
         //((currency_curves*)obj_loc[id])->name = 0;
         
         ((currency_curves*)obj_loc[id])->interest_rate_feed = atoi(row[2]);
+
+        tier_manager[2][tier_manager[2][0]] = id;
+        tier_manager[2][0]++;
 
         std::cout << "New currency_curves created." << std::endl;
     }

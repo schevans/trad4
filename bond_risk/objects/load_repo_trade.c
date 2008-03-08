@@ -14,8 +14,9 @@ extern void* obj_loc[NUM_OBJECTS+1];
 extern void* calculate_repo_trade_wrapper( void* id );
 extern int create_shmem( void** ret_mem, size_t pub_size );
 extern bool repo_trade_need_refresh( int id );
+extern int tier_manager[NUM_TIERS+1][NUM_OBJECTS+1];
 
-void load_repo_trades( MYSQL* mysql )
+void load_repo_trade( MYSQL* mysql )
 {
     std::cout << "load_repo_trades()" << std::endl;
 
@@ -54,6 +55,9 @@ void load_repo_trades( MYSQL* mysql )
         ((repo_trade*)obj_loc[id])->book = atoi(row[8]);
         ((repo_trade*)obj_loc[id])->bond = atoi(row[9]);
         ((repo_trade*)obj_loc[id])->currency_curves = atoi(row[10]);
+
+        tier_manager[4][tier_manager[4][0]] = id;
+        tier_manager[4][0]++;
 
         std::cout << "New repo_trade created." << std::endl;
     }

@@ -22,5 +22,5 @@ void* calculate_currency_curves_wrapper( void* id )
 
 bool currency_curves_need_refresh( int id )
 {
-    return ( (((object_header*)obj_loc[id])->status == STOPPED ) && ( *(int*)obj_loc[id] < *(int*)obj_loc[((currency_curves*)obj_loc[id])->interest_rate_feed] ) ||  0 );
+    return ( (((object_header*)obj_loc[id])->status == STOPPED ) && ( ( *(int*)obj_loc[id] < *(int*)obj_loc[((currency_curves*)obj_loc[id])->interest_rate_feed] ) ||  0 ));
 }

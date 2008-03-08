@@ -22,5 +22,5 @@ void* calculate_bond_wrapper( void* id )
 
 bool bond_need_refresh( int id )
 {
-    return ( (((object_header*)obj_loc[id])->status == STOPPED ) && ( *(int*)obj_loc[id] < *(int*)obj_loc[((bond*)obj_loc[id])->currency_curves] ) ||  0 );
+    return ( (((object_header*)obj_loc[id])->status == STOPPED ) && ( ( *(int*)obj_loc[id] < *(int*)obj_loc[((bond*)obj_loc[id])->currency_curves] ) ||  0 ));
 }

@@ -22,5 +22,5 @@ void* calculate_outright_trade_wrapper( void* id )
 
 bool outright_trade_need_refresh( int id )
 {
-    return ( (((object_header*)obj_loc[id])->status == STOPPED ) && ( *(int*)obj_loc[id] < *(int*)obj_loc[((outright_trade*)obj_loc[id])->bond] ) ||  0 );
+    return ( (((object_header*)obj_loc[id])->status == STOPPED ) && ( ( *(int*)obj_loc[id] < *(int*)obj_loc[((outright_trade*)obj_loc[id])->bond] ) ||  0 ));
 }
