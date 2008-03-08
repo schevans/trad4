@@ -10,7 +10,6 @@ int create_shmem( void** ret_mem, size_t pub_size )
 {
 
     int shmid;
-cout << "create_shmem start " << shmid << ", " << *ret_mem << endl;
 
     if ((shmid = shmget(IPC_PRIVATE, pub_size, IPC_CREAT | 0600)) == -1)
     {
@@ -22,8 +21,6 @@ cout << "create_shmem start " << shmid << ", " << *ret_mem << endl;
         cout << "shmat error." << endl;
         exit(0);
     }
-
-cout << "create_shmem returning " << shmid << ", " << *ret_mem << endl;
 
     return shmid;
 

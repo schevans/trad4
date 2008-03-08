@@ -13,6 +13,8 @@
 
 #define NUM_THREADS 10
 
+#define NUM_TIERS 4
+
 #define OBJECT_NAME_LEN 32
 
 enum log_level {

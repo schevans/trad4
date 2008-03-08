@@ -57,7 +57,7 @@ sub generate_table();
 
 open TYPES_FILE, "$ENV{INSTANCE_ROOT}/defs/object_types.t4s" or die "Can't open $ENV{INSTANCE_ROOT}/defs/object_types.t4s for reading";
 
-my ( $line, $num, $type );
+my ( $line, @line_array, $type_num, $type_name, $tier );
 my %types_map;
 while ( $line = <TYPES_FILE> ) {
 
@@ -67,8 +67,17 @@ while ( $line = <TYPES_FILE> ) {
         next;
     }
 
-    ( $num, $type ) = split /,/, $line;
-    $types_map{$type} = $num;
+    @line_array = split /,/, $line;
+
+    $type_num = $line_array[0]; 
+    $type_name = $line_array[2]; 
+
+    $types_map{$type_name} = $type_num;
+
+    if ( "$type_name" =~ "$name" ) {
+
+        $tier = $line_array[1];
+    }
 }
 
 close TYPES_FILE;
@@ -255,8 +264,9 @@ sub generate_loader()
     print C_FILE "extern void* calculate_$name"."_wrapper( void* id );\n";
     print C_FILE "extern int create_shmem( void** ret_mem, size_t pub_size );\n";
     print C_FILE "extern bool $name"."_need_refresh( int id );\n";
+    print C_FILE "extern int tier_manager[NUM_TIERS+1][NUM_OBJECTS+1];\n";
     print C_FILE "\n";
-    print C_FILE "void load_$name"."s( MYSQL* mysql )\n";
+    print C_FILE "void load_$name( MYSQL* mysql )\n";
     print C_FILE "{\n";
     print C_FILE "    std::cout << \"load_$name"."s()\" << std::endl;\n";
     print C_FILE "\n";
@@ -353,6 +363,9 @@ sub generate_loader()
 
 
     print C_FILE "\n";
+    print C_FILE "        tier_manager[$tier][tier_manager[$tier][0]] = id;\n";
+    print C_FILE "        tier_manager[$tier][0]++;\n";
+    print C_FILE "\n";
     print C_FILE "        std::cout << \"New $name created.\" << std::endl;\n";
 
     print C_FILE "    }\n";
@@ -441,18 +454,18 @@ sub generate_c_wrapper()
     }
     else {
 
-        print C_FILE "(((object_header*)obj_loc[id])->status == STOPPED ) && ";
+        print C_FILE "(((object_header*)obj_loc[id])->status == STOPPED ) && ( ";
 
         foreach $tuple ( @sub ) {
 
             ( $type, $var ) = split / /, $tuple;
 
-            print C_FILE "(( *(int*)obj_loc[id] < *(int*)obj_loc[(($name*)obj_loc[id])->$var] ) || ";
+            print C_FILE "( *(int*)obj_loc[id] < *(int*)obj_loc[(($name*)obj_loc[id])->$var] ) || ";
 
 
         }
 
-        print C_FILE " 0 )));\n";
+        print C_FILE " 0 ));\n";
 
     }
 

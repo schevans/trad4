@@ -1,6 +1,6 @@
-1,interest_rate_feed
-2,currency_curves
-3,bond
-4,outright_trade
-5,repo_trade
-6,fx_rate_feed
+#id, tier, name
+1,1,interest_rate_feed
+2,2,currency_curves
+3,3,bond
+4,4,outright_trade
+5,4,repo_trade

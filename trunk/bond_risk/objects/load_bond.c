@@ -13,8 +13,9 @@ extern void* obj_loc[NUM_OBJECTS+1];
 extern void* calculate_bond_wrapper( void* id );
 extern int create_shmem( void** ret_mem, size_t pub_size );
 extern bool bond_need_refresh( int id );
+extern int tier_manager[NUM_TIERS+1][NUM_OBJECTS+1];
 
-void load_bonds( MYSQL* mysql )
+void load_bond( MYSQL* mysql )
 {
     std::cout << "load_bonds()" << std::endl;
 
@@ -49,6 +50,9 @@ void load_bonds( MYSQL* mysql )
         ((bond*)obj_loc[id])->maturity_date = atoi(row[4]);
         ((bond*)obj_loc[id])->coupons_per_year = atoi(row[5]);
         ((bond*)obj_loc[id])->currency_curves = atoi(row[6]);
+
+        tier_manager[3][tier_manager[3][0]] = id;
+        tier_manager[3][0]++;
 
         std::cout << "New bond created." << std::endl;
     }
