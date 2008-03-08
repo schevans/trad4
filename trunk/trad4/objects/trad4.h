@@ -11,6 +11,8 @@
 
 #define NUM_OBJECTS 600
 
+#define NUM_THREADS 10
+
 #define OBJECT_NAME_LEN 32
 
 enum log_level {

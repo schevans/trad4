@@ -11,19 +11,11 @@
 using namespace std;
 
 void* obj_loc[NUM_OBJECTS+1];
-
-#define NUM_THREADS 10
-
 int thread_contoller[NUM_THREADS+1];
 
 bool fire_object( int id );
-void run();
-
 void* thread_loop( void* thread_id );
 void start_threads();
-
-// This is only ever called from the object threads, as it's a writer.
-void set_timestamp( int id );
 
 extern void load_all();
 
@@ -31,21 +23,33 @@ int main() {
 
     load_all();
 
-    // Fire off the feed once and let it terminate. This will populate rate_interpol
-//    fire_object( 1 );
-
     start_threads();
 
-sleep(1);
+    sleep(1);
 
-    run();
+    while (1)
+    {
+        for ( int i=1 ; i <= NUM_OBJECTS ; i++ )
+        {
+            if ( obj_loc[i] )
+            {
+                //cout << "Calling need_refresh_fpointer for " << i << endl;
 
+                if ( (*((object_header*)obj_loc[i])->need_refresh_fpointer)(i) )
+                {
+                    while ( ! fire_object( i ) )
+                    {
+                        cout << "Fire object failed due to lack of spare threads. Sleeping master thread." << endl;
+                        sleep(1);
+                    }
+                }
+            }
+        }
+    }
 }
 
 bool fire_object( int id )
 {
-    //cout << "Firing object " << id << endl;
-
     bool fired(false);
 
     for ( int i=1 ; i <= NUM_THREADS ; i++ )
@@ -64,8 +68,7 @@ bool fire_object( int id )
 
 void set_timestamp( int id )
 {
-
-sleep(2);
+    for ( int i=0 ; i < 1000000000 ; i++ );   // Simulate long calculations
 
     timeval time;
     gettimeofday( &time, NULL );
@@ -79,50 +82,26 @@ sleep(2);
     ((object_header*)obj_loc[id])->status = STOPPED;
 }
 
-void run()
-{
-    while (1) 
-    {
-        for ( int i=1 ; i <= NUM_OBJECTS ; i++ )
-        {
-            if ( obj_loc[i] )
-            { 
-                //cout << "Calling need_refresh_fpointer for " << i << endl;
-
-                if ( (*((object_header*)obj_loc[i])->need_refresh_fpointer)(i) )
-                {
-                    while ( ! fire_object( i ) )
-                    {
-                        cout << "Fire object failed due to lack of spare threads. Sleeping master thread." << endl;
-                        sleep(1);
-                    }
-                }
-            }
-        }
-    }
-}
-
 void* thread_loop( void* thread_id ) 
 {
 
-cout << "Starting thread " << (int)thread_id << endl;
+    cout << "Starting thread " << (int)thread_id << endl;
 
     while (1) {
 
         if ( thread_contoller[(int)thread_id] != 0 )
         {
 
-cout << "Thread #" << (int)thread_id << " working on obj id: " << thread_contoller[(int)thread_id] << endl;
+            cout << "Thread #" << (int)thread_id << " working on obj id: " << thread_contoller[(int)thread_id] << endl;
 
             (*((object_header*)obj_loc[thread_contoller[(int)thread_id]])->calculator_fpointer)((void*)(thread_contoller[(int)thread_id]));
             thread_contoller[(int)thread_id] = 0;
-cout << "Thread #" << (int)thread_id << " done." << endl;
+
+            cout << "Thread #" << (int)thread_id << " done." << endl;
         }
 
-        sleep(1);
-
+        usleep(50);
     }
-
 }
 
 void start_threads()
@@ -136,6 +115,5 @@ void start_threads()
             abort();
         }
     }
-
 }
 
