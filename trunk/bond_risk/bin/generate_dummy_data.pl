@@ -47,9 +47,9 @@ generate_interest_rates();
 generate_currency_curves();
 #generate_fx_rates();
 #generate_books();
-generate_bonds( 60 );
-generate_outright_trades( 60 );
-generate_repo_trades( 6 );
+generate_bonds( 400000 );
+generate_outright_trades( 400000 );
+generate_repo_trades( 200000 );
 
 sub generate_interest_rates() {
 
@@ -121,14 +121,14 @@ sub generate_currency_curves()
     my $file = "$dummy_data_root/currency_curves.sql";
     open FILE, ">$file" or die "Can't open $file";
 
-    print FILE "delete from currency_curve;\n";
+    print FILE "delete from currency_curves;\n";
 
     my $id = get_next_id();
     my $name = "USD-CCY-CURVES";
     my $interest_rate = 1;
 
     print FILE "insert into object values (  $id, 2, \"$name\" );\n";
-    print FILE "insert into currency_curve values ( $id, $interest_rate );\n";
+    print FILE "insert into currency_curves values ( $id, $interest_rate );\n";
 
     push @currency_curve_ids, $id;
 
@@ -136,7 +136,7 @@ sub generate_currency_curves()
     $interest_rate = 2;
 
     print FILE "insert into object values (  $id, 2, \"$name\" );\n";
-    print FILE "insert into currency_curve values ( $id, $interest_rate );\n";
+    print FILE "insert into currency_curves values ( $id, $interest_rate );\n";
 
     push @currency_curve_ids, $id;
 
@@ -144,7 +144,7 @@ sub generate_currency_curves()
     $interest_rate = 3;
 
     print FILE "insert into object values (  $id, 2, \"$name\" );\n";
-    print FILE "insert into currency_curve values ( $id, $interest_rate );\n";
+    print FILE "insert into currency_curves values ( $id, $interest_rate );\n";
 
     push @currency_curve_ids, $id;
 

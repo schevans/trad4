@@ -17,7 +17,7 @@ extern int tier_manager[NUM_TIERS+1][NUM_OBJECTS+1];
 
 void load_currency_curves( MYSQL* mysql )
 {
-    std::cout << "load_currency_curvess()" << std::endl;
+    // std::cout << "load_currency_curvess()" << std::endl;
 
     MYSQL_RES *result;
     MYSQL_ROW row;
@@ -50,8 +50,9 @@ void load_currency_curves( MYSQL* mysql )
         tier_manager[2][tier_manager[2][0]] = id;
         tier_manager[2][0]++;
 
-        std::cout << "New currency_curves created." << std::endl;
     }
+
+    std::cout << "Currency_curves loaded." << std::endl;
 
     mysql_free_result(result);
 }

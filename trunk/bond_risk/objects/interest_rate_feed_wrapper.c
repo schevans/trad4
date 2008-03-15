@@ -1,4 +1,7 @@
 
+
+
+#include <iostream>
 #include "trad4.h"
 #include "interest_rate_feed.h"
 
@@ -20,5 +23,7 @@ void* calculate_interest_rate_feed_wrapper( void* id )
 
 bool interest_rate_feed_need_refresh( int id )
 {
+//std::cout << *(int*)obj_loc[id] <<std::endl;
+//std::cout << (((interest_rate_feed*)obj_loc[id])->sub)->last_published <<std::endl;
     return ( (((object_header*)obj_loc[id])->status == STOPPED ) && ( *(int*)obj_loc[id] < (((interest_rate_feed*)obj_loc[id])->sub)->last_published ));
 }

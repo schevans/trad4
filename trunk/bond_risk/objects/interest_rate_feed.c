@@ -20,7 +20,7 @@ using namespace std;
 
 void* calculate_interest_rate_feed( interest_rate_feed* pub_interest_rate_feed )
 {
-    cout << "calculate_interest_rate_feed()" << endl;
+    //cout << "calculate_interest_rate_feed()" << endl;
 
     for ( int i=0 ; i < INTEREST_RATE_LEN - 1 ; i++ )
     {
@@ -33,7 +33,7 @@ void* calculate_interest_rate_feed( interest_rate_feed* pub_interest_rate_feed )
 /*
 void load_interest_rate_feeds( MYSQL* mysql )
 {
-    cout << "load_interest_rate_feeds()" << endl;
+    //cout << "load_interest_rate_feeds()" << endl;
 
     MYSQL_RES *result;
     MYSQL_ROW row;

@@ -8,7 +8,7 @@ using namespace std;
 
 void* calculate_repo_trade( repo_trade* pub_repo_trade , bond* sub_bond , currency_curves* sub_currency_curves )
 {
-    cout << "calculate_repo_trade()" << endl;
+    //cout << "calculate_repo_trade()" << endl;
 
 //cout << "_cash: " << _cash << ", _notional: " << _notional << ", sub_bond->price: " <<sub_bond->price/100.0 << endl;
 
@@ -33,6 +33,6 @@ void* calculate_repo_trade( repo_trade* pub_repo_trade , bond* sub_bond , curren
 
     pub_repo_trade->mtm_pnl = ( cash_agg - total_end_cash );
 
-    cout << "repo_trade margin=" << pub_repo_trade->margin << ", mtm_pnl=" << pub_repo_trade->mtm_pnl << endl;
+    //cout << "repo_trade margin=" << pub_repo_trade->margin << ", mtm_pnl=" << pub_repo_trade->mtm_pnl << endl;
 }
 
