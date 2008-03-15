@@ -1,7 +1,0 @@
-
-create table object (
-    id int, 
-    type int,
-    name char(32)
-) 
-    
