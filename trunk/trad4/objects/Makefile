@@ -1,20 +1,19 @@
 # Copyright (c) Steve Evans 2008
 # steve@topaz.myzen.co.uk
 
-CXX = g++ 
+CXX = g++
 
-CXXFLAGS = -O3
+CXXFLAGS = -c
 
 COMPILE = $(CXX) $(CXXFLAGS)
 
-all: trad4.o feed.o
+OBJECTS = trad4.o feed.o
 
-trad4.o: trad4.c
-	g++ -c -o trad4.o trad4.c 
+all : $(OBJECTS)
 
-feed.o: feed.c
-	g++ -c -o feed.o feed.c 
+%.o : %.c
+	$(COMPILE) $< -o $@
 
-clean :
-	rm -f trad4.o feed.o
+clean : 
+	rm -f $(OBJECTS)
 
