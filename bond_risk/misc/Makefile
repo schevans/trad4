@@ -11,5 +11,5 @@ BIN = ../bin
 all: load_interest_rate
 
 load_interest_rate: load_interest_rate.c
-	g++ -o load_interest_rate load_interest_rate.c -I../objects -I../../trad4/objects -L/usr/local/lib/mysql -lmysqlclient
+	g++ -o load_interest_rate load_interest_rate.c -I../gen/objects -I../objects -I../../trad4/objects -L/usr/local/lib/mysql -lmysqlclient
 
