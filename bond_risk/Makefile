@@ -9,9 +9,9 @@ COMPILE = $(CXX) $(CXXFLAGS)
 
 OBJECTS = ../trad4/objects/trad4.o ../trad4/objects/feed.o ./objects/bond.o ./objects/interest_rate_feed.o ./objects/currency_curves.o ./objects/outright_trade.o ./objects/repo_trade.o ./gen/objects/loader.o ./gen/objects/load_bond.o  ./gen/objects/load_interest_rate_feed.o ./gen/objects/load_currency_curves.o ./gen/objects/load_outright_trade.o ./gen/objects/load_repo_trade.o
 
-SUBDIRS = $(INSTANCE_ROOT)/objects $(TRAD4_ROOT)/objects $(INSTANCE_ROOT)/gen/objects
+SUBDIRS = $(INSTANCE_ROOT)/objects $(TRAD4_ROOT)/objects $(INSTANCE_ROOT)/gen/objects $(INSTANCE_ROOT)/misc
 
-all: objs bond_risk
+all: objs bond_risk 
 
 objs:
 	for dir in $(SUBDIRS); do cd $$dir; $(MAKE) all ; cd $(INSTANCE_ROOT); done
