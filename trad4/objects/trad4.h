@@ -9,7 +9,9 @@
 
 #define MAX_OBJECTS 20000
 
-#define NUM_OBJECTS 600
+#define MC //
+
+#define NUM_OBJECTS 1400000
 
 #define NUM_THREADS 10
 

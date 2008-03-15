@@ -8,7 +8,7 @@ using namespace std;
 
 void* calculate_currency_curves( currency_curves* pub_currency_curves , interest_rate_feed* sub_interest_rate_feed )
 {
-   cout << "calculate_currency_curves()" << endl; 
+   //cout << "calculate_currency_curves()" << endl; 
 
     int current_period_start;
     int current_period_end;

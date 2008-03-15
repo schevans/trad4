@@ -17,7 +17,7 @@ extern int tier_manager[NUM_TIERS+1][NUM_OBJECTS+1];
 
 void load_outright_trade( MYSQL* mysql )
 {
-    std::cout << "load_outright_trades()" << std::endl;
+    // std::cout << "load_outright_trades()" << std::endl;
 
     MYSQL_RES *result;
     MYSQL_ROW row;
@@ -54,8 +54,9 @@ void load_outright_trade( MYSQL* mysql )
         tier_manager[4][tier_manager[4][0]] = id;
         tier_manager[4][0]++;
 
-        std::cout << "New outright_trade created." << std::endl;
     }
+
+    std::cout << "Outright_trades loaded." << std::endl;
 
     mysql_free_result(result);
 }

@@ -110,7 +110,7 @@ int main(int argc,char *argv[]) {
     int sec = time.tv_sec;
     int mil = time.tv_usec;
 
-    int timestamp = (( sec - 1203000000 ) * 1000 ) + ( mil / 1000 );
+    int timestamp = (( sec - 1204000000 ) * 1000 ) + ( mil / 1000 );
 
     interest_rate->last_published = timestamp;
 

@@ -27,3 +27,5 @@ clean_bond_risk:
 bond_risk: $(OBJECTS)
 	$(CXX) -o bond_risk $(OBJECTS) -lpthread -L/usr/local/lib/mysql -lmysqlclient
 
+opt:
+	g++ -O3 -o  bond_risk ../trad4/objects/trad4.c ../trad4/objects/feed.c ./objects/bond.c ./objects/interest_rate_feed.c ./objects/currency_curves.c ./objects/loader.c ./objects/outright_trade.c ./objects/repo_trade.c ./objects/load_bond.c  ./objects/load_interest_rate_feed.c ./objects/load_currency_curves.c ./objects/load_outright_trade.c ./objects/load_repo_trade.c -I./objects -I../trad4/objects  -lpthread -L/usr/local/lib/mysql -lmysqlclient

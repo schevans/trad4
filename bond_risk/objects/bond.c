@@ -12,7 +12,7 @@ using namespace std;
 
 void* calculate_bond( bond* pub_bond, currency_curves* sub_currency_curves )
 {
-    cout << "calculate_bond()" << endl;
+    //cout << "calculate_bond()" << endl;
 
     std::vector<int> _coupon_date_vec;
     std::vector<float> _payment_vec;
@@ -64,6 +64,6 @@ void* calculate_bond( bond* pub_bond, currency_curves* sub_currency_curves )
     pub_bond->price = ( price );
     pub_bond->dv01 = ( price - price_01 );
 
-    cout << "New bond price: " << price << ", dv01: " << ( price - price_01 ) << endl;
+    //cout << "New bond price: " << price << ", dv01: " << ( price - price_01 ) << endl;
 }
 

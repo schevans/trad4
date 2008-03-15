@@ -21,7 +21,7 @@ using namespace std;
 
 void load_interest_rate_feed( MYSQL* mysql )
 {
-    cout << "load_interest_rate_feeds()" << endl;
+    // cout << "load_interest_rate_feeds()" << endl;
 
     MYSQL_RES *result;
     MYSQL_ROW row;
@@ -65,7 +65,6 @@ void load_interest_rate_feed( MYSQL* mysql )
         tier_manager[1][tier_manager[1][0]] = id;
         tier_manager[1][0]++;
 
-        cout << "New interest_rate_feed created." << endl;
     }
 
     mysql_free_result(result);
@@ -84,6 +83,8 @@ void load_interest_rate_feed( MYSQL* mysql )
             ((interest_rate_feed*)obj_loc[(int)id])->rate[i] = 0;
         }
     }
+
+    cout << "Interest_rate_feeds loaded." << endl;
 
     save_file.close();
 

@@ -17,7 +17,7 @@ extern int tier_manager[NUM_TIERS+1][NUM_OBJECTS+1];
 
 void load_bond( MYSQL* mysql )
 {
-    std::cout << "load_bonds()" << std::endl;
+    //std::cout << "load_bonds()" << std::endl;
 
     MYSQL_RES *result;
     MYSQL_ROW row;
@@ -54,8 +54,9 @@ void load_bond( MYSQL* mysql )
         tier_manager[3][tier_manager[3][0]] = id;
         tier_manager[3][0]++;
 
-        std::cout << "New bond created." << std::endl;
+        //std::cout << "New bond created." << std::endl;
     }
 
     mysql_free_result(result);
+    std::cout << "Bonds loaded." << std::endl;
 }
