@@ -1,0 +1,13 @@
+
+
+sub
+    int stock_trade
+    int rate_trade
+
+pub
+    double d1
+    double d2
+    double Npd1
+    double Npd2
+    double delta
+

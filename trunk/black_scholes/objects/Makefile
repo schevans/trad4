@@ -1,19 +1,15 @@
-# Copyright (c) Steve Evans 2007
-# steve@topaz.myzen.co.uk
-# This code is licenced under the BSD licence. For details see $INSTANCE_ROOT/LICENCE
-# 
 
 CXX = g++
 
-CXXFLAGS = -Wall -I$(INSTANCE_ROOT)/objects -I$(INSTANCE_ROOT)/gen/objects -I$(TRAD4_ROOT)/objects
+CXXFLAGS = -I$(INSTANCE_ROOT)/objects -I$(INSTANCE_ROOT)/gen/objects -I$(TRAD4_ROOT)/objects
 
 COMPILE = $(CXX) $(CXXFLAGS) -c
 
-OBJECTS = RiskFreeRateFeed.o StockFeed.o Option.o OptionMgr.o
+OBJECTS = loader.o option_feed.o risk_free_rate_feed.o stock_feed.o rate_trade.o stock_trade.o bs_delta.o theta.o kertn_pd2.o vega.o gamma.o sn_pd1.o rho.o price.o listener.o
 
 all : $(OBJECTS)
 
-%.o : %.cc
+%.o : %.c
 	$(COMPILE) $< -o $@
 
 clean :

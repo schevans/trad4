@@ -1,0 +1,9 @@
+
+
+sub
+    int rate_trade
+    int bs_delta
+
+pub
+    double KerTN_pd2
+
