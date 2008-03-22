@@ -11,8 +11,9 @@ case $SUFFIX in
         echo "Unkown suffix $SUFFIX"
 esac
 
-echo "drop $TYPE $PREFIX" | mysql -u root trad4
 
-cat $FILE | mysql -u root trad4
+echo "drop $TYPE $PREFIX" | mysql -u root $INSTANCE
+
+cat $FILE | mysql -u root $INSTANCE
 
  

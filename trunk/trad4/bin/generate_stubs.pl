@@ -31,7 +31,7 @@ my $loader_filename = "load_$name.c";
 my $c_wrapper_filename = "$name"."_wrapper.c";
 my $table_filename = "$name.table";
 
-my ( @sub, @pub, @mem_pub, @static, @static_vec, @common, @header );
+my ( @sub, @pub, @mem_pub, @static, @static_vec, @header );
 
 @header = ( "ulong last_published",
             "object_status status",
@@ -43,7 +43,7 @@ my ( @sub, @pub, @mem_pub, @static, @static_vec, @common, @header );
         );
 
 my $defs_root=$ENV{INSTANCE_ROOT}."/defs";
-my $gen_root=$ENV{INSTANCE_ROOT};
+my $gen_root=$ENV{INSTANCE_ROOT}."/gen";
 my $obj_root=$ENV{INSTANCE_ROOT}."/objects";
 
 
@@ -84,19 +84,14 @@ close TYPES_FILE;
 
 load_defs( "$defs_root/$name.t4" );
 
-#generate_h();
+generate_h();
 generate_table();
 generate_c_wrapper();
-
-if ( ! -f "$gen_root/objects/$loader_filename" ) {
-    generate_loader();
-}
+generate_loader();
 
 if ( ! -f "$obj_root/$c_filename" ) {
     generate_c();
 }
-
-exit 0;
 
 sub generate_h()
 {
@@ -112,11 +107,30 @@ sub generate_h()
     print H_FILE "\n";
     print H_FILE "#include \"common.h\"\n";
     print H_FILE "\n";
+
+    if ( $is_feed ) {
+
+        print H_FILE "typedef struct {\n";
+
+        foreach $tuple ( @pub, @mem_pub ) {
+
+            ( $type, $var ) = split / /, $tuple;
+
+            print H_FILE "    $type $var;\n";
+
+        }
+
+        print H_FILE "    int last_published;\n";
+        print H_FILE "} $name"."_sub;\n";
+        print H_FILE "\n";
+
+    }
+
     print H_FILE "typedef struct {\n";
 
     print H_FILE "    // Header\n";
 
-    foreach $tuple ( @header, @common ) {
+    foreach $tuple ( @header ) {
 
         ( $type, $var ) = split / /, $tuple;
 
@@ -137,6 +151,12 @@ sub generate_h()
 
     print H_FILE "\n";
     print H_FILE "    // Static\n";
+
+    if ( $is_feed ) {
+
+        print H_FILE "    int shmid;\n";
+        print H_FILE "    $name"."_sub* sub;\n";
+    }
 
     foreach $tuple ( @static ) {
 
@@ -168,7 +188,7 @@ sub generate_h()
 sub load_defs($) {
     my $file = shift;
 
-    open FILE, "$file" or die "Could not open $file";
+    open FILE, "$file" or die "Could not open $file for reading";
 
 
     my $line;
@@ -337,12 +357,8 @@ sub generate_loader()
 
         print C_FILE "        (($name*)obj_loc[id])->$var = ";
 
-        if ( $type =~ /int/ ) {
-            print C_FILE "atoi(row[$counter]);\n";
-        }
-        else {
-            print C_FILE "atof(row[$counter]);\n";
-        }
+        print C_FILE type2atoX($type)."(row[$counter]);\n";
+
         $counter++
     }
 
@@ -480,7 +496,7 @@ sub generate_c_wrapper()
 
 sub generate_c()
 {
-    open C_FILE, ">$gen_root/objects/$c_filename" or die "Can't open $gen_root/objects/$c_filename for writing. Exiting";
+    open C_FILE, ">$obj_root/$c_filename" or die "Can't open $obj_root/$c_filename for writing. Exiting";
 
     #print_licence_header( C_FILE );
 
@@ -508,7 +524,7 @@ sub generate_c()
 
 sub generate_table() {
     
-    open TABLE_FILE, ">$gen_root/sql/$table_filename" or die "Can't open $gen_root/objects/$table_filename for writing. Exiting";
+    open TABLE_FILE, ">$gen_root/sql/$table_filename" or die "Can't open $gen_root/sql/$table_filename for writing. Exiting";
 
     my $tuple;
     my ( $column, $type );
@@ -552,5 +568,20 @@ sub cpp2sql_type($) {
     return $sql_type;
 }
 
+sub type2atoX($) {
+    my $type = shift;
 
+    if ( $type =~ /int/ ) {
+        return "atoi";
+    }
+    elsif ( $type =~ /_enum/ ) {
+        return "($type)atoi";
+    }
+    elsif ( $type =~ /double/ ) {
+        return "std::atof";
+    }
+    else {
+        die "Odd type: $type";
+    }
+}
 

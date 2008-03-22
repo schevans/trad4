@@ -13,8 +13,9 @@ do
 
 echo $t4_file | sed 's/\..*//'
 
-    /home/steve/src/trad4/bin/generate_stubs.pl $NAME
+    $TRAD4_ROOT/bin/generate_stubs.pl $NAME
 done
 
 
+$TRAD4_ROOT/bin/generate_common.pl
 
