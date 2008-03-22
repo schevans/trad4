@@ -1,0 +1,8 @@
+
+sub
+    int kertn_pd2
+    int sn_pd1
+
+pub
+    double price
+
