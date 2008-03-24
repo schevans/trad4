@@ -39,7 +39,6 @@ int main() {
     while (1)
     {
         bool tier1_fired(false);
-
         for ( int tier=1 ; tier < NUM_TIERS+1 ; tier ++ )
         {
 
@@ -188,7 +187,9 @@ void set_timestamp( int id )
 
 //std::cout << "sec: " << sec << ", mil: " << mil << std::endl;
 
-    int timestamp = (( sec - 1204000000 ) * 1000 ) + ( mil / 1000 );
+    int timestamp = (( sec - 1206000000 ) * 1000 ) + ( mil / 1000 );
+
+//std::cout << "timestamp: " << timestamp << std::endl;
 
     *(int*)obj_loc[id] = timestamp;
 
