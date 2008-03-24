@@ -30,6 +30,7 @@ my $c_filename = "$name.c";
 my $loader_filename = "load_$name.c";
 my $c_wrapper_filename = "$name"."_wrapper.c";
 my $table_filename = "$name.table";
+my $dummy_data_filename = "$name.sql";
 
 my ( @sub, @pub, @mem_pub, @static, @static_vec, @header );
 
@@ -45,7 +46,7 @@ my ( @sub, @pub, @mem_pub, @static, @static_vec, @header );
 my $defs_root=$ENV{INSTANCE_ROOT}."/defs";
 my $gen_root=$ENV{INSTANCE_ROOT}."/gen";
 my $obj_root=$ENV{INSTANCE_ROOT}."/objects";
-
+my $dummy_data_root=$ENV{INSTANCE_ROOT}."/data/small_set";
 
 sub generate_h();
 sub generate_c();
@@ -54,6 +55,7 @@ sub generate_c_wrapper();
 sub load_defs($);
 sub cpp2sql_type($);
 sub generate_table();
+sub generate_dummy_data();
 
 open TYPES_FILE, "$ENV{INSTANCE_ROOT}/defs/object_types.t4s" or die "Can't open $ENV{INSTANCE_ROOT}/defs/object_types.t4s for reading";
 
@@ -91,6 +93,45 @@ generate_loader();
 
 if ( ! -f "$obj_root/$c_filename" ) {
     generate_c();
+}
+
+if ( ! -f "$dummy_data_root/$dummy_data_filename" ) {
+    generate_dummy_data();
+}
+
+
+sub generate_dummy_data()
+{
+    open FILE, ">$dummy_data_root/$dummy_data_filename" or die "Can't open $dummy_data_root/$dummy_data_filename for writing. Exiting";
+
+    my $tupe_num = $types_map{$name};
+
+    print FILE "delete from $name;\n";
+    print FILE "insert into object values ( $tupe_num, $tupe_num, \"$name"."_$tupe_num\" );\n";
+    print FILE "insert into $name values ( $tupe_num";
+
+    if ( @static ) {
+
+        foreach $tuple ( @static ) {
+
+            print FILE ", 0";
+        }
+    }
+
+    if ( ! $is_feed ) {
+
+        foreach $tuple ( @sub ) {
+
+            ( $type, $var ) = split / /, $tuple;
+
+            print FILE ", $types_map{$var}";
+
+        }
+    }
+
+    print FILE " );\n";
+
+    close FILE;
 }
 
 sub generate_h()
@@ -335,6 +376,11 @@ sub generate_loader()
     print C_FILE "\n";
     print C_FILE "    result = mysql_use_result(mysql);\n";
     print C_FILE "\n";
+
+    if ( $is_feed ) {
+        print C_FILE "void* tmp;\n";
+    }
+
     print C_FILE "    while (( row = mysql_fetch_row(result) ))\n";
     print C_FILE "    {\n";
     print C_FILE "        int id = atoi(row[0]);\n";
@@ -348,6 +394,14 @@ sub generate_loader()
     print C_FILE "        (($name*)obj_loc[id])->type = ".$types_map{$name}.";\n";
     print C_FILE "        //(($name*)obj_loc[id])->name = 0;\n";
     print C_FILE "        \n";
+
+    if ( $is_feed ) {
+
+        print C_FILE "        (($name*)obj_loc[id])->shmid = create_shmem( \&tmp, sizeof( $name"."_sub ) );;\n";
+        print C_FILE "        (($name*)obj_loc[id])->sub = ($name"."_sub*)tmp;\n";
+        print C_FILE "        ((($name*)obj_loc[id])->sub)->last_published = 0;\n";
+
+    }
 
     my $counter=2;
 
