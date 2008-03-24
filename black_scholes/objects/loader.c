@@ -72,6 +72,6 @@ void load_all()
     load_sn_pd1( &mysql );
     load_rho( &mysql );
     load_price( &mysql );
-    load_listener( &mysql );
+//    load_listener( &mysql );
 
 }
