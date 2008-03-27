@@ -1,8 +1,9 @@
 
 
 sub
-    int stock_trade
-    int rate_trade
+    int risk_free_rate_feed
+    int stock_feed
+    int option_feed
 
 pub
     double d1

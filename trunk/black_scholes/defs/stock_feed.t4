@@ -3,7 +3,9 @@
 # This code is licenced under the BSD licence. For details see $INSTANCE_ROOT/LICENCE
 
 
-pub:
-    double stock_price
-    double volatility
-    double volatility2 
+static
+    double S
+    double v
+
+pub
+    double vv
