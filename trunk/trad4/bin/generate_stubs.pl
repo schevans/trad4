@@ -453,8 +453,11 @@ sub generate_c_wrapper()
     #print_licence_header( C_FILE );
 
     print C_FILE "\n";
+    print C_FILE "#include <iostream>\n";
+    print C_FILE "\n";
     print C_FILE "#include \"trad4.h\"\n";
     print C_FILE "#include \"$name.h\"\n";
+    print C_FILE "#include \"$name"."_macros.h\"\n";
 
     foreach $tuple ( @sub ) {
 
@@ -469,43 +472,13 @@ sub generate_c_wrapper()
     print C_FILE "\n";
     print C_FILE "extern void set_timestamp( int id );\n";
 
-    print C_FILE "extern void* calculate_$name( $name* pub_$name ";
+    print C_FILE "extern void* calculate_$name( int id );";
 
-    foreach $tuple ( @sub ) {
-
-        ( $type, $var ) = split / /, $tuple;
-        
-        print C_FILE ", $var* sub_$var ";
-
-    }
-
-    print C_FILE ");\n";
-    print C_FILE "\n";
     print C_FILE "\n";
     print C_FILE "void* calculate_$name"."_wrapper( void* id )\n";
     print C_FILE "{\n";
-    print C_FILE "    $name* pub_$name = ($name*)obj_loc[(int)id];\n";
-
-    foreach $tuple ( @sub ) {
-
-        ( $type, $var ) = split / /, $tuple;
-        
-        print C_FILE "    $var* sub_$var = ($var*)obj_loc[pub_$name->$var];\n";
-
-    }
-
     print C_FILE "\n";
-    print C_FILE "    calculate_$name( pub_$name ";
-
-    foreach $tuple ( @sub ) {
-
-        ( $type, $var ) = split / /, $tuple;
-        
-        print C_FILE ", sub_$var ";
-
-    }
-
-    print C_FILE ");\n";
+    print C_FILE "    calculate_$name( (int)id );\n";
     print C_FILE "\n";
     print C_FILE "    set_timestamp((int)id);\n";
     print C_FILE "\n";
@@ -513,6 +486,8 @@ sub generate_c_wrapper()
     print C_FILE "\n";
     print C_FILE "bool ".$name."_need_refresh( int id )\n";
     print C_FILE "{\n";
+
+    print C_FILE "    DEBUG( \"$name"."_need_refresh( \" << id << \")\" )\n";
 
     print C_FILE "    return ( ";
 
@@ -557,17 +532,7 @@ sub generate_c()
     print C_FILE "\n";
     print C_FILE "#include \"$name"."_wrapper.c\"\n";
     print C_FILE "\n";
-    print C_FILE "void* calculate_$name( $name* pub_$name ";
-
-    foreach $tuple ( @sub ) {
-
-        ( $type, $var ) = split / /, $tuple;
-        
-        print C_FILE ", $var* sub_$var ";
-
-    }
-
-    print C_FILE ")\n";
+    print C_FILE "void* calculate_$name( int id )\n";
     print C_FILE "{\n";
     print C_FILE "\n";
     print C_FILE "}\n";
