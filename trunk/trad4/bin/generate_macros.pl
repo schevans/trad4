@@ -3,11 +3,14 @@
 use warnings;
 use Data::Dumper;
 
-if ( !$ENV{TRAD4_ROOT} ) {
+if ( !$ENV{INSTANCE_ROOT} ) {
 
-    print "TRAD4_ROOT not set. Exiting\n";
+    print "INSTANCE_ROOT not set. Exiting\n";
     exit 1;
 }
+
+my $gen_root=$ENV{INSTANCE_ROOT}."/gen";
+
 
 sub load_defs($);
 sub print_accessors($$);
@@ -31,14 +34,22 @@ while ( $line = <TYPES_FILE> ) {
 
 close TYPES_FILE;
 
-open FILE, ">bs_delta_macros.h";
 
+foreach $name ( keys %{object_hash} ) {
 
-print_accessors( "bs_delta", FILE );
+print "Doing $name\n";
 
-close FILE;
+    my $filename = $name."_macros.h";
 
-print Dumper( %object_hash );
+    open FILE, ">$gen_root/objects/$filename" or die "Can't open $gen_root/objects/$filename for writing. Exiting";
+
+    print_accessors( $name, FILE );
+
+    close FILE;
+
+}
+
+#print Dumper( %object_hash );
 
 sub print_accessors($$) {
     my $name = shift;
@@ -47,15 +58,22 @@ sub print_accessors($$) {
 
         foreach $var ( keys %{$object_hash{$name}{pub}} ) {
 
-            print $FILEHANDLE "#define $name"."_$var ($name*)obj_loc[id]->$var\n"; 
+            print $FILEHANDLE "#define $name"."_$var (($name*)obj_loc[id])->$var\n"; 
 
         }
+
+        foreach $var ( keys %{$object_hash{$name}{static}} ) {
+
+            print $FILEHANDLE "#define $name"."_$var (($name*)obj_loc[id])->$var\n"; 
+
+        }
+
 
         foreach $var ( keys %{$object_hash{$name}{sub}} ) {
 
             foreach $var2 ( keys %{$object_hash{$var}{pub}} ) {
 
-                print $FILEHANDLE "#define $var"."_$var2 ($var*)obj_loc[ (($name*)obj_loc[id])->$var]->$var2\n"; 
+                print $FILEHANDLE "#define $var"."_$var2 (($var*)obj_loc[(($name*)obj_loc[id])->$var])->$var2\n"; 
             }
 
             foreach $var2 ( keys %{$object_hash{$var}{static}} ) {
