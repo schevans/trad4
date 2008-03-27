@@ -13,11 +13,19 @@
 
 #define NUM_OBJECTS 1400000
 
-#define NUM_THREADS 10
+#define NUM_THREADS 1
 
-#define NUM_TIERS 4
+#define NUM_TIERS 2
 
 #define OBJECT_NAME_LEN 32
+
+#define DEBUG_ON 1
+
+#ifdef DEBUG_ON
+#define DEBUG( debug ) std::cout << debug << std::endl;
+#else
+#define DEBUG( debug )
+#endif
 
 enum log_level {
     NONE,
