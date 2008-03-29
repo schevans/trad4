@@ -65,8 +65,10 @@ int main() {
                 total_mil = time.tv_usec;
             }
 
-            for ( int i=1 ; i < tier_manager[tier][0] ; i++ )
+            for ( int i=1 ; i <= tier_manager[tier][0] ; i++ )
             {
+                //std::cout << "Checking tier " << tier << ". i=" << i << ", num objs this tier: " << tier_manager[tier][0] << std::endl; 
+
                 if ( obj_loc[tier_manager[tier][i]] )
                 {
                     //cout << "Calling need_refresh_fpointer for " << tier_manager[tier][i] << endl;
@@ -147,12 +149,15 @@ int main() {
             {
                 usleep(500);
             }
+
+            //sleep(1);
         }
     }
 }
 
 bool fire_object( int id )
 {
+    //std::cout << "fire_object " << id << std::endl;
     bool fired(false);
 
     for ( int i=current_thread ; i <= NUM_THREADS ; i++ )
@@ -189,7 +194,7 @@ void set_timestamp( int id )
 
     int timestamp = (( sec - 1206000000 ) * 1000 ) + ( mil / 1000 );
 
-//std::cout << "timestamp: " << timestamp << std::endl;
+    //std::cout << "setting timestamp: " << timestamp << std::endl;
 
     *(int*)obj_loc[id] = timestamp;
 
