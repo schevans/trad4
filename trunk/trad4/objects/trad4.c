@@ -74,24 +74,30 @@ int main() {
                 get_timestamp( end_sec, end_mil );
 
                 int elapsed_sec = end_sec - start_sec;
-                int elapsed_mil = end_sec - start_sec;
+                int elapsed_mil = end_mil - start_mil;
                 
-
-//cout << "start_sec:" << start_sec << " time.tv_sec:" << tmp1 << " end_sec:" << end_sec << endl;
-//cout << "start_mil:" << start_mil << " time.tv_usec:" << tmp2 << " end_mil:" << end_mil << endl;
-
-                
-
                 if ( elapsed_sec < 0 )
                 {
                     elapsed_sec = end_sec + 1;
                     elapsed_mil = elapsed_mil + 1000000;
                 }
 
-
-                cout << "Tier " << tier << " complete in " << elapsed_sec << "s " << elapsed_mil << "m." << endl << endl;
+                cout << "Tier " << tier << " complete in " << elapsed_sec << "s " << elapsed_mil << "ms." << endl << endl;
 
             }
+
+            get_timestamp( total_end_sec, total_end_mil );
+
+            int total_elapsed_sec = total_end_sec - total_start_sec;
+            int total_elapsed_mil = total_end_mil - total_start_mil;
+
+            if ( total_elapsed_sec < 0 )
+            {
+                total_elapsed_sec = total_end_sec + 1;
+                total_elapsed_mil = total_elapsed_mil + 1000000;
+            }
+
+            cout << endl << "All tiers complete in " << total_elapsed_sec << "s " << total_elapsed_mil << "ms." << endl << endl;
 
         }
         else

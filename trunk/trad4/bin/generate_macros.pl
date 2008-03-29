@@ -105,7 +105,8 @@ sub load_defs($) {
             next;
         }
 
-        $line =~ s/^ *//;
+        $line =~ s/^\s+//;
+        $line =~ s/\s+$//;
 
         if ( $line =~ /sub|pub|static/ ) {
 
