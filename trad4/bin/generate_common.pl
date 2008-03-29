@@ -102,7 +102,7 @@ sub generate_top_lvl_make() {
 
     print MAKE_FILE "	for dir in \$(SUBDIRS); do cd \$\$dir; \$(MAKE) all ; cd \$(INSTANCE_ROOT); done\n";
     print MAKE_FILE "\n";
-    print MAKE_FILE "$ENV{INSTANCE}:\n";
+    print MAKE_FILE "$ENV{INSTANCE}: \$(OBJECTS)\n";
     print MAKE_FILE "	\$(CXX) -o $ENV{INSTANCE} \$(OBJECTS) -lpthread -L/usr/local/lib/mysql -lmysqlclient\n";
 
 
