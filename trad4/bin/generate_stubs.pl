@@ -489,7 +489,8 @@ sub generate_c_wrapper()
 
     print C_FILE "    DEBUG( \"$name"."_need_refresh( \" << id << \")\" )\n";
 
-    print C_FILE "    return ( ";
+    print C_FILE "\n";
+    print C_FILE "    bool retval = (";
 
     if ( $is_feed ) {
 
@@ -515,9 +516,15 @@ sub generate_c_wrapper()
     }
 
 
+    if ( $is_feed ) {
 
+        print C_FILE "\n";
+        print C_FILE "    DEBUG( \"\tstatus=\" << ((object_header*)obj_loc[id])->status<< \" this ts=\" <<  *(int*)obj_loc[id] << \" sub ts=\" << ((($name*)obj_loc[id])->sub)->last_published << \" retval=\" << retval )\n";
+    }
 
-
+    print C_FILE "\n";
+    print C_FILE "    return retval;\n";
+    print C_FILE "\n";
     print C_FILE "}\n";
 
     close C_FILE;
@@ -530,11 +537,15 @@ sub generate_c()
     #print_licence_header( C_FILE );
 
     print C_FILE "\n";
+    print C_FILE "#include <iostream>\n";
+    print C_FILE "\n";
     print C_FILE "#include \"$name"."_wrapper.c\"\n";
+    print C_FILE "\n";
+    print C_FILE "using namespace std;\n";
     print C_FILE "\n";
     print C_FILE "void* calculate_$name( int id )\n";
     print C_FILE "{\n";
-    print C_FILE "\n";
+    print C_FILE "    DEBUG( \"calculate_$name( \" << id << \")\" )\n";
     print C_FILE "}\n";
     print C_FILE "\n";
 

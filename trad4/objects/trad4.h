@@ -19,7 +19,6 @@
 
 #define OBJECT_NAME_LEN 32
 
-#define DEBUG_ON 1
 
 #ifdef DEBUG_ON
 #define DEBUG( debug ) std::cout << debug << std::endl;
