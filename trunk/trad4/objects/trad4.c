@@ -12,20 +12,25 @@ using namespace std;
 
 void* obj_loc[NUM_OBJECTS+1];
 int thread_contoller[NUM_THREADS+1];
+int tier_manager[NUM_TIERS+1][NUM_OBJECTS+1];
 
 bool fire_object( int id );
 void* thread_loop( void* thread_id );
 void start_threads();
+void get_timestamp( int& sec, int& mil );
+bool run_tier( int tier );
 
 extern void load_all();
 
-int tier_manager[NUM_TIERS+1][NUM_OBJECTS+1];
-
 int current_thread(1);
-
 int num_threads_fired(0);
+int timestamp_offset(0);
 
 int main() {
+
+    timeval time;
+    gettimeofday( &time, NULL );
+    timestamp_offset = ( time.tv_sec / 1000000 ) * 1000000;
 
     load_all();
 
@@ -33,136 +38,147 @@ int main() {
 
     sleep(1);
 
-    int total_sec;
-    int total_mil;
+    cout << endl;
+
+    int total_start_sec;
+    int total_start_mil;
+    int total_end_sec;
+    int total_end_mil;
+    int start_sec;
+    int start_mil;
+    int end_sec;
+    int end_mil;
 
     while (1)
     {
-        bool tier1_fired(false);
-        for ( int tier=1 ; tier < NUM_TIERS+1 ; tier ++ )
+
+        get_timestamp( start_sec, start_mil );
+
+        if ( run_tier( 1 ) )
         {
+            get_timestamp( end_sec, end_mil );
 
-            int num_times_waited_this_tier(0);
+            cout << "Tier " << 1 << " run in " << end_sec - start_sec << "s " << end_mil - start_mil << "m." << endl << endl;
 
-            int start_sec;
-            int start_mil;
+            total_start_sec = start_sec;
+            total_start_mil = start_mil;
 
-            if ( tier != 1 )
+            for ( int tier=2 ; tier < NUM_TIERS+1 ; tier++ )
             {
-                timeval time;
-                gettimeofday( &time, NULL );
-                start_sec = time.tv_sec;
-                start_mil = time.tv_usec;
+                get_timestamp( start_sec, start_mil );
 
                 cout << "Tier " << tier << " running." << endl;
-            }
+        
+                run_tier( tier );
 
-            if ( tier == 2 )
-            {
-                timeval time;
-                gettimeofday( &time, NULL );
-                total_sec = time.tv_sec;
-                total_mil = time.tv_usec;
-            }
+                get_timestamp( end_sec, end_mil );
 
-            for ( int i=1 ; i <= tier_manager[tier][0] ; i++ )
-            {
-                //std::cout << "Checking tier " << tier << ". i=" << i << ", num objs this tier: " << tier_manager[tier][0] << std::endl; 
+                int elapsed_sec = end_sec - start_sec;
+                int elapsed_mil = end_sec - start_sec;
+                
 
-                if ( obj_loc[tier_manager[tier][i]] )
+//cout << "start_sec:" << start_sec << " time.tv_sec:" << tmp1 << " end_sec:" << end_sec << endl;
+//cout << "start_mil:" << start_mil << " time.tv_usec:" << tmp2 << " end_mil:" << end_mil << endl;
+
+                
+
+                if ( elapsed_sec < 0 )
                 {
-                    //cout << "Calling need_refresh_fpointer for " << tier_manager[tier][i] << endl;
-
-                    if ( (*((object_header*)obj_loc[tier_manager[tier][i]])->need_refresh_fpointer)(tier_manager[tier][i]) )
-                    {
-                        while ( ! fire_object( tier_manager[tier][i] ) )
-                        {
-                            //cout << "Fire object failed due to lack of spare threads. Sleeping master thread." << endl;
-                            num_times_waited_this_tier++;
-                            usleep(5);
-                        }
-
-                        tier1_fired = true;
-                    }
-                }
-            }
-
-            if ( tier == 1 && tier1_fired == false )
-            {
-//                usleep(500);
-                break;
-            }
-
-            // Wait for all the threads to finish with this tier.
-
-            bool thread_still_runnning(true);
-
-            while ( thread_still_runnning ) 
-            {
-                thread_still_runnning = false;
-
-                for ( int i=1 ; i <= NUM_THREADS ; i++ )
-                {
-                    if ( thread_contoller[i] != 0 )
-                    {
-                        thread_still_runnning = true;
-                        break;
-                    }
+                    elapsed_sec = end_sec + 1;
+                    elapsed_mil = elapsed_mil + 1000000;
                 }
 
-                if ( thread_still_runnning )
-                {
-                    usleep(50);
-                }
+
+                cout << "Tier " << tier << " complete in " << elapsed_sec << "s " << elapsed_mil << "m." << endl << endl;
+
             }
 
-                timeval time;
-                gettimeofday( &time, NULL );
-                int end_sec = time.tv_sec;
-                int end_mil = time.tv_usec;
+        }
+        else
+        {
+            usleep(500);
+        }
 
-            cout << "Tier " << tier << " complete in " << end_sec - start_sec << "s " << end_mil - start_mil << "m. Waited " << num_times_waited_this_tier << " times this tier." << endl << endl;
+    }
+}
 
-            if ( tier == 4 )
+void get_timestamp( int& sec, int& mil )
+{
+    timeval time;
+    gettimeofday( &time, NULL );
+    sec = time.tv_sec;
+    mil = time.tv_usec;
+}
+
+bool run_tier( int tier ) {
+
+    bool tier_fired(false);
+
+    int num_times_waited_this_tier(0);
+
+    for ( int i=1 ; i <= tier_manager[tier][0] ; i++ )
+    {
+
+        //std::cout << "Checking tier " << tier << ". i=" << i << ", num objs this tier: " << tier_manager[tier][0] - 1 << std::endl; 
+
+        if ( obj_loc[tier_manager[tier][i]] )
+        {
+            //cout << "Calling need_refresh_fpointer for " << tier_manager[tier][i] << endl;
+
+            if ( (*((object_header*)obj_loc[tier_manager[tier][i]])->need_refresh_fpointer)(tier_manager[tier][i]) )
             {
-                timeval time;
-                gettimeofday( &time, NULL );
-
-                int end_sec = time.tv_sec - total_sec;
-                int end_mil = time.tv_usec - total_mil;
-
-                if ( end_mil < 0 )
+                while ( ! fire_object( tier_manager[tier][i] ) )
                 {
-                    end_sec = end_sec + 1;
-                    end_mil = end_mil + 1000000;
+                    //cout << "Fire object failed due to lack of spare threads. Sleeping master thread." << endl;
+                    num_times_waited_this_tier++;
+                    usleep(5);
                 }
 
-                cout << "Total time to recalc " << num_threads_fired << " objects: " << end_sec << "s, " << end_mil << "m." << endl << endl << endl;
-
-                total_sec = time.tv_sec;
-                total_mil = time.tv_usec;
-                num_threads_fired = 0;
-
+                tier_fired = true;
             }
-
-            if ( tier == 1 )
-            {
-                usleep(500);
-            }
-
-            //sleep(1);
         }
     }
+
+
+    // Wait for all the threads to finish with this tier.
+
+    bool thread_still_runnning(true);
+
+    while ( thread_still_runnning )
+    {
+        thread_still_runnning = false;
+
+        for ( int i=1 ; i <= NUM_THREADS ; i++ )
+        {
+            if ( thread_contoller[i] != 0 )
+            {
+                thread_still_runnning = true;
+                break;
+            }
+        }
+
+        if ( thread_still_runnning )
+        {
+            usleep(50);
+        }
+    }
+
+    if ( tier_fired ) 
+    {
+        cout << "Waited " << num_times_waited_this_tier << " this tier." << endl;
+    }
+
+    return tier_fired;
 }
 
 bool fire_object( int id )
 {
     //std::cout << "fire_object " << id << std::endl;
+
     bool fired(false);
 
     for ( int i=current_thread ; i <= NUM_THREADS ; i++ )
     {
-
         if ( thread_contoller[i] == 0 )
         {
             ((object_header*)obj_loc[id])->status = RUNNING;
@@ -190,9 +206,7 @@ void set_timestamp( int id )
     int sec = time.tv_sec;
     int mil = time.tv_usec;
 
-//std::cout << "sec: " << sec << ", mil: " << mil << std::endl;
-
-    int timestamp = (( sec - 1206000000 ) * 1000 ) + ( mil / 1000 );
+    int timestamp = (( sec - timestamp_offset ) * 1000 ) + ( mil / 1000 );
 
     //std::cout << "setting timestamp: " << timestamp << std::endl;
 
@@ -209,6 +223,9 @@ void* thread_loop( void* thread_id )
     bool thread_fired(false);
 
     while (1) {
+
+
+//cout << "thread_contoller[(int)thread_id] = " << thread_contoller[(int)thread_id] << endl;
 
         if ( thread_contoller[(int)thread_id] != 0 )
         {
