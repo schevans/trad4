@@ -36,17 +36,19 @@ my ( @sub, @pub, @mem_pub, @static, @static_vec, @header );
 
 @header = ( "ulong last_published",
             "object_status status",
+            "int id",
             "void* (*calculator_fpointer)(void*)",
             "bool (*need_refresh_fpointer)(int)",
             "int type" ,
-            "char name[OBJECT_NAME_LEN]"
+            "char name[OBJECT_NAME_LEN]",
+            "int log_level"
             
         );
 
 my $defs_root=$ENV{INSTANCE_ROOT}."/defs";
 my $gen_root=$ENV{INSTANCE_ROOT}."/gen";
 my $obj_root=$ENV{INSTANCE_ROOT}."/objects";
-my $dummy_data_root=$ENV{INSTANCE_ROOT}."/data/small_set";
+my $dummy_data_root=$ENV{INSTANCE_ROOT}."/data/default_set";
 
 sub generate_h();
 sub generate_c();
@@ -107,7 +109,7 @@ sub generate_dummy_data()
     my $tupe_num = $types_map{$name};
 
     print FILE "delete from $name;\n";
-    print FILE "insert into object values ( $tupe_num, $tupe_num, \"$name"."_$tupe_num\" );\n";
+    print FILE "insert into object values ( $tupe_num, $tupe_num, \"$name"."_$tupe_num\", 0 );\n";
     print FILE "insert into $name values ( $tupe_num";
 
     if ( @static ) {
@@ -335,7 +337,7 @@ sub generate_loader()
     print C_FILE "    MYSQL_ROW row;\n";
     print C_FILE "\n";
     print C_FILE "    std::ostringstream dbstream;\n";
-    print C_FILE "    dbstream << \"select o.id, o.name ";
+    print C_FILE "    dbstream << \"select o.id, o.name, o.log_level ";
 
     foreach $tuple ( @static ) {
 
@@ -387,6 +389,8 @@ sub generate_loader()
     print C_FILE "\n";
     print C_FILE "        obj_loc[id] = new $name;\n";
     print C_FILE "\n";
+    print C_FILE "        (($name*)obj_loc[id])->id = id;\n";
+    print C_FILE "        (($name*)obj_loc[id])->log_level = atoi(row[2]);\n";
     print C_FILE "        (($name*)obj_loc[id])->last_published = 0;\n";
     print C_FILE "        (($name*)obj_loc[id])->status = STOPPED;\n";
     print C_FILE "        (($name*)obj_loc[id])->calculator_fpointer = &calculate_$name"."_wrapper;\n";
@@ -403,7 +407,7 @@ sub generate_loader()
 
     }
 
-    my $counter=2;
+    my $counter=3;
 
     foreach $tuple ( @static ) {
 
