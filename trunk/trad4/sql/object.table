@@ -3,6 +3,7 @@ create table object (
     id int, 
     type int,
     name char(32),
-    log_level int
+    log_level int,
+    need_reload int
 ) 
     

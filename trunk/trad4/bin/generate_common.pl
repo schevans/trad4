@@ -22,6 +22,7 @@ open TYPES_FILE, "$ENV{INSTANCE_ROOT}/defs/object_types.t4s" or die "Can't open 
 my ( $line, $num, $type, $tier );
 my %types_map;
 my @all_objs;
+my %obj_type_num_map;
 my $max_tier;
 
 while ( $line = <TYPES_FILE> ) {
@@ -35,6 +36,8 @@ while ( $line = <TYPES_FILE> ) {
     ( $num, $tier, $type ) = split /,/, $line;
     $types_map{$type} = $num;
     push @all_objs, $type;
+
+    %obj_type_num_map->{$type} = $num;
 
     if ( $tier > $max_tier )
     {
@@ -181,6 +184,7 @@ sub generate_loader() {
     print FILE "\n";
     print FILE "#include <iostream>\n";
     print FILE "#include <sstream>\n";
+    print FILE "#include <vector>\n";
     print FILE "\n";
     print FILE "#include \"trad4.h\"\n";
     print FILE "#include \"common.h\"\n";
@@ -203,11 +207,14 @@ sub generate_loader() {
 
     foreach $obj (@all_objs) {
 
-        print FILE "extern void load_$obj( MYSQL* mysql );\n";
+        print FILE "extern void load_$obj( MYSQL* mysql, int id );\n";
+        print FILE "extern void load_all_$obj( MYSQL* mysql );\n";
     }
  
     print FILE "\n";
     print FILE "extern int tier_manager[NUM_TIERS+1][NUM_OBJECTS+1];\n";
+    print FILE "\n";
+    print FILE "using namespace std;\n";
     print FILE "\n";
     print FILE "void load_all()\n";
     print FILE "{\n";
@@ -219,7 +226,7 @@ sub generate_loader() {
     print FILE "    }\n";
     print FILE "\n";
 
-    for ( $i=1 ; $i < $max_tier ; $i++ )
+    for ( $i=1 ; $i <= $max_tier ; $i++ )
     {
         print FILE "    tier_manager[$i][0]=1;\n";
     } 
@@ -228,10 +235,64 @@ sub generate_loader() {
 
     foreach $obj (@all_objs) {
 
-        print FILE "    load_$obj( &mysql );\n";
+        print FILE "    load_all_$obj( &mysql );\n";
 
     }
     print FILE "\n";
+    print FILE "}\n";
+
+    print FILE "void reload_objects()\n";
+    print FILE "{\n";
+
+    print FILE "    MYSQL_RES *result;\n";
+    print FILE "    MYSQL_ROW row;\n";
+    print FILE "\n";
+    print FILE "    std::ostringstream dbstream;\n";
+    print FILE "    dbstream << \"select id, type from object where need_reload=1\";\n";
+    print FILE "\n";
+
+    print FILE "    if(mysql_query(&mysql, dbstream.str().c_str()) != 0) {\n";
+    print FILE "        std::cout << __LINE__ << \": \" << mysql_error(&mysql) << std::endl;\n";
+    print FILE "        exit(0);\n";
+    print FILE "    }\n";
+    print FILE "\n";
+    print FILE "    result = mysql_use_result(&mysql);\n";
+    print FILE "\n";
+    print FILE "    std::vector<int> id_vec;\n";
+    print FILE "    std::vector<int> type_vec;\n";
+    print FILE "\n";
+
+    print FILE "    while (( row = mysql_fetch_row(result) ))\n";
+    print FILE "    {\n";
+    print FILE "        id_vec.push_back(atoi(row[0]));\n";
+    print FILE "        type_vec.push_back(atoi(row[1]));\n";
+    print FILE "    }\n";
+    print FILE "\n";
+    print FILE "    mysql_free_result(result);\n";
+    print FILE "\n";
+    print FILE "    for( int i = 0 ; i < id_vec.size() ; i++ )\n";
+    print FILE "    {\n";
+    print FILE "        int id = id_vec[i];\n";
+    print FILE "        int type = type_vec[i];\n";
+    print FILE "\n";
+    print FILE "        switch( type )\n";
+    print FILE "        {\n";
+    print FILE "\n";
+
+    foreach $obj (@all_objs) {
+
+        print FILE "            case $obj_type_num_map{$obj}:\n";
+        print FILE "                load_$obj( &mysql, id );\n";
+        print FILE "                break;\n";
+
+    }
+
+    print FILE "            default:\n";
+    print FILE "                std::cout << \"Unknown type \" << type << std::endl;\n";
+    print FILE "                exit(0);\n";
+    print FILE "\n";
+    print FILE "        }\n";
+    print FILE "    }\n";
     print FILE "}\n";
 
     close FILE;

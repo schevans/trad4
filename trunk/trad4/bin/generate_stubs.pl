@@ -35,8 +35,8 @@ my $dummy_data_filename = "$name.sql";
 my ( @sub, @pub, @mem_pub, @static, @static_vec, @header );
 
 @header = ( "ulong last_published",
-            "object_status status",
             "int id",
+            "object_status status",
             "void* (*calculator_fpointer)(void*)",
             "bool (*need_refresh_fpointer)(int)",
             "int type" ,
@@ -109,7 +109,7 @@ sub generate_dummy_data()
     my $tupe_num = $types_map{$name};
 
     print FILE "delete from $name;\n";
-    print FILE "insert into object values ( $tupe_num, $tupe_num, \"$name"."_$tupe_num\", 0 );\n";
+    print FILE "insert into object values ( $tupe_num, $tupe_num, \"$name"."_$tupe_num\", 0, 0 );\n";
     print FILE "insert into $name values ( $tupe_num";
 
     if ( @static ) {
@@ -326,14 +326,15 @@ sub generate_loader()
     print C_FILE "extern void* obj_loc[NUM_OBJECTS+1];\n";
     print C_FILE "extern void* calculate_$name"."_wrapper( void* id );\n";
     print C_FILE "extern int create_shmem( void** ret_mem, size_t pub_size );\n";
+    print C_FILE "extern void set_timestamp( int id );\n";
     print C_FILE "extern bool $name"."_need_refresh( int id );\n";
     print C_FILE "extern int tier_manager[NUM_TIERS+1][NUM_OBJECTS+1];\n";
     print C_FILE "\n";
     print C_FILE "using namespace std;\n";
     print C_FILE "\n";
-    print C_FILE "void load_$name( MYSQL* mysql )\n";
+    print C_FILE "void load_all_$name( MYSQL* mysql )\n";
     print C_FILE "{\n";
-    print C_FILE "    std::cout << \"load_$name"."s()\" << std::endl;\n";
+    print C_FILE "    std::cout << \"load_all_$name"."s()\" << std::endl;\n";
     print C_FILE "\n";
     print C_FILE "    MYSQL_RES *result;\n";
     print C_FILE "    MYSQL_ROW row;\n";
@@ -449,6 +450,101 @@ sub generate_loader()
     print C_FILE "    mysql_free_result(result);\n";
     print C_FILE "}\n";
 
+    print C_FILE "\n";
+    print C_FILE "void load_$name( MYSQL* mysql, int id )\n";
+    print C_FILE "{\n";
+    print C_FILE "    std::cout << \"load_$name"."()\" << std::endl;\n";
+    print C_FILE "\n";
+    print C_FILE "    MYSQL_RES *result;\n";
+    print C_FILE "    MYSQL_ROW row;\n";
+    print C_FILE "\n";
+    print C_FILE "    std::ostringstream dbstream;\n";
+    print C_FILE "    dbstream << \"select o.id, o.name, o.log_level ";
+
+    foreach $tuple ( @static ) {
+
+        ( $type, $var ) = split / /, $tuple;
+        
+        print C_FILE ", t.$var ";
+
+    }
+
+    foreach $tuple ( @sub ) {
+
+        ( $type, $var ) = split / /, $tuple;
+        
+        print C_FILE ", t.$var ";
+
+    }
+
+    print C_FILE " from object o ";
+
+    if ( @static || @sub ) {
+        print C_FILE ", $name t ";
+    }
+
+    print C_FILE " where ";
+
+    if ( @static || @sub ) {
+        print C_FILE " o.id = t.id and ";
+
+    }
+    print C_FILE " o.type = ".$types_map{$name}." and o.id=\" << id;\n";
+
+
+    print C_FILE "\n";
+    print C_FILE "    if(mysql_query(mysql, dbstream.str().c_str()) != 0) {\n";
+    print C_FILE "        std::cout << __LINE__ << \": \" << mysql_error(mysql) << std::endl;\n";
+    print C_FILE "        exit(0);\n";
+    print C_FILE "    }\n";
+    print C_FILE "\n";
+    print C_FILE "    result = mysql_use_result(mysql);\n";
+    print C_FILE "\n";
+    print C_FILE "    row = mysql_fetch_row(result);\n";
+    print C_FILE "\n";
+
+    print C_FILE "        (($name*)obj_loc[id])->log_level = atoi(row[2]);\n";
+    print C_FILE "        memcpy( (($name*)obj_loc[id])->name, row[1], 32 );\n";
+    print C_FILE "        \n";
+
+    if ( $is_feed ) {
+
+        print C_FILE "        ((($name*)obj_loc[id])->sub)->last_published = (($name*)obj_loc[id])->last_published+1;\n";
+
+    }
+
+    $counter=3;
+
+    foreach $tuple ( @static ) {
+
+        ( $type, $var ) = split / /, $tuple;
+
+        print C_FILE "        (($name*)obj_loc[id])->$var = ";
+
+        print C_FILE type2atoX($type)."(row[$counter]);\n";
+
+        $counter++
+    }
+
+    foreach $tuple ( @sub ) {
+
+        ( $type, $var ) = split / /, $tuple;
+
+        print C_FILE "        (($name*)obj_loc[id])->$var = ";
+
+        if ( $type =~ /int/ ) {
+            print C_FILE "atoi(row[$counter]);\n";
+        }
+        else {
+            print C_FILE "atof(row[$counter]);\n";
+        }
+        $counter++
+    }
+
+
+    print C_FILE "\n";
+    print C_FILE "    mysql_free_result(result);\n";
+    print C_FILE "}\n";
     close C_FILE;
 }
 

@@ -5,6 +5,7 @@
 #include <iostream>
 #include <pthread.h>
 #include <sys/time.h>
+#include <signal.h>
 
 #include "trad4.h"
 
@@ -20,13 +21,21 @@ void start_threads();
 void get_timestamp( int& sec, int& mil );
 bool run_tier( int tier );
 
+bool need_reload(false);
+void reload_handler( int sig_num );
+
 extern void load_all();
+extern void reload_objects();
 
 int current_thread(1);
 int num_threads_fired(0);
 int timestamp_offset(0);
 
+
+
 int main() {
+
+    signal(SIGUSR1, reload_handler);
 
     timeval time;
     gettimeofday( &time, NULL );
@@ -105,6 +114,12 @@ int main() {
             usleep(500);
         }
 
+        if ( need_reload )
+        {
+            need_reload = false;
+            reload_objects();
+        }
+
     }
 }
 
@@ -179,7 +194,7 @@ bool run_tier( int tier ) {
 
 bool fire_object( int id )
 {
-    //std::cout << "fire_object " << id << std::endl;
+    std::cout << "fire_object " << id << std::endl;
 
     bool fired(false);
 
@@ -267,3 +282,10 @@ void start_threads()
     }
 }
 
+void reload_handler( int sig_num )
+{
+    signal(SIGUSR1, reload_handler);
+
+    cout << "reload_handler" << endl;
+    need_reload = true;
+}
