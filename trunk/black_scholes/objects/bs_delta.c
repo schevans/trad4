@@ -27,7 +27,7 @@ void* calculate_bs_delta( int id )
     if ( option_feed_call_or_put == CALL )
         bs_delta_delta = bs_delta_Npd1;
     else
-        bs_delta_delta = bs_delta_Npd2;
+        bs_delta_delta = bs_delta_Npd1 - 1.0;
 
 std::cout << "delta: " << bs_delta_delta << std::endl;
 
