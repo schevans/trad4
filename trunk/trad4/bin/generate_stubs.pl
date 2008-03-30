@@ -329,6 +329,8 @@ sub generate_loader()
     print C_FILE "extern bool $name"."_need_refresh( int id );\n";
     print C_FILE "extern int tier_manager[NUM_TIERS+1][NUM_OBJECTS+1];\n";
     print C_FILE "\n";
+    print C_FILE "using namespace std;\n";
+    print C_FILE "\n";
     print C_FILE "void load_$name( MYSQL* mysql )\n";
     print C_FILE "{\n";
     print C_FILE "    std::cout << \"load_$name"."s()\" << std::endl;\n";
@@ -396,7 +398,7 @@ sub generate_loader()
     print C_FILE "        (($name*)obj_loc[id])->calculator_fpointer = &calculate_$name"."_wrapper;\n";
     print C_FILE "        (($name*)obj_loc[id])->need_refresh_fpointer = &$name"."_need_refresh;\n";
     print C_FILE "        (($name*)obj_loc[id])->type = ".$types_map{$name}.";\n";
-    print C_FILE "        //(($name*)obj_loc[id])->name = 0;\n";
+    print C_FILE "        memcpy( (($name*)obj_loc[id])->name, row[1], 32 );\n";
     print C_FILE "        \n";
 
     if ( $is_feed ) {
@@ -478,6 +480,8 @@ sub generate_c_wrapper()
 
     print C_FILE "extern void* calculate_$name( int id );";
 
+    print C_FILE "\n";
+    print C_FILE "using namespace std;\n";
     print C_FILE "\n";
     print C_FILE "void* calculate_$name"."_wrapper( void* id )\n";
     print C_FILE "{\n";
