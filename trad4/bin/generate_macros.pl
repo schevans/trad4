@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
-use warnings;
-use Data::Dumper;
+#use warnings;
+#use Data::Dumper;
 
 if ( !$ENV{INSTANCE_ROOT} ) {
 
@@ -36,8 +36,6 @@ close TYPES_FILE;
 
 
 foreach $name ( keys %{object_hash} ) {
-
-print "Doing $name\n";
 
     my $filename = $name."_macros.h";
 
