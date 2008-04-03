@@ -58,6 +58,7 @@ sub load_defs($);
 sub cpp2sql_type($);
 sub generate_table();
 sub generate_dummy_data();
+sub error_and_exit($);
 
 open TYPES_FILE, "$ENV{INSTANCE_ROOT}/defs/object_types.t4s" or die "Can't open $ENV{INSTANCE_ROOT}/defs/object_types.t4s for reading";
 
@@ -85,6 +86,10 @@ while ( $line = <TYPES_FILE> ) {
 }
 
 close TYPES_FILE;
+
+if ( not defined $types_map{$name} ) {
+    error_and_exit( "$name not found in object_types.t4s" );
+}
 
 load_defs( "$defs_root/$name.t4" );
 
@@ -719,3 +724,11 @@ sub type2atoX($) {
     }
 }
 
+sub error_and_exit($) {
+    my $error_string = shift;
+
+    print "Error: $error_string. Exiting.\n";
+    
+    exit(0);
+
+}
