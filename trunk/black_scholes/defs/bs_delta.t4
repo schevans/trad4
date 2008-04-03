@@ -4,6 +4,7 @@ sub
     int risk_free_rate_feed
     int stock_feed
     int option_feed
+    int stock_trade
 
 pub
     double d1

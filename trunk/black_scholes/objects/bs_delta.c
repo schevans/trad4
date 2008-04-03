@@ -10,24 +10,28 @@ double nc(double x);
 
 void* calculate_bs_delta( int id )
 {
-    std::cout << "stock_feed_S: " << stock_feed_S << std::endl;
+    DEBUG( "calculate_bs_delta( " << id << ")" )
 
-    double vv = stock_feed_v * stock_feed_v;
-    double vRtT = stock_feed_v * sqrt( option_feed_T );
+    bs_delta_d1 =  ( stock_trade_ln_SK + ( risk_free_rate_feed_r + ( stock_feed_vv / 2.0 ) ) * option_feed_T ) / stock_trade_v2T_2;
 
+cout << "d1: " << bs_delta_d1 << endl;
 
-    bs_delta_d1 =  ( log( stock_feed_S / option_feed_K ) + ( risk_free_rate_feed_r + ( vv / 2.0 ) ) * option_feed_T ) / vRtT;
-
-    bs_delta_d2 = bs_delta_d1 - vRtT;
+    bs_delta_d2 = bs_delta_d1 - stock_trade_v2T_2;
 
     bs_delta_Npd1 = ndf( bs_delta_d1 );
 
     bs_delta_Npd2 = ndf( bs_delta_d2 );
 
     if ( option_feed_call_or_put == CALL )
+    {
+cout << "Call" << endl;
         bs_delta_delta = bs_delta_Npd1;
+    }
     else
+    {
+cout << "Put" << endl;
         bs_delta_delta = bs_delta_Npd1 - 1.0;
+    }
 
 std::cout << "delta: " << bs_delta_delta << std::endl;
 

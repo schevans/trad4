@@ -2,4 +2,6 @@
 1,1,option_feed
 2,1,risk_free_rate_feed
 3,1,stock_feed
-4,2,bs_delta
+4,2,stock_trade
+5,2,rate_trade
+6,3,bs_delta
