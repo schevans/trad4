@@ -15,7 +15,7 @@
 
 #define NUM_THREADS 1
 
-#define NUM_TIERS 2
+#define NUM_TIERS 3
 
 #define OBJECT_NAME_LEN 32
 
