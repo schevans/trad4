@@ -18,4 +18,5 @@ done
 
 
 $TRAD4_ROOT/bin/generate_common.pl
+$TRAD4_ROOT/bin/generate_macros.pl
 
