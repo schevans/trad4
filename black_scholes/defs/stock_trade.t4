@@ -5,7 +5,8 @@ sub
     int stock_feed
 
 pub
-    double v2T_2
+    double vvT_2
+    double vRtT
     double ln_SK
 
 
