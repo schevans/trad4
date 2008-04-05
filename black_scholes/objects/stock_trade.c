@@ -14,6 +14,6 @@ void* calculate_stock_trade( int id )
 
     stock_trade_vvT_2 = ( stock_feed_vv * option_feed_T ) / 2.0;
 
-    stock_trade_vRtT = stock_feed_v * sqrt( option_feed_T );
+    stock_trade_vRtT = stock_feed_v * option_feed_RrT;
 }
 
