@@ -59,6 +59,7 @@ sub cpp2sql_type($);
 sub generate_table();
 sub generate_dummy_data();
 sub error_and_exit($);
+sub validate();
 
 open TYPES_FILE, "$ENV{INSTANCE_ROOT}/defs/object_types.t4s" or die "Can't open $ENV{INSTANCE_ROOT}/defs/object_types.t4s for reading";
 
@@ -93,18 +94,17 @@ if ( not defined $types_map{$name} ) {
 
 load_defs( "$defs_root/$name.t4" );
 
+validate();
 generate_h();
 generate_table();
 generate_c_wrapper();
 generate_loader();
+generate_dummy_data();
 
 if ( ! -f "$obj_root/$c_filename" ) {
     generate_c();
 }
 
-if ( ! -f "$dummy_data_root/$dummy_data_filename" ) {
-    generate_dummy_data();
-}
 
 
 sub generate_dummy_data()
@@ -732,3 +732,28 @@ sub error_and_exit($) {
     exit(0);
 
 }
+
+sub validate() {
+
+        foreach $tuple ( @sub ) {
+
+            ( $type, $var ) = split / /, $tuple;
+
+            if ( ! $types_map{$var} ) {
+
+                error_and_exit( "Validation failed for $name - type $type, var $var refrerenced in $name.t4 not found in object_types.t4s" );
+
+            }
+
+        }
+
+}
+
+
+
+
+
+
+
+
+
