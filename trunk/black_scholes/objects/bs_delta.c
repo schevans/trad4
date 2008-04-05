@@ -12,11 +12,11 @@ void* calculate_bs_delta( int id )
 {
     DEBUG( "calculate_bs_delta( " << id << ")" )
 
-    bs_delta_d1 =  ( stock_trade_ln_SK + ( risk_free_rate_feed_r + ( stock_feed_vv / 2.0 ) ) * option_feed_T ) / stock_trade_v2T_2;
+    bs_delta_d1 =  ( stock_trade_ln_SK + rate_trade_rT  + stock_trade_vvT_2 ) / stock_trade_vRtT;
 
 cout << "d1: " << bs_delta_d1 << endl;
 
-    bs_delta_d2 = bs_delta_d1 - stock_trade_v2T_2;
+    bs_delta_d2 = bs_delta_d1 - stock_trade_vRtT;
 
     bs_delta_Npd1 = ndf( bs_delta_d1 );
 
