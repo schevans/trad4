@@ -10,5 +10,6 @@ pub
     double d2
     double Npd1
     double Npd2
-    double delta
 
+feed_out
+    double delta

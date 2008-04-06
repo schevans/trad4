@@ -106,9 +106,20 @@ sub load_defs($) {
         $line =~ s/^\s+//;
         $line =~ s/\s+$//;
 
-        if ( $line =~ /sub|pub|static/ ) {
+        if ( $line =~ /sub|pub|static|feed_in|feed_out/ ) {
 
-            $section = $line;
+            if ( $line =~ /feed_in/ ) {
+
+                $section = "static";
+            }
+            elsif ( $line =~ /feed_out/ ) {
+
+                $section = "pub";
+            }
+            else {
+                $section = $line;
+            }
+
             next;
         }
 
