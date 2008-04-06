@@ -19,11 +19,11 @@ if ( @ARGV != 1 ) {
 
 my $name = $ARGV[0];
 
-my $is_feed=0;
+my $has_feed=0;
 
-if ( $name =~ /feed/ ) {
-    $is_feed = 1;
-}
+#if ( $name =~ /feed/ ) {
+#    $has_feed = 1;
+#}
 
 my $h_filename = "$name.h";
 my $c_filename = "$name.c";
@@ -31,8 +31,9 @@ my $loader_filename = "load_$name.c";
 my $c_wrapper_filename = "$name"."_wrapper.c";
 my $table_filename = "$name.table";
 my $dummy_data_filename = "$name.sql";
+my $PI = 3.1416;
 
-my ( @sub, @pub, @mem_pub, @static, @static_vec, @header );
+my ( @sub, @pub, @mem_pub, @static, @static_vec, @header, @feed_in, @feed_out );
 
 @header = ( "ulong last_published",
             "int id",
@@ -117,24 +118,20 @@ sub generate_dummy_data()
     print FILE "insert into object values ( $tupe_num, $tupe_num, \"$name"."_$tupe_num\", 0, 0 );\n";
     print FILE "insert into $name values ( $tupe_num";
 
-    if ( @static ) {
+        foreach $tuple ( @static, @feed_in ) {
 
-        foreach $tuple ( @static ) {
-
-            print FILE ", 0";
+            print FILE ", $PI";
         }
-    }
-
-    if ( ! $is_feed ) {
 
         foreach $tuple ( @sub ) {
 
             ( $type, $var ) = split / /, $tuple;
 
+#print "\t$name= $type, $var: ".$types_map{$var}."\n";
+
             print FILE ", $types_map{$var}";
 
         }
-    }
 
     print FILE " );\n";
 
@@ -156,11 +153,11 @@ sub generate_h()
     print H_FILE "#include \"common.h\"\n";
     print H_FILE "\n";
 
-    if ( $is_feed ) {
+    if ( $has_feed ) {
 
         print H_FILE "typedef struct {\n";
 
-        foreach $tuple ( @pub, @mem_pub ) {
+        foreach $tuple ( @feed_in, @feed_out ) {
 
             ( $type, $var ) = split / /, $tuple;
 
@@ -169,7 +166,7 @@ sub generate_h()
         }
 
         print H_FILE "    int last_published;\n";
-        print H_FILE "} $name"."_sub;\n";
+        print H_FILE "} $name"."_$has_feed;\n";
         print H_FILE "\n";
 
     }
@@ -198,15 +195,18 @@ sub generate_h()
     }
 
     print H_FILE "\n";
-    print H_FILE "    // Static\n";
+    print H_FILE "    // Feed\n";
 
-    if ( $is_feed ) {
+    if ( $has_feed ) {
 
         print H_FILE "    int shmid;\n";
-        print H_FILE "    $name"."_sub* sub;\n";
+        print H_FILE "    $name"."_$has_feed* $has_feed;\n";
     }
 
-    foreach $tuple ( @static ) {
+    print H_FILE "\n";
+    print H_FILE "    // Static\n";
+
+    foreach $tuple ( @static, @feed_in ) {
 
         ( $type, $var ) = split / /, $tuple;
 
@@ -217,7 +217,7 @@ sub generate_h()
     print H_FILE "\n";
     print H_FILE "    // Pub\n";
 
-    foreach $tuple ( @pub, @mem_pub ) {
+    foreach $tuple ( @pub, @mem_pub, @feed_out ) {
 
         ( $type, $var ) = split / /, $tuple;
 
@@ -253,11 +253,12 @@ sub load_defs($) {
             next;
         }
 
-        if ( $line =~ /sub|pub|static/ ) {
+        if ( $line =~ /sub|pub|static|feed_in|feed_out/ ) {
 
             $doing = $line;
             next;
         }
+
         if ( $doing =~ /sub/ ) {
 
             push @sub, trim( $line );
@@ -282,6 +283,18 @@ sub load_defs($) {
             else {
                 push @static, trim( $line );
             }
+        }
+        elsif ( $doing =~ /feed_in/ ) {
+
+            push @feed_in, trim( $line );
+
+            $has_feed = "in";
+        }
+        elsif ( $doing =~ /feed_out/ ) {
+
+            push @feed_out, trim( $line );
+
+            $has_feed = "out";
         }
         else {
             die "Error: Unknown label $doing.";
@@ -347,7 +360,7 @@ sub generate_loader()
     print C_FILE "    std::ostringstream dbstream;\n";
     print C_FILE "    dbstream << \"select o.id, o.name, o.log_level ";
 
-    foreach $tuple ( @static ) {
+    foreach $tuple ( @static, @feed_in ) {
 
         ( $type, $var ) = split / /, $tuple;
         
@@ -365,7 +378,7 @@ sub generate_loader()
 
     print C_FILE " from object o ";
 
-    if ( @static || @sub ) {
+    if ( @static || @sub || @feed_in ) {
         print C_FILE ", $name t ";
     }
 
@@ -387,8 +400,9 @@ sub generate_loader()
     print C_FILE "    result = mysql_use_result(mysql);\n";
     print C_FILE "\n";
 
-    if ( $is_feed ) {
-        print C_FILE "void* tmp;\n";
+    if ( $has_feed ) {
+        print C_FILE "     void* tmp;\n";
+        print C_FILE "\n";
     }
 
     print C_FILE "    while (( row = mysql_fetch_row(result) ))\n";
@@ -407,17 +421,17 @@ sub generate_loader()
     print C_FILE "        memcpy( (($name*)obj_loc[id])->name, row[1], 32 );\n";
     print C_FILE "        \n";
 
-    if ( $is_feed ) {
+    if ( $has_feed ) {
 
-        print C_FILE "        (($name*)obj_loc[id])->shmid = create_shmem( \&tmp, sizeof( $name"."_sub ) );;\n";
-        print C_FILE "        (($name*)obj_loc[id])->sub = ($name"."_sub*)tmp;\n";
-        print C_FILE "        ((($name*)obj_loc[id])->sub)->last_published = 0;\n";
+        print C_FILE "        (($name*)obj_loc[id])->shmid = create_shmem( \&tmp, sizeof( $name"."_$has_feed ) );;\n";
+        print C_FILE "        (($name*)obj_loc[id])->$has_feed = ($name"."_$has_feed*)tmp;\n";
+        print C_FILE "        ((($name*)obj_loc[id])->$has_feed)->last_published = 0;\n";
 
     }
 
     my $counter=3;
 
-    foreach $tuple ( @static ) {
+    foreach $tuple ( @static, @feed_in ) {
 
         ( $type, $var ) = split / /, $tuple;
 
@@ -443,11 +457,18 @@ sub generate_loader()
         $counter++
     }
 
-
-    print C_FILE "\n";
-    print C_FILE "        tier_manager[$tier][tier_manager[$tier][0]] = id;\n";
-    print C_FILE "        tier_manager[$tier][0]++;\n";
-    print C_FILE "\n";
+    if ( ! @sub && ! @feed_in )
+    {
+        print C_FILE "\n";
+        print C_FILE "        calculate_$name"."_wrapper((void*)id);\n";
+        print C_FILE "\n";
+    }
+    else {
+        print C_FILE "\n";
+        print C_FILE "        tier_manager[$tier][tier_manager[$tier][0]] = id;\n";
+        print C_FILE "        tier_manager[$tier][0]++;\n";
+        print C_FILE "\n";
+    }
     print C_FILE "        std::cout << \"New $name created.\" << std::endl;\n";
 
     print C_FILE "    }\n";
@@ -512,9 +533,9 @@ sub generate_loader()
     print C_FILE "        memcpy( (($name*)obj_loc[id])->name, row[1], 32 );\n";
     print C_FILE "        \n";
 
-    if ( $is_feed ) {
+    if ( $has_feed ) {
 
-        print C_FILE "        ((($name*)obj_loc[id])->sub)->last_published = (($name*)obj_loc[id])->last_published+1;\n";
+        print C_FILE "        ((($name*)obj_loc[id])->$has_feed)->last_published = (($name*)obj_loc[id])->last_published+1;\n";
 
     }
 
@@ -544,6 +565,12 @@ sub generate_loader()
             print C_FILE "atof(row[$counter]);\n";
         }
         $counter++
+    }
+
+    if ( ! @sub && ! @feed_in )
+    {
+        print C_FILE "\n";
+        print C_FILE "        calculate_$name"."_wrapper((void*)id);\n";
     }
 
 
@@ -601,35 +628,24 @@ sub generate_c_wrapper()
     print C_FILE "\n";
     print C_FILE "    bool retval = (";
 
-    if ( $is_feed ) {
 
-        print C_FILE "(((object_header*)obj_loc[id])->status == STOPPED ) && ( *(int*)obj_loc[id] < ((($name*)obj_loc[id])->sub)->last_published ));\n";
+    print C_FILE "(((object_header*)obj_loc[id])->status == STOPPED ) && ( ";
+
+    foreach $tuple ( @sub ) {
+
+        ( $type, $var ) = split / /, $tuple;
+
+        print C_FILE "( *(int*)obj_loc[id] < *(int*)obj_loc[(($name*)obj_loc[id])->$var] ) || ";
 
 
     }
-    else {
 
-        print C_FILE "(((object_header*)obj_loc[id])->status == STOPPED ) && ( ";
+    if ( $has_feed eq "in" ) {
 
-        foreach $tuple ( @sub ) {
-
-            ( $type, $var ) = split / /, $tuple;
-
-            print C_FILE "( *(int*)obj_loc[id] < *(int*)obj_loc[(($name*)obj_loc[id])->$var] ) || ";
-
-
-        }
-
-        print C_FILE " 0 ));\n";
+                print C_FILE "(*(int*)obj_loc[id] < ((($name*)obj_loc[id])->in)->last_published ) ||"
 
     }
-
-
-    if ( $is_feed ) {
-
-        print C_FILE "\n";
-        print C_FILE "    DEBUG( \"\tstatus=\" << ((object_header*)obj_loc[id])->status<< \" this ts=\" <<  *(int*)obj_loc[id] << \" sub ts=\" << ((($name*)obj_loc[id])->sub)->last_published << \" retval=\" << retval )\n";
-    }
+    print C_FILE " 0 ));\n";
 
     print C_FILE "\n";
     print C_FILE "    return retval;\n";
