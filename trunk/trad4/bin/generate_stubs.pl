@@ -384,7 +384,7 @@ sub generate_loader()
 
     print C_FILE " where ";
 
-    if ( @static || @sub ) {
+    if ( @static || @sub || @feed_in ) {
         print C_FILE " o.id = t.id and ";
 
     }
@@ -463,12 +463,12 @@ sub generate_loader()
         print C_FILE "        calculate_$name"."_wrapper((void*)id);\n";
         print C_FILE "\n";
     }
-    else {
-        print C_FILE "\n";
-        print C_FILE "        tier_manager[$tier][tier_manager[$tier][0]] = id;\n";
-        print C_FILE "        tier_manager[$tier][0]++;\n";
-        print C_FILE "\n";
-    }
+
+    print C_FILE "\n";
+    print C_FILE "        tier_manager[$tier][tier_manager[$tier][0]] = id;\n";
+    print C_FILE "        tier_manager[$tier][0]++;\n";
+    print C_FILE "\n";
+
     print C_FILE "        std::cout << \"New $name created.\" << std::endl;\n";
 
     print C_FILE "    }\n";
@@ -567,11 +567,7 @@ sub generate_loader()
         $counter++
     }
 
-    if ( ! @sub && ! @feed_in )
-    {
-        print C_FILE "\n";
-        print C_FILE "        calculate_$name"."_wrapper((void*)id);\n";
-    }
+    print C_FILE "        (($name*)obj_loc[id])->status = RELOADED;\n";
 
 
     print C_FILE "\n";
@@ -626,7 +622,7 @@ sub generate_c_wrapper()
     print C_FILE "    DEBUG( \"$name"."_need_refresh( \" << id << \")\" )\n";
 
     print C_FILE "\n";
-    print C_FILE "    bool retval = (";
+    print C_FILE "    bool retval = ( (((object_header*)obj_loc[id])->status == RELOADED ) || ";
 
 
     print C_FILE "(((object_header*)obj_loc[id])->status == STOPPED ) && ( ";
@@ -687,7 +683,7 @@ sub generate_table() {
     print TABLE_FILE "create table $name (\n";
     print TABLE_FILE "    id int";
 
-    foreach $tuple ( @static ) {
+    foreach $tuple ( @static, @feed_in ) {
 
         ( $type, $column ) = split / /, $tuple;
 
