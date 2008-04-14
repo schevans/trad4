@@ -3,7 +3,7 @@
 sub
     int option_feed
     int rate_trade
-    int kertn_pd2
+    int bs_delta
 
 pub
     double rho

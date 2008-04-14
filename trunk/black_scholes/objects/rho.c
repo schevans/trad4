@@ -1,8 +1,23 @@
 
+#include <iostream>
+
 #include "rho_wrapper.c"
 
-void* calculate_rho( rho* pub_rho , option_feed* sub_option_feed , rate_trade* sub_rate_trade , kertn_pd2* sub_kertn_pd2 )
-{
+using namespace std;
 
+void* calculate_rho( int id )
+{
+    DEBUG( "calculate_rho( " << id << ")" )
+
+    if ( option_feed_call_or_put == CALL )
+    {
+        rho_rho = rate_trade_KerT * option_feed_T * bs_delta_N_pd2;
+    }
+    else
+    {
+        rho_rho = - rate_trade_KerT * option_feed_T * bs_delta_N_md2;
+    }
+
+    cout << "rho: " << rho_rho << endl;
 }
 

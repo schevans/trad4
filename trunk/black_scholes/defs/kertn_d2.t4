@@ -6,4 +6,5 @@ sub
 
 pub
     double KerTN_pd2
+    double KerTN_md2
 
