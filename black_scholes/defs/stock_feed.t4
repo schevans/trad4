@@ -3,7 +3,7 @@
 # This code is licenced under the BSD licence. For details see $INSTANCE_ROOT/LICENCE
 
 
-feed_in
+static
     double S
     double v
 

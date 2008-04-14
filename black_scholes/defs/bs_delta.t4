@@ -8,8 +8,8 @@ sub
 pub
     double d1
     double d2
-    double Npd1
-    double Npd2
-
-feed_out
+    double N_pd1
+    double N_pd2
+    double N_md2
+    double N_md1
     double delta

@@ -5,3 +5,8 @@
 4,2,stock_trade
 5,2,rate_trade
 6,3,bs_delta
+7,4,kertn_d2
+8,4,vega
+9,4,theta
+10,5,price
+11,5,rho

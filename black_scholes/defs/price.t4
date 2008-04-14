@@ -1,7 +1,9 @@
 
 sub
-    int kertn_pd2
-    int sn_pd1
+    int kertn_d2
+    int bs_delta
+    int stock_feed
+    int option_feed
 
 pub
     double price

@@ -12,25 +12,34 @@ void* calculate_bs_delta( int id )
 {
     DEBUG( "calculate_bs_delta( " << id << ")" )
 
+cout << "rate_trade_rT: " << rate_trade_rT << endl;
+cout << "stock_trade_ln_SK: " << stock_trade_ln_SK << endl;
+cout << "stock_trade_vRtT: " << stock_trade_vRtT << endl;
+cout << "stock_trade_vvT_2: " << stock_trade_vvT_2 << endl;
+
     bs_delta_d1 =  ( stock_trade_ln_SK + rate_trade_rT  + stock_trade_vvT_2 ) / stock_trade_vRtT;
 
 cout << "d1: " << bs_delta_d1 << endl;
 
     bs_delta_d2 = bs_delta_d1 - stock_trade_vRtT;
 
-    bs_delta_Npd1 = ndf( bs_delta_d1 );
+    bs_delta_N_pd1 = ndf( bs_delta_d1 );
 
-    bs_delta_Npd2 = ndf( bs_delta_d2 );
+    bs_delta_N_pd2 = ndf( bs_delta_d2 );
+
+    bs_delta_N_md1 = ndf( - bs_delta_d1 );
+
+    bs_delta_N_md2 = ndf( - bs_delta_d2 );
 
     if ( option_feed_call_or_put == CALL )
     {
 cout << "Call" << endl;
-        bs_delta_delta = bs_delta_Npd1;
+        bs_delta_delta = bs_delta_N_pd1;
     }
     else
     {
 cout << "Put" << endl;
-        bs_delta_delta = bs_delta_Npd1 - 1.0;
+        bs_delta_delta = bs_delta_N_pd1 - 1.0;
     }
 
 std::cout << "delta: " << bs_delta_delta << std::endl;

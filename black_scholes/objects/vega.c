@@ -1,8 +1,16 @@
 
+#include <iostream>
+
 #include "vega_wrapper.c"
 
-void* calculate_vega( vega* pub_vega , rate_trade* sub_rate_trade , bs_delta* sub_bs_delta , stock_feed* sub_stock_feed )
-{
+using namespace std;
 
+void* calculate_vega( int id )
+{
+    DEBUG( "calculate_vega( " << id << ")" )
+
+    vega_vega = stock_feed_S * bs_delta_N_pd1 * option_feed_RrT;
+
+    cout << "vega: " << vega_vega << endl;
 }
 
