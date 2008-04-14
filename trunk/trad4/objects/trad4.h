@@ -13,9 +13,9 @@
 
 #define NUM_OBJECTS 1400000
 
-#define NUM_THREADS 1
+#define NUM_THREADS 4
 
-#define NUM_TIERS 3
+#define NUM_TIERS 5
 
 #define OBJECT_NAME_LEN 32
 
@@ -36,7 +36,8 @@ enum logging_level {
 enum object_status {
     STOPPED,
     RUNNING,
-    FAILED
+    FAILED,
+    RELOADED
 };
 
 typedef struct {
