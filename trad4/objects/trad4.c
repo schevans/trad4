@@ -49,6 +49,10 @@ int main() {
 
     cout << endl;
 
+    for ( int tier=1 ; tier <= NUM_TIERS ; tier++ )
+    {
+        std::cout << "Checking tier " << tier << ". Num objs this tier: " << tier_manager[tier][0] - 1 << std::endl; 
+    }
     int total_start_sec;
     int total_start_mil;
     int total_end_sec;
@@ -194,7 +198,7 @@ bool run_tier( int tier ) {
 
 bool fire_object( int id )
 {
-    std::cout << "fire_object " << id << std::endl;
+    //std::cout << "fire_object " << id << std::endl;
 
     bool fired(false);
 
