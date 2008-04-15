@@ -6,6 +6,16 @@
 
 use warnings;
 
+############## New stuff ###############
+
+use PreComp::Header;
+use PreComp::Loader;
+use PreComp::Utilities;
+
+
+
+########################################
+
 if ( !$ENV{TRAD4_ROOT} ) {
 
     print "TRAD4_ROOT not set. Exiting\n";
@@ -96,17 +106,26 @@ if ( not defined $types_map{$name} ) {
 load_defs( "$defs_root/$name.t4" );
 
 validate();
-generate_h();
+#generate_h();
 generate_table();
 generate_c_wrapper();
-generate_loader();
+#generate_loader();
 generate_dummy_data();
 
 if ( ! -f "$obj_root/$c_filename" ) {
     generate_c();
 }
 
+######################### New stuff #########################
 
+
+my $master_hash = PreComp::Utilities::LoadDefs();
+
+PreComp::Header::Generate( $master_hash->{$name} );
+PreComp::Loader::Generate( $master_hash->{$name} );
+
+
+#############################################################
 
 sub generate_dummy_data()
 {
@@ -303,7 +322,6 @@ sub load_defs($) {
     }
 
     close FILE;
-
 }
 
 sub trim($) {
