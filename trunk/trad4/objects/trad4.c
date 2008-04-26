@@ -6,14 +6,23 @@
 #include <pthread.h>
 #include <sys/time.h>
 #include <signal.h>
+#include <stdlib.h>
+#include <dlfcn.h>
+#include <sstream>
+
+#include "mysql/mysql.h"
+
 
 #include "trad4.h"
 
 using namespace std;
 
-void* obj_loc[NUM_OBJECTS+1];
+//void* obj_loc[NUM_OBJECTS+1];
+obj_loc_t obj_loc;
+tier_manager_t tier_manager;
+
 int thread_contoller[NUM_THREADS+1];
-int tier_manager[NUM_TIERS+1][NUM_OBJECTS+1];
+//int tier_manager[NUM_TIERS+1][NUM_OBJECTS+1];
 
 bool fire_object( int id );
 void* thread_loop( void* thread_id );
@@ -24,18 +33,41 @@ bool run_tier( int tier );
 bool need_reload(false);
 void reload_handler( int sig_num );
 
-extern void load_all();
-extern void reload_objects();
+void load_all();
+//extern void reload_objects();
 
 int current_thread(1);
 int num_threads_fired(0);
 int timestamp_offset(0);
 
+int create_types();
+
+typedef void (*calculate_fpointer)(obj_loc_t obj_loc, int i);
+typedef int (*need_refresh_fpointer)(obj_loc_t obj_loc, int id );
+typedef void (*load_objects_fpointer)(obj_loc_t obj_loc, tier_manager_t tier_manager );
+
+typedef struct {
+    void* lib_handle;
+    calculate_fpointer calculate;
+    need_refresh_fpointer need_refresh;
+    load_objects_fpointer load_objects;
+    void* constructor_fpointer;
+} type_struct;
+
+type_struct* my_type_struct[15];
 
 
 int main() {
 
     signal(SIGUSR1, reload_handler);
+
+create_types();
+
+tier_manager[1][0]=1;
+tier_manager[2][0]=1;
+tier_manager[3][0]=1;
+tier_manager[4][0]=1;
+tier_manager[5][0]=1;
 
     timeval time;
     gettimeofday( &time, NULL );
@@ -121,7 +153,7 @@ int main() {
         if ( need_reload )
         {
             need_reload = false;
-            reload_objects();
+            load_all();
         }
 
     }
@@ -150,7 +182,8 @@ bool run_tier( int tier ) {
         {
             //cout << "Calling need_refresh_fpointer for " << tier_manager[tier][i] << endl;
 
-            if ( (*((object_header*)obj_loc[tier_manager[tier][i]])->need_refresh_fpointer)(tier_manager[tier][i]) )
+            if ( (*my_type_struct[ ((object_header*)obj_loc[tier_manager[tier][i]])->type ]->need_refresh)(obj_loc, tier_manager[tier][i] ) ) 
+//            if ( (*((object_header*)obj_loc[tier_manager[tier][i]])->need_refresh_fpointer)(obj_loc, tier_manager[tier][i]) )
             {
                 while ( ! fire_object( tier_manager[tier][i] ) )
                 {
@@ -198,7 +231,7 @@ bool run_tier( int tier ) {
 
 bool fire_object( int id )
 {
-    //std::cout << "fire_object " << id << std::endl;
+    std::cout << "fire_object " << id << std::endl;
 
     bool fired(false);
 
@@ -255,11 +288,20 @@ void* thread_loop( void* thread_id )
         if ( thread_contoller[(int)thread_id] != 0 )
         {
 
-            //cout << "Thread #" << (int)thread_id << " working on obj id: " << thread_contoller[(int)thread_id] << endl;
+            cout << "Thread #" << (int)thread_id << " working on obj id: " << thread_contoller[(int)thread_id] << endl;
 
-            (*((object_header*)obj_loc[thread_contoller[(int)thread_id]])->calculator_fpointer)((void*)(thread_contoller[(int)thread_id]));
+//            if ( (*my_type_struct[tier_manager[tier][i]]->need_refresh)(obj_loc, tier_manager[tier][i] ) )
 
-            //cout << "Thread #" << (int)thread_id << " done." << endl;
+//(*my_type_struct[tier_manager[tier][i]]->calculate)(obj_loc, tier_manager[tier][i] );
+
+//            if ( (*((object_header*)obj_loc[tier_manager[tier][i]])->need_refresh_fpointer)(obj_loc, tier_manager[tier][i]) )
+
+            (*my_type_struct[ ((object_header*)obj_loc[thread_contoller[(int)thread_id]])->type ]->need_refresh)(obj_loc, thread_contoller[(int)thread_id] ); 
+
+
+//            (*((object_header*)obj_loc[thread_contoller[(int)thread_id]])->calculator_fpointer)(obj_loc,thread_contoller[(int)thread_id]);
+
+            cout << "Thread #" << (int)thread_id << " done." << endl;
             thread_fired=true;
 
             thread_contoller[(int)thread_id] = 0;
@@ -292,4 +334,121 @@ void reload_handler( int sig_num )
 
     cout << "reload_handler" << endl;
     need_reload = true;
+}
+
+int create_types()
+{
+
+    MYSQL_RES *result;
+    MYSQL_ROW row;
+    MYSQL mysql;
+
+    mysql_init(&mysql);
+
+    if (!mysql_real_connect(&mysql,"localhost", "root", NULL,"black_scholes",0,NULL,0))
+    {
+        std::cout << __LINE__ << " "  << mysql_error(&mysql) << std::endl;
+    }
+
+    std::ostringstream dbstream;
+    dbstream << "select type_id, tier from types where need_reload=1";
+
+    if(mysql_query(&mysql, dbstream.str().c_str()) != 0) {
+        std::cout << __LINE__ << ": " << mysql_error(&mysql) << std::endl;
+        exit(0);
+    }
+
+    result = mysql_use_result(&mysql);
+
+    while (( row = mysql_fetch_row(result) ))
+    {
+
+
+
+        char *error;
+
+    //    typedef void (*hello_t)();
+
+        int obj_num = atoi(row[0]);
+cout << "Type id: " << obj_num << endl;
+
+        my_type_struct[obj_num] = new type_struct;
+
+        ostringstream lib_name;
+        lib_name << "/home/steve/src/black_scholes/lib/t4lib_" << obj_num;
+
+        (my_type_struct[obj_num])->lib_handle = dlopen (lib_name.str().c_str(), RTLD_LAZY);
+        if (!my_type_struct[obj_num]->lib_handle) {
+            fputs (dlerror(), stderr);
+            exit(1);
+        }
+
+        my_type_struct[obj_num]->constructor_fpointer = dlsym(my_type_struct[obj_num]->lib_handle, "constructor");
+        if ((error = dlerror()) != NULL)  {
+            fputs(error, stderr);
+            exit(1);
+        }
+
+        my_type_struct[obj_num]->need_refresh = (need_refresh_fpointer)dlsym(my_type_struct[obj_num]->lib_handle, "need_refresh");
+        if ((error = dlerror()) != NULL)  {
+            fputs(error, stderr);
+            exit(1);
+        }
+
+        my_type_struct[obj_num]->calculate = (calculate_fpointer)dlsym(my_type_struct[obj_num]->lib_handle, "calculate");
+        if ((error = dlerror()) != NULL)  {
+            fputs(error, stderr);
+            exit(1);
+        }
+
+        my_type_struct[obj_num]->load_objects = (load_objects_fpointer)dlsym(my_type_struct[obj_num]->lib_handle, "load_objects");
+        if ((error = dlerror()) != NULL)  {
+            fputs(error, stderr);
+            exit(1);
+        }
+
+    }
+
+    mysql_free_result(result);
+
+}
+
+void load_all() 
+{
+/*
+    MYSQL_RES *result;
+    MYSQL_ROW row;
+    MYSQL mysql;
+
+    mysql_init(&mysql);
+
+    if (!mysql_real_connect(&mysql,"localhost", "root", NULL,"black_scholes",0,NULL,0))
+    {
+        std::cout << __LINE__ << " "  << mysql_error(&mysql) << std::endl;
+    }
+
+    std::ostringstream dbstream;
+    dbstream << "select t.type_id, tier from types where need_reload=1";
+
+    if(mysql_query(&mysql, dbstream.str().c_str()) != 0) {
+        std::cout << __LINE__ << ": " << mysql_error(&mysql) << std::endl;
+        exit(0);
+    }
+
+    result = mysql_use_result(&mysql);
+
+    while (( row = mysql_fetch_row(result) ))
+    {
+*/
+
+//        int obj_num = atoi(row[0]);
+
+
+
+        (*my_type_struct[3]->load_objects)(obj_loc, tier_manager );
+        (*my_type_struct[2]->load_objects)(obj_loc, tier_manager );
+DBG
+
+ //   }
+
 }

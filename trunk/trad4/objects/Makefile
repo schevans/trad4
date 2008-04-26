@@ -12,7 +12,7 @@ OBJECTS = trad4.o feed.o
 all : $(OBJECTS)
 
 %.o : %.c
-	$(COMPILE) $< -o $@
+	g++ trad4.c -o black_scholes -lpthread -ldl
 
 clean : 
 	rm -f $(OBJECTS)
