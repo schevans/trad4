@@ -13,7 +13,7 @@ sub Generate($) {
     my @header = PreComp::Constants::CommomHeader();
 #    my @sub = PreComp::Utilities::GetSub( $obj_hash );
 
-    my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::GenObjRoot().$name.h );
+    my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::GenObjRoot().$name.".".h );
 
 
 #    open $FHD, ">$gen_root/objects/$h_filename" or die "Can't open $gen_root/objects/$h_filename for writing. Exiting";

@@ -17,7 +17,7 @@ sub Generate($) {
 
     my @header = PreComp::Constants::CommomHeader();
 
-    my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::GenObjRoot()."load_$name.c" );
+    my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::GenObjRoot()."$name"."_wrapper.c" );
 
     #print_licence_header( $FHD );
 
@@ -28,6 +28,7 @@ sub Generate($) {
     print $FHD "\n";
     print $FHD "#include \"trad4.h\"\n";
     print $FHD "#include \"$name.h\"\n";
+    print $FHD "#include \"$name"."_macros.h\"\n";
 
     foreach $key ( keys %{$obj_hash->{data}->{sub}} ) {
 
@@ -39,7 +40,7 @@ sub Generate($) {
     print $FHD "#include \"mysql/mysql.h\"\n";
     print $FHD "\n";
     print $FHD "\n";
-    print $FHD "extern void calculate_$obj_hash->{name}( int id );\n";
+    print $FHD "void calculate_$obj_hash->{name}( obj_loc_t obj_loc, int id );\n";
 
 
     print $FHD "\n";
@@ -66,7 +67,7 @@ sub generate_constructor($$)
     my $obj_hash = shift;
     my $FHD = shift;
 
-    print $FHD "extern \"C\" void* construct()\n";
+    print $FHD "extern \"C\" void* constructor()\n";
     print $FHD "{\n";
     print $FHD "    return new $obj_hash->{name};\n";
     print $FHD "}\n";
@@ -77,9 +78,9 @@ sub generate_calculate($$)
     my $obj_hash = shift;
     my $FHD = shift;
 
-    print $FHD "extern \"C\" void calculate( int id )\n";
+    print $FHD "extern \"C\" void calculate( obj_loc_t obj_loc, int id )\n";
     print $FHD "{\n";
-    print $FHD "    calculate_$obj_hash->{name}( id );\n";
+    print $FHD "    calculate_$obj_hash->{name}( obj_loc, id );\n";
     print $FHD "\n";
     print $FHD "}\n";
 
@@ -132,13 +133,15 @@ sub generate_loader($$)
     my $name = $obj_hash->{name};
 
     print $FHD "\n";
-    print $FHD "void load_$name( obj_loc_t obj_loc, tier_manager_t tier_manager )\n";
+    print $FHD "extern \"C\" void load_objects( obj_loc_t obj_loc, tier_manager_t tier_manager )\n";
     print $FHD "{\n";
     print $FHD "    std::cout << \"load_all_$name"."s()\" << std::endl;\n";
     print $FHD "\n";
     print $FHD "    MYSQL_RES *result;\n";
     print $FHD "    MYSQL_ROW row;\n";
     print $FHD "    MYSQL mysql;\n";
+    print $FHD "\n";
+    print $FHD "    mysql_init(&mysql);\n";
     print $FHD "\n";
     print $FHD "    if (!mysql_real_connect(&mysql,\"localhost\", \"root\", NULL,\"black_scholes\",0,NULL,0))\n";
     print $FHD "    {\n";
@@ -265,6 +268,7 @@ sub generate_loader($$)
     print $FHD "    }\n";
     print $FHD "\n";
     print $FHD "    mysql_free_result(result);\n";
+    print $FHD "\n";
     print $FHD "}\n";
 
     print $FHD "\n";

@@ -9,8 +9,6 @@
 
 #define MAX_OBJECTS 20000
 
-#define MC //
-
 #define NUM_OBJECTS 1400000
 
 #define NUM_THREADS 4
@@ -20,6 +18,10 @@
 #define OBJECT_NAME_LEN 32
 
 #define DEBUG_ON 1
+
+typedef void* obj_loc_t[NUM_OBJECTS+1];
+typedef int tier_manager_t[NUM_TIERS+1][NUM_OBJECTS+1];
+
 
 #ifdef DEBUG_ON
 #define DEBUG( debug ) if ( ((object_header*)obj_loc[id])->log_level > 0 ) std::cout << debug << std::endl;
@@ -37,7 +39,8 @@ enum object_status {
     STOPPED,
     RUNNING,
     FAILED,
-    RELOADED
+    RELOADED,
+    NEW
 };
 
 typedef struct {
@@ -45,8 +48,8 @@ typedef struct {
     time_t last_published;
     int id;
     object_status status;
-    void* (*calculator_fpointer)(void*);
-    bool (*need_refresh_fpointer)(int);
+    void (*calculator_fpointer)(obj_loc_t,int);
+    int (*need_refresh_fpointer)(obj_loc_t,int);
     int type;
     char name[OBJECT_NAME_LEN];
     int log_level; 
