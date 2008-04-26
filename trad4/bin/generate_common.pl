@@ -60,10 +60,10 @@ if ( ! -f "$ENV{INSTANCE_ROOT}/objects/common.h" ) {
 
 }
 
-generate_gen_obj_make();
-generate_top_lvl_make();
-generate_obj_make();
-generate_loader();
+#generate_gen_obj_make();
+#generate_top_lvl_make();
+#generate_obj_make();
+#generate_loader();
 
 
 
