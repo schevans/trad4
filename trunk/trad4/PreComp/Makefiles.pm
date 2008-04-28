@@ -40,7 +40,7 @@ sub generate_top_lvl_make($) {
     print $FHD "\n";
 
 
-    print $FHD "all: objs $ENV{INSTANCE}\n";
+    print $FHD "all: objs\n";
     print $FHD "\n";
     print $FHD "\n";
     print $FHD "objs: \n";

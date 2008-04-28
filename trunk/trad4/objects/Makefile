@@ -9,9 +9,9 @@ COMPILE = $(CXX) $(CXXFLAGS)
 
 OBJECTS = trad4.o feed.o
 
-all : $(OBJECTS)
+all : trad4.o
 
-%.o : %.c
+trad4.o : trad4.c
 	g++ trad4.c -o $(INSTANCE_ROOT)/bin/black_scholes -lpthread -ldl -lmysqlclient
 
 clean : 

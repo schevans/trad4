@@ -445,8 +445,17 @@ void load_all()
 
 
 
-        (*my_type_struct[3]->load_objects)(obj_loc, tier_manager );
+        (*my_type_struct[1]->load_objects)(obj_loc, tier_manager );
         (*my_type_struct[2]->load_objects)(obj_loc, tier_manager );
+        (*my_type_struct[3]->load_objects)(obj_loc, tier_manager );
+        (*my_type_struct[4]->load_objects)(obj_loc, tier_manager );
+        (*my_type_struct[5]->load_objects)(obj_loc, tier_manager );
+        (*my_type_struct[6]->load_objects)(obj_loc, tier_manager );
+        (*my_type_struct[7]->load_objects)(obj_loc, tier_manager );
+        (*my_type_struct[8]->load_objects)(obj_loc, tier_manager );
+        (*my_type_struct[9]->load_objects)(obj_loc, tier_manager );
+        (*my_type_struct[10]->load_objects)(obj_loc, tier_manager );
+        (*my_type_struct[11]->load_objects)(obj_loc, tier_manager );
 DBG
 
  //   }
