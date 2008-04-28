@@ -5,7 +5,7 @@
 
 using namespace std;
 
-void* calculate_kertn_d2( int id )
+void calculate_kertn_d2( obj_loc_t obj_loc, int id )
 {
     DEBUG( "calculate_kertn_d2( " << id << ")" )
 

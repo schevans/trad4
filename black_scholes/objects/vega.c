@@ -5,7 +5,7 @@
 
 using namespace std;
 
-void* calculate_vega( int id )
+void calculate_vega( obj_loc_t obj_loc, int id )
 {
     DEBUG( "calculate_vega( " << id << ")" )
 

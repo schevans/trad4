@@ -5,7 +5,7 @@
 
 using namespace std;
 
-void* calculate_rho( int id )
+void calculate_rho( obj_loc_t obj_loc, int id )
 {
     DEBUG( "calculate_rho( " << id << ")" )
 
