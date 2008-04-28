@@ -25,6 +25,17 @@ my @all_objs;
 my %obj_type_num_map;
 my $max_tier;
 
+######################### New stuff #########################
+
+use PreComp::Makefiles;
+use PreComp::Utilities;
+
+my $master_hash = PreComp::Utilities::LoadDefs();
+
+PreComp::Makefiles::Generate( $master_hash );
+
+#############################################################
+
 while ( $line = <TYPES_FILE> ) {
 
     chomp $line;
