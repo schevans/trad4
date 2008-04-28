@@ -5,7 +5,7 @@
 
 using namespace std;
 
-void* calculate_theta( int id )
+void calculate_theta( obj_loc_t obj_loc, int id )
 {
     DEBUG( "calculate_theta( " << id << ")" )
 }

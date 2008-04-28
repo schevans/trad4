@@ -8,7 +8,7 @@ double ndf(double t);
 double nc(double x);
 
 
-void* calculate_bs_delta( int id )
+void calculate_bs_delta( obj_loc_t obj_loc, int id )
 {
     DEBUG( "calculate_bs_delta( " << id << ")" )
 

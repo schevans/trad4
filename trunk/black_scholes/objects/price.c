@@ -5,7 +5,7 @@
 
 using namespace std;
 
-void* calculate_price( int id )
+void calculate_price( obj_loc_t obj_loc, int id )
 {
     DEBUG( "calculate_price( " << id << ")" )
 

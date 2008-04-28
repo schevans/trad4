@@ -6,7 +6,7 @@
 
 using namespace std;
 
-void* calculate_option_feed( int id )
+void calculate_option_feed( obj_loc_t obj_loc, int id )
 {
     DEBUG( "calculate_option_feed( " << id << ")" )
 

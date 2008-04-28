@@ -6,7 +6,7 @@
 
 using namespace std;
 
-void* calculate_rate_trade( int id )
+void calculate_rate_trade( obj_loc_t obj_loc, int id )
 {
     DEBUG( "calculate_rate_trade( " << id << ")" )
 
