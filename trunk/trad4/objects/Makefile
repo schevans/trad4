@@ -12,7 +12,7 @@ OBJECTS = trad4.o feed.o
 all : $(OBJECTS)
 
 %.o : %.c
-	g++ trad4.c -o black_scholes -lpthread -ldl
+	g++ trad4.c -o $(INSTANCE_ROOT)/bin/black_scholes -lpthread -ldl -lmysqlclient
 
 clean : 
 	rm -f $(OBJECTS)
