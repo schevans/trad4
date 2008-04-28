@@ -1,0 +1,7 @@
+
+create table types (
+    type_id int,
+    tier int,
+    need_reload int
+)
+
