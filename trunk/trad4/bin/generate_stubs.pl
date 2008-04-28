@@ -6,13 +6,6 @@
 
 use warnings;
 
-############## New stuff ###############
-
-
-
-
-########################################
-
 if ( !$ENV{TRAD4_ROOT} ) {
 
     print "TRAD4_ROOT not set. Exiting\n";
