@@ -1,0 +1,12 @@
+delete from types;
+insert into types values ( 1, 1, 1 );
+insert into types values ( 2, 1, 1 );
+insert into types values ( 3, 1, 1 );
+insert into types values ( 4, 2, 1 );
+insert into types values ( 5, 2, 1 );
+insert into types values ( 6, 3, 1 );
+insert into types values ( 7, 4, 1 );
+insert into types values ( 8, 4, 1 );
+insert into types values ( 9, 4, 1 );
+insert into types values ( 10, 5, 1 );
+insert into types values ( 11, 5, 1 );
