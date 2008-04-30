@@ -96,7 +96,7 @@ sub generate_need_refresh($$)
     print $FHD "extern \"C\" int need_refresh( obj_loc_t obj_loc, int id )\n";
     print $FHD "{\n";
 
-    print $FHD "    DEBUG( \"$name"."_need_refresh( \" << id << \")\" )\n";
+    print $FHD "    DEBUG_FINE( \"$name"."_need_refresh( \" << id << \")\" )\n";
 
     print $FHD "\n";
     print $FHD "    int retval = ( (((object_header*)obj_loc[id])->status == RELOADED ) || ";

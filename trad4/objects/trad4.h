@@ -24,9 +24,11 @@ typedef int tier_manager_t[NUM_TIERS+1][NUM_OBJECTS+1];
 
 
 #ifdef DEBUG_ON
-#define DEBUG( debug ) if ( ((object_header*)obj_loc[id])->log_level > 0 ) std::cout << debug << std::endl;
+#define DEBUG( debug ) if ( ((object_header*)obj_loc[id])->log_level == 1 ) std::cout << debug << std::endl;
+#define DEBUG_FINE( debug ) if ( ((object_header*)obj_loc[id])->log_level > 1 ) std::cout << debug << std::endl;
 #else
 #define DEBUG( debug )
+#define DEBUG_FINE( debug )
 #endif
 
 enum logging_level {
