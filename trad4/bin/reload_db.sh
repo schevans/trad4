@@ -26,4 +26,5 @@ do
     fi
 done
 
+$TRAD4_ROOT/bin/runsql $TRAD4_ROOT/sql/types.sql
 
