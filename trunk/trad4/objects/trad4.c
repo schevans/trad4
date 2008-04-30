@@ -40,7 +40,7 @@ int current_thread(1);
 int num_threads_fired(0);
 int timestamp_offset(0);
 
-int create_types();
+void create_types();
 
 typedef void (*calculate_fpointer)(obj_loc_t obj_loc, int i);
 typedef int (*need_refresh_fpointer)(obj_loc_t obj_loc, int id );
@@ -290,16 +290,7 @@ void* thread_loop( void* thread_id )
 
             cout << "Thread #" << (int)thread_id << " working on obj id: " << thread_contoller[(int)thread_id] << endl;
 
-//            if ( (*my_type_struct[tier_manager[tier][i]]->need_refresh)(obj_loc, tier_manager[tier][i] ) )
-
-//(*my_type_struct[tier_manager[tier][i]]->calculate)(obj_loc, tier_manager[tier][i] );
-
-//            if ( (*((object_header*)obj_loc[tier_manager[tier][i]])->need_refresh_fpointer)(obj_loc, tier_manager[tier][i]) )
-
-            (*my_type_struct[ ((object_header*)obj_loc[thread_contoller[(int)thread_id]])->type ]->need_refresh)(obj_loc, thread_contoller[(int)thread_id] ); 
-
-
-//            (*((object_header*)obj_loc[thread_contoller[(int)thread_id]])->calculator_fpointer)(obj_loc,thread_contoller[(int)thread_id]);
+            (*my_type_struct[ ((object_header*)obj_loc[thread_contoller[(int)thread_id]])->type ]->calculate)(obj_loc, thread_contoller[(int)thread_id] );
 
             cout << "Thread #" << (int)thread_id << " done." << endl;
             thread_fired=true;
@@ -336,7 +327,7 @@ void reload_handler( int sig_num )
     need_reload = true;
 }
 
-int create_types()
+void create_types()
 {
 
     MYSQL_RES *result;
