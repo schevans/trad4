@@ -138,6 +138,20 @@ sub Type2atoX($) {
     }
 }
 
+sub Type2Sql($) {
+    my $type = shift;
+
+    my $sql_type;
+
+    if ( $type =~ 'double' ) {
+        $sql_type = "float";
+    }
+    else {
+        $sql_type = "int";
+    }
+
+    return $sql_type;
+}
 
 1;
 
