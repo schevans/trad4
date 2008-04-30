@@ -97,7 +97,7 @@ load_defs( "$defs_root/$name.t4" );
 
 validate();
 #generate_h();
-generate_table();
+#generate_table();
 #generate_c_wrapper();
 #generate_loader();
 generate_dummy_data();
@@ -111,11 +111,13 @@ if ( ! -f "$obj_root/$c_filename" ) {
 use PreComp::Header;
 use PreComp::Wrapper;
 use PreComp::Utilities;
+use PreComp::Sql;
 
 my $master_hash = PreComp::Utilities::LoadDefs();
 
 PreComp::Header::Generate( $master_hash->{$name} );
 PreComp::Wrapper::Generate( $master_hash->{$name} );
+PreComp::Sql::Generate( $master_hash->{$name} );
 
 
 #############################################################
