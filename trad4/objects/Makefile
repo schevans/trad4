@@ -3,16 +3,14 @@
 
 CXX = g++
 
-CXXFLAGS = -c
+CXXFLAGS = -Wall
 
 COMPILE = $(CXX) $(CXXFLAGS)
 
-OBJECTS = trad4.o feed.o
+all : $(INSTANCE_ROOT)/bin/$(INSTANCE)
 
-all : trad4.o
-
-trad4.o : trad4.c
-	g++ trad4.c -o $(INSTANCE_ROOT)/bin/black_scholes -lpthread -ldl -lmysqlclient
+$(INSTANCE_ROOT)/bin/$(INSTANCE) : trad4.c
+	$(COMPILE) trad4.c -o $(INSTANCE_ROOT)/bin/$(INSTANCE) -lpthread -ldl -lmysqlclient
 
 clean : 
 	rm -f $(OBJECTS)
