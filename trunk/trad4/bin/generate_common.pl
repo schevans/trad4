@@ -28,11 +28,13 @@ my $max_tier;
 ######################### New stuff #########################
 
 use PreComp::Makefiles;
+use PreComp::Macros;
 use PreComp::Utilities;
 
 my $master_hash = PreComp::Utilities::LoadDefs();
 
 PreComp::Makefiles::Generate( $master_hash );
+PreComp::Macros::Generate( $master_hash );
 
 #############################################################
 
