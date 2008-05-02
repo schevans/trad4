@@ -26,8 +26,14 @@ sub CloseFile() {
 
     $current_obj =~ s/\.t4t//;
 
-    system( "cp $current_obj.t4t $current_obj" );
+    my $diff = `diff $current_obj.t4t $current_obj`;
 
+    if ( $diff ) {
+        `mv $current_obj.t4t $current_obj`;
+    }
+    else {
+        `rm -f $current_obj.t4t`;
+    }
 }
 
 sub LoadDefs() {
