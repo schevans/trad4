@@ -5,14 +5,14 @@
 
 using namespace std;
 
-void* calculate_outright_trade( outright_trade* pub_outright_trade , bond* sub_bond )
+void calculate_outright_trade( obj_loc_t obj_loc, int id )
 {
-    //cout << "calculate_outright_trade()" << endl;
+    cout << "calculate_outright_trade()" << endl;
 
-    pub_outright_trade->pv = ( pub_outright_trade->quantity * sub_bond->price / 100 );
+    outright_trade_pv = ( outright_trade_quantity * bond_price / 100 );
 
-    pub_outright_trade->pnl = (( pub_outright_trade->quantity * sub_bond->price / 100 ) - ( pub_outright_trade->quantity * pub_outright_trade->trade_price / 100 ));
+    outright_trade_pnl = (( outright_trade_quantity * bond_price / 100 ) - ( outright_trade_quantity * outright_trade_trade_price / 100 ));
 
-    //cout << "outright_trade pv=" << pub_outright_trade->pv << ", pnl=" << pub_outright_trade->pnl << endl;
+    cout << "outright_trade pv=" << outright_trade_pv << ", pnl=" << outright_trade_pnl << endl;
 }
 
