@@ -1,5 +1,0 @@
-create table currency_curves (
-    id int,
-    interest_rate_feed int
-)
-
