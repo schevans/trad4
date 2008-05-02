@@ -3,31 +3,15 @@
 //
 
 #include <iostream>
-#include <sstream>
-#include <fstream>
 #include <vector>
-#include "mysql/mysql.h"
 
 #include "interest_rate_feed_wrapper.c"
 
-extern void* obj_loc[NUM_OBJECTS+1];
-extern void set_timestamp( int id );
-
-extern void* calculate_interest_rate_feed( void* id );
-extern int create_shmem( void** ret_mem, size_t pub_size );
-
 using namespace std;
 
-void* calculate_interest_rate_feed( interest_rate_feed* pub_interest_rate_feed )
+void calculate_interest_rate_feed( obj_loc_t obj_loc, int id )
 {
-    //cout << "calculate_interest_rate_feed()" << endl;
-
-    for ( int i=0 ; i < INTEREST_RATE_LEN - 1 ; i++ )
-    {
-        pub_interest_rate_feed->asof[i] = (pub_interest_rate_feed->sub)->asof[i];
-        pub_interest_rate_feed->rate[i] = (pub_interest_rate_feed->sub)->rate[i];
-
-    }
+    cout << "calculate_interest_rate_feed()" << endl;
 
 }
 /*

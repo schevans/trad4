@@ -6,7 +6,7 @@
 
 using namespace std;
 
-void* calculate_currency_curves( currency_curves* pub_currency_curves , interest_rate_feed* sub_interest_rate_feed )
+void calculate_currency_curves( obj_loc_t obj_loc, int id )
 {
    //cout << "calculate_currency_curves()" << endl; 
 
@@ -20,21 +20,20 @@ void* calculate_currency_curves( currency_curves* pub_currency_curves , interest
 
     for ( int indx = 0; indx < INTEREST_RATE_LEN - 1 ; indx++)
     {
-        current_period_start = sub_interest_rate_feed->asof[indx];
-        current_period_end = sub_interest_rate_feed->asof[indx+1];
+        current_period_start = interest_rate_feed_asof[indx];
+        current_period_end = interest_rate_feed_asof[indx+1];
 
+// Hack
 if ( indx == 8 )
     current_period_end = 20000;
 
-        gradient = ((  sub_interest_rate_feed->rate[indx] -  sub_interest_rate_feed->rate[indx+1] ) / (  sub_interest_rate_feed->asof[indx] -  sub_interest_rate_feed->asof[indx+1] ) );
-        y_intercept = sub_interest_rate_feed->rate[indx] - gradient * sub_interest_rate_feed->asof[indx];
-
-        //cout << "\tCurrent period start (" << indx << "): " << current_period_start << ", end: " << current_period_end << ", gradinet: " << gradient << ", y_intercept: " << y_intercept << endl;
+        gradient = ((  interest_rate_feed_rate[indx] -  interest_rate_feed_rate[indx+1] ) / (  interest_rate_feed_asof[indx] -  interest_rate_feed_asof[indx+1] ) );
+        y_intercept = interest_rate_feed_rate[indx] - gradient * interest_rate_feed_asof[indx];
 
         for ( int i = current_period_start ; i <= current_period_end ; i++ )
         {
             //cout << "\tDate " << i << " index  " << i - DATE_RANGE_START << " rate: " <<(  i*gradient + y_intercept ) << endl;
-            pub_currency_curves->interest_rate_interpol[i - DATE_RANGE_START] = (  i*gradient + y_intercept );
+            currency_curves_interest_rate_interpol[i - DATE_RANGE_START] = (  i*gradient + y_intercept );
         }
 
     }
@@ -45,9 +44,9 @@ if ( indx == 8 )
     {
         //cout << "Libor: " << pub_currency_curves->interest_rate_interpol[i] << ", Disco: " << exp( -pub_currency_curves->interest_rate_interpol[i] * (( i / YEAR_BASIS)/ YEAR_BASIS ) ) << " Year frac: " << ( i/ YEAR_BASIS ) << endl;
 
-        pub_currency_curves->discount_rate[i] = exp( -pub_currency_curves->interest_rate_interpol[i] * (( i / YEAR_BASIS)/ YEAR_BASIS ) );
+        currency_curves_discount_rate[i] = exp( -currency_curves_interest_rate_interpol[i] * (( i / YEAR_BASIS)/ YEAR_BASIS ) );
 
-        pub_currency_curves->discount_rate_01[i] = exp( -(pub_currency_curves->interest_rate_interpol[i] -0.0001) * (( i / YEAR_BASIS)/ YEAR_BASIS ) );
+        currency_curves_discount_rate_01[i] = exp( -(currency_curves_interest_rate_interpol[i] -0.0001) * (( i / YEAR_BASIS)/ YEAR_BASIS ) );
     }
 
 }
