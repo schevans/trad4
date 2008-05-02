@@ -143,9 +143,9 @@ sub generate_loader($$)
     print $FHD "\n";
     print $FHD "    mysql_init(&mysql);\n";
     print $FHD "\n";
-    print $FHD "    if (!mysql_real_connect(&mysql,\"localhost\", \"root\", NULL,\"black_scholes\",0,NULL,0))\n";
+    print $FHD "    if (!mysql_real_connect(&mysql,\"localhost\", \"root\", NULL,\"".$ENV{INSTANCE}."\",0,NULL,0))\n";
     print $FHD "    {\n";
-    print $FHD "        std::cout << __LINE__ << \" \"  << mysql_error(&mysql) << std::endl;\n";
+    print $FHD "        std::cout << __FILE__ << \": \" << __LINE__ << \" \"  << mysql_error(&mysql) << std::endl;\n";
     print $FHD "    }\n";
     print $FHD "\n";
     print $FHD "    std::ostringstream dbstream;\n";
