@@ -336,7 +336,7 @@ void create_types()
 
     mysql_init(&mysql);
 
-    if (!mysql_real_connect(&mysql,"localhost", "root", NULL,"black_scholes",0,NULL,0))
+    if (!mysql_real_connect(&mysql,"localhost", "root", NULL,getenv("INSTANCE"),0,NULL,0))
     {
         std::cout << __LINE__ << " "  << mysql_error(&mysql) << std::endl;
     }
@@ -366,7 +366,7 @@ cout << "Type id: " << obj_num << endl;
         my_type_struct[obj_num] = new type_struct;
 
         ostringstream lib_name;
-        lib_name << "/home/steve/src/black_scholes/lib/t4lib_" << obj_num;
+        lib_name << "/home/steve/src/" << getenv("INSTANCE") << "/lib/t4lib_" << obj_num;
 
         (my_type_struct[obj_num])->lib_handle = dlopen (lib_name.str().c_str(), RTLD_LAZY);
         if (!my_type_struct[obj_num]->lib_handle) {
@@ -413,7 +413,7 @@ void load_all()
 
     mysql_init(&mysql);
 
-    if (!mysql_real_connect(&mysql,"localhost", "root", NULL,"black_scholes",0,NULL,0))
+    if (!mysql_real_connect(&mysql,"localhost", "root", NULL,getenv("INSTANCE"),0,NULL,0))
     {
         std::cout << __LINE__ << " "  << mysql_error(&mysql) << std::endl;
     }
@@ -441,13 +441,14 @@ void load_all()
         (*my_type_struct[3]->load_objects)(obj_loc, tier_manager );
         (*my_type_struct[4]->load_objects)(obj_loc, tier_manager );
         (*my_type_struct[5]->load_objects)(obj_loc, tier_manager );
+/*
         (*my_type_struct[6]->load_objects)(obj_loc, tier_manager );
         (*my_type_struct[7]->load_objects)(obj_loc, tier_manager );
         (*my_type_struct[8]->load_objects)(obj_loc, tier_manager );
         (*my_type_struct[9]->load_objects)(obj_loc, tier_manager );
         (*my_type_struct[10]->load_objects)(obj_loc, tier_manager );
         (*my_type_struct[11]->load_objects)(obj_loc, tier_manager );
-DBG
+*/
 
  //   }
 
