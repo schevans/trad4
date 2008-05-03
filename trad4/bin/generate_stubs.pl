@@ -103,11 +103,12 @@ validate();
 generate_dummy_data();
 
 if ( ! -f "$obj_root/$c_filename" ) {
-    generate_c();
+    #generate_c();
 }
 
 ######################### New stuff #########################
 
+use PreComp::Calculate;
 use PreComp::Header;
 use PreComp::Wrapper;
 use PreComp::Utilities;
@@ -118,6 +119,7 @@ my $master_hash = PreComp::Utilities::LoadDefs();
 PreComp::Header::Generate( $master_hash->{$name} );
 PreComp::Wrapper::Generate( $master_hash->{$name} );
 PreComp::Sql::Generate( $master_hash->{$name} );
+PreComp::Calculate::Generate( $master_hash->{$name} );
 
 
 #############################################################
