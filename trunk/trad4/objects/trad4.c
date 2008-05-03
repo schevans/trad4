@@ -406,7 +406,6 @@ cout << "Type id: " << obj_num << endl;
 
 void load_all() 
 {
-/*
     MYSQL_RES *result;
     MYSQL_ROW row;
     MYSQL mysql;
@@ -415,14 +414,14 @@ void load_all()
 
     if (!mysql_real_connect(&mysql,"localhost", "root", NULL,getenv("INSTANCE"),0,NULL,0))
     {
-        std::cout << __LINE__ << " "  << mysql_error(&mysql) << std::endl;
+        std::cout << __FILE__ << " " << __LINE__ << " "  << mysql_error(&mysql) << std::endl;
     }
 
     std::ostringstream dbstream;
-    dbstream << "select t.type_id, tier from types where need_reload=1";
+    dbstream << "select type_id, tier from types where need_reload=1";
 
     if(mysql_query(&mysql, dbstream.str().c_str()) != 0) {
-        std::cout << __LINE__ << ": " << mysql_error(&mysql) << std::endl;
+        std::cout << __FILE__ << " " << __LINE__ << ": " << mysql_error(&mysql) << std::endl;
         exit(0);
     }
 
@@ -430,26 +429,9 @@ void load_all()
 
     while (( row = mysql_fetch_row(result) ))
     {
-*/
+        (*my_type_struct[atoi(row[0])]->load_objects)(obj_loc, tier_manager );
+    }
 
-//        int obj_num = atoi(row[0]);
-
-
-
-        (*my_type_struct[1]->load_objects)(obj_loc, tier_manager );
-        (*my_type_struct[2]->load_objects)(obj_loc, tier_manager );
-        (*my_type_struct[3]->load_objects)(obj_loc, tier_manager );
-        (*my_type_struct[4]->load_objects)(obj_loc, tier_manager );
-        (*my_type_struct[5]->load_objects)(obj_loc, tier_manager );
-/*
-        (*my_type_struct[6]->load_objects)(obj_loc, tier_manager );
-        (*my_type_struct[7]->load_objects)(obj_loc, tier_manager );
-        (*my_type_struct[8]->load_objects)(obj_loc, tier_manager );
-        (*my_type_struct[9]->load_objects)(obj_loc, tier_manager );
-        (*my_type_struct[10]->load_objects)(obj_loc, tier_manager );
-        (*my_type_struct[11]->load_objects)(obj_loc, tier_manager );
-*/
-
- //   }
+    mysql_free_result(result);
 
 }
