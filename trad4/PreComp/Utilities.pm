@@ -14,6 +14,24 @@ sub OpenFile($) {
 
     $current_obj = $file;
 
+    my @path_array = split /\//, $file;
+
+    pop( @path_array );
+
+    my $current_path = "";
+
+    foreach $dir ( @path_array ) {
+
+        $current_path = $current_path.$dir."/";
+
+        if ( ! -d $current_path ) {
+
+            print "Creating directory $current_path\n";
+
+            mkdir( $current_path );
+        }
+    }
+
     open $current_file, ">$file.t4t" or die "Can't open file $file";
 
     return $current_file;
