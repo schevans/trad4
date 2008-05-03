@@ -14,14 +14,10 @@ sub Generate($) {
 
     my $file = PreComp::Constants::ObjRoot()."$name.c";
 
-print "$file\n";
-
     if ( -f $file ) {
-print "Returning\n";
        return;
     } 
 
-print "NOT Returning\n";
     my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::ObjRoot()."$name.c" );
 
     #print_licence_header( $FHD );
