@@ -26,18 +26,25 @@ sub Generate($) {
         foreach $var ( keys %{$obj_hash->{$name}->{data}->{pub}} ) {
 
             $var =~ s/\[.*]$//;
-
             print $FHD "#define $name"."_$var (($name*)obj_loc[id])->$var\n";
 
         }
 
         foreach $var ( keys %{$obj_hash->{$name}->{data}->{static}} ) {
 
+            print $FHD "#define $name"."_$var (($name*)obj_loc[id])->$var\n";
+
+        }
+
+
+        foreach $var ( keys %{$obj_hash->{$name}->{data}->{static_vec}} ) {
+
             $var =~ s/\[.*]$//;
 
             print $FHD "#define $name"."_$var (($name*)obj_loc[id])->$var\n";
 
         }
+
 
 
         foreach $var ( keys %{$obj_hash->{$name}->{data}->{sub}} ) {
@@ -48,16 +55,22 @@ sub Generate($) {
             foreach $var2 ( keys %{$obj_hash->{$var}->{data}->{pub}} ) {
 
                 $var2 =~ s/\[.*]$//;
-
                 print $FHD "#define $var"."_$var2 (($var*)obj_loc[(($name*)obj_loc[id])->$var])->$var2\n";
             }
 
             foreach $var2 ( keys %{$obj_hash->{$var}->{data}->{static}} ) {
 
+                print $FHD "#define $var"."_$var2 (($var*)obj_loc[(($name*)obj_loc[id])->$var])->$var2\n";
+            }
+
+            foreach $var2 ( keys %{$obj_hash->{$var}->{data}->{static_vec}} ) {
+
                 $var2 =~ s/\[.*]$//;
 
                 print $FHD "#define $var"."_$var2 (($var*)obj_loc[(($name*)obj_loc[id])->$var])->$var2\n";
+
             }
+
         }
 
         print $FHD "#endif\n";

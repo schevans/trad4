@@ -24,6 +24,11 @@ sub Generate($) {
     print $FHD "\n";
     print $FHD "#include <iostream>\n";
     print $FHD "#include <sstream>\n";
+
+    if ( %{$obj_hash->{data}->{static_vec}} ) {
+        print $FHD "#include <vector>\n";
+    }
+
     print $FHD "\n";
     print $FHD "\n";
     print $FHD "#include \"trad4.h\"\n";
@@ -42,6 +47,10 @@ sub Generate($) {
     print $FHD "\n";
     print $FHD "void calculate_$obj_hash->{name}( obj_loc_t obj_loc, int id );\n";
 
+    if ( %{$obj_hash->{data}->{static_vec}} ) {
+
+        print $FHD "void extra_loader( obj_loc_t obj_loc, int id, MYSQL& mysql );\n";
+    }
 
     print $FHD "\n";
     print $FHD "using namespace std;\n";
@@ -180,7 +189,7 @@ sub generate_loader($$)
 
     print $FHD "\n";
     print $FHD "    if(mysql_query(&mysql, dbstream.str().c_str()) != 0) {\n";
-    print $FHD "        std::cout << __LINE__ << \": \" << mysql_error(&mysql) << std::endl;\n";
+    print $FHD "        std::cout << __FILE__ << \": \" << __LINE__ << \": \" << mysql_error(&mysql) << std::endl;\n";
     print $FHD "        exit(0);\n";
     print $FHD "    }\n";
     print $FHD "\n";
@@ -192,10 +201,19 @@ sub generate_loader($$)
         print $FHD "\n";
     }
 
+    if ( %{$obj_hash->{data}->{static_vec}} ) {
+        print $FHD "    vector<int> loaded_ids;\n";
+    }
+
     print $FHD "    while (( row = mysql_fetch_row(result) ))\n";
     print $FHD "    {\n";
     print $FHD "        int id = atoi(row[0]);\n";
     print $FHD "\n";
+
+    if ( %{$obj_hash->{data}->{static_vec}} ) {
+        print $FHD "        loaded_ids.push_back( id );\n";
+    }
+
     print $FHD "        bool is_new(false);\n";
     print $FHD "\n";
     print $FHD "        if ( !obj_loc[id] ) \n";
@@ -269,6 +287,18 @@ sub generate_loader($$)
     print $FHD "\n";
     print $FHD "    mysql_free_result(result);\n";
     print $FHD "\n";
+
+    if ( %{$obj_hash->{data}->{static_vec}} ) {
+
+        print $FHD "    vector<int>::iterator iter;\n";
+        print $FHD "\n";
+        print $FHD "    for ( iter = loaded_ids.begin(); iter != loaded_ids.end(); iter++ ) {\n";
+        print $FHD "\n";
+        print $FHD "        extra_loader( obj_loc, (*iter), mysql );\n";
+        print $FHD "    }\n";
+        print $FHD "\n";
+    }
+
     print $FHD "}\n";
 
     print $FHD "\n";
