@@ -26,9 +26,14 @@ sub CloseFile() {
 
     $current_obj =~ s/\.t4t//;
 
-    my $diff = `diff $current_obj.t4t $current_obj`;
+    my $overwrite=1;
 
-    if ( $diff ) {
+    if ( -f $current_obj ) {
+
+        $overwrite = `diff $current_obj.t4t $current_obj`;
+    }
+
+    if ( $overwrite ) {
         `mv $current_obj.t4t $current_obj`;
     }
     else {
@@ -99,6 +104,10 @@ sub LoadDef($) {
         }
 
         ( $type, $var ) = split / /, $line;
+
+        if ( $section =~ /static/ and  $var =~ /\[.*]/ ) {
+            $section = "static_vec";
+        }
 
         $object_hash{$section}{$var} = $type;
     }

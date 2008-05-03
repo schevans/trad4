@@ -74,6 +74,7 @@ sub Generate($) {
     print $FHD "    // Static\n";
 
     PreComp::Utilities::PrintSection( $FHD, $obj_hash->{data}->{static}, "    " );
+    PreComp::Utilities::PrintSection( $FHD, $obj_hash->{data}->{static_vec}, "    " );
     PreComp::Utilities::PrintSection( $FHD, $obj_hash->{data}->{feed_in}, "    " );
 
     print $FHD "\n";
