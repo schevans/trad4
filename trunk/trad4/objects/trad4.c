@@ -12,62 +12,41 @@
 
 #include "mysql/mysql.h"
 
-
 #include "trad4.h"
 
 using namespace std;
 
-//void* obj_loc[NUM_OBJECTS+1];
 obj_loc_t obj_loc;
 tier_manager_t tier_manager;
+int thread_contoller[MAX_THREADS+1];
+object_type_struct_t* object_type_struct[MAX_TYPES+1];
 
-int thread_contoller[NUM_THREADS+1];
-//int tier_manager[NUM_TIERS+1][NUM_OBJECTS+1];
+int num_tiers(MAX_TIERS);   // Will be dynamic.
+int num_threads(MAX_THREADS);   // Will be dynamic.
+int current_thread(1);
+int num_threads_fired(0);
+int timestamp_offset(0);
+bool need_reload(false);
 
 bool fire_object( int id );
 void* thread_loop( void* thread_id );
 void start_threads();
 void get_timestamp( int& sec, int& mil );
 bool run_tier( int tier );
-
-bool need_reload(false);
 void reload_handler( int sig_num );
-
 void load_all();
-//extern void reload_objects();
-
-int current_thread(1);
-int num_threads_fired(0);
-int timestamp_offset(0);
-
 void create_types();
-
-typedef void (*calculate_fpointer)(obj_loc_t obj_loc, int i);
-typedef int (*need_refresh_fpointer)(obj_loc_t obj_loc, int id );
-typedef void (*load_objects_fpointer)(obj_loc_t obj_loc, tier_manager_t tier_manager );
-
-typedef struct {
-    void* lib_handle;
-    calculate_fpointer calculate;
-    need_refresh_fpointer need_refresh;
-    load_objects_fpointer load_objects;
-    void* constructor_fpointer;
-} type_struct;
-
-type_struct* my_type_struct[15];
-
 
 int main() {
 
     signal(SIGUSR1, reload_handler);
 
-create_types();
+    create_types();
 
-tier_manager[1][0]=1;
-tier_manager[2][0]=1;
-tier_manager[3][0]=1;
-tier_manager[4][0]=1;
-tier_manager[5][0]=1;
+    for ( int i=1 ; i < MAX_TIERS+1 ; i++ )
+    {
+        tier_manager[i][0]=1;
+    }
 
     timeval time;
     gettimeofday( &time, NULL );
@@ -81,10 +60,11 @@ tier_manager[5][0]=1;
 
     cout << endl;
 
-    for ( int tier=1 ; tier <= NUM_TIERS ; tier++ )
+    for ( int tier=1 ; tier <= num_tiers ; tier++ )
     {
         std::cout << "Checking tier " << tier << ". Num objs this tier: " << tier_manager[tier][0] - 1 << std::endl; 
     }
+
     int total_start_sec;
     int total_start_mil;
     int total_end_sec;
@@ -108,7 +88,7 @@ tier_manager[5][0]=1;
             total_start_sec = start_sec;
             total_start_mil = start_mil;
 
-            for ( int tier=2 ; tier < NUM_TIERS+1 ; tier++ )
+            for ( int tier=2 ; tier < num_tiers+1 ; tier++ )
             {
                 get_timestamp( start_sec, start_mil );
 
@@ -182,7 +162,7 @@ bool run_tier( int tier ) {
         {
             //cout << "Calling need_refresh_fpointer for " << tier_manager[tier][i] << endl;
 
-            if ( (*my_type_struct[ ((object_header*)obj_loc[tier_manager[tier][i]])->type ]->need_refresh)(obj_loc, tier_manager[tier][i] ) ) 
+            if ( (*object_type_struct[ ((object_header*)obj_loc[tier_manager[tier][i]])->type ]->need_refresh)(obj_loc, tier_manager[tier][i] ) ) 
 //            if ( (*((object_header*)obj_loc[tier_manager[tier][i]])->need_refresh_fpointer)(obj_loc, tier_manager[tier][i]) )
             {
                 while ( ! fire_object( tier_manager[tier][i] ) )
@@ -206,7 +186,7 @@ bool run_tier( int tier ) {
     {
         thread_still_runnning = false;
 
-        for ( int i=1 ; i <= NUM_THREADS ; i++ )
+        for ( int i=1 ; i <= num_threads ; i++ )
         {
             if ( thread_contoller[i] != 0 )
             {
@@ -235,7 +215,7 @@ bool fire_object( int id )
 
     bool fired(false);
 
-    for ( int i=current_thread ; i <= NUM_THREADS ; i++ )
+    for ( int i=current_thread ; i <= num_threads ; i++ )
     {
         if ( thread_contoller[i] == 0 )
         {
@@ -248,7 +228,7 @@ bool fire_object( int id )
 
         current_thread++;
 
-        if ( current_thread > NUM_THREADS )
+        if ( current_thread > num_threads )
             current_thread=1;
     }
 
@@ -282,15 +262,14 @@ void* thread_loop( void* thread_id )
 
     while (1) {
 
-
-//cout << "thread_contoller[(int)thread_id] = " << thread_contoller[(int)thread_id] << endl;
+        //cout << "thread_contoller[(int)thread_id] = " << thread_contoller[(int)thread_id] << endl;
 
         if ( thread_contoller[(int)thread_id] != 0 )
         {
 
             cout << "Thread #" << (int)thread_id << " working on obj id: " << thread_contoller[(int)thread_id] << endl;
 
-            (*my_type_struct[ ((object_header*)obj_loc[thread_contoller[(int)thread_id]])->type ]->calculate)(obj_loc, thread_contoller[(int)thread_id] );
+            (*object_type_struct[ ((object_header*)obj_loc[thread_contoller[(int)thread_id]])->type ]->calculate)(obj_loc, thread_contoller[(int)thread_id] );
 
             set_timestamp( obj_loc, thread_contoller[(int)thread_id] );
 
@@ -310,7 +289,7 @@ void* thread_loop( void* thread_id )
 
 void start_threads()
 {
-    for ( int i=1 ; i <= NUM_THREADS ; i++ )
+    for ( int i=1 ; i <= num_threads ; i++ )
     {
         pthread_t t1;
 
@@ -355,50 +334,47 @@ void create_types()
 
     while (( row = mysql_fetch_row(result) ))
     {
-
-
-
         char *error;
 
-    //    typedef void (*hello_t)();
-
         int obj_num = atoi(row[0]);
-cout << "Type id: " << obj_num << endl;
 
-        my_type_struct[obj_num] = new type_struct;
+        //cout << "Type id: " << obj_num << ", tier: " << atoi(row[1]) << endl;
+
+        object_type_struct[obj_num] = new object_type_struct_t;
 
         ostringstream lib_name;
         lib_name << "/home/steve/src/" << getenv("INSTANCE") << "/lib/t4lib_" << obj_num;
 
-        (my_type_struct[obj_num])->lib_handle = dlopen (lib_name.str().c_str(), RTLD_LAZY);
-        if (!my_type_struct[obj_num]->lib_handle) {
+        (object_type_struct[obj_num])->lib_handle = dlopen (lib_name.str().c_str(), RTLD_LAZY);
+        if (!object_type_struct[obj_num]->lib_handle) {
             fputs (dlerror(), stderr);
             exit(1);
         }
 
-        my_type_struct[obj_num]->constructor_fpointer = dlsym(my_type_struct[obj_num]->lib_handle, "constructor");
+        object_type_struct[obj_num]->constructor_fpointer = dlsym(object_type_struct[obj_num]->lib_handle, "constructor");
         if ((error = dlerror()) != NULL)  {
             fputs(error, stderr);
             exit(1);
         }
 
-        my_type_struct[obj_num]->need_refresh = (need_refresh_fpointer)dlsym(my_type_struct[obj_num]->lib_handle, "need_refresh");
+        object_type_struct[obj_num]->need_refresh = (need_refresh_fpointer)dlsym(object_type_struct[obj_num]->lib_handle, "need_refresh");
         if ((error = dlerror()) != NULL)  {
             fputs(error, stderr);
             exit(1);
         }
 
-        my_type_struct[obj_num]->calculate = (calculate_fpointer)dlsym(my_type_struct[obj_num]->lib_handle, "calculate");
+        object_type_struct[obj_num]->calculate = (calculate_fpointer)dlsym(object_type_struct[obj_num]->lib_handle, "calculate");
         if ((error = dlerror()) != NULL)  {
             fputs(error, stderr);
             exit(1);
         }
 
-        my_type_struct[obj_num]->load_objects = (load_objects_fpointer)dlsym(my_type_struct[obj_num]->lib_handle, "load_objects");
+        object_type_struct[obj_num]->load_objects = (load_objects_fpointer)dlsym(object_type_struct[obj_num]->lib_handle, "load_objects");
         if ((error = dlerror()) != NULL)  {
             fputs(error, stderr);
             exit(1);
         }
+
 
     }
 
@@ -431,7 +407,7 @@ void load_all()
 
     while (( row = mysql_fetch_row(result) ))
     {
-        (*my_type_struct[atoi(row[0])]->load_objects)(obj_loc, tier_manager );
+        (*object_type_struct[atoi(row[0])]->load_objects)(obj_loc, tier_manager );
     }
 
     mysql_free_result(result);
