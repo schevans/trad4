@@ -255,9 +255,9 @@ bool fire_object( int id )
     return fired;
 }
 
-void set_timestamp( int id )
+void set_timestamp( obj_loc_t obj_loc, int id )
 {
-//    for ( int i=0 ; i < 1000000000 ; i++ );   // Simulate long calculations
+    //for ( int i=0 ; i < 1000000000 ; i++ );   // Simulate long calculations
 
     timeval time;
     gettimeofday( &time, NULL );
@@ -291,6 +291,8 @@ void* thread_loop( void* thread_id )
             cout << "Thread #" << (int)thread_id << " working on obj id: " << thread_contoller[(int)thread_id] << endl;
 
             (*my_type_struct[ ((object_header*)obj_loc[thread_contoller[(int)thread_id]])->type ]->calculate)(obj_loc, thread_contoller[(int)thread_id] );
+
+            set_timestamp( obj_loc, thread_contoller[(int)thread_id] );
 
             cout << "Thread #" << (int)thread_id << " done." << endl;
             thread_fired=true;
