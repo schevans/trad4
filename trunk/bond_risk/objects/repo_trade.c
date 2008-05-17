@@ -33,6 +33,6 @@ void calculate_repo_trade( obj_loc_t obj_loc, int id )
 
     repo_trade_mtm_pnl = ( cash_agg - total_end_cash );
 
-    //cout << "repo_trade margin=" << pub_repo_trade->margin << ", mtm_pnl=" << pub_repo_trade->mtm_pnl << endl;
+    cout << "repo_trade margin=" << repo_trade_margin << ", mtm_pnl=" << repo_trade_mtm_pnl << endl;
 }
 
