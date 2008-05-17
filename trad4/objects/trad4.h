@@ -7,20 +7,29 @@
 
 #include <sys/types.h>
 
-#define MAX_OBJECTS 20000
-
-#define NUM_OBJECTS 1400000
-
-#define NUM_THREADS 4
-
-#define NUM_TIERS 5
+#define MAX_OBJECTS 1400000
+#define MAX_THREADS 4
+#define MAX_TIERS 5
+#define MAX_TYPES 15
 
 #define OBJECT_NAME_LEN 32
 
 #define DEBUG_ON 1
 
-typedef void* obj_loc_t[NUM_OBJECTS+1];
-typedef int tier_manager_t[NUM_TIERS+1][NUM_OBJECTS+1];
+typedef void* obj_loc_t[MAX_OBJECTS+1];
+typedef int tier_manager_t[MAX_TIERS+1][MAX_OBJECTS+1];
+
+typedef void (*calculate_fpointer)(obj_loc_t obj_loc, int i);
+typedef int (*need_refresh_fpointer)(obj_loc_t obj_loc, int id );
+typedef void (*load_objects_fpointer)(obj_loc_t obj_loc, tier_manager_t tier_manager );
+
+typedef struct {
+    void* lib_handle;
+    calculate_fpointer calculate;
+    need_refresh_fpointer need_refresh;
+    load_objects_fpointer load_objects;
+    void* constructor_fpointer;
+} object_type_struct_t;
 
 
 #ifdef DEBUG_ON
