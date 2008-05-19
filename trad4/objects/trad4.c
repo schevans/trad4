@@ -344,7 +344,7 @@ void create_types()
         object_type_struct[obj_num] = new object_type_struct_t;
 
         ostringstream lib_name;
-        lib_name << "/home/steve/src/" << getenv("INSTANCE") << "/lib/t4lib_" << obj_num;
+        lib_name << getenv("INSTANCE_ROOT") << "/lib/t4lib_" << obj_num;
 
         (object_type_struct[obj_num])->lib_handle = dlopen (lib_name.str().c_str(), RTLD_LAZY);
         if (!object_type_struct[obj_num]->lib_handle) {
