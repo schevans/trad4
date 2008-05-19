@@ -17,7 +17,6 @@ sub Generate($$) {
     generate_table($obj_hash);
 
     generate_dummy_data( $master_hash, $name );
-
 }
 
 sub generate_dummy_data($$) {
