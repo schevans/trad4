@@ -9,6 +9,22 @@ my $current_obj;
 
 my %file_handle_map;
 
+sub Validate($$) {
+    my $master_hash = shift;
+    my $name = shift;
+
+    my $obj_hash = $master_hash->{$name};
+
+    foreach $key ( keys %{$obj_hash->{data}->{sub}} ) {
+
+        if ( ! $master_hash->{$key} ) {
+
+            print "Error: Validation failed for $name - type $key not found.\n";
+            print "**I would exit at this stage but there's currently no way to do so.**\n";
+        }
+    }
+}
+
 sub OpenFile($) {
     my $file = shift;
 
