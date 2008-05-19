@@ -17,6 +17,57 @@ sub Generate($) {
              
                                               
         print $FHD "\n";
+        print $FHD "/*======================================================================\n";
+        print $FHD "\n";
+        print $FHD "The following variables are in-scope for calculate_$name():\n";
+        print $FHD "\n";
+
+        foreach $var ( keys %{$obj_hash->{$name}->{data}->{pub}} ) {
+
+#PreComp::Utilities::PrintSection( $FHD, $obj_hash->{$name}->{data}->{pub}, "    " );
+
+            print $FHD "    $obj_hash->{$name}->{data}->{pub}->{$var} $name"."_$var\n";
+        }
+
+        foreach $var ( keys %{$obj_hash->{$name}->{data}->{static}} ) {
+
+            print $FHD "    $obj_hash->{$name}->{data}->{static}->{$var} $name"."_$var\n";
+
+        }
+
+
+        foreach $var ( keys %{$obj_hash->{$name}->{data}->{static_vec}} ) {
+
+            print $FHD "    $obj_hash->{$name}->{data}->{static_vec}->{$var}$name"."_$var\n";
+
+        }
+
+        print $FHD "\n";
+
+        foreach $var ( keys %{$obj_hash->{$name}->{data}->{sub}} ) {
+
+            foreach $var2 ( keys %{$obj_hash->{$var}->{data}->{pub}} ) {
+
+                print $FHD "    $obj_hash->{$var}->{data}->{pub}->{$var2} $var"."_$var2\n";
+            }
+
+            foreach $var2 ( keys %{$obj_hash->{$var}->{data}->{static}} ) {
+
+                print $FHD "    $obj_hash->{$var}->{data}->{static}->{$var2} $var"."_$var2\n";
+            }
+
+            foreach $var2 ( keys %{$obj_hash->{$var}->{data}->{static_vec}} ) {
+
+                print $FHD "    $obj_hash->{$var}->{data}->{static_vec}->{$var2} $var"."_$var2\n";
+
+            }
+
+            print $FHD "\n";
+
+        }
+
+        print $FHD "======================================================================*/\n";
+        print $FHD "\n";
         print $FHD "#ifndef __$name"."_marcos_h__\n";
         print $FHD "#define __$name"."_marcos_h__\n";
         print $FHD "\n";
@@ -73,7 +124,9 @@ sub Generate($) {
 
         }
 
+        print $FHD "\n";
         print $FHD "#endif\n";
+        print $FHD "\n";
 
         PreComp::Utilities::CloseFile();
     }
