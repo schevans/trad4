@@ -101,6 +101,7 @@ sub LoadDefs() {
 
     }
 
+#print Dumper( %master_hash );
     return \%master_hash;
 
 }

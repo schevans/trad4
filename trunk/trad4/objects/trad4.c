@@ -217,6 +217,7 @@ bool fire_object( int id )
 
     for ( int i=current_thread ; i <= num_threads ; i++ )
     {
+// Something broken here?
         if ( thread_contoller[i] == 0 )
         {
             ((object_header*)obj_loc[id])->status = RUNNING;
@@ -323,7 +324,7 @@ void create_types()
     }
 
     std::ostringstream dbstream;
-    dbstream << "select type_id, tier from types where need_reload=1";
+    dbstream << "select type_id, name, tier from object_types where need_reload=1";
 
     if(mysql_query(&mysql, dbstream.str().c_str()) != 0) {
         std::cout << __LINE__ << ": " << mysql_error(&mysql) << std::endl;
@@ -396,7 +397,7 @@ void load_all()
     }
 
     std::ostringstream dbstream;
-    dbstream << "select type_id, tier from types where need_reload=1";
+    dbstream << "select type_id, tier from object_types where need_reload=1";
 
     if(mysql_query(&mysql, dbstream.str().c_str()) != 0) {
         std::cout << __FILE__ << " " << __LINE__ << ": " << mysql_error(&mysql) << std::endl;

@@ -8,6 +8,7 @@ use PreComp::Header;
 use PreComp::Wrapper;
 use PreComp::Utilities;
 use PreComp::Sql;
+use PreComp::SqlCommon;
 use PreComp::Makefiles;
 use PreComp::Macros;
 
@@ -27,4 +28,7 @@ foreach $type ( %{$master_hash} ) {
 
 PreComp::Makefiles::Generate( $master_hash );
 PreComp::Macros::Generate( $master_hash );
+PreComp::SqlCommon::Generate( $master_hash );
+
+
 
