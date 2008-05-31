@@ -91,9 +91,6 @@ int main() {
 //int i = obj_loc;
 
  DBG 
-    obj_loc[2] = new object_header;
-
-    ((object_header*)obj_loc[2])->status = RUNNING;
  DBG 
 /* 
     obj_loc = new unsigned char[MAX_OBJECTS+1];
