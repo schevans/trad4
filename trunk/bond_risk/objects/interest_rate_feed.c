@@ -23,16 +23,10 @@ static int extra_loader_callback( void *obj_loc_v, int argc, char **row, char **
     //  void* arithmetic for some reason...
     unsigned char** obj_loc = (unsigned char**)obj_loc_v;
 
-DBG
     int id = atoi(row[0]);
-DBG
-
-cout << "id: " << id << ", ct: " << counter << ", d: " << atoi(row[1]) << ", r: " << atof(row[2]) << endl;
 
     interest_rate_feed_asof[counter]  = atoi(row[1]);
-DBG
     interest_rate_feed_rate[counter]  = atof(row[2]);
-DBG
    
     counter++;
  

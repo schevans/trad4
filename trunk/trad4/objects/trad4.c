@@ -9,8 +9,7 @@
 #include <stdlib.h>
 #include <dlfcn.h>
 #include <sstream>
-
-#include "mysql/mysql.h"
+#include <sqlite3.h>
 
 #include "trad4.h"
 
@@ -20,6 +19,8 @@ obj_loc_t obj_loc;
 tier_manager_t tier_manager;
 int thread_contoller[MAX_THREADS+1];
 object_type_struct_t* object_type_struct[MAX_TYPES+1];
+sqlite3* db;
+char *zErrMsg = 0;  // ??
 
 int num_tiers(MAX_TIERS);   // Will be dynamic.
 int num_threads(MAX_THREADS);   // Will be dynamic.
@@ -37,44 +38,6 @@ void reload_handler( int sig_num );
 void load_all();
 void create_types();
 
-#include <sqlite3.h>
-
-sqlite3* db;
-char *zErrMsg = 0;  // ??
-
-
-static int mycounter(0);
-
-static int callback(void *NotUsed, int argc, char **argv, char **azColName){
-  int i;
-  for(i=0; i<argc; i++){
-    //printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
-  }
-    mycounter++;
-//  printf("%d\n", mycounter);
-  return 0;
-}
-
-int sqlite_test()
-{
-
-
-    char* sql = "select o.name, b.maturity_date from object o, bond b where o.id=b.id and need_reload=0";
-
-    int rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
-
-    if( rc!=SQLITE_OK ){
-        fprintf(stderr, "SQL error: %s\n", zErrMsg);
-        sqlite3_free(zErrMsg);
-    }
-
-  printf("done %d\n", mycounter);
-    sqlite3_close(db);
-    return 0;
-
-
-}
-
 int main() {
 
     signal(SIGUSR1, reload_handler);
@@ -88,16 +51,6 @@ int main() {
 
     create_types();
 
-//int i = obj_loc;
-
- DBG 
- DBG 
-/* 
-    obj_loc = new unsigned char[MAX_OBJECTS+1];
-
-
-cout << "3: obj_loc[2]: " << obj_loc[2] << endl;
-*/
     for ( int i=1 ; i < MAX_TIERS+1 ; i++ )
     {
         tier_manager[i][0]=1;
@@ -109,28 +62,14 @@ cout << "3: obj_loc[2]: " << obj_loc[2] << endl;
 
     load_all();
 
-
     for ( int i = 0 ; i < MAX_OBJECTS+1 ; i++ )
     {
         if ( obj_loc[i] )
         {
-
-        //tier_manager[4][tier_manager[4][0]] = id;
-        //tier_manager[4][0]++;
-
-int tier = ((object_header*)obj_loc[i])->tier;
-
-            tier_manager[tier][tier_manager[tier][0]] = i;
-            tier_manager[tier][0]++;
+            tier_manager[((object_header*)obj_loc[i])->tier][tier_manager[((object_header*)obj_loc[i])->tier][0]] = i;
+            tier_manager[((object_header*)obj_loc[i])->tier][0]++;
         }
     }
-DBG
-
-//cout << "FF@ " << ((object_header*)obj_loc[3])->status << endl;
-
-        tier_manager[4][tier_manager[4][0]] = 4;
-        tier_manager[4][0]++;
-
 
     start_threads();
 
@@ -141,6 +80,14 @@ DBG
     for ( int tier=1 ; tier <= num_tiers ; tier++ )
     {
         std::cout << "Checking tier " << tier << ". Num objs this tier: " << tier_manager[tier][0] - 1 << std::endl; 
+    }
+
+    if ( 1 ) 
+    {
+        cout << endl << "Forcing reload.." << endl << endl;
+        sleep(1);
+
+        load_all();
     }
 
     int total_start_sec;
@@ -154,7 +101,6 @@ DBG
 
     while (1)
     {
-
         get_timestamp( start_sec, start_mil );
 
         if ( run_tier( 1 ) )
@@ -241,7 +187,6 @@ bool run_tier( int tier ) {
             //cout << "Calling need_refresh_fpointer for " << tier_manager[tier][i] << endl;
 
             if ( (*object_type_struct[ ((object_header*)obj_loc[tier_manager[tier][i]])->type ]->need_refresh)(obj_loc, tier_manager[tier][i] ) ) 
-//            if ( (*((object_header*)obj_loc[tier_manager[tier][i]])->need_refresh_fpointer)(obj_loc, tier_manager[tier][i]) )
             {
                 while ( ! fire_object( tier_manager[tier][i] ) )
                 {
