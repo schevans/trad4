@@ -119,9 +119,9 @@ sub generate_lib_make($) {
 
     foreach $type ( keys %{$obj_hash} ) {
 
-        $type_num = $obj_hash->{$type}->{type_num};
+        $name = $obj_hash->{$type}->{name};
 
-        print $FHD " t4lib_$type_num";
+        print $FHD " lib$name.so";
     }
 
     print $FHD "\n";
@@ -132,10 +132,10 @@ sub generate_lib_make($) {
 
     foreach $type ( keys %{$obj_hash} ) {
 
-        $type_num = $obj_hash->{$type}->{type_num};
+        $name = $obj_hash->{$type}->{name};
 
-        print $FHD "t4lib_$type_num: ../objects/$type.c ../gen/objects/$type"."_wrapper.c\n";
-        print $FHD "	g++ -shared -Wl,-soname,t4lib_$type_num -o t4lib_$type_num ../objects/$type.o -lmysqlclient\n";
+        print $FHD "lib$name.so: ../objects/$type.c ../gen/objects/$type"."_wrapper.c\n";
+        print $FHD "	g++ -shared -Wl,-soname,lib$name.so -o lib$name.so ../../sqlite-amalgamation-3.5.9/sqlite3.o ../objects/$type.o\n";
         print $FHD "\n";
     
     }
