@@ -149,22 +149,12 @@ sub generate_loader_callback($$)
     print $FHD "\n";
     print $FHD "static int load_objects_callback(void *obj_loc_v, int argc, char **row, char **azColName)\n";
     print $FHD "{\n";
-
     print $FHD "    // Have to cast to unsigned char** here as C++ doesn't like\n";
-    print $FHD "    //  void* arithmetic for some reason... \n";
+    print $FHD "    //  void* arithmetic for some strange reason... \n";
     print $FHD "    unsigned char** obj_loc = (unsigned char**)obj_loc_v;\n";
-
-if ( %{$obj_hash->{data}->{static_vec}} ) {
-    print $FHD "vector<int> loaded_ids;\n";
-}
     print $FHD "\n";
     print $FHD "    int id = atoi(row[0]);\n";
     print $FHD "\n";
-
-    if ( %{$obj_hash->{data}->{static_vec}} ) {
-        print $FHD "    loaded_ids.push_back( id );\n";
-    }
-
     print $FHD "    bool is_new(false);\n";
     print $FHD "\n";
     print $FHD "    if ( !obj_loc[id] ) \n";
@@ -301,13 +291,15 @@ sub generate_loader($$)
 
     if ( %{$obj_hash->{data}->{static_vec}} ) {
 
-        print $FHD "    vector<int> loaded_ids;\n";
-        print $FHD "    vector<int>::iterator iter;\n";
         print $FHD "\n";
-        print $FHD "    for ( iter = loaded_ids.begin(); iter != loaded_ids.end(); iter++ ) {\n";
-        print $FHD "\n";
-        print $FHD "        extra_loader( obj_loc, (*iter), db );\n";
+        print $FHD "    for ( int i = 0 ; i < MAX_OBJECTS+1 ; i++ )\n";
+        print $FHD "    {\n";
+        print $FHD "        if ( obj_loc[i] && ((object_header*)obj_loc[i])->type == 1 && ((object_header*)obj_loc[i])->status == RELOADED)\n";
+        print $FHD "        {\n";
+        print $FHD "            extra_loader( obj_loc, i, db );\n";
+        print $FHD "        }\n";
         print $FHD "    }\n";
+        print $FHD "\n";
         print $FHD "\n";
     }
 
