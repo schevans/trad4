@@ -5,5 +5,5 @@ create table object (
     name char(32),
     log_level int,
     need_reload int
-) 
+) ;
     

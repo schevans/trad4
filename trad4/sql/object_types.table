@@ -4,5 +4,5 @@ create table object_types (
     name char(32),
     tier int,
     need_reload int
-)
+);
 

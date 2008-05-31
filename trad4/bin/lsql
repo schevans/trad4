@@ -12,8 +12,8 @@ case $SUFFIX in
 esac
 
 
-echo "drop $TYPE $PREFIX" | mysql -u root $INSTANCE
+echo "drop $TYPE $PREFIX;" | $TRAD4_BIN/sqlite3 $TRAD4_DB > /dev/null 2>&1
 
-cat $FILE | mysql -u root $INSTANCE
+$TRAD4_BIN/runsql $FILE
 
  
