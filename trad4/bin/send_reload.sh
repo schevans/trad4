@@ -1,6 +1,6 @@
 #!/bin/sh
 
-PID=`ps -ef | grep $INSTANCE | grep -v grep | grep -v mysql | awk '{print $2}'`
+PID=`ps -ef | grep $INSTANCE | grep -v grep | grep -v sqlite3 | awk '{print $2}'`
 
 if [ $PID ]
 then
