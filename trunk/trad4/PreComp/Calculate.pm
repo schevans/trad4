@@ -38,7 +38,7 @@ sub Generate($) {
     if ( %{$obj_hash->{data}->{static_vec}} ) {
 
         print $FHD "\n";
-        print $FHD "void extra_loader( obj_loc_t obj_loc, int id, MYSQL& mysql )\n";
+        print $FHD "void extra_loader( obj_loc_t obj_loc, int id, sqlite3* db )\n";
         print $FHD "{\n";
         print $FHD "    cout << \"extra_loader()\" << endl;\n";
         print $FHD "\n";
