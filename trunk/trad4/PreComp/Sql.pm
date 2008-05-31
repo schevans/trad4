@@ -82,7 +82,7 @@ sub generate_table($) {
     }
 
     print $FHD "\n";
-    print $FHD ")\n";
+    print $FHD ");\n";
     print $FHD "\n";
 
 

@@ -8,8 +8,9 @@ then
     exit 0
 fi
 
+echo "Reloading $TRAD4_DB"
 
-echo "delete from object" | mysql -u root $INSTANCE
+echo "delete from object;" | $TRAD4_BIN/sqlite3 $TRAD4_DB
 
 DATA_DIR=$1
 

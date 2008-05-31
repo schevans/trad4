@@ -1,6 +1,7 @@
 
+
 FILE=$1
 
-mysql -u root $INSTANCE < $FILE
+$TRAD4_BIN/sqlite3 $TRAD4_DB < $FILE
 
 

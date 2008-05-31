@@ -37,12 +37,70 @@ void reload_handler( int sig_num );
 void load_all();
 void create_types();
 
+#include <sqlite3.h>
+
+sqlite3* db;
+char *zErrMsg = 0;  // ??
+
+
+static int mycounter(0);
+
+static int callback(void *NotUsed, int argc, char **argv, char **azColName){
+  int i;
+  for(i=0; i<argc; i++){
+    //printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+  }
+    mycounter++;
+//  printf("%d\n", mycounter);
+  return 0;
+}
+
+int sqlite_test()
+{
+
+
+    char* sql = "select o.name, b.maturity_date from object o, bond b where o.id=b.id and need_reload=0";
+
+    int rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
+
+    if( rc!=SQLITE_OK ){
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+    }
+
+  printf("done %d\n", mycounter);
+    sqlite3_close(db);
+    return 0;
+
+
+}
+
 int main() {
 
     signal(SIGUSR1, reload_handler);
 
+    sqlite3_open(getenv("TRAD4_DB"), &db);
+
+    for ( int i = 0 ; i < MAX_OBJECTS+1 ; i++ )
+    {
+        obj_loc[i] = 0;
+    }
+
     create_types();
 
+//int i = obj_loc;
+
+ DBG 
+    obj_loc[2] = new object_header;
+
+    ((object_header*)obj_loc[2])->status = RUNNING;
+ DBG 
+/* 
+    obj_loc = new unsigned char[MAX_OBJECTS+1];
+
+
+cout << "3: obj_loc[2]: " << obj_loc[2] << endl;
+*/
     for ( int i=1 ; i < MAX_TIERS+1 ; i++ )
     {
         tier_manager[i][0]=1;
@@ -53,6 +111,29 @@ int main() {
     timestamp_offset = ( time.tv_sec / 1000000 ) * 1000000;
 
     load_all();
+
+
+    for ( int i = 0 ; i < MAX_OBJECTS+1 ; i++ )
+    {
+        if ( obj_loc[i] )
+        {
+
+        //tier_manager[4][tier_manager[4][0]] = id;
+        //tier_manager[4][0]++;
+
+int tier = ((object_header*)obj_loc[i])->tier;
+
+            tier_manager[tier][tier_manager[tier][0]] = i;
+            tier_manager[tier][0]++;
+        }
+    }
+DBG
+
+//cout << "FF@ " << ((object_header*)obj_loc[3])->status << endl;
+
+        tier_manager[4][tier_manager[4][0]] = 4;
+        tier_manager[4][0]++;
+
 
     start_threads();
 
@@ -309,108 +390,79 @@ void reload_handler( int sig_num )
     need_reload = true;
 }
 
+static int create_types_callback(void *NotUsed, int argc, char **row, char **azColName)
+{
+    char *error;
+
+    int obj_num = atoi(row[0]);
+    char* name = row[1];
+
+    cout << "Name: " << name << ", type id: " << obj_num << ", tier: " << atoi(row[2]) << endl;
+
+    object_type_struct[obj_num] = new object_type_struct_t;
+
+    ostringstream lib_name;
+    lib_name << getenv("INSTANCE_ROOT") << "/lib/lib" << name << ".so";
+
+    (object_type_struct[obj_num])->lib_handle = dlopen (lib_name.str().c_str(), RTLD_LAZY);
+    if (!object_type_struct[obj_num]->lib_handle) {
+        fputs (dlerror(), stderr);
+        exit(1);
+    }
+
+    object_type_struct[obj_num]->constructor_fpointer = dlsym(object_type_struct[obj_num]->lib_handle, "constructor");
+    if ((error = dlerror()) != NULL)  {
+        fputs(error, stderr);
+        exit(1);
+    }
+
+    object_type_struct[obj_num]->need_refresh = (need_refresh_fpointer)dlsym(object_type_struct[obj_num]->lib_handle, "need_refresh");
+    if ((error = dlerror()) != NULL)  {
+        fputs(error, stderr);
+        exit(1);
+    }
+
+    object_type_struct[obj_num]->calculate = (calculate_fpointer)dlsym(object_type_struct[obj_num]->lib_handle, "calculate");
+    if ((error = dlerror()) != NULL)  {
+        fputs(error, stderr);
+        exit(1);
+    }
+
+    object_type_struct[obj_num]->load_objects = (load_objects_fpointer)dlsym(object_type_struct[obj_num]->lib_handle, "load_objects");
+    if ((error = dlerror()) != NULL)  {
+        fputs(error, stderr);
+        exit(1);
+    }
+
+    return 0;
+}
+
 void create_types()
 {
-
-    MYSQL_RES *result;
-    MYSQL_ROW row;
-    MYSQL mysql;
-
-    mysql_init(&mysql);
-
-    if (!mysql_real_connect(&mysql,"localhost", "root", NULL,getenv("INSTANCE"),0,NULL,0))
-    {
-        std::cout << __LINE__ << " "  << mysql_error(&mysql) << std::endl;
-    }
 
     std::ostringstream dbstream;
     dbstream << "select type_id, name, tier from object_types where need_reload=1";
 
-    if(mysql_query(&mysql, dbstream.str().c_str()) != 0) {
-        std::cout << __LINE__ << ": " << mysql_error(&mysql) << std::endl;
-        exit(0);
+    if( sqlite3_exec(db, dbstream.str().c_str(), create_types_callback, 0, &zErrMsg) != SQLITE_OK ){
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
     }
+}
 
-    result = mysql_use_result(&mysql);
+static int load_all_callback(void *NotUsed, int argc, char **row, char **azColName)
+{
+    (*object_type_struct[atoi(row[0])]->load_objects)(obj_loc, tier_manager );
 
-    while (( row = mysql_fetch_row(result) ))
-    {
-        char *error;
-
-        int obj_num = atoi(row[0]);
-
-        //cout << "Type id: " << obj_num << ", tier: " << atoi(row[1]) << endl;
-
-        object_type_struct[obj_num] = new object_type_struct_t;
-
-        ostringstream lib_name;
-        lib_name << getenv("INSTANCE_ROOT") << "/lib/t4lib_" << obj_num;
-
-        (object_type_struct[obj_num])->lib_handle = dlopen (lib_name.str().c_str(), RTLD_LAZY);
-        if (!object_type_struct[obj_num]->lib_handle) {
-            fputs (dlerror(), stderr);
-            exit(1);
-        }
-
-        object_type_struct[obj_num]->constructor_fpointer = dlsym(object_type_struct[obj_num]->lib_handle, "constructor");
-        if ((error = dlerror()) != NULL)  {
-            fputs(error, stderr);
-            exit(1);
-        }
-
-        object_type_struct[obj_num]->need_refresh = (need_refresh_fpointer)dlsym(object_type_struct[obj_num]->lib_handle, "need_refresh");
-        if ((error = dlerror()) != NULL)  {
-            fputs(error, stderr);
-            exit(1);
-        }
-
-        object_type_struct[obj_num]->calculate = (calculate_fpointer)dlsym(object_type_struct[obj_num]->lib_handle, "calculate");
-        if ((error = dlerror()) != NULL)  {
-            fputs(error, stderr);
-            exit(1);
-        }
-
-        object_type_struct[obj_num]->load_objects = (load_objects_fpointer)dlsym(object_type_struct[obj_num]->lib_handle, "load_objects");
-        if ((error = dlerror()) != NULL)  {
-            fputs(error, stderr);
-            exit(1);
-        }
-
-
-    }
-
-    mysql_free_result(result);
-
+    return 0;
 }
 
 void load_all() 
 {
-    MYSQL_RES *result;
-    MYSQL_ROW row;
-    MYSQL mysql;
-
-    mysql_init(&mysql);
-
-    if (!mysql_real_connect(&mysql,"localhost", "root", NULL,getenv("INSTANCE"),0,NULL,0))
-    {
-        std::cout << __FILE__ << " " << __LINE__ << " "  << mysql_error(&mysql) << std::endl;
-    }
-
     std::ostringstream dbstream;
     dbstream << "select type_id, tier from object_types where need_reload=1";
 
-    if(mysql_query(&mysql, dbstream.str().c_str()) != 0) {
-        std::cout << __FILE__ << " " << __LINE__ << ": " << mysql_error(&mysql) << std::endl;
-        exit(0);
+    if( sqlite3_exec(db, dbstream.str().c_str(), load_all_callback, 0, &zErrMsg) != SQLITE_OK ){
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
     }
-
-    result = mysql_use_result(&mysql);
-
-    while (( row = mysql_fetch_row(result) ))
-    {
-        (*object_type_struct[atoi(row[0])]->load_objects)(obj_loc, tier_manager );
-    }
-
-    mysql_free_result(result);
-
 }
