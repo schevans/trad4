@@ -16,6 +16,7 @@ sub CommomHeader {
         "int id",
         "object_status status",
         "int type" ,
+        "int tier" ,
         "char name[OBJECT_NAME_LEN]",
         "int log_level"
     );
