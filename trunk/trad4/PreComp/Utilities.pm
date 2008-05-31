@@ -69,7 +69,10 @@ sub CloseFile() {
 
     if ( $overwrite ) {
 
-        `cp $current_obj $current_obj.t4p`;
+        if ( -f $current_obj ) {
+            `cp $current_obj $current_obj.t4p`;
+        }
+
         `mv $current_obj.t4t $current_obj`;
     }
     else {
