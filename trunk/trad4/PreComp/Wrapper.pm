@@ -219,9 +219,6 @@ sub generate_loader_callback($$)
 
     print $FHD "    if ( is_new )\n";
     print $FHD "    {\n";
-    print $FHD "        //tier_manager[$obj_hash->{tier}][tier_manager[$obj_hash->{tier}][0]] = id;\n";
-    print $FHD "        //tier_manager[$obj_hash->{tier}][0]++;\n";
-    print $FHD "\n";
     print $FHD "        std::cout << \"New $name created.\" << std::endl;\n";
     print $FHD "    }\n";
 
@@ -239,7 +236,7 @@ sub generate_loader($$)
     my $name = $obj_hash->{name};
 
     print $FHD "\n";
-    print $FHD "extern \"C\" void load_objects( obj_loc_t obj_loc, tier_manager_t tier_manager )\n";
+    print $FHD "extern \"C\" void load_objects( obj_loc_t obj_loc )\n";
     print $FHD "{\n";
     print $FHD "    std::cout << \"load_all_$name"."s()\" << std::endl;\n";
     print $FHD "\n";

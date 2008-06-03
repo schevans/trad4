@@ -186,7 +186,7 @@ bool run_tier( int tier ) {
         {
             //cout << "Calling need_refresh_fpointer for " << tier_manager[tier][i] << endl;
 
-            if ( (*object_type_struct[ ((object_header*)obj_loc[tier_manager[tier][i]])->type ]->need_refresh)(obj_loc, tier_manager[tier][i] ) ) 
+            if ( (*object_type_struct[((object_header*)obj_loc[tier_manager[tier][i]])->type]->need_refresh)(obj_loc, tier_manager[tier][i] ) ) 
             {
                 while ( ! fire_object( tier_manager[tier][i] ) )
                 {
@@ -293,7 +293,7 @@ void* thread_loop( void* thread_id )
 
             cout << "Thread #" << (int)thread_id << " working on obj id: " << thread_contoller[(int)thread_id] << endl;
 
-            (*object_type_struct[ ((object_header*)obj_loc[thread_contoller[(int)thread_id]])->type ]->calculate)(obj_loc, thread_contoller[(int)thread_id] );
+            (*object_type_struct[((object_header*)obj_loc[thread_contoller[(int)thread_id]])->type]->calculate)(obj_loc, thread_contoller[(int)thread_id] );
 
             set_timestamp( obj_loc, thread_contoller[(int)thread_id] );
 
@@ -393,7 +393,7 @@ void create_types()
 
 static int load_all_callback(void *NotUsed, int argc, char **row, char **azColName)
 {
-    (*object_type_struct[atoi(row[0])]->load_objects)(obj_loc, tier_manager );
+    (*object_type_struct[atoi(row[0])]->load_objects)( obj_loc );
 
     return 0;
 }
