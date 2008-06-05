@@ -40,7 +40,12 @@ sub generate_top_lvl_make($) {
     print $FHD "\n";
 
 
-    print $FHD "all:\n";
+    print $FHD "all: objs bond_risk\n";
+    print $FHD "\n";
+    print $FHD "bond_risk: objects/main.o\n";
+    print $FHD "	g++ objects/main.o \$(TRAD4_ROOT)/libs/sqlite3.o -o bin/bond_risk -ltrad4 -L\$(TRAD4_ROOT)/objects -lpthread -ldl\n";
+    print $FHD "\n";
+    print $FHD "objs:\n";
 
     print $FHD "	for dir in \$(SUBDIRS); do cd \$\$dir; \$(MAKE) all ; cd \$(INSTANCE_ROOT); done\n";
     print $FHD "\n";
@@ -69,12 +74,12 @@ sub generate_object_make($) {
     print $FHD "\n";
     print $FHD "CXX = g++\n";
     print $FHD "\n";
-    print $FHD "CXXFLAGS = -Wall\n";
+    print $FHD "CXXFLAGS = -Wall -c\n";
     print $FHD "\n";
-    print $FHD "COMPILE = \$(CXX) \$(CXXFLAGS) -c\n";
+    print $FHD "COMPILE = \$(CXX) \$(CXXFLAGS)\n";
     print $FHD "\n";
 
-    print $FHD "all:";
+    print $FHD "all: main.o";
 
     foreach $type ( keys %{$obj_hash} ) {
 
@@ -82,6 +87,9 @@ sub generate_object_make($) {
     }
 
     print $FHD "\n";
+    print $FHD "\n";
+    print $FHD "main.o: main.c\n";
+    print $FHD "	\$(COMPILE) main.c -I\$(TRAD4_ROOT)/objects\n";
     print $FHD "\n";
 
     foreach $type ( keys %{$obj_hash} ) {
