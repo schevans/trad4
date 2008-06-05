@@ -38,7 +38,7 @@ void reload_handler( int sig_num );
 void load_all();
 void create_types();
 
-int main() {
+void run_trad4() {
 
     signal(SIGUSR1, reload_handler);
 

@@ -3,15 +3,19 @@
 
 CXX = g++
 
-CXXFLAGS = -Wall
+CXXFLAGS = -Wall -c
 
 COMPILE = $(CXX) $(CXXFLAGS)
 
-all : $(INSTANCE_ROOT)/bin/$(INSTANCE)
+all : trad4.o libtrad4.so
 
-$(INSTANCE_ROOT)/bin/$(INSTANCE) : trad4.c
-	$(COMPILE) trad4.c ../../sqlite-amalgamation-3.5.9/sqlite3.o -o $(INSTANCE_ROOT)/bin/$(INSTANCE) -lpthread -ldl
+trad4.o: trad4.c
+	$(COMPILE) trad4.c -o trad4.o
+
+libtrad4.so: trad4.o
+	$(CXX) -shared -Wl,-soname,libtrad4.so -o libtrad4.so trad4.o
+
 
 clean : 
-	rm -f $(OBJECTS)
+	rm -f libtrad4.so trad4.o
 
