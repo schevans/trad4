@@ -47,9 +47,9 @@ generate_interest_rates();
 generate_currency_curves();
 #generate_fx_rates();
 #generate_books();
-generate_bonds( 400000 );
-generate_outright_trades( 400000 );
-generate_repo_trades( 200000 );
+generate_bonds( 10000 );
+generate_outright_trades( 10000 );
+generate_repo_trades( 10000 );
 
 sub generate_interest_rates() {
 
@@ -57,10 +57,9 @@ sub generate_interest_rates() {
     my $file = "$dummy_data_root/interest_rate_feeds.sql";
     open FILE, ">$file" or die "Can't open $file";
 
-    print FILE "delete from object;\n";
     print FILE "delete from interest_rate_feed_data;\n";
 
-    print FILE "insert into object values ( $id, 1, \"LIBOR-USD\");\n";
+    print FILE "insert into object values ( $id, 1, \"LIBOR-USD\", 0, 1 );\n";
 
     print FILE "insert into interest_rate_feed_data values ( $id, 10000,2.6 );\n";
     print FILE "insert into interest_rate_feed_data values ( $id, 10010,2.7 );\n";
@@ -78,7 +77,7 @@ sub generate_interest_rates() {
     
     $id = 2;
 
-    print FILE "insert into object values (  $id, 1, \"LIBOR-GBP\" );\n";
+    print FILE "insert into object values (  $id, 1, \"LIBOR-GBP\", 0, 1 );\n";
 
     print FILE "insert into interest_rate_feed_data values ( $id, 10000,5.2 );\n";
     print FILE "insert into interest_rate_feed_data values ( $id, 10010,5.3 );\n";
@@ -95,7 +94,7 @@ sub generate_interest_rates() {
     $interest_rate_ccys{$id} = $id;
 
     $id = 3;
-    print FILE "insert into object values (  $id, 1, \"LIBOR-EUR\" );\n";
+    print FILE "insert into object values (  $id, 1, \"LIBOR-EUR\", 0, 1 );\n";
 
     print FILE "insert into interest_rate_feed_data values ( $id, 10000,3.6 );\n";
     print FILE "insert into interest_rate_feed_data values ( $id, 10010,3.7 );\n";
@@ -127,7 +126,7 @@ sub generate_currency_curves()
     my $name = "USD-CCY-CURVES";
     my $interest_rate = 1;
 
-    print FILE "insert into object values (  $id, 2, \"$name\" );\n";
+    print FILE "insert into object values (  $id, 2, \"$name\", 0, 1 );\n";
     print FILE "insert into currency_curves values ( $id, $interest_rate );\n";
 
     push @currency_curve_ids, $id;
@@ -135,7 +134,7 @@ sub generate_currency_curves()
     $id = get_next_id();
     $interest_rate = 2;
 
-    print FILE "insert into object values (  $id, 2, \"$name\" );\n";
+    print FILE "insert into object values (  $id, 2, \"$name\", 0, 1 );\n";
     print FILE "insert into currency_curves values ( $id, $interest_rate );\n";
 
     push @currency_curve_ids, $id;
@@ -143,7 +142,7 @@ sub generate_currency_curves()
     $id = get_next_id();
     $interest_rate = 3;
 
-    print FILE "insert into object values (  $id, 2, \"$name\" );\n";
+    print FILE "insert into object values (  $id, 2, \"$name\", 0, 1 );\n";
     print FILE "insert into currency_curves values ( $id, $interest_rate );\n";
 
     push @currency_curve_ids, $id;
@@ -284,14 +283,14 @@ sub generate_bonds($) {
 
         $currency_curve = $currency_curve_ids[ int( rand( @currency_curve_ids )) ];
 
-        print FILE "insert into object values (  $id, 3, \"$name\" );\n";
+        print FILE "insert into object values (  $id, 3, \"$name\", 0, 1 );\n";
 
         print FILE "insert into bond values (  $id, ".
-            sprintf("%.2f", (rand( 8 - 2 ) + 2)).",".
             int( 6000 + rand(  8000 - 6000 )).",".
             int( 18000 + rand( 20000 - 18000 )).",".
             $coup_pys[ int( rand( @coup_pys )) ].",".
-            $currency_curve.");\n;";
+            sprintf("%.2f", (rand( 8 - 2 ) + 2)).",".
+            $currency_curve.");\n";
             
         push @bond_ids, $id;
         $bond_to_ccy_curve{$id} = $currency_curve;
@@ -316,7 +315,7 @@ sub generate_outright_trades($) {
 
         $name = "C".int( rand(999999));
 
-        print FILE "insert into object values (  $id, 4, \"$name\" );\n";
+        print FILE "insert into object values (  $id, 4, \"$name\", 0, 1 );\n";
 
         print FILE "insert into outright_trade values ( $id, ".
             1000 * int( rand( 1000  )).",".
@@ -347,7 +346,7 @@ sub generate_repo_trades($) {
 
         my $name = "R".int( rand(999999));
 
-        print FILE "insert into object values (  $id, 5, \"$name\" );\n";
+        print FILE "insert into object values (  $id, 5, \"$name\", 0, 1 );\n";
 
         my $cash_ccy = $currencies[ int( rand( @currencies )) ];
         my $notional = 10000 * int( rand( 100  ));
@@ -356,12 +355,13 @@ sub generate_repo_trades($) {
         my $interest_rate = $bond_to_ccy_curve{$bond};
 
         print FILE "insert into repo_trade values ( $id, ". 
-            int( 8000 + rand(  99999 - 8000 )).",".
-            int( 16000 + rand(  18000 - 16000 )).",".
-            "$notional,$cash_ccy,".
             sprintf("%.2f", (rand( 8 - 2 ) + 2)).",".
-            $notional * int( sprintf("%.2f", 95.0 + (rand( 10 )))).",".
+            "$cash_ccy,".
+            int( 16000 + rand(  18000 - 16000 )).",".
             "0,".
+            int( 8000 + rand(  99999 - 8000 )).",".
+            $notional * int( sprintf("%.2f", 95.0 + (rand( 10 )))).",".
+            "$notional,".
             $bond.",".
             $interest_rate.");\n";
 
