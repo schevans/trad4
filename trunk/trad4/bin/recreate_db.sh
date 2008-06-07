@@ -14,5 +14,13 @@ do
     $TRAD4_ROOT/bin/lsql $i
 done
 
+cd $INSTANCE_ROOT/sql
+
+for i in `ls *.table`
+do
+    $TRAD4_ROOT/bin/lsql $i
+done
+
+
 
 
