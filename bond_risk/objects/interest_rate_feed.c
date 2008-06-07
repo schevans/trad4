@@ -13,7 +13,7 @@ static int counter(1);
 
 void calculate_interest_rate_feed( obj_loc_t obj_loc, int id )
 {
-    cout << "calculate_interest_rate_feed()" << endl;
+    //cout << "calculate_interest_rate_feed()" << endl;
 
 }
 
@@ -35,7 +35,7 @@ static int extra_loader_callback( void *obj_loc_v, int argc, char **row, char **
 
 void extra_loader( obj_loc_t obj_loc, int id, sqlite3* db )
 {
-    cout << "extra_loader()" << endl;
+    //cout << "extra_loader()" << endl;
 
     counter = 0;
     char *zErrMsg = 0;
