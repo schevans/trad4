@@ -219,7 +219,7 @@ sub generate_loader_callback($$)
 
     print $FHD "    if ( is_new )\n";
     print $FHD "    {\n";
-    print $FHD "        std::cout << \"New $name created.\" << std::endl;\n";
+    print $FHD "        //std::cout << \"New $name created.\" << std::endl;\n";
     print $FHD "    }\n";
 
     print $FHD "\n";
