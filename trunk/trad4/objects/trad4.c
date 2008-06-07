@@ -234,7 +234,7 @@ bool run_tier( int tier ) {
 
 bool fire_object( int id )
 {
-    std::cout << "fire_object " << id << std::endl;
+    //std::cout << "fire_object " << id << std::endl;
 
     bool fired(false);
 
@@ -291,13 +291,13 @@ void* thread_loop( void* thread_id )
         if ( thread_contoller[(int)thread_id] != 0 )
         {
 
-            cout << "Thread #" << (int)thread_id << " working on obj id: " << thread_contoller[(int)thread_id] << endl;
+            //cout << "Thread #" << (int)thread_id << " working on obj id: " << thread_contoller[(int)thread_id] << endl;
 
             (*object_type_struct[((object_header*)obj_loc[thread_contoller[(int)thread_id]])->type]->calculate)(obj_loc, thread_contoller[(int)thread_id] );
 
             set_timestamp( obj_loc, thread_contoller[(int)thread_id] );
 
-            cout << "Thread #" << (int)thread_id << " done." << endl;
+            //cout << "Thread #" << (int)thread_id << " done." << endl;
             thread_fired=true;
 
             thread_contoller[(int)thread_id] = 0;
