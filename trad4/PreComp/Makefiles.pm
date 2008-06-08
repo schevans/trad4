@@ -33,7 +33,7 @@ sub generate_top_lvl_make($) {
     print $FHD "\n";
     print $FHD "CXXFLAGS = $all_headers\n";
     print $FHD "\n";
-    print $FHD "COMPILE = \$(CXX) \$(CXXFLAGS) -c\n";
+    print $FHD "COMPILE = \$(CXX) \$(CXXFLAGS) -O3 -c\n";
     print $FHD "\n";
     print $FHD "\n";
     print $FHD "SUBDIRS = \$(INSTANCE_ROOT)/objects \$(INSTANCE_ROOT)/lib \$(TRAD4_ROOT)/objects\n";
@@ -74,7 +74,7 @@ sub generate_object_make($) {
     print $FHD "\n";
     print $FHD "CXX = g++\n";
     print $FHD "\n";
-    print $FHD "CXXFLAGS = -Wall -c\n";
+    print $FHD "CXXFLAGS =  -O3 -Wall -c\n";
     print $FHD "\n";
     print $FHD "COMPILE = \$(CXX) \$(CXXFLAGS)\n";
     print $FHD "\n";
@@ -120,7 +120,7 @@ sub generate_lib_make($) {
     print $FHD "\n";
     print $FHD "CXXFLAGS = $all_headers\n";
     print $FHD "\n";
-    print $FHD "COMPILE = \$(CXX) \$(CXXFLAGS) -c\n";
+    print $FHD "COMPILE = \$(CXX) \$(CXXFLAGS) -c -O3 \n";
     print $FHD "\n";
 
     print $FHD "LIBS =";
@@ -143,7 +143,7 @@ sub generate_lib_make($) {
         $name = $obj_hash->{$type}->{name};
 
         print $FHD "lib$name.so: ../objects/$type.c ../gen/objects/$type"."_wrapper.c\n";
-        print $FHD "	g++ -shared -Wl,-soname,lib$name.so -o lib$name.so ../../sqlite-amalgamation-3.5.9/sqlite3.o ../objects/$type.o\n";
+        print $FHD "	g++ -shared -Wl,-soname,lib$name.so -o lib$name.so \$(TRAD4_ROOT)/libs/sqlite3.o ../objects/$type.o\n";
         print $FHD "\n";
     
     }
