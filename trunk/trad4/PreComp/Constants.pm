@@ -12,7 +12,7 @@ sub DefsRoot { return "$ENV{INSTANCE_ROOT}/defs/"; }
 sub CommomHeader { 
 
     my @header = ( 
-        "ulong last_published",
+        "long_long last_published",
         "int id",
         "object_status status",
         "int type" ,

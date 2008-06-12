@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <dlfcn.h>
 #include <sstream>
+#include <iomanip>
 #include <sqlite3.h>
 
 #include "trad4.h"
@@ -26,13 +27,12 @@ int num_tiers(MAX_TIERS);   // Will be dynamic.
 int num_threads(MAX_THREADS);   // Will be dynamic.
 int current_thread(1);
 int num_threads_fired(0);
-int timestamp_offset(0);
 bool need_reload(false);
 
 bool fire_object( int id );
 void* thread_loop( void* thread_id );
 void start_threads();
-void get_timestamp( int& sec, int& mil );
+void get_timestamp( double& out_time );
 bool run_tier( int tier );
 void reload_handler( int sig_num );
 void load_all();
@@ -55,10 +55,6 @@ void run_trad4() {
     {
         tier_manager[i][0]=1;
     }
-
-    timeval time;
-    gettimeofday( &time, NULL );
-    timestamp_offset = ( time.tv_sec / 1000000 ) * 1000000;
 
     load_all();
 
@@ -90,63 +86,45 @@ void run_trad4() {
         load_all();
     }
 
-    int total_start_sec;
-    int total_start_mil;
-    int total_end_sec;
-    int total_end_mil;
-    int start_sec;
-    int start_mil;
-    int end_sec;
-    int end_mil;
-
+    double start_time;
+    double end_time;
+    double tier_start_time; 
+    double tier_end_time;
+    
     while (1)
     {
-        get_timestamp( start_sec, start_mil );
+        get_timestamp( start_time );
+        get_timestamp( tier_start_time );
 
         if ( run_tier( 1 ) )
         {
-            get_timestamp( end_sec, end_mil );
+            get_timestamp( tier_end_time );
 
-            cout << "Tier " << 1 << " run in " << end_sec - start_sec << "s " << end_mil - start_mil << "m." << endl << endl;
-
-            total_start_sec = start_sec;
-            total_start_mil = start_mil;
+            cout << setprecision(6) << "Tier " << 1 << " run in " << tier_end_time - tier_start_time << endl << endl;
 
             for ( int tier=2 ; tier < num_tiers+1 ; tier++ )
             {
-                get_timestamp( start_sec, start_mil );
+                if ( tier_manager[tier][0] <= 1 )
+                {
+                    continue;
+                }
 
-                cout << "Tier " << tier << " running." << endl;
+                get_timestamp( tier_start_time );
+
+                cout << setprecision(6) << "Tier " << tier << " running." << endl;
         
                 run_tier( tier );
 
-                get_timestamp( end_sec, end_mil );
+                get_timestamp( tier_end_time );
 
-                int elapsed_sec = end_sec - start_sec;
-                int elapsed_mil = end_mil - start_mil;
-                
-                if ( elapsed_sec < 0 )
-                {
-                    elapsed_sec = end_sec + 1;
-                    elapsed_mil = elapsed_mil + 1000000;
-                }
 
-                cout << "Tier " << tier << " complete in " << elapsed_sec << "s " << elapsed_mil << "ms." << endl << endl;
+                cout << setprecision(6) << "Tier " << tier << " complete in " << tier_end_time - tier_start_time << endl;
 
             }
 
-            get_timestamp( total_end_sec, total_end_mil );
+            get_timestamp( end_time );
 
-            int total_elapsed_sec = total_end_sec - total_start_sec;
-            int total_elapsed_mil = total_end_mil - total_start_mil;
-
-            if ( total_elapsed_sec < 0 )
-            {
-                total_elapsed_sec = total_end_sec + 1;
-                total_elapsed_mil = total_elapsed_mil + 1000000;
-            }
-
-            cout << endl << "All tiers complete in " << total_elapsed_sec << "s " << total_elapsed_mil << "ms." << endl << endl;
+            cout << endl << "All tiers complete in " << end_time-start_time << endl << endl;
 
         }
         else
@@ -163,12 +141,12 @@ void run_trad4() {
     }
 }
 
-void get_timestamp( int& sec, int& mil )
+void get_timestamp( double& out_time )
 {
-    timeval time;
-    gettimeofday( &time, NULL );
-    sec = time.tv_sec;
-    mil = time.tv_usec;
+    timeval tim;
+    gettimeofday(&tim, NULL);
+    out_time = tim.tv_sec + ( tim.tv_usec / 1000000.0 );
+
 }
 
 bool run_tier( int tier ) {
@@ -263,12 +241,11 @@ void set_timestamp( obj_loc_t obj_loc, int id )
 {
     //for ( int i=0 ; i < 1000000000 ; i++ );   // Simulate long calculations
 
-    timeval time;
-    gettimeofday( &time, NULL );
-    int sec = time.tv_sec;
-    int mil = time.tv_usec;
+    timeval tim;
+    gettimeofday( &tim, NULL );
 
-    int timestamp = (( sec - timestamp_offset ) * 1000 ) + ( mil / 1000 );
+    double timestamp_double = tim.tv_sec + (tim.tv_usec / 1000000.0);
+    long long timestamp = (long long)(timestamp_double * 1000000 );
 
     //std::cout << "setting timestamp: " << timestamp << std::endl;
 

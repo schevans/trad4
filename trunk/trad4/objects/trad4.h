@@ -56,9 +56,12 @@ enum object_status {
     NEW
 };
 
+// Hack to get the beta out (precomp expects only one string per type)...
+#define long_long long long
+
 typedef struct {
     // Header
-    time_t last_published;
+    long long last_published;
     int id;
     object_status status;
     int type;
