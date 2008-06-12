@@ -35,7 +35,7 @@ void start_threads();
 void get_timestamp( double& out_time );
 bool run_tier( int tier );
 void reload_handler( int sig_num );
-void load_all();
+void load_all( int initial_load );
 void create_types();
 
 void run_trad4() {
@@ -56,7 +56,7 @@ void run_trad4() {
         tier_manager[i][0]=1;
     }
 
-    load_all();
+    load_all( 1 );
 
     for ( int i = 0 ; i < MAX_OBJECTS+1 ; i++ )
     {
@@ -83,7 +83,7 @@ void run_trad4() {
         cout << endl << "Forcing reload.." << endl << endl;
         sleep(1);
 
-        load_all();
+        load_all( 0 );
     }
 
     double start_time;
@@ -135,7 +135,7 @@ void run_trad4() {
         if ( need_reload )
         {
             need_reload = false;
-            load_all();
+            load_all( 0 );
         }
 
     }
@@ -368,19 +368,21 @@ void create_types()
     }
 }
 
-static int load_all_callback(void *NotUsed, int argc, char **row, char **azColName)
+static int load_all_callback(void* initial_load_v, int argc, char **row, char **azColName)
 {
-    (*object_type_struct[atoi(row[0])]->load_objects)( obj_loc );
+    int initial_load = *((int*)initial_load_v);
+
+    (*object_type_struct[atoi(row[0])]->load_objects)( obj_loc, initial_load );
 
     return 0;
 }
 
-void load_all() 
+void load_all( int initial_load )
 {
     std::ostringstream dbstream;
     dbstream << "select type_id, tier from object_types where need_reload=1";
 
-    if( sqlite3_exec(db, dbstream.str().c_str(), load_all_callback, 0, &zErrMsg) != SQLITE_OK ){
+    if( sqlite3_exec(db, dbstream.str().c_str(), load_all_callback, (void*)&initial_load, &zErrMsg) != SQLITE_OK ){
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
         sqlite3_free(zErrMsg);
     }

@@ -21,7 +21,7 @@ typedef int tier_manager_t[MAX_TIERS+1][MAX_OBJECTS+1];
 
 typedef void (*calculate_fpointer)( obj_loc_t obj_loc, int id );
 typedef int (*need_refresh_fpointer)( obj_loc_t obj_loc, int id );
-typedef void (*load_objects_fpointer)( obj_loc_t obj_loc );
+typedef void (*load_objects_fpointer)( obj_loc_t obj_loc, int initial_load );
 
 void run_trad4();
 

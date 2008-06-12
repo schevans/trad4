@@ -236,7 +236,7 @@ sub generate_loader($$)
     my $name = $obj_hash->{name};
 
     print $FHD "\n";
-    print $FHD "extern \"C\" void load_objects( obj_loc_t obj_loc )\n";
+    print $FHD "extern \"C\" void load_objects( obj_loc_t obj_loc, int initial_load )\n";
     print $FHD "{\n";
     print $FHD "    std::cout << \"load_all_$name"."s()\" << std::endl;\n";
     print $FHD "\n";
@@ -271,8 +271,13 @@ sub generate_loader($$)
         print $FHD " o.id = t.id and ";
 
     }
-    print $FHD " o.type = ot.type_id and o.type = ".$obj_hash->{type_num}." and o.need_reload=1\";\n";
+    print $FHD " o.type = ot.type_id and o.type = ".$obj_hash->{type_num}."\";\n";
 
+    
+    print $FHD "\n";
+    print $FHD "    if ( initial_load != 1 )\n";
+    print $FHD "        dbstream << \" and o.need_reload=1\";\n";
+    print $FHD "\n";
 
     print $FHD "\n";
     print $FHD "    if( sqlite3_exec(db, dbstream.str().c_str(), load_objects_callback, obj_loc, &zErrMsg) != SQLITE_OK ){\n";
