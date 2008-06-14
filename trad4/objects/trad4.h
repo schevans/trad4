@@ -30,7 +30,7 @@ typedef struct {
     calculate_fpointer calculate;
     need_refresh_fpointer need_refresh;
     load_objects_fpointer load_objects;
-    void* constructor_fpointer;
+    void* constructor_fpointer; // Not used in beta.
 } object_type_struct_t;
 
 
