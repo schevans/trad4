@@ -35,8 +35,8 @@ void start_threads();
 void get_timestamp( double& out_time );
 bool run_tier( int tier );
 void reload_handler( int sig_num );
-void load_all( int initial_load );
-void create_types();
+void load_objects( int initial_load );
+void load_types( int initial_load );
 
 void run_trad4() {
 
@@ -49,14 +49,19 @@ void run_trad4() {
         obj_loc[i] = 0;
     }
 
-    create_types();
+    for ( int i = 0 ; i < MAX_TYPES+1 ; i++ )
+    {
+        object_type_struct[i] = 0;
+    }
+
+    load_types( 1 );
 
     for ( int i=1 ; i < MAX_TIERS+1 ; i++ )
     {
         tier_manager[i][0]=1;
     }
 
-    load_all( 1 );
+    load_objects( 1 );
 
     for ( int i = 0 ; i < MAX_OBJECTS+1 ; i++ )
     {
@@ -83,7 +88,7 @@ void run_trad4() {
         cout << endl << "Forcing reload.." << endl << endl;
         sleep(1);
 
-        load_all( 0 );
+        load_objects( 0 );
     }
 
     double start_time;
@@ -135,7 +140,10 @@ void run_trad4() {
         if ( need_reload )
         {
             need_reload = false;
-            load_all( 0 );
+    
+            load_types( 0 );
+    
+            load_objects( 0 );
         }
 
     }
@@ -309,16 +317,29 @@ void reload_handler( int sig_num )
     need_reload = true;
 }
 
-static int create_types_callback(void *NotUsed, int argc, char **row, char **azColName)
+static int load_types_callback(void *NotUsed, int argc, char **row, char **azColName)
 {
     char *error;
 
     int obj_num = atoi(row[0]);
     char* name = row[1];
 
-    cout << "Name: " << name << ", type id: " << obj_num << ", tier: " << atoi(row[2]) << endl;
+    if ( object_type_struct[obj_num] == 0 )
+    {
+        cout << "Creating new type " << name << ", type id: " << obj_num << ", tier: " << atoi(row[2]) << endl;
 
-    object_type_struct[obj_num] = new object_type_struct_t;
+        object_type_struct[obj_num] = new object_type_struct_t;
+    }
+    else 
+    {
+        cout << "Reloading type " << name << ", id: " << obj_num << ", tier: " << atoi(row[2]) << endl;
+
+        dlclose(object_type_struct[obj_num]->lib_handle);
+        object_type_struct[obj_num]->constructor_fpointer = 0;
+        object_type_struct[obj_num]->need_refresh = 0;
+        object_type_struct[obj_num]->calculate = 0;
+        object_type_struct[obj_num]->load_objects = 0;
+    }
 
     ostringstream lib_name;
     lib_name << getenv("INSTANCE_ROOT") << "/lib/lib" << name << ".so";
@@ -356,19 +377,24 @@ static int create_types_callback(void *NotUsed, int argc, char **row, char **azC
     return 0;
 }
 
-void create_types()
+void load_types( int initial_load )
 {
 
     std::ostringstream dbstream;
-    dbstream << "select type_id, name, tier from object_types where need_reload=1";
 
-    if( sqlite3_exec(db, dbstream.str().c_str(), create_types_callback, 0, &zErrMsg) != SQLITE_OK ){
+    if ( initial_load ) 
+        dbstream << "select type_id, name, tier from object_types";
+    else
+        dbstream << "select type_id, name, tier from object_types where need_reload=1";
+        
+
+    if( sqlite3_exec(db, dbstream.str().c_str(), load_types_callback, 0, &zErrMsg) != SQLITE_OK ){
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
         sqlite3_free(zErrMsg);
     }
 }
 
-static int load_all_callback(void* initial_load_v, int argc, char **row, char **azColName)
+static int load_objects_callback(void* initial_load_v, int argc, char **row, char **azColName)
 {
     int initial_load = *((int*)initial_load_v);
 
@@ -377,12 +403,12 @@ static int load_all_callback(void* initial_load_v, int argc, char **row, char **
     return 0;
 }
 
-void load_all( int initial_load )
+void load_objects( int initial_load )
 {
     std::ostringstream dbstream;
-    dbstream << "select type_id, tier from object_types where need_reload=1";
+    dbstream << "select type_id, tier from object_types";
 
-    if( sqlite3_exec(db, dbstream.str().c_str(), load_all_callback, (void*)&initial_load, &zErrMsg) != SQLITE_OK ){
+    if( sqlite3_exec(db, dbstream.str().c_str(), load_objects_callback, (void*)&initial_load, &zErrMsg) != SQLITE_OK ){
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
         sqlite3_free(zErrMsg);
     }
