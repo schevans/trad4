@@ -14,6 +14,7 @@ trad4.o: trad4.c
 
 libtrad4.so: trad4.o
 	$(CXX) -shared -Wl,-soname,libtrad4.so -o libtrad4.so trad4.o
+	mv libtrad4.so $(INSTANCE_ROOT)/lib/.
 
 
 clean : 
