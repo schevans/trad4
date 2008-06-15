@@ -36,7 +36,7 @@ sub generate_top_lvl_make($) {
     print $FHD "\n";
     print $FHD "CXXFLAGS = $all_headers\n";
     print $FHD "\n";
-    print $FHD "COMPILE = \$(CXX) \$(CXXFLAGS) -O3 -c\n";
+    print $FHD "COMPILE = \$(CXX) \$(CXXFLAGS) -c\n";
     print $FHD "\n";
     print $FHD "\n";
     print $FHD "SUBDIRS = \$(TRAD4_ROOT)/objects \$(INSTANCE_ROOT)/objects \$(INSTANCE_ROOT)/lib\n";
@@ -77,7 +77,7 @@ sub generate_object_make($) {
     print $FHD "\n";
     print $FHD "CXX = g++\n";
     print $FHD "\n";
-    print $FHD "CXXFLAGS =  -O3 -Wall -c\n";
+    print $FHD "CXXFLAGS =  -Wall -c\n";
     print $FHD "\n";
     print $FHD "COMPILE = \$(CXX) \$(CXXFLAGS)\n";
     print $FHD "\n";
@@ -123,7 +123,7 @@ sub generate_lib_make($) {
     print $FHD "\n";
     print $FHD "CXXFLAGS = $all_headers\n";
     print $FHD "\n";
-    print $FHD "COMPILE = \$(CXX) \$(CXXFLAGS) -c -O3 \n";
+    print $FHD "COMPILE = \$(CXX) \$(CXXFLAGS) -c \n";
     print $FHD "\n";
 
     print $FHD "LIBS =";
