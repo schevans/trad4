@@ -43,7 +43,7 @@ sub generate_top_lvl_make($) {
     print $FHD "all: objs bond_risk\n";
     print $FHD "\n";
     print $FHD "bond_risk: objects/main.o\n";
-    print $FHD "	g++ objects/main.o \$(TRAD4_ROOT)/libs/sqlite3.o -o bin/bond_risk -ltrad4 -L\$(TRAD4_ROOT)/objects -lpthread -ldl -L\$(INSTANCE_ROOT)/lib\n";
+    print $FHD "	g++ objects/main.o \$(TRAD4_ROOT)/objects/sqlite3.o -o bin/bond_risk -ltrad4 -L\$(TRAD4_ROOT)/objects -lpthread -ldl -L\$(INSTANCE_ROOT)/lib\n";
     print $FHD "\n";
     print $FHD "objs:\n";
 
@@ -143,7 +143,7 @@ sub generate_lib_make($) {
         $name = $obj_hash->{$type}->{name};
 
         print $FHD "lib$name.so: ../objects/$type.c ../gen/objects/$type"."_wrapper.c\n";
-        print $FHD "	g++ -shared -Wl,-soname,lib$name.so -o lib$name.so \$(TRAD4_ROOT)/libs/sqlite3.o ../objects/$type.o\n";
+        print $FHD "	g++ -shared -Wl,-soname,lib$name.so -o lib$name.so \$(TRAD4_ROOT)/objects/sqlite3.o ../objects/$type.o\n";
         print $FHD "\n";
     
     }
