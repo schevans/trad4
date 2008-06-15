@@ -36,7 +36,7 @@ sub generate_top_lvl_make($) {
     print $FHD "COMPILE = \$(CXX) \$(CXXFLAGS) -O3 -c\n";
     print $FHD "\n";
     print $FHD "\n";
-    print $FHD "SUBDIRS = \$(INSTANCE_ROOT)/objects \$(INSTANCE_ROOT)/lib \$(TRAD4_ROOT)/objects\n";
+    print $FHD "SUBDIRS = \$(TRAD4_ROOT)/objects \$(INSTANCE_ROOT)/objects \$(INSTANCE_ROOT)/lib\n";
     print $FHD "\n";
 
 
