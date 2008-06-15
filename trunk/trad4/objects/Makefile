@@ -10,7 +10,7 @@ COMPILE = $(CXX) $(CXXFLAGS)
 all : trad4.o libtrad4.so sqlite3.o
 
 trad4.o: trad4.c
-	$(COMPILE) trad4.c -o trad4.o
+	$(COMPILE) trad4.c -o trad4.o -I.
 
 libtrad4.so: trad4.o
 	$(CXX) -shared -Wl,-soname,libtrad4.so -o libtrad4.so trad4.o
