@@ -1,3 +1,6 @@
+// Copyright (c) Steve Evans 2008
+// steve@topaz.myzen.co.uk
+//
 
 #include <iostream>
 #include <math.h>

@@ -1,3 +1,7 @@
+# Copyright (c) Steve Evans 2008
+# steve@topaz.myzen.co.uk
+#
+
 
 package PreComp::Calculate;
 
