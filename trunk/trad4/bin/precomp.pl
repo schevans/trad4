@@ -16,7 +16,7 @@ my $master_hash = PreComp::Utilities::LoadDefs();
 
 my $type;
 
-foreach $type ( %{$master_hash} ) {
+foreach $type ( keys %{$master_hash} ) {
 
     PreComp::Utilities::Validate( $master_hash, $type );
     PreComp::Header::Generate( $master_hash->{$type} );
