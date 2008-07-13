@@ -6,11 +6,11 @@
 package PreComp::Constants;
 
 
-sub SqlRoot { return "$ENV{INSTANCE_ROOT}/gen/sql/"; }
-sub GenObjRoot { return "$ENV{INSTANCE_ROOT}/gen/objects/"; }
-sub ObjRoot { return "$ENV{INSTANCE_ROOT}/objects/"; }
+sub SqlRoot { return "$ENV{APP_ROOT}/gen/sql/"; }
+sub GenObjRoot { return "$ENV{APP_ROOT}/gen/objects/"; }
+sub ObjRoot { return "$ENV{APP_ROOT}/objects/"; }
 
-sub DefsRoot { return "$ENV{INSTANCE_ROOT}/defs/"; }
+sub DefsRoot { return "$ENV{APP_ROOT}/defs/"; }
 
 sub CommomHeader { 
 

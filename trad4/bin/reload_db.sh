@@ -10,11 +10,11 @@ fi
 
 echo "Reloading $TRAD4_DB"
 
-echo "delete from object;" | $TRAD4_BIN/sqlite3 $TRAD4_DB
+echo "delete from object;" | $SQLITE $TRAD4_DB
 
 DATA_DIR=$1
 
-cd $INSTANCE_ROOT/data/$DATA_DIR
+cd $APP_ROOT/data/$DATA_DIR
 
 for i in `ls *.sql`
 do
@@ -27,5 +27,5 @@ do
     fi
 done
 
-$TRAD4_ROOT/bin/runsql $INSTANCE_ROOT/gen/sql/object_types.sql
+$TRAD4_ROOT/bin/runsql $APP_ROOT/gen/sql/object_types.sql
 

@@ -30,9 +30,9 @@ PreComp::Makefiles::Generate( $master_hash );
 PreComp::Macros::Generate( $master_hash );
 PreComp::SqlCommon::Generate( $master_hash );
 
-if ( ! -f "$ENV{INSTANCE_ROOT}/objects/main.c" ) {
+if ( ! -f "$ENV{APP_ROOT}/objects/main.c" ) {
 
-    open MAIN, ">$ENV{INSTANCE_ROOT}/objects/main.c" or die "Can't open $ENV{INSTANCE_ROOT}/objects/main.c";
+    open MAIN, ">$ENV{APP_ROOT}/objects/main.c" or die "Can't open $ENV{APP_ROOT}/objects/main.c";
 
     print MAIN "#include \"trad4.h\"\n";
     print MAIN "\n";

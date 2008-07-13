@@ -33,7 +33,7 @@ sub generate_dummy_data($$) {
     my $name = $obj_hash->{name};
     my $type_num = $obj_hash->{type_num};
 
-    my $FHD = PreComp::Utilities::OpenFile( $ENV{INSTANCE_ROOT}."/data/default_set/$name.sql" );
+    my $FHD = PreComp::Utilities::OpenFile( $ENV{APP_ROOT}."/data/default_set/$name.sql" );
 
     #print_licence_header( $FHD );
 
