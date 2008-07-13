@@ -2,6 +2,6 @@
 
 FILE=$1
 
-$TRAD4_BIN/sqlite3 $TRAD4_DB < $FILE
+$SQLITE $TRAD4_DB < $FILE
 
 

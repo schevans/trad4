@@ -7,20 +7,24 @@ do
     $TRAD4_ROOT/bin/lsql $i
 done
 
-cd $INSTANCE_ROOT/gen/sql
+cd $APP_ROOT/gen/sql
 
 for i in `ls *.table`
 do
     $TRAD4_ROOT/bin/lsql $i
 done
 
-cd $INSTANCE_ROOT/sql
+if [ -d $APP_ROOT/sql ] 
+then
 
-for i in `ls *.table`
-do
-    $TRAD4_ROOT/bin/lsql $i
-done
+    cd $APP_ROOT/sql
 
+    for i in `ls *.table`
+    do
+        $TRAD4_ROOT/bin/lsql $i
+    done
+
+fi
 
 
 

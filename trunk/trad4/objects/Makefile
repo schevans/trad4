@@ -14,11 +14,11 @@ trad4.o: trad4.c
 
 libtrad4.so: trad4.o
 	$(CXX) -shared -Wl,-soname,libtrad4.so -o libtrad4.so trad4.o
-	mv libtrad4.so $(INSTANCE_ROOT)/lib/.
+	mv libtrad4.so $(APP_ROOT)/lib/.
 
 sqlite3.o : sqlite3.c
 	gcc -c sqlite3.c -o sqlite3.o
 
 clean : 
-	rm -f libtrad4.so trad4.o sqlite3.o
+	rm -f libtrad4.so trad4.o sqlite3.o $(APP_ROOT)/lib/libtrad4.so
 

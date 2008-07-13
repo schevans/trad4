@@ -85,7 +85,7 @@ sub CloseFile() {
 
 sub LoadDefs() {
 
-    open TYPES_FILE, "$ENV{INSTANCE_ROOT}/defs/object_types.t4s" or die "Can't open $ENV{INSTANCE_ROOT}/defs/object_types.t4s for reading";
+    open TYPES_FILE, "$ENV{APP_ROOT}/defs/object_types.t4s" or die "Can't open $ENV{APP_ROOT}/defs/object_types.t4s for reading";
 
     my %master_hash;
 
@@ -117,7 +117,7 @@ sub LoadDefs() {
 sub LoadDef($) {
     my $object = shift;
 
-    my $file = $ENV{INSTANCE_ROOT}."/defs/$object.t4";
+    my $file = $ENV{APP_ROOT}."/defs/$object.t4";
 
     open FILE, "$file" or die "Could not open $file for reading";
 
