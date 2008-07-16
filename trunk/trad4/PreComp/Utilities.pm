@@ -110,6 +110,13 @@ sub LoadDefs() {
         if ( -f $ENV{APP_ROOT}."/defs/$type.t4" ) {
 
             $master_hash{$type}{tier} = $tier;
+
+            if ( $master_hash{$type}{type_num} ) {
+
+                print "Error: Two objects share the same type_id - $master_hash{$type} and $master_hash{$master_hash{$type}{type_num}}. Exiting\n";
+                exit(1);
+            }
+
             $master_hash{$type}{type_num} = $num;
             $master_hash{$type}{name} = $type;
 
@@ -117,7 +124,7 @@ sub LoadDefs() {
         }
         else {
 
-            print "Warning: Object \'$type\' referenced in object_types.t4 but not found in ".$ENV{APP_ROOT}."/defs. Ignoring object.\n";
+            print "Warning: Object \'$type\' referenced in object_types.t4s but not found in ".$ENV{APP_ROOT}."/defs. Ignoring object.\n";
         }
     }
 
@@ -131,7 +138,7 @@ sub LoadDefs() {
 
         if ( ! exists($master_hash{$file} )) {
 
-            print "Warning: Object \'$file\' has a $file.t4 file but is not referenced in object_types.t4. Ignoring object.\n";
+            print "Warning: Object \'$file\' has a $file.t4 file but is not referenced in object_types.t4s. Ignoring object.\n";
         }
     }
 
