@@ -18,11 +18,13 @@ my $type;
 
 foreach $type ( keys %{$master_hash} ) {
 
-    PreComp::Utilities::Validate( $master_hash, $type );
-    PreComp::Header::Generate( $master_hash->{$type} );
-    PreComp::Wrapper::Generate( $master_hash->{$type} );
-    PreComp::Sql::Generate( $master_hash, $type );
-    PreComp::Calculate::Generate( $master_hash->{$type} );
+    if ( PreComp::Utilities::Validate( $master_hash, $type ) ) {
+
+        PreComp::Header::Generate( $master_hash->{$type} );
+        PreComp::Wrapper::Generate( $master_hash->{$type} );
+        PreComp::Sql::Generate( $master_hash, $type );
+        PreComp::Calculate::Generate( $master_hash->{$type} );
+    }
 
 }
 
