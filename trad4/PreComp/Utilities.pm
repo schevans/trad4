@@ -22,7 +22,7 @@ sub Validate($$) {
 
         if ( ! $master_hash->{$key} ) {
 
-            print "Error: Validation failed for $name - type $key not found.\n";
+            print "Error: Object \'$name\' has a sub type \'$key\', which is not found in $ENV{APP_ROOT}/defs. Exiting.\n";
             return 0;
         }
     }
