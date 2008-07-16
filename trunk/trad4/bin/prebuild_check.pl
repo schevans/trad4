@@ -3,19 +3,19 @@
 use warnings;
 use Data::Dumper;
 
-if ( !$ENV{INSTANCE_ROOT} ) {
+if ( !$ENV{APP_ROOT} ) {
 
-    print "INSTANCE_ROOT not set. Exiting\n";
+    print "APP_ROOT not set. Exiting\n";
     exit 1;
 }
 
-my $gen_root=$ENV{INSTANCE_ROOT}."/gen";
+my $gen_root=$ENV{APP_ROOT}."/gen";
 
 
 sub load_defs($);
 my %object_hash;
 
-open TYPES_FILE, "$ENV{INSTANCE_ROOT}/defs/object_types.t4s" or die "Can't open $ENV{INSTANCE_ROOT}/defs/object_types.t4s for reading";
+open TYPES_FILE, "$ENV{APP_ROOT}/defs/object_types.t4s" or die "Can't open $ENV{APP_ROOT}/defs/object_types.t4s for reading";
 
 while ( $line = <TYPES_FILE> ) {
 
@@ -38,7 +38,7 @@ foreach $object ( keys %object_hash ) {
 
     foreach $sub ( keys %{$object_hash{$object}{sub}} ) {
 
-        my $file = "$ENV{INSTANCE_ROOT}/objects/$object.c";
+        my $file = "$ENV{APP_ROOT}/objects/$object.c";
 
         my $found = `grep $sub $file`;
 
@@ -55,7 +55,7 @@ foreach $object ( keys %object_hash ) {
 sub load_defs($) {
     my $name = shift;
 
-    my $file = $ENV{INSTANCE_ROOT}."/defs/$name.t4";
+    my $file = $ENV{APP_ROOT}."/defs/$name.t4";
 
     open FILE, "$file" or die "Could not open $file for reading";
 
