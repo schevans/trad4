@@ -23,9 +23,11 @@ sub Validate($$) {
         if ( ! $master_hash->{$key} ) {
 
             print "Error: Validation failed for $name - type $key not found.\n";
-            print "**I would exit at this stage but there's currently no way to do so.**\n";
+            return 0;
         }
     }
+
+    return 1;
 }
 
 sub OpenFile($) {
@@ -85,6 +87,12 @@ sub CloseFile() {
 
 sub LoadDefs() {
 
+    if ( ! -f $ENV{APP_ROOT}."/defs/object_types.t4s" ) {
+
+        print "Error: File $ENV{APP_ROOT}/defs/object_types.t4s not found. Exiting.\n";
+        exit(1);
+    }
+
     open TYPES_FILE, "$ENV{APP_ROOT}/defs/object_types.t4s" or die "Can't open $ENV{APP_ROOT}/defs/object_types.t4s for reading";
 
     my %master_hash;
@@ -99,17 +107,34 @@ sub LoadDefs() {
 
         ( $num, $tier, $type ) = split /,/, $line;
 
-        $master_hash{$type}{tier} = $tier;
+        if ( -f $ENV{APP_ROOT}."/defs/$type.t4" ) {
 
-        $master_hash{$type}{type_num} = $num;
-        $master_hash{$type}{name} = $type;
+            $master_hash{$type}{tier} = $tier;
+            $master_hash{$type}{type_num} = $num;
+            $master_hash{$type}{name} = $type;
 
+            $master_hash{$type}{data} = LoadDef( $type );
+        }
+        else {
 
-        $master_hash{$type}{data} = LoadDef( $type );
-
+            print "Warning: Object \'$type\' referenced in object_types.t4 but not found in ".$ENV{APP_ROOT}."/defs. Ignoring object.\n";
+        }
     }
 
-#print Dumper( %master_hash );
+    my @file_list = `cd $ENV{APP_ROOT}/defs && ls *.t4`;
+
+    foreach $file ( @file_list  ) {
+
+        chomp ( $file );
+
+        $file =~ s/\.t4//g;
+
+        if ( ! exists($master_hash{$file} )) {
+
+            print "Warning: Object \'$file\' has a $file.t4 file but is not referenced in object_types.t4. Ignoring object.\n";
+        }
+    }
+
     return \%master_hash;
 
 }
