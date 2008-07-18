@@ -6,6 +6,7 @@ package PreComp::Utilities;
 
 use Data::Dumper;
 use warnings;
+use Term::ReadKey;
 
 my $current_file;
 my $current_obj;
@@ -18,6 +19,28 @@ sub SetExitOnError($) {
     
     $exit_on_error = shift;
 }
+
+sub Clean() {
+
+    print "Cleaning $ENV{APP_ROOT}/gen/objects..\n";
+    `rm -f $ENV{APP_ROOT}/gen/objects/*`; 
+
+    print "Cleaning $ENV{APP_ROOT}/gen/sql..\n";
+    `rm -f $ENV{APP_ROOT}/gen/sql/*`; 
+
+    print "Cleaning $ENV{APP_ROOT}/data/default_set..\n";
+    `rm -f $ENV{APP_ROOT}/data/default_set/*`; 
+
+    print "Warning: About to delete all *.c files in $ENV{APP_ROOT}/objects.\nThis will cause you to lose any localised changes.\nContinue? (y/n)\n";
+    ReadMode 'cbreak';
+    my $key = ReadKey(0);
+    ReadMode 'normal';
+
+    if ( $key =~ /y/ ) {
+        print "Cleaning $ENV{APP_ROOT}/objects..\n";
+        `rm -f $ENV{APP_ROOT}/objects/*.c`; 
+    }
+}    
 
 sub Validate($$) {
     my $master_hash = shift;

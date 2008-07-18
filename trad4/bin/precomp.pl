@@ -16,10 +16,16 @@ use PreComp::Macros;
 
 sub usage();
 
-our( $opt_h, $opt_k );
+our( $opt_h, $opt_k, $opt_c );
 
-if ( ! getopts( 'hk') ) {
+if ( ! getopts( 'hkc') ) {
     usage();
+}
+
+if ( $opt_c ) {
+
+    PreComp::Utilities::Clean();
+    exit 0;
 }
 
 if( $opt_h ) {
@@ -75,6 +81,7 @@ sub usage() {
     print "The trad4 precompiler.\n";
     print"\n";
     print "  -k             continue on error\n";
+    print "  -c             remove all generated files\n";
     print "  -h             display this help and exit\n";
     print"\n";
 
