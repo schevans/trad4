@@ -2,6 +2,7 @@
 
 use warnings;
 use strict;
+use Data::Dumper;
 
 use PreComp::Calculate;
 use PreComp::Header;
@@ -14,18 +15,23 @@ use PreComp::Macros;
 
 my $master_hash = PreComp::Utilities::LoadDefs();
 
+#print Dumper( $master_hash );
+
 my $type;
 
 foreach $type ( keys %{$master_hash} ) {
 
-    if ( PreComp::Utilities::Validate( $master_hash, $type ) ) {
-
-        PreComp::Header::Generate( $master_hash->{$type} );
-        PreComp::Wrapper::Generate( $master_hash->{$type} );
-        PreComp::Sql::Generate( $master_hash, $type );
-        PreComp::Calculate::Generate( $master_hash->{$type} );
+    if ( ! PreComp::Utilities::Validate( $master_hash, $type ) ) {
+        exit 1;
     }
+}
 
+foreach $type ( keys %{$master_hash} ) {
+
+    PreComp::Header::Generate( $master_hash->{$type} );
+    PreComp::Wrapper::Generate( $master_hash->{$type} );
+    PreComp::Sql::Generate( $master_hash, $type );
+    PreComp::Calculate::Generate( $master_hash->{$type} );
 }
 
 PreComp::Makefiles::Generate( $master_hash );
