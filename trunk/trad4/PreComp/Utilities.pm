@@ -22,8 +22,22 @@ sub Validate($$) {
 
         if ( ! $master_hash->{$key} ) {
 
-            print "Error: Object \'$name\' has a sub type \'$key\', which is not found in $ENV{APP_ROOT}/defs. Exiting.\n";
+            print "Error: Type \'$name\' has a sub type \'$key\', which is not found in $ENV{APP_ROOT}/defs. Exiting.\n";
             return 0;
+        }
+    }
+
+    my $type_num =  $master_hash->{$name}->{type_num};
+
+    foreach $key ( keys %{$master_hash} ) {
+
+        if ( $key ne $name ) {
+
+            if ( $master_hash->{$key}->{type_num} == $type_num ) {
+
+                print "Error: Types \'$name\' and \'$key\' share the same type_num \'$type_num\' in object_types.t4s. Exiting.\n";
+                return 0;
+            }
         }
     }
 
@@ -124,7 +138,7 @@ sub LoadDefs() {
         }
         else {
 
-            print "Warning: Object \'$type\' referenced in object_types.t4s but not found in ".$ENV{APP_ROOT}."/defs. Ignoring object.\n";
+            print "Warning: Type \'$type\' referenced in object_types.t4s but not found in ".$ENV{APP_ROOT}."/defs. Ignoring type.\n";
         }
     }
 
@@ -138,7 +152,7 @@ sub LoadDefs() {
 
         if ( ! exists($master_hash{$file} )) {
 
-            print "Warning: Object \'$file\' has a $file.t4 file but is not referenced in object_types.t4s. Ignoring object.\n";
+            print "Warning: Type \'$file\' has a $file.t4 file but is not referenced in object_types.t4s. Ignoring type.\n";
         }
     }
 
