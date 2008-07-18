@@ -3,6 +3,7 @@
 use warnings;
 use strict;
 use Data::Dumper;
+use Getopt::Std;
 
 use PreComp::Calculate;
 use PreComp::Header;
@@ -13,6 +14,22 @@ use PreComp::SqlCommon;
 use PreComp::Makefiles;
 use PreComp::Macros;
 
+sub usage();
+
+our( $opt_h, $opt_k );
+
+if ( ! getopts( 'hk') ) {
+    usage();
+}
+
+if( $opt_h ) {
+    usage();
+}
+
+if( $opt_k ) {
+    PreComp::Utilities::SetExitOnError( 0 );
+}
+
 my $master_hash = PreComp::Utilities::LoadDefs();
 
 #print Dumper( $master_hash );
@@ -22,7 +39,7 @@ my $type;
 foreach $type ( keys %{$master_hash} ) {
 
     if ( ! PreComp::Utilities::Validate( $master_hash, $type ) ) {
-        exit 1;
+        PreComp::Utilities::ExitOnError();
     }
 }
 
@@ -50,4 +67,18 @@ if ( ! -f "$ENV{APP_ROOT}/objects/main.c" ) {
     print MAIN "}\n";
 
 }
+
+
+sub usage() {
+
+    print "Usage: precomp.pl [OPTION]\n";
+    print "The trad4 precompiler.\n";
+    print"\n";
+    print "  -k             continue on error\n";
+    print "  -h             display this help and exit\n";
+    print"\n";
+
+    exit 0;
+}
+
 

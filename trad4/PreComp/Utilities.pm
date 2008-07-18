@@ -12,6 +12,13 @@ my $current_obj;
 
 my %file_handle_map;
 
+my $exit_on_error=1;
+
+sub SetExitOnError($) {
+    
+    $exit_on_error = shift;
+}
+
 sub Validate($$) {
     my $master_hash = shift;
     my $name = shift;
@@ -22,7 +29,7 @@ sub Validate($$) {
 
         if ( ! $master_hash->{$key} ) {
 
-            print "Error: Type \'$name\' has a sub type \'$key\', which is not found in $ENV{APP_ROOT}/defs. Exiting.\n";
+            print "Error: Type \'$name\' has a sub type \'$key\', which is not found in $ENV{APP_ROOT}/defs.\n";
             return 0;
         }
     }
@@ -35,7 +42,7 @@ sub Validate($$) {
 
             if ( $master_hash->{$key}->{type_num} == $type_num ) {
 
-                print "Error: Types \'$name\' and \'$key\' share the same type_num \'$type_num\' in object_types.t4s. Exiting.\n";
+                print "Error: Types \'$name\' and \'$key\' share the same type_num \'$type_num\' in object_types.t4s.\n";
                 return 0;
             }
         }
@@ -103,8 +110,8 @@ sub LoadDefs() {
 
     if ( ! -f $ENV{APP_ROOT}."/defs/object_types.t4s" ) {
 
-        print "Error: File $ENV{APP_ROOT}/defs/object_types.t4s not found. Exiting.\n";
-        exit(1);
+        print "Error: File $ENV{APP_ROOT}/defs/object_types.t4s not found.\n";
+        ExitOnError();
     }
 
     open TYPES_FILE, "$ENV{APP_ROOT}/defs/object_types.t4s" or die "Can't open $ENV{APP_ROOT}/defs/object_types.t4s for reading";
@@ -127,8 +134,8 @@ sub LoadDefs() {
 
             if ( $master_hash{$type}{type_num} ) {
 
-                print "Error: Two objects share the same type_id - $master_hash{$type} and $master_hash{$master_hash{$type}{type_num}}. Exiting\n";
-                exit(1);
+                print "Error: Two objects share the same type_id - $master_hash{$type} and $master_hash{$master_hash{$type}{type_num}}.\n";
+                ExitOnError();
             }
 
             $master_hash{$type}{type_num} = $num;
@@ -171,10 +178,13 @@ sub LoadDef($) {
 
     my $line;
     my $section;
+    my $counter = 0;
 
     my ( $type, $var );
 
     while ( $line = <FILE> ) {
+
+        $counter = $counter+1;
 
         chomp $line;
 
@@ -192,7 +202,14 @@ sub LoadDef($) {
             next;
         }
 
+
         ( $type, $var ) = split / /, $line;
+
+        if ( !$type or !$var ) {
+
+            print "Error: Malformed $object.t4 file, line $counter.\n";
+            ExitOnError();
+        }
 
         if ( $section =~ /static/ and  $var =~ /\[.*]/ ) {
             $section = "static_vec";
@@ -257,5 +274,13 @@ sub Type2Sql($) {
     return $sql_type;
 }
 
+sub ExitOnError() {
+
+    if ( $exit_on_error ) {
+
+        exit 1;
+    }
+
+}
 1;
 
