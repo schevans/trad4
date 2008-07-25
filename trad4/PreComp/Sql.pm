@@ -10,14 +10,21 @@ use Data::Dumper;
 
 sub generate_table($);
 sub generate_dummy_data($$);
+sub generate_vec_tables($$);
 
-sub Generate($$) {
+sub Generate($$$) {
     my $master_hash = shift;
+    my $struct_hash = shift;
     my $name = shift;
 
     my $obj_hash = $master_hash->{$name};
 
     generate_table($obj_hash);
+
+    if ( $obj_hash->{data}->{static_vec} ) {
+
+        generate_vec_tables( $obj_hash, $struct_hash );
+    }
 
     generate_dummy_data( $master_hash, $name );
 }
@@ -56,6 +63,43 @@ sub generate_dummy_data($$) {
 
     PreComp::Utilities::CloseFile();
 }
+
+sub generate_vec_tables($$) {
+    my $obj_hash = shift;
+    my $struct_hash = shift;
+
+
+    foreach $key ( keys %{$obj_hash->{data}->{static_vec}} ) {
+
+        $static_vec_short = $key;
+        $static_vec_short =~ s/\[.*\]//g;
+
+        my $name = $obj_hash->{name}."_".$static_vec_short;
+
+        my $static_vec_type = $obj_hash->{data}->{static_vec}->{$key};
+
+        my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::SqlRoot()."$name.table" );
+
+        print $FHD "create table $name (\n";
+        print $FHD "    id int";
+
+        if ( $struct_hash->{$static_vec_type} ) {
+
+            foreach $struct ( keys %{$struct_hash->{$static_vec_type}} ) {
+
+                print $FHD ",\n    $struct_hash->{$static_vec_type}->{$struct} $struct";
+            }
+        }
+        else {
+            print $FHD ",\n    ".PreComp::Utilities::Type2Sql( $static_vec_short )." $static_vec_short";
+        }
+
+        print $FHD "\n);\n";
+
+        PreComp::Utilities::CloseFile();
+
+    }
+}   
 
 sub generate_table($) {
     my $obj_hash = shift;
