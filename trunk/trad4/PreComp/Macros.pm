@@ -25,11 +25,19 @@ sub Generate($) {
         print $FHD "The following variables are in-scope for calculate_$name():\n";
         print $FHD "\n";
 
+        if ( keys %{$obj_hash->{$name}->{data}->{pub}} ) {
+            print $FHD "pub:\n";
+        }
+
         foreach $var ( keys %{$obj_hash->{$name}->{data}->{pub}} ) {
 
 #PreComp::Utilities::PrintSection( $FHD, $obj_hash->{$name}->{data}->{pub}, "    " );
 
             print $FHD "    $obj_hash->{$name}->{data}->{pub}->{$var} $name"."_$var\n";
+        }
+
+        if ( keys %{$obj_hash->{$name}->{data}->{static}} or keys %{$obj_hash->{$name}->{data}->{static_vec}} ) {
+            print $FHD "\nstatic:\n";
         }
 
         foreach $var ( keys %{$obj_hash->{$name}->{data}->{static}} ) {
@@ -38,14 +46,17 @@ sub Generate($) {
 
         }
 
-
         foreach $var ( keys %{$obj_hash->{$name}->{data}->{static_vec}} ) {
 
-            print $FHD "    $obj_hash->{$name}->{data}->{static_vec}->{$var}$name"."_$var\n";
+            print $FHD "    $obj_hash->{$name}->{data}->{static_vec}->{$var} $name"."_$var\n";
 
         }
 
         print $FHD "\n";
+
+        if ( keys %{$obj_hash->{$name}->{data}->{sub}} ) {
+            print $FHD "\nsub:\n";
+        }
 
         foreach $var ( keys %{$obj_hash->{$name}->{data}->{sub}} ) {
 
