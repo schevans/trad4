@@ -53,7 +53,7 @@ sub Generate($) {
 
     if ( %{$obj_hash->{data}->{static_vec}} ) {
 
-        print $FHD "void extra_loader( obj_loc_t obj_loc, int id, sqlite3* db );\n";
+        print $FHD "void $name"."_extra_loader( obj_loc_t obj_loc, int id, sqlite3* db );\n";
     }
 
     print $FHD "\n";
@@ -299,9 +299,9 @@ sub generate_loader($$)
         print $FHD "\n";
         print $FHD "    for ( int i = 0 ; i < MAX_OBJECTS+1 ; i++ )\n";
         print $FHD "    {\n";
-        print $FHD "        if ( obj_loc[i] && ((object_header*)obj_loc[i])->type == 1 && ((object_header*)obj_loc[i])->status == RELOADED)\n";
+        print $FHD "        if ( obj_loc[i] && ((object_header*)obj_loc[i])->type == $obj_hash->{type_num} && ((object_header*)obj_loc[i])->status == RELOADED)\n";
         print $FHD "        {\n";
-        print $FHD "            extra_loader( obj_loc, i, db );\n";
+        print $FHD "            $name"."_extra_loader( obj_loc, i, db );\n";
         print $FHD "        }\n";
         print $FHD "    }\n";
         print $FHD "\n";
