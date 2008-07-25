@@ -36,9 +36,17 @@ if( $opt_k ) {
     PreComp::Utilities::SetExitOnError( 0 );
 }
 
+
+my $struct_hash;
+
+if (  -f $ENV{APP_ROOT}."/defs/structures.t4s" ) {
+
+    $struct_hash = PreComp::Utilities::LoadStructures();
+}
+
 my $master_hash = PreComp::Utilities::LoadDefs();
 
-#print Dumper( $master_hash );
+#print Dumper( $struct_hash );
 
 my $type;
 
@@ -52,8 +60,8 @@ foreach $type ( keys %{$master_hash} ) {
 foreach $type ( keys %{$master_hash} ) {
 
     PreComp::Header::Generate( $master_hash->{$type} );
-    PreComp::Wrapper::Generate( $master_hash->{$type} );
-    PreComp::Sql::Generate( $master_hash, $type );
+    PreComp::Wrapper::Generate( $master_hash->{$type}, $struct_hash );
+    PreComp::Sql::Generate( $master_hash, $struct_hash, $type );
     PreComp::Calculate::Generate( $master_hash->{$type} );
 }
 

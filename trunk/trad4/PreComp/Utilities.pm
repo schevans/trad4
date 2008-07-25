@@ -129,7 +129,59 @@ sub CloseFile() {
     }
 }
 
+sub LoadStructures() {
+
+    open STRUCTURES_FILE, "$ENV{APP_ROOT}/defs/structures.t4s" or die "Can't open $ENV{APP_ROOT}/defs/structures.t4s for reading";
+
+    my %struct_hash;
+
+    my $line;
+    my $struct;
+    my $counter = 0;
+
+    my ( $type, $var );
+
+    while ( $line = <STRUCTURES_FILE> ) {
+
+        $counter = $counter+1;
+
+        chomp $line;
+
+        if ( !$line or $line =~ /#/ ) {
+            next;
+        }
+
+        if ( $line =~ /^[a-z]/ ) {
+
+            $struct = $line;
+
+print "Struct $struct\n";
+            next;
+        }
+
+        $line =~ s/^\s+//;
+        $line =~ s/\s+$//;
+
+        ( $type, $var ) = split / /, $line;
+
+        if ( !$type or !$var ) {
+
+            print "Error: Malformed structures.t4s file, line $counter.\n";
+            ExitOnError();
+        }
+
+        $struct_hash{$struct}{$var} = $type;
+
+    }
+
+    close STRUCTURES_FILE;
+
+    return \%struct_hash;
+}
+
 sub LoadDefs() {
+
+    my %master_hash;
 
     if ( ! -f $ENV{APP_ROOT}."/defs/object_types.t4s" ) {
 
@@ -138,8 +190,6 @@ sub LoadDefs() {
     }
 
     open TYPES_FILE, "$ENV{APP_ROOT}/defs/object_types.t4s" or die "Can't open $ENV{APP_ROOT}/defs/object_types.t4s for reading";
-
-    my %master_hash;
 
     while ( $line = <TYPES_FILE> ) {
 
@@ -238,11 +288,23 @@ sub LoadDef($) {
             $section = "static_vec";
         }
 
+        if ( $section =~ /static/ and not $var =~ /\[.*]/ ) {
+            $section = "static";
+        }
+
         $object_hash{$section}{$var} = $type;
     }
     close FILE;
 
     return \%object_hash;
+}
+
+sub HasStruct($$) {
+    my $master_hash = shift;
+    my $object = shift;
+
+
+
 }
 
 sub HasFeed($) {
