@@ -13,6 +13,7 @@ use PreComp::Sql;
 use PreComp::SqlCommon;
 use PreComp::Makefiles;
 use PreComp::Macros;
+use PreComp::Structures;
 
 sub usage();
 
@@ -46,7 +47,7 @@ if (  -f $ENV{APP_ROOT}."/defs/structures.t4s" ) {
 
 my $master_hash = PreComp::Utilities::LoadDefs();
 
-#print Dumper( $struct_hash );
+#print Dumper( $master_hash );
 
 my $type;
 
@@ -68,6 +69,7 @@ foreach $type ( keys %{$master_hash} ) {
 PreComp::Makefiles::Generate( $master_hash );
 PreComp::Macros::Generate( $master_hash );
 PreComp::SqlCommon::Generate( $master_hash );
+PreComp::Structures::Generate( $struct_hash );
 
 if ( ! -f "$ENV{APP_ROOT}/objects/main.c" ) {
 
