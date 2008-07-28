@@ -155,7 +155,6 @@ sub LoadStructures() {
 
             $struct = $line;
 
-print "Struct $struct\n";
             next;
         }
 
