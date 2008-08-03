@@ -177,6 +177,8 @@ sub Generate($$) {
 
             }
 
+        }
+
         print $FHD "\n";
         print $FHD "#endif\n";
         print $FHD "\n";
