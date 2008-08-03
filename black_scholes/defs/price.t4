@@ -3,7 +3,6 @@ sub
     int rho
     int bs_delta
     int stock
-    int rate_trade
     int option
 
 pub
