@@ -2,7 +2,7 @@
 
 # Copyright (c) Steve Evans 2007
 # steve@topaz.myzen.co.uk
-# This code is licenced under the BSD licence. For details see $INSTANCE_ROOT/LICENCE
+# This code is licenced under the BSD licence. For details see $APP_ROOT/LICENCE
 
 use warnings;
 use strict;
@@ -25,7 +25,7 @@ sub generate_rho();
 
 
 my $current_id = 20;
-my $dummy_data_root="$ENV{INSTANCE_ROOT}/data/stress_test";
+my $dummy_data_root="$ENV{APP_ROOT}/data/dummy_data";
 my @currencies = ( "null", "USD", "GBP", "EUR" );
 
 my @stock_ids;
@@ -42,7 +42,7 @@ my %option_kertn_d2;
 
 generate_risk_free_rate_feeds();
 generate_stock_feeds();
-generate_options( 100000 );
+generate_options( 10 );
 #generate_option_managers();
 generate_rate_trades();
 generate_stock_trades();
@@ -297,7 +297,7 @@ sub generate_options($) {
 sub generate_stock_feeds()
 {
 
-    open IN_FILE, "$ENV{INSTANCE_ROOT}/spreadsheets/FTSE250_Data.csv" or die "Can't open $ENV{INSTANCE_ROOT}/spreadsheets/FTSE250_Data.csv";
+    open IN_FILE, "$ENV{APP_ROOT}/spreadsheets/FTSE250_Data.csv" or die "Can't open $ENV{APP_ROOT}/spreadsheets/FTSE250_Data.csv";
 
     my ( $line, $id);
     my @line_array;
