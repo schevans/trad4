@@ -91,7 +91,7 @@ foreach $type ( keys %doing ) {
 }
 
 PreComp::Makefiles::Generate( $master_hash );
-PreComp::Macros::Generate( $master_hash );
+PreComp::Macros::Generate( $master_hash, $struct_hash );
 PreComp::SqlCommon::Generate( $master_hash );
 PreComp::Structures::Generate( $struct_hash );
 

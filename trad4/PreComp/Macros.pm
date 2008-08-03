@@ -8,8 +8,9 @@ use PreComp::Utilities;
 use PreComp::Constants;
 use Data::Dumper;
 
-sub Generate($) {
+sub Generate($$) {
     my $obj_hash = shift;
+    my $struct_hash = shift;
 
     foreach $name ( keys %{$obj_hash} ) {
 
@@ -46,9 +47,24 @@ sub Generate($) {
 
         }
 
-        foreach $var ( keys %{$obj_hash->{$name}->{data}->{static_vec}} ) {
+        foreach $static_vec_name ( keys %{$obj_hash->{$name}->{data}->{static_vec}} ) {
 
-            print $FHD "    $obj_hash->{$name}->{data}->{static_vec}->{$var} $name"."_$var\n";
+            $static_vec_type = $obj_hash->{$name}->{data}->{static_vec}->{$static_vec_name};
+
+            $static_vec_short = $static_vec_name;
+            $static_vec_short =~ s/\[.*\]//g;
+
+            if ( $struct_hash->{$static_vec_type} ) {
+
+                foreach $key ( keys %{$struct_hash->{$static_vec_type}} ) {
+
+                    print $FHD "    $struct_hash->{$static_vec_type}->{$key} $name"."_$static_vec_short"."_$key( index );\n";
+                }
+            }
+            else {
+                print $FHD "    $static_vec_type $name"."_$static_vec_short"."_$key( index );\n";
+            }
+
 
         }
 
@@ -101,16 +117,26 @@ sub Generate($) {
 
         }
 
+        foreach $static_vec_name ( keys %{$obj_hash->{$name}->{data}->{static_vec}} ) {
 
-        foreach $var ( keys %{$obj_hash->{$name}->{data}->{static_vec}} ) {
+            $static_vec_type = $obj_hash->{$name}->{data}->{static_vec}->{$static_vec_name};
 
-            $var =~ s/\[.*]$//;
+            $static_vec_short = $static_vec_name;
+            $static_vec_short =~ s/\[.*\]//g;
 
-            print $FHD "#define $name"."_$var (($name*)obj_loc[id])->$var\n";
+            if ( $struct_hash->{$static_vec_type} ) {
+
+                foreach $key ( keys %{$struct_hash->{$static_vec_type}} ) {
+
+                    print $FHD "#define $name"."_$static_vec_short"."_$key( index ) (($name*)obj_loc[id])->$static_vec_short\[index\].$key\n";
+                }
+            }
+            else {
+                print $FHD "Write me\n";
+            }
+
 
         }
-
-
 
         foreach $var ( keys %{$obj_hash->{$name}->{data}->{sub}} ) {
 
@@ -128,15 +154,28 @@ sub Generate($) {
                 print $FHD "#define $var"."_$var2 (($var*)obj_loc[(($name*)obj_loc[id])->$var])->$var2\n";
             }
 
-            foreach $var2 ( keys %{$obj_hash->{$var}->{data}->{static_vec}} ) {
+            foreach $static_vec_name ( keys %{$obj_hash->{$var}->{data}->{static_vec}} ) {
 
-                $var2 =~ s/\[.*]$//;
+                $static_vec_type = $obj_hash->{$var}->{data}->{static_vec}->{$static_vec_name};
 
-                print $FHD "#define $var"."_$var2 (($var*)obj_loc[(($name*)obj_loc[id])->$var])->$var2\n";
+                $static_vec_short = $static_vec_name;
+                $static_vec_short =~ s/\[.*\]//g;
+
+                print $FHD "#define $var"."_$static_vec_short (($var*)obj_loc[(($name*)obj_loc[id])->$var])->$static_vec_short\n";
+
+                if ( $struct_hash->{$static_vec_type} ) {
+
+                    foreach $key ( keys %{$struct_hash->{$static_vec_type}} ) {
+
+                        print $FHD "#define $var"."_$static_vec_short"."_$key( index ) $var"."_$static_vec_short\[index\].$key\n";
+                    }
+                }
+                else {
+                    print $FHD "Write me\n";
+                }
+
 
             }
-
-        }
 
         print $FHD "\n";
         print $FHD "#endif\n";
