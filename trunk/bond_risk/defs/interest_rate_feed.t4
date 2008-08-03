@@ -2,6 +2,5 @@
 # steve@topaz.myzen.co.uk
 
 static
-    int asof[INTEREST_RATE_LEN]
-    double rate[INTEREST_RATE_LEN]
+    rate rates[INTEREST_RATE_LEN]
 

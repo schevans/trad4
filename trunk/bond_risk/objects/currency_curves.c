@@ -23,15 +23,11 @@ void calculate_currency_curves( obj_loc_t obj_loc, int id )
 
     for ( int indx = 0; indx < INTEREST_RATE_LEN - 1 ; indx++)
     {
-        current_period_start = interest_rate_feed_asof[indx];
-        current_period_end = interest_rate_feed_asof[indx+1];
+        current_period_start = interest_rate_feed_rates_asof(indx);
+        current_period_end = interest_rate_feed_rates_asof(indx+1);
 
-// Hack
-if ( indx == 8 )
-    current_period_end = 20000;
-
-        gradient = ((  interest_rate_feed_rate[indx] -  interest_rate_feed_rate[indx+1] ) / (  interest_rate_feed_asof[indx] -  interest_rate_feed_asof[indx+1] ) );
-        y_intercept = interest_rate_feed_rate[indx] - gradient * interest_rate_feed_asof[indx];
+        gradient = ((  interest_rate_feed_rates_value(indx) -  interest_rate_feed_rates_value(indx+1) ) / (  interest_rate_feed_rates_asof(indx) -  interest_rate_feed_rates_asof(indx+1) ) );
+        y_intercept = interest_rate_feed_rates_value(indx) - gradient * interest_rate_feed_rates_asof(indx);
 
         for ( int i = current_period_start ; i <= current_period_end ; i++ )
         {

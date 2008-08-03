@@ -61,6 +61,6 @@ void calculate_bond( obj_loc_t obj_loc, int id )
     bond_price = ( price );
     bond_dv01 = ( price - price_01 );
 
-    //cout << "New bond price: " << price << ", dv01: " << ( price - price_01 ) << endl;
+    cout << "New bond price: " << price << ", dv01: " << ( price - price_01 ) << endl;
 }
 
