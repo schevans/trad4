@@ -1,7 +1,6 @@
 
-
 sub
-    int option_feed
+    int option
     int rate_trade
     int bs_delta
 

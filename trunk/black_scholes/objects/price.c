@@ -1,4 +1,7 @@
 
+// Please see the comment at the top of black_scholes/gen/objects/price_macros.c
+//  to see what's in-scope.
+
 #include <iostream>
 
 #include "price_wrapper.c"
@@ -7,17 +10,15 @@ using namespace std;
 
 void calculate_price( obj_loc_t obj_loc, int id )
 {
-    DEBUG( "calculate_price( " << id << ")" )
+    DEBUG( "calculate_price( " << id << " )" )
 
-    if ( option_feed_call_or_put == CALL )
+    if ( option_call_or_put == CALL )
     {
-        price_price = stock_feed_S * bs_delta_N_pd1 - kertn_d2_KerTN_pd2;
+        price_price = ( stock_S * bs_delta_N_pd1 ) - ( rate_trade_KerT * bs_delta_N_pd1 );
     }
     else
     {
-        price_price = kertn_d2_KerTN_md2 - stock_feed_S * bs_delta_N_md1;
+        price_price = ( rate_trade_KerT * bs_delta_N_md2 ) - ( stock_S * bs_delta_N_md1 );
     }
-
-    cout << "price_price: " << price_price << endl;
 }
 

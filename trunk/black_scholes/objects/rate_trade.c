@@ -1,4 +1,7 @@
 
+// Please see the comment at the top of black_scholes/gen/objects/rate_trade_macros.c
+//  to see what's in-scope.
+
 #include <iostream>
 #include <math.h>
 
@@ -8,12 +11,13 @@ using namespace std;
 
 void calculate_rate_trade( obj_loc_t obj_loc, int id )
 {
-    DEBUG( "calculate_rate_trade( " << id << ")" )
+    DEBUG( "calculate_rate_trade( " << id << " )" )
 
-    rate_trade_rT = risk_free_rate_feed_r * option_feed_T;
+    rate_trade_rT = risk_free_rate_r * option_T;
 
-    rate_trade_KerT = option_feed_T * exp( - rate_trade_rT );
+    rate_trade_KerT = option_T * exp( - rate_trade_rT );
 
-    rate_trade_rKerT = 0.0; //TODO 
+    rate_trade_rKerT = risk_free_rate_r * rate_trade_KerT;
+
 }
 

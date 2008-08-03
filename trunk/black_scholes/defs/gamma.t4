@@ -1,9 +1,9 @@
 
 sub
-    int option
     int bs_delta
+    int stock_trade
     int stock
 
 pub
-    double vega
+    double gamma
 

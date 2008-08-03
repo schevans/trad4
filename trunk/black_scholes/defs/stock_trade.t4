@@ -1,12 +1,10 @@
 
-
 sub
-    int option_feed
-    int stock_feed
+    int stock
+    int option
 
 pub
+    double ln_SK
     double vvT_2
     double vRtT
-    double ln_SK
-
 

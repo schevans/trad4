@@ -1,10 +1,11 @@
 
-
 sub
-    int option_feed
-    int risk_free_rate_feed
+    int option
+    int risk_free_rate
 
 pub
     double rT
     double KerT
-    double rKerT 
+    double rKerT
+
+

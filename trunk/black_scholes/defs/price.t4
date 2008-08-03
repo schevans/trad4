@@ -1,9 +1,10 @@
 
 sub
-    int kertn_d2
+    int rho
     int bs_delta
-    int stock_feed
-    int option_feed
+    int stock
+    int rate_trade
+    int option
 
 pub
     double price

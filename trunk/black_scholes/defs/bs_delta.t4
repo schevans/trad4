@@ -1,15 +1,14 @@
 
-
 sub
-    int rate_trade
     int stock_trade
-    int option_feed
+    int rate_trade
+    int option
 
 pub
-    double d1
-    double d2
     double N_pd1
     double N_pd2
-    double N_md2
     double N_md1
+    double N_md2
     double delta
+
+
