@@ -17,9 +17,11 @@ use PreComp::Structures;
 
 sub usage();
 
-our( $opt_h, $opt_k, $opt_c );
+my %opts;
 
-if ( ! getopts( 'hkc') ) {
+our( $opt_h, $opt_k, $opt_c, $opt_o );
+
+if ( ! getopts( 'hko:c', \%opts ) ) {
     usage();
 }
 
@@ -37,7 +39,6 @@ if( $opt_k ) {
     PreComp::Utilities::SetExitOnError( 0 );
 }
 
-
 my $struct_hash;
 
 if (  -f $ENV{APP_ROOT}."/defs/structures.t4s" ) {
@@ -47,18 +48,41 @@ if (  -f $ENV{APP_ROOT}."/defs/structures.t4s" ) {
 
 my $master_hash = PreComp::Utilities::LoadDefs();
 
+my %doing;
+
+if ( $opts{o} ) {
+
+    if ( $master_hash->{$opts{o}} ) {
+        $doing{$opts{o}} = 1;
+    }
+    else {
+    
+        print "Error: Type $opts{o} not found. Exiting.\n";
+        exit(1);
+    }
+}
+else {
+
+    my $key;
+
+    foreach $key ( keys %{$master_hash} ) {
+
+        $doing{$key} = 1;
+    }
+}
+
 #print Dumper( $master_hash );
 
 my $type;
 
-foreach $type ( keys %{$master_hash} ) {
+foreach $type ( keys %doing ) {
 
     if ( ! PreComp::Utilities::Validate( $master_hash, $type ) ) {
         PreComp::Utilities::ExitOnError();
     }
 }
 
-foreach $type ( keys %{$master_hash} ) {
+foreach $type ( keys %doing ) {
 
     PreComp::Header::Generate( $master_hash->{$type} );
     PreComp::Wrapper::Generate( $master_hash->{$type}, $struct_hash );
@@ -84,12 +108,12 @@ if ( ! -f "$ENV{APP_ROOT}/objects/main.c" ) {
 
 }
 
-
 sub usage() {
 
     print "Usage: precomp.pl [OPTION]\n";
     print "The trad4 precompiler.\n";
     print"\n";
+    print "  -o <object>    precompile <object> only\n";
     print "  -k             continue on error\n";
     print "  -c             remove all generated files\n";
     print "  -h             display this help and exit\n";
