@@ -98,8 +98,8 @@ sub Generate($$) {
 
         print $FHD "======================================================================*/\n";
         print $FHD "\n";
-        print $FHD "#ifndef __$name"."_marcos_h__\n";
-        print $FHD "#define __$name"."_marcos_h__\n";
+        print $FHD "#ifndef __$name"."_macros_h__\n";
+        print $FHD "#define __$name"."_macros_h__\n";
         print $FHD "\n";
 
         print $FHD "// $name macros\n";
