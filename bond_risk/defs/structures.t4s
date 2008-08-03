@@ -1,0 +1,4 @@
+
+rate
+    double value
+    int asof
