@@ -19,23 +19,21 @@ sub usage();
 
 my %opts;
 
-our( $opt_h, $opt_k, $opt_c, $opt_o );
-
-if ( ! getopts( 'hko:c', \%opts ) ) {
+if ( ! getopts( 'o:hck', \%opts ) ) {
     usage();
 }
 
-if ( $opt_c ) {
+if ( $opts{c} ) {
 
     PreComp::Utilities::Clean();
     exit 0;
 }
 
-if( $opt_h ) {
+if( $opts{h} ) {
     usage();
 }
 
-if( $opt_k ) {
+if( $opts{k} ) {
     PreComp::Utilities::SetExitOnError( 0 );
 }
 
