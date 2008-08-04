@@ -116,17 +116,17 @@ sub generate_table($) {
     print $FHD "create table $name (\n";
     print $FHD "    id int";
 
-    foreach $key ( keys %{$obj_hash->{data}->{static}} ) {
+    foreach $key ( @{$obj_hash->{data}->{static_order}} ) {
 
         print $FHD ",\n    $key ".PreComp::Utilities::Type2Sql($obj_hash->{data}->{static}->{$key});
     }
 
-    foreach $key ( keys %{$obj_hash->{data}->{feed_in}} ) {
+    foreach $key ( @{$obj_hash->{data}->{feed_in_order}} ) {
 
         print $FHD ",\n    $key ".PreComp::Utilities::Type2Sql($obj_hash->{data}->{static}->{$key});
     }
 
-    foreach $key ( keys %{$obj_hash->{data}->{sub}} ) {
+    foreach $key ( @{$obj_hash->{data}->{sub_order}} ) {
 
         print $FHD ",\n    $key ".PreComp::Utilities::Type2Sql($obj_hash->{data}->{sub}->{$key});
     }

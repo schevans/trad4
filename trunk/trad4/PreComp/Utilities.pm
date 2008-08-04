@@ -252,6 +252,8 @@ sub LoadDef($) {
     my $section;
     my $counter = 0;
 
+    my @order;
+
     my ( $type, $var );
 
     while ( $line = <FILE> ) {
@@ -270,10 +272,9 @@ sub LoadDef($) {
         if ( $line =~ /sub|pub|static|feed_in|feed_out/ ) {
 
             $section = $line;
-
+            @order = ();
             next;
         }
-
 
         ( $type, $var ) = split / /, $line;
 
@@ -292,7 +293,14 @@ sub LoadDef($) {
         }
 
         $object_hash{$section}{$var} = $type;
+        
+        push @order, $var;
+        $temp = $section."_order";
+
+        $object_hash{$temp} = [ @order ];
+
     }
+
     close FILE;
 
     return \%object_hash;
