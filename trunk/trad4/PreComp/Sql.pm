@@ -51,12 +51,12 @@ sub generate_dummy_data($$) {
     print $FHD "insert into object values ( $type_num, $type_num, \"$name"."_$type_num\", 0, 1 );\n";
     print $FHD "insert into $name values ( $type_num";
 
-    foreach $key ( keys %{$obj_hash->{data}->{static}} ) {
+    foreach $key ( @{$obj_hash->{data}->{static_order}} ) {
 
         print $FHD ", $PI";
     }
 
-    foreach $key ( keys %{$obj_hash->{data}->{sub}} ) {
+    foreach $key ( @{$obj_hash->{data}->{sub_order}} ) {
 
         print $FHD ", $master_hash->{$key}->{type_num}";
 

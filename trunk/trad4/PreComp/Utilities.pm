@@ -53,7 +53,7 @@ sub Validate($$) {
         if ( ! $master_hash->{$key} ) {
 
             print "Error: Type \'$name\' has a sub type \'$key\', which is not found in $ENV{APP_ROOT}/defs.\n";
-            return 0;
+            ExitOnError();
         }
     }
 
@@ -66,7 +66,7 @@ sub Validate($$) {
             if ( $master_hash->{$key}->{type_num} == $type_num ) {
 
                 print "Error: Types \'$name\' and \'$key\' share the same type_num \'$type_num\' in object_types.t4s.\n";
-                return 0;
+                ExitOnError();
             }
         }
     }
