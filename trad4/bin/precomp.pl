@@ -75,9 +75,7 @@ my $type;
 
 foreach $type ( keys %doing ) {
 
-    if ( ! PreComp::Utilities::Validate( $master_hash, $type ) ) {
-        PreComp::Utilities::ExitOnError();
-    }
+    PreComp::Utilities::Validate( $master_hash, $type );
 }
 
 foreach $type ( keys %doing ) {
