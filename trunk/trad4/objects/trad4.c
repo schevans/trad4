@@ -234,22 +234,25 @@ bool fire_object( int id )
 
     bool fired(false);
 
-    for ( int i=current_thread ; i <= num_threads ; i++ )
+    int num_threads_checked=0;
+
+    while ( ! fired && num_threads_checked < num_threads )
     {
-// Something broken here?
-        if ( thread_contoller[i] == 0 )
+        //cout << "current_thread: " << current_thread << std::endl;
+
+        if ( thread_contoller[current_thread] == 0 )
         {
             ((object_header*)obj_loc[id])->status = RUNNING;
-            thread_contoller[i] = id;
+            thread_contoller[current_thread] = id;
             fired = true;
-            num_threads_fired++;
-            break;
         }
 
         current_thread++;
 
         if ( current_thread > num_threads )
             current_thread=1;
+
+        num_threads_checked++;
     }
 
     return fired;
