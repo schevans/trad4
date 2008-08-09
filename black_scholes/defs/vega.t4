@@ -1,8 +1,8 @@
 
 sub
-    int option
     int bs_delta
     int stock
+    int option
 
 pub
     double vega

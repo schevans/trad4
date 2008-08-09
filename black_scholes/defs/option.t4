@@ -1,7 +1,7 @@
 
 static
-    double K
     double T
+    double K
     call_or_put_enum call_or_put
 
 pub

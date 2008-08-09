@@ -10,8 +10,6 @@ using namespace std;
 
 void calculate_rho( obj_loc_t obj_loc, int id )
 {
-    DEBUG( "calculate_rho( " << id << " )" )
-
     if ( option_call_or_put == CALL )
     {
         rho_rho = option_T * rate_trade_KerT * bs_delta_N_pd2;

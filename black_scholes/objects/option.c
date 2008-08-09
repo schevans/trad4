@@ -11,8 +11,6 @@ using namespace std;
 
 void calculate_option( obj_loc_t obj_loc, int id )
 {
-    DEBUG( "calculate_option( " << id << " )" )
-
     option_RtT = sqrt( option_T );
 }
 

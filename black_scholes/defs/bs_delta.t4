@@ -1,7 +1,7 @@
 
 sub
-    int stock_trade
     int rate_trade
+    int stock_trade
     int option
 
 pub
