@@ -54,14 +54,24 @@ void run_trad4() {
         object_type_struct[i] = 0;
     }
 
-    load_types( 1 );
-
     for ( int i=1 ; i < MAX_TIERS+1 ; i++ )
     {
         tier_manager[i][0]=1;
     }
 
+    load_types( 1 );
+
     load_objects( 1 );
+
+    cout << "Validating objects..." << endl;
+
+    for ( int i = 0 ; i < MAX_OBJECTS+1 ; i++ )
+    {
+        if ( obj_loc[i] )
+        {
+            ((object_type_struct[((object_header*)obj_loc[i])->type])->validate)( obj_loc, i );
+        }
+    }
 
     for ( int i = 0 ; i < MAX_OBJECTS+1 ; i++ )
     {
@@ -332,6 +342,7 @@ static int load_types_callback(void *NotUsed, int argc, char **row, char **azCol
     }
     else 
     {
+// Validate
         cout << "Reloading type " << name << ", id: " << obj_num << ", tier: " << atoi(row[2]) << endl;
 
         dlclose(object_type_struct[obj_num]->lib_handle);
@@ -339,6 +350,7 @@ static int load_types_callback(void *NotUsed, int argc, char **row, char **azCol
         object_type_struct[obj_num]->need_refresh = 0;
         object_type_struct[obj_num]->calculate = 0;
         object_type_struct[obj_num]->load_objects = 0;
+        object_type_struct[obj_num]->validate = 0;
     }
 
     ostringstream lib_name;
@@ -369,6 +381,12 @@ static int load_types_callback(void *NotUsed, int argc, char **row, char **azCol
     }
 
     object_type_struct[obj_num]->load_objects = (load_objects_fpointer)dlsym(object_type_struct[obj_num]->lib_handle, "load_objects");
+    if ((error = dlerror()) != NULL)  {
+        fputs(error, stderr);
+        exit(1);
+    }
+
+    object_type_struct[obj_num]->validate = (validate_fpointer)dlsym(object_type_struct[obj_num]->lib_handle, "validate");
     if ((error = dlerror()) != NULL)  {
         fputs(error, stderr);
         exit(1);

@@ -81,7 +81,7 @@ foreach $type ( keys %doing ) {
 foreach $type ( keys %doing ) {
 
     PreComp::Header::Generate( $master_hash->{$type} );
-    PreComp::Wrapper::Generate( $master_hash->{$type}, $struct_hash );
+    PreComp::Wrapper::Generate( $master_hash, $type, $struct_hash );
     PreComp::Sql::Generate( $master_hash, $struct_hash, $type );
     PreComp::Calculate::Generate( $master_hash->{$type} );
 }

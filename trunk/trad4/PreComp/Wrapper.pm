@@ -8,6 +8,7 @@ use PreComp::Utilities;
 use PreComp::Constants;
 use Data::Dumper;
 
+sub generate_validator($$$);
 sub generate_loader($$);
 sub generate_constructor($$);
 sub generate_calculate($$);
@@ -16,11 +17,12 @@ sub generate_loader_callback($$);
 
 sub generate_extra_loaders($$$);
 
-sub Generate($$) {
-    my $obj_hash = shift;
+sub Generate($$$) {
+    my $master_hash = shift;
+    my $name = shift;
     my $struct_hash = shift;
 
-    my $name = $obj_hash->{name};
+    my $obj_hash = $master_hash->{$name};
 
     my @header = PreComp::Constants::CommomHeader();
 
@@ -76,6 +78,9 @@ sub Generate($$) {
     generate_need_refresh( $obj_hash, $FHD );
     print $FHD "\n";
 
+    generate_validator( $master_hash, $name, $FHD );
+    print $FHD "\n";
+
     generate_loader_callback( $obj_hash, $FHD );
     print $FHD "\n";
 
@@ -114,6 +119,43 @@ sub generate_calculate($$)
     print $FHD "\n";
     print $FHD "}\n";
 
+}
+
+sub generate_validator($$$)
+{
+    my $master_hash = shift;
+    my $name = shift;
+    my $FHD = shift;
+
+    my $obj_hash = $master_hash->{$name};
+
+    print $FHD "extern \"C\" int validate( obj_loc_t obj_loc, int id )\n";
+    print $FHD "{\n";
+    print $FHD "    int retval=0;\n";
+    print $FHD "\n";
+
+    foreach $key ( keys %{$obj_hash->{data}->{sub}} ) {
+
+        print $FHD "    if ( ! obj_loc[(($name*)obj_loc[id])->$key] )\n";
+        print $FHD "    {\n";
+        print $FHD "        cout << \"Error: Type $name, id \" << id << \" failed validation because a sub object $key, id \" << (($name*)obj_loc[id])->$key << \" does not exist.\" << endl;\n";
+        print $FHD "        exit(0);\n";
+        print $FHD "    }\n";
+        print $FHD "\n";
+        print $FHD "    if ( ((object_header*)obj_loc[(($name*)obj_loc[id])->$key])->type != $master_hash->{$key}->{type_num} )\n";
+        print $FHD "    {\n";
+        print $FHD "        cout << \"Error: Type $name, id \" << id << \" failed validation because a sub object $key, id \" << (($name*)obj_loc[id])->$key << \" is not of type $master_hash->{$key}->{type_num}.\" << endl;\n";
+        print $FHD "        exit(0);\n";
+        print $FHD "    }\n";
+        print $FHD "\n";
+
+
+    }
+#    if ( $has_feed eq "in" ) {
+
+    print $FHD "    return retval;\n";
+    print $FHD "\n";
+    print $FHD "}\n";
 }
 
 sub generate_need_refresh($$)
