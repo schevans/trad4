@@ -22,6 +22,7 @@ typedef int tier_manager_t[MAX_TIERS+1][MAX_OBJECTS+1];
 typedef void (*calculate_fpointer)( obj_loc_t obj_loc, int id );
 typedef int (*need_refresh_fpointer)( obj_loc_t obj_loc, int id );
 typedef void (*load_objects_fpointer)( obj_loc_t obj_loc, int initial_load );
+typedef int (*validate_fpointer)( obj_loc_t obj_loc, int initial_load );
 
 void run_trad4();
 
@@ -31,6 +32,7 @@ typedef struct {
     need_refresh_fpointer need_refresh;
     load_objects_fpointer load_objects;
     void* constructor_fpointer; // Not used in beta.
+    validate_fpointer validate;
 } object_type_struct_t;
 
 
