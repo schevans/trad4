@@ -10,6 +10,6 @@ using namespace std;
 
 void calculate_risk_free_rate( obj_loc_t obj_loc, int id )
 {
-    DEBUG( "calculate_risk_free_rate( " << id << " )" )
+    // Does nothing.
 }
 

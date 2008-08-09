@@ -9,71 +9,51 @@
 
 using namespace std;
 
-double ndf(double t);
-double nc(double x);
+double CumeNormDist(const double x);
 
 void calculate_bs_delta( obj_loc_t obj_loc, int id )
 {
-    DEBUG( "calculate_bs_delta( " << id << " )" )
-
-cout << "rate_trade_rT: " << rate_trade_rT << endl;
-cout << "stock_trade_ln_SK: " << stock_trade_ln_SK << endl;
-cout << "stock_trade_vRtT: " << stock_trade_vRtT << endl;
-cout << "stock_trade_vvT_2: " << stock_trade_vvT_2 << endl;
-
     double d1 =  ( stock_trade_ln_SK + rate_trade_rT  + stock_trade_vvT_2 ) / stock_trade_vRtT;
-
-cout << "d1: " << d1 << endl;
 
     double d2 = d1 - stock_trade_vRtT;
 
-    bs_delta_N_pd1 = ndf( d1 );
+    bs_delta_N_pd1 = CumeNormDist( d1 );
 
-    bs_delta_N_pd2 = ndf( d2 );
+    bs_delta_N_pd2 = CumeNormDist( d2 );
 
-    bs_delta_N_md1 = ndf( - d1 );
+    bs_delta_N_md1 = CumeNormDist( - d1 );
 
-    bs_delta_N_md2 = ndf( - d2 );
+    bs_delta_N_md2 = CumeNormDist( - d2 );
 
     if ( option_call_or_put == CALL )
     {
-cout << "Call" << endl;
         bs_delta_delta = bs_delta_N_pd1;
     }
     else
     {
-cout << "Put" << endl;
         bs_delta_delta = bs_delta_N_pd1 - 1.0;
     }
-
-std::cout << "delta: " << bs_delta_delta << std::endl;
-
 }
 
-double ndf(double t)
+double CumeNormDist(const double x)
 {
-    return 0.398942280401433*exp(-t*t/2);
-}
+  const double b1 =  0.319381530;
+  const double b2 = -0.356563782;
+  const double b3 =  1.781477937;
+  const double b4 = -1.821255978;
+  const double b5 =  1.330274429;
+  const double p  =  0.2316419;
+  const double c  =  0.39894228;
 
-double nc(double x)
-{
-    double result;
-
-    if (x<-7.)
-        result = ndf(x)/sqrt(1.+x*x);
-    else if (x>7.)
-        result = 1. - nc(-x);
-    else
-    {
-        result = 0.2316419;
-        static double a[5] = {0.31938153,-0.356563782,1.781477937,-1.821255978,1.330274429};
-        result=1./(1+result*fabs(x));
-        result=1-ndf(x)*(result*(a[0]+result*(a[1]+result*(a[2]+result*(a[3]+result*a[4])))));
-
-        if (x<=0.)
-            result=1.-result;
+  if(x >= 0.0) {
+      double t = 1.0 / ( 1.0 + p * x );
+      return (1.0 - c * exp( -x * x / 2.0 ) * t *
+      ( t *( t * ( t * ( t * b5 + b4 ) + b3 ) + b2 ) + b1 ));
+  }
+  else {
+      double t = 1.0 / ( 1.0 - p * x );
+      return ( c * exp( -x * x / 2.0 ) * t *
+      ( t *( t * ( t * ( t * b5 + b4 ) + b3 ) + b2 ) + b1 ));
     }
-
-    return result;
 }
 
