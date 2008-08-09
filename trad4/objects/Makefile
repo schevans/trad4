@@ -20,5 +20,5 @@ sqlite3.o : sqlite3.c
 	gcc -c sqlite3.c -o sqlite3.o
 
 clean : 
-	rm -f libtrad4.so trad4.o sqlite3.o $(APP_ROOT)/lib/libtrad4.so
+	rm -f libtrad4.so trad4.o $(APP_ROOT)/lib/libtrad4.so
 
