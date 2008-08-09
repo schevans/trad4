@@ -10,9 +10,6 @@ using namespace std;
 
 void calculate_theta( obj_loc_t obj_loc, int id )
 {
-
-cout << "rate_trade_rKerT * bs_delta_N_pd2: " << rate_trade_rKerT * bs_delta_N_pd2  << endl;
-
     if ( option_call_or_put == CALL )
     {
         theta_theta = (( - stock_S * bs_delta_N_pd1 * stock_v ) / ( 2.0 * option_RtT )) - ( rate_trade_rKerT * bs_delta_N_pd2 );
