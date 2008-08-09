@@ -11,7 +11,7 @@ use Data::Dumper;
 sub generate_validator($$$);
 sub generate_loader($$);
 sub generate_constructor($$);
-sub generate_calculate($$);
+sub generate_calculate($$$);
 sub generate_need_refresh($$);
 sub generate_loader_callback($$);
 
@@ -72,7 +72,7 @@ sub Generate($$$) {
     generate_constructor( $obj_hash, $FHD );
     print $FHD "\n";
 
-    generate_calculate( $obj_hash, $FHD );
+    generate_calculate( $master_hash, $name, $FHD );
     print $FHD "\n";
 
     generate_need_refresh( $obj_hash, $FHD );
@@ -108,14 +108,53 @@ sub generate_constructor($$)
     print $FHD "}\n";
 }
 
-sub generate_calculate($$)
+sub generate_calculate($$$)
 {
-    my $obj_hash = shift;
+    my $master_hash = shift;
+    my $name = shift;
     my $FHD = shift;
+
+    my $obj_hash = $master_hash->{$name};
 
     print $FHD "extern \"C\" void calculate( obj_loc_t obj_loc, int id )\n";
     print $FHD "{\n";
+    print $FHD "    DEBUG( \"calculate_$obj_hash->{name}( \" << id << \" )\" );\n";
+    print $FHD "\n";
+    print $FHD "    DEBUG_FINE( \"Static:\" );\n";
+
+    foreach $key ( @{$obj_hash->{data}->{static_order}} ) {
+
+        print $FHD "    DEBUG_FINE( \"\\t$obj_hash->{name}_$key: \" << $obj_hash->{name}_$key );\n";
+
+    }
+
+    print $FHD "\n";
+
+    foreach $key ( @{$obj_hash->{data}->{sub_order}} ) {
+
+        print $FHD "    DEBUG_FINE( \"$key:\" );\n";
+
+        foreach $key2 ( @{$master_hash->{$key}->{data}->{pub_order}} ) {
+
+            print $FHD "    DEBUG_FINE( \"\\t$key"."_$key2: \" << $key"."_$key2 );\n";
+        }
+
+        foreach $key2 ( @{$master_hash->{$key}->{data}->{static_order}} ) {
+
+            print $FHD "    DEBUG_FINE( \"\\t$key"."_$key2: \" << $key"."_$key2 );\n";
+        }
+    }
+
+    print $FHD "\n";
     print $FHD "    calculate_$obj_hash->{name}( obj_loc, id );\n";
+    print $FHD "\n";
+    print $FHD "    DEBUG_FINE( \"Pub:\");\n";
+
+    foreach $key ( @{$obj_hash->{data}->{pub_order}} ) {
+
+        print $FHD "    DEBUG( \"\\t$obj_hash->{name}_$key: \" << $obj_hash->{name}_$key );\n";
+
+    }
     print $FHD "\n";
     print $FHD "}\n";
 
