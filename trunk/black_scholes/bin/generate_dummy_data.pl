@@ -5,23 +5,21 @@
 # This code is licenced under the BSD licence. For details see $APP_ROOT/LICENCE
 
 use warnings;
-use strict;
 
 sub get_next_id();
 sub open_file($);
 
-sub generate_risk_free_rate_feeds();
-sub generate_stock_feeds();
+sub generate_risk_free_rates();
+sub generate_stocks();
 sub generate_options($);
-sub generate_option_managers();
 sub generate_rate_trades();
 sub generate_stock_trades();
 sub generate_bs_delta();
-sub generate_kertn_d2();
 sub generate_vega();
 sub generate_theta();
 sub generate_price();
 sub generate_rho();
+sub generate_gamma();
 
 
 my $current_id = 20;
@@ -38,43 +36,20 @@ my %option_name;
 my %option_stock_trade;
 my %option_rate_trade;
 my %option_bs_delta;
-my %option_kertn_d2;
+my %option_rho;
 
-generate_risk_free_rate_feeds();
-generate_stock_feeds();
-generate_options( 10 );
-#generate_option_managers();
+generate_risk_free_rates();
+generate_stocks();
+generate_options( 100000 );
 generate_rate_trades();
 generate_stock_trades();
 generate_bs_delta();
-generate_kertn_d2();
 generate_vega();
 generate_theta();
-generate_price();
+#generate_price();
 generate_rho();
-
-sub generate_rho() {
-
-    my $FILE = open_file( "rho" );
-
-    print $FILE "delete from rho;\n";
-
-    my ( $option, $id );
-
-    foreach $option ( @option_ids ) {
-
-        $id = get_next_id();
-
-        print $FILE "insert into object values ( $id, 11, \"$option_name{$option}_rho\", 0, 0 );\n";
-
-        print $FILE "insert into rho values ( $id, $option, $option_rate_trade{$option}, $option_bs_delta{$option} );\n";
-
-
-    }
-
-    close $FILE;
-}
-
+generate_gamma();
+generate_price();
 
 sub generate_price() {
 
@@ -88,15 +63,63 @@ sub generate_price() {
 
         $id = get_next_id();
 
-        print $FILE "insert into object values ( $id, 10, \"$option_name{$option}_price\", 0, 0 );\n";
+        print $FILE "insert into object values ( $id, 11, \"$option_name{$option}_price\", 0, 0 );\n";
 
-        print $FILE "insert into price values ( $id, $option_kertn_d2{$option}, $option_bs_delta{$option}, $option_stock_ids{$option}, $option );\n";
+        print $FILE "insert into price values ( $id, $option_bs_delta{$option}, $option_stock_ids{$option}, $option, $option_rate_trade{$option} );\n";
 
 
     }
 
     close $FILE;
 }
+
+
+sub generate_gamma() {
+
+    my $FILE = open_file( "gamma" );
+
+    print $FILE "delete from gamma;\n";
+
+    my ( $option, $id );
+
+    foreach $option ( @option_ids ) {
+
+        $id = get_next_id();
+
+        print $FILE "insert into object values ( $id, 10, \"$option_name{$option}_gamma\", 0, 0 );\n";
+
+        print $FILE "insert into gamma values ( $id, $option_bs_delta{$option}, $option_stock_trade{$option}, $option_stock_ids{$option} );\n";
+
+
+    }
+
+    close $FILE;
+}
+
+sub generate_rho() {
+
+    my $FILE = open_file( "rho" );
+
+    print $FILE "delete from rho;\n";
+
+    my ( $option, $id );
+
+    foreach $option ( @option_ids ) {
+
+        $id = get_next_id();
+
+        print $FILE "insert into object values ( $id, 8, \"$option_name{$option}_rho\", 0, 0 );\n";
+
+        print $FILE "insert into rho values ( $id, $option, $option_rate_trade{$option}, $option_bs_delta{$option} );\n";
+
+        $option_rho{$option} = $id;
+
+    }
+
+    close $FILE;
+}
+
+
 
 sub generate_theta() {
 
@@ -110,9 +133,9 @@ sub generate_theta() {
 
         $id = get_next_id();
 
-        print $FILE "insert into object values ( $id, 9, \"$option_name{$option}_theta\", 0, 0 );\n";
+        print $FILE "insert into object values ( $id, 7, \"$option_name{$option}_theta\", 0, 0 );\n";
 
-        print $FILE "insert into theta values ( $id, $option, $option_rate_trade{$option}, $option_stock_ids{$option}, $option_bs_delta{$option} );\n";
+        print $FILE "insert into theta values ( $id, $option, $option_stock_ids{$option}, $option_rate_trade{$option}, $option_bs_delta{$option} );\n";
 
 
     }
@@ -134,7 +157,7 @@ sub generate_vega() {
 
         $id = get_next_id();
 
-        print $FILE "insert into object values ( $id, 8, \"$option_name{$option}_vega\", 0, 0 );\n";
+        print $FILE "insert into object values ( $id, 9, \"$option_name{$option}_vega\", 0, 0 );\n";
 
         print $FILE "insert into vega values ( $id, $option_bs_delta{$option}, $option_stock_ids{$option}, $option );\n";
 
@@ -146,31 +169,6 @@ sub generate_vega() {
 
 }
 
-
-sub generate_kertn_d2() {
-
-    my $FILE = open_file( "kertn_d2" );
-
-    print $FILE "delete from kertn_d2;\n";
-
-    my ( $option, $id );
-
-    foreach $option ( @option_ids ) {
-
-        $id = get_next_id();
-
-        print $FILE "insert into object values ( $id, 7, \"$option_name{$option}_KE\", 0, 0 );\n";
-
-        print $FILE "insert into kertn_d2 values ( $id, $option_rate_trade{$option}, $option_bs_delta{$option} );\n";
-
-        $option_kertn_d2{$option} = $id;
-
-    }
-
-
-    close $FILE;
-
-}
 
 sub generate_bs_delta() {
 
@@ -249,11 +247,11 @@ sub generate_rate_trades() {
 sub generate_options($) {
     my $num_options = shift;
 
-    my ( $id, $FILE, $name, $stock_id, $stock_price, $risk_free_rate, $time_to_maturity, $strike_price, $mult, $call_or_put  );
+    my ( $id, $FILE, $risk_free_rate, $stock_id, $name, $time_to_maturity, $stock_price, $strike_price, $mult, $call_or_put  );
 
-    $FILE = open_file( "option_feed" );
+    $FILE = open_file( "option" );
 
-    print $FILE "delete from option_feed;\n";
+    print $FILE "delete from option;\n";
 
 
     while ( $num_options > 0 ) {
@@ -282,7 +280,7 @@ sub generate_options($) {
 
         print $FILE "insert into object values ( $id, 1, \"$name\", 0, 0 );\n";
 
-        print $FILE "insert into option_feed values ( $id, $time_to_maturity, $strike_price, $call_or_put );\n";
+        print $FILE "insert into option values ( $id, $time_to_maturity, $strike_price, $call_or_put );\n";
         $option_name{$id} = $name;
         push @option_ids, $id;
         $option_stock_ids{$id} = $stock_id;
@@ -294,7 +292,7 @@ sub generate_options($) {
 
 }
 
-sub generate_stock_feeds()
+sub generate_stocks()
 {
 
     open IN_FILE, "$ENV{APP_ROOT}/spreadsheets/FTSE250_Data.csv" or die "Can't open $ENV{APP_ROOT}/spreadsheets/FTSE250_Data.csv";
@@ -303,9 +301,9 @@ sub generate_stock_feeds()
     my @line_array;
     my $FILE;
 
-    $FILE = open_file( "stock_feed" );
+    $FILE = open_file( "stock" );
 
-    print $FILE "delete from stock_feed;\n";
+    print $FILE "delete from stock;\n";
 
     while ( $line = <IN_FILE> ) {
 
@@ -315,8 +313,8 @@ sub generate_stock_feeds()
         
         $id = get_next_id();
 
-        print $FILE "insert into object values ( $id, 3, \"$line_array[0]\", 0, 0 );\n";
-        print $FILE "insert into stock_feed values ( $id, $line_array[2], $line_array[3] );\n";
+        print $FILE "insert into object values ( $id, 3, \"$line_array[0]\", 0, 1 );\n";
+        print $FILE "insert into stock values ( $id, $line_array[2], $line_array[3] );\n";
 
         push @stock_ids, $id;
 
@@ -327,22 +325,22 @@ sub generate_stock_feeds()
 
 }
 
-sub generate_risk_free_rate_feeds() {
+sub generate_risk_free_rates() {
 
     my $FILE;
 
-    $FILE = open_file( "risk_free_rate_feed" );
+    $FILE = open_file( "risk_free_rate" );
 
-    print $FILE "delete from risk_free_rate_feed;\n";
+    print $FILE "delete from risk_free_rate;\n";
 
-    print $FILE "insert into object values ( 1, 2, \"RFR-USD\", 0, 0 );\n";
-    print $FILE "insert into risk_free_rate_feed values ( 1, 0.035 );\n";
+    print $FILE "insert into object values ( 1, 2, \"RFR-USD\", 0, 1 );\n";
+    print $FILE "insert into risk_free_rate values ( 1, 0.035 );\n";
 
-    print $FILE "insert into object values ( 2, 2, \"RFR-GBP\", 0, 0 );\n";
-    print $FILE "insert into risk_free_rate_feed values ( 2, 0.045 );\n";
+    print $FILE "insert into object values ( 2, 2, \"RFR-GBP\", 0, 1 );\n";
+    print $FILE "insert into risk_free_rate values ( 2, 0.045 );\n";
 
-    print $FILE "insert into object values ( 3, 2, \"RFR-EUR\", 0, 0 );\n";
-    print $FILE "insert into risk_free_rate_feed values ( 3, 0.0475 );\n";
+    print $FILE "insert into object values ( 3, 2, \"RFR-EUR\", 0, 1 );\n";
+    print $FILE "insert into risk_free_rate values ( 3, 0.0475 );\n";
 
     close $FILE;
 
