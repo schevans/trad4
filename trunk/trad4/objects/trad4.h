@@ -39,9 +39,11 @@ typedef struct {
 #ifdef DEBUG_ON
 #define DEBUG( debug ) if ( ((object_header*)obj_loc[id])->log_level > 0 ) std::cout << debug << std::endl;
 #define DEBUG_FINE( debug ) if ( ((object_header*)obj_loc[id])->log_level > 1 ) std::cout << debug << std::endl;
+#define DEBUG_LOADS( debug ) if ( ((object_header*)obj_loc[id])->log_level > 2 ) std::cout << debug << std::endl;
 #else
 #define DEBUG( debug )
 #define DEBUG_FINE( debug )
+#define DEBUG_LOADS( debug )
 #endif
 
 enum logging_level {
