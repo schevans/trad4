@@ -207,7 +207,16 @@ sub generate_need_refresh($$)
     print $FHD "extern \"C\" int need_refresh( obj_loc_t obj_loc, int id )\n";
     print $FHD "{\n";
 
-    print $FHD "    DEBUG_FINE( \"$name"."_need_refresh( \" << id << \")\" )\n";
+    print $FHD "    DEBUG_LOADS( \"$name"."_need_refresh( \" << id << \")\" );\n";
+
+    print $FHD "\n";
+    print $FHD "    DEBUG_LOADS( \"\t$name timestamp: \" <<  *(int*)obj_loc[id] );\n";
+    print $FHD "    DEBUG_LOADS( \"\t$name state: \" << ((object_header*)obj_loc[id])->status );\n";
+
+    foreach $key ( keys %{$obj_hash->{data}->{sub}} ) {
+
+        print $FHD "    DEBUG_LOADS( \"\t\t$key timestamp: \" << *(int*)obj_loc[(($name*)obj_loc[id])->$key] );\n";
+    }
 
     print $FHD "\n";
     print $FHD "    int retval = ( (((object_header*)obj_loc[id])->status == RELOADED ) || ";
@@ -228,6 +237,8 @@ sub generate_need_refresh($$)
     }
     print $FHD " 0 ));\n";
 
+    print $FHD "\n";
+    print $FHD "    DEBUG_LOADS( \"\treturning: \" << retval )\n";
     print $FHD "\n";
     print $FHD "    return retval;\n";
     print $FHD "\n";
@@ -264,10 +275,7 @@ sub generate_loader_callback($$)
     print $FHD "    (($name*)obj_loc[id])->log_level = atoi(row[3]);\n";
     print $FHD "    (($name*)obj_loc[id])->last_published = 0;\n";
     print $FHD "\n";
-    print $FHD "    if ( is_new )\n";
-    print $FHD "        (($name*)obj_loc[id])->status = STOPPED;\n";
-    print $FHD "    else\n";
-    print $FHD "        (($name*)obj_loc[id])->status = RELOADED;\n";
+    print $FHD "    (($name*)obj_loc[id])->status = RELOADED;\n";
     print $FHD "\n";
     print $FHD "    //(($name*)obj_loc[id])->calculator_fpointer = &calculate_$name"."_wrapper;\n";
     print $FHD "    //(($name*)obj_loc[id])->need_refresh_fpointer = &$name"."_need_refresh;\n";

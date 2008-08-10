@@ -28,6 +28,7 @@ int num_threads(MAX_THREADS);   // Will be dynamic.
 int current_thread(1);
 int num_threads_fired(0);
 bool need_reload(false);
+void set_timestamp( obj_loc_t obj_loc, int id );
 
 bool fire_object( int id );
 void* thread_loop( void* thread_id );
@@ -63,6 +64,22 @@ void run_trad4() {
 
     load_objects( 1 );
 
+    for ( int i = 0 ; i < MAX_OBJECTS+1 ; i++ )
+    {
+        if ( obj_loc[i] )
+        {
+            tier_manager[((object_header*)obj_loc[i])->tier][tier_manager[((object_header*)obj_loc[i])->tier][0]] = i;
+            tier_manager[((object_header*)obj_loc[i])->tier][0]++;
+        }
+    }
+
+    cout << endl;
+
+    for ( int tier=1 ; tier <= num_tiers ; tier++ )
+    {
+        std::cout << "Checking tier " << tier << ". Num objs this tier: " << tier_manager[tier][0] - 1 << std::endl; 
+    }
+
     cout << "Validating objects..." << endl;
 
     for ( int i = 0 ; i < MAX_OBJECTS+1 ; i++ )
@@ -73,33 +90,9 @@ void run_trad4() {
         }
     }
 
-    for ( int i = 0 ; i < MAX_OBJECTS+1 ; i++ )
-    {
-        if ( obj_loc[i] )
-        {
-            tier_manager[((object_header*)obj_loc[i])->tier][tier_manager[((object_header*)obj_loc[i])->tier][0]] = i;
-            tier_manager[((object_header*)obj_loc[i])->tier][0]++;
-        }
-    }
-
     start_threads();
 
     sleep(1);
-
-    cout << endl;
-
-    for ( int tier=1 ; tier <= num_tiers ; tier++ )
-    {
-        std::cout << "Checking tier " << tier << ". Num objs this tier: " << tier_manager[tier][0] - 1 << std::endl; 
-    }
-
-    if ( 1 ) 
-    {
-        cout << endl << "Forcing reload.." << endl << endl;
-        sleep(1);
-
-        load_objects( 0 );
-    }
 
     double start_time;
     double end_time;
@@ -428,6 +421,9 @@ void load_objects( int initial_load )
 {
     std::ostringstream dbstream;
     dbstream << "select type_id, tier from object_types";
+
+    if ( initial_load != 1 )
+        dbstream << " where need_reload=1";
 
     if( sqlite3_exec(db, dbstream.str().c_str(), load_objects_callback, (void*)&initial_load, &zErrMsg) != SQLITE_OK ){
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
