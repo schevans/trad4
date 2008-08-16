@@ -11,8 +11,6 @@ using namespace std;
 
 void calculate_currency_curves( obj_loc_t obj_loc, int id )
 {
-   //cout << "calculate_currency_curves()" << endl; 
-
     int current_period_start;
     int current_period_end;
 
@@ -39,13 +37,13 @@ void calculate_currency_curves( obj_loc_t obj_loc, int id )
     
     // Then calc the discount rates..
 
-    for ( int i = 0 ; i < DATE_RANGE_LEN ; i++ )
+    for ( int i = 0 ; i <= DATE_RANGE_LEN ; i++ )
     {
-        //cout << "Libor: " << pub_currency_curves->interest_rate_interpol[i] << ", Disco: " << exp( -pub_currency_curves->interest_rate_interpol[i] * (( i / YEAR_BASIS)/ YEAR_BASIS ) ) << " Year frac: " << ( i/ YEAR_BASIS ) << endl;
-
         currency_curves_discount_rate[i] = exp( -currency_curves_interest_rate_interpol[i] * (( i / YEAR_BASIS)/ YEAR_BASIS ) );
 
         currency_curves_discount_rate_01[i] = exp( -(currency_curves_interest_rate_interpol[i] -0.0001) * (( i / YEAR_BASIS)/ YEAR_BASIS ) );
+
+        //cout << "currency_curves_discount_rate[ " << i << "]: " << currency_curves_discount_rate[i] << endl;
     }
 
 }

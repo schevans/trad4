@@ -11,12 +11,6 @@ using namespace std;
 
 void calculate_repo_trade( obj_loc_t obj_loc, int id )
 {
-    //cout << "calculate_repo_trade()" << endl;
-
-//cout << "_cash: " << _cash << ", _notional: " << _notional << ", sub_bond->price: " <<sub_bond->price/100.0 << endl;
-
-//cout << "margin: " << _cash - ( _notional * ( sub_bond->price / 100.0 )) << endl;
-
     repo_trade_margin = repo_trade_cash - ( repo_trade_notional * ( bond_price / 100.0 ));
 
     int duration = repo_trade_end_date - TODAY;
