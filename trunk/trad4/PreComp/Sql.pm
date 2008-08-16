@@ -35,7 +35,7 @@ sub Generate($$$) {
 sub generate_dummy_data($$) {
     my $master_hash = shift;
     my $name = shift;
-    
+   
     my $obj_hash = $master_hash->{$name};
 
     my $PI = 3.14;
@@ -162,7 +162,6 @@ sub generate_vec_dummy_data($$$) {
         my $FHD = PreComp::Utilities::OpenFile( $ENV{APP_ROOT}."/data/default_set/"."$name.sql" );
 
         print $FHD "delete from $name;\n";
-        print $FHD "insert into object values ( $type_num, $type_num, \"$name"."_$type_num\", 0, 1 );\n";
         print $FHD "insert into $name values ( $type_num";
 
         if ( $struct_hash->{$static_vec_type} ) {
