@@ -12,7 +12,7 @@ case $SUFFIX in
 esac
 
 
-echo "drop $TYPE $PREFIX;" | $SQLITE $TRAD4_DB > /dev/null 2>&1
+echo "drop $TYPE $PREFIX;" | $SQLITE $APP_DB > /dev/null 2>&1
 
 $TRAD4_BIN/runsql $FILE
 

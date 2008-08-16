@@ -2,6 +2,6 @@
 
 FILE=$1
 
-$SQLITE $TRAD4_DB < $FILE
+$SQLITE $APP_DB < $FILE
 
 

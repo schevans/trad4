@@ -43,7 +43,11 @@ void run_trad4() {
 
     signal(SIGUSR1, reload_handler);
 
-    sqlite3_open(getenv("TRAD4_DB"), &db);
+    if ( sqlite3_open(getenv("APP_DB"), &db) != SQLITE_OK )
+    {
+        cout << "Unable to open " << getenv("APP_DB") << endl;
+        exit(1);
+    }
 
     for ( int i = 0 ; i < MAX_OBJECTS+1 ; i++ )
     {
@@ -148,7 +152,6 @@ void run_trad4() {
     
             load_objects( 0 );
         }
-
     }
 }
 
