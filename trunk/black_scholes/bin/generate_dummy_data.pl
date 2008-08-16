@@ -40,7 +40,7 @@ my %option_rho;
 
 generate_risk_free_rates();
 generate_stocks();
-generate_options( 100000 );
+generate_options( 110000 );
 generate_rate_trades();
 generate_stock_trades();
 generate_bs_delta();
