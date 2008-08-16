@@ -12,11 +12,11 @@ pub
     double margin  
 
 static
-    int start_date
-    int end_date
-    int notional
-    int cash_ccy
     double rate
-    double cash
+    int cash_ccy
+    int end_date
     int book
+    int start_date
+    double cash
+    int notional
 

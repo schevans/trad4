@@ -10,10 +10,10 @@ pub
     double dv01
 
 static
-    double coupon
     int start_date
     int maturity_date
     int coupons_per_year
+    double coupon
 
 
 
