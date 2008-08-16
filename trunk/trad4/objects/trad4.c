@@ -229,7 +229,7 @@ int run_tier( int tier ) {
 
     if ( num_objects_fired > 0 )
     {
-        cout << "Waited " << num_times_waited_this_tier << " times this tier." << endl;
+        //cout << "Waited " << num_times_waited_this_tier << " times this tier." << endl;
     }
 
     return num_objects_fired;
