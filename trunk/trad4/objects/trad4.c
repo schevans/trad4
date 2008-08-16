@@ -34,7 +34,7 @@ bool fire_object( int id );
 void* thread_loop( void* thread_id );
 void start_threads();
 void get_timestamp( double& out_time );
-bool run_tier( int tier );
+int run_tier( int tier );
 void reload_handler( int sig_num );
 void load_objects( int initial_load );
 void load_types( int initial_load );
@@ -81,7 +81,7 @@ void run_trad4() {
 
     for ( int tier=1 ; tier <= num_tiers ; tier++ )
     {
-        std::cout << "Checking tier " << tier << ". Num objs this tier: " << tier_manager[tier][0] - 1 << std::endl; 
+        std::cout << "Checking tier " << tier << ". Num objects this tier: " << tier_manager[tier][0] - 1 << std::endl; 
     }
 
     cout << "Validating objects..." << endl;
@@ -102,17 +102,23 @@ void run_trad4() {
     double end_time;
     double tier_start_time; 
     double tier_end_time;
-    
+    int num_objects_run;
+    int num_object_run_this_tier;
+
     while (1)
     {
         get_timestamp( start_time );
         get_timestamp( tier_start_time );
 
-        if ( run_tier( 1 ) )
+        num_object_run_this_tier = run_tier( 1 );
+
+        if ( num_object_run_this_tier > 0 )
         {
             get_timestamp( tier_end_time );
 
-            cout << setprecision(6) << "Tier " << 1 << " run in " << tier_end_time - tier_start_time << endl << endl;
+            num_objects_run = num_object_run_this_tier;
+
+            cout << setprecision(6) << "Tier " << 1 << " ran " << num_object_run_this_tier << " objects in " << tier_end_time - tier_start_time << " seconds." << endl;
 
             for ( int tier=2 ; tier < num_tiers+1 ; tier++ )
             {
@@ -123,20 +129,19 @@ void run_trad4() {
 
                 get_timestamp( tier_start_time );
 
-                cout << setprecision(6) << "Tier " << tier << " running." << endl;
-        
-                run_tier( tier );
+                num_object_run_this_tier = run_tier( tier );
 
                 get_timestamp( tier_end_time );
 
+                num_objects_run = num_objects_run + num_object_run_this_tier;
 
-                cout << setprecision(6) << "Tier " << tier << " complete in " << tier_end_time - tier_start_time << endl;
+                cout << setprecision(6) << "Tier " << tier << " ran " << num_object_run_this_tier << " objects in " << tier_end_time - tier_start_time << " seconds." << endl;
 
             }
 
             get_timestamp( end_time );
 
-            cout << endl << "All tiers complete in " << end_time-start_time << endl << endl;
+            cout << endl << "All tiers ran " << num_objects_run << " objects in " << end_time-start_time << " seconds." << endl;
 
         }
         else
@@ -163,11 +168,11 @@ void get_timestamp( double& out_time )
 
 }
 
-bool run_tier( int tier ) {
+int run_tier( int tier ) {
 
-    bool tier_fired(false);
+    int num_times_waited_this_tier = 0;
 
-    int num_times_waited_this_tier(0);
+    int num_objects_fired = 0;
 
     for ( int i=1 ; i <= tier_manager[tier][0] ; i++ )
     {
@@ -180,6 +185,12 @@ bool run_tier( int tier ) {
 
             if ( (*object_type_struct[((object_header*)obj_loc[tier_manager[tier][i]])->type]->need_refresh)(obj_loc, tier_manager[tier][i] ) ) 
             {
+
+                if ( num_objects_fired == 0 ) 
+                {
+                    cout << endl << "Tier " << tier << " running." << endl;
+                }
+
                 while ( ! fire_object( tier_manager[tier][i] ) )
                 {
                     //cout << "Fire object failed due to lack of spare threads. Sleeping master thread." << endl;
@@ -187,7 +198,7 @@ bool run_tier( int tier ) {
                     usleep(5);
                 }
 
-                tier_fired = true;
+                num_objects_fired++;
             }
         }
     }
@@ -216,12 +227,12 @@ bool run_tier( int tier ) {
         }
     }
 
-    if ( tier_fired ) 
+    if ( num_objects_fired > 0 )
     {
-        cout << "Waited " << num_times_waited_this_tier << " this tier." << endl;
+        cout << "Waited " << num_times_waited_this_tier << " times this tier." << endl;
     }
 
-    return tier_fired;
+    return num_objects_fired;
 }
 
 bool fire_object( int id )
