@@ -8,9 +8,9 @@ then
     exit 0
 fi
 
-echo "Reloading $TRAD4_DB"
+echo "Reloading $APP_DB"
 
-echo "delete from object;" | $SQLITE $TRAD4_DB
+echo "delete from object;" | $SQLITE $APP_DB
 
 DATA_DIR=$1
 

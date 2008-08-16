@@ -347,7 +347,7 @@ sub generate_loader($$)
     print $FHD "\n";
     print $FHD "    char *zErrMsg = 0;\n";
     print $FHD "    sqlite3* db;\n";
-    print $FHD "    sqlite3_open(getenv(\"TRAD4_DB\"), &db);\n";
+    print $FHD "    sqlite3_open(getenv(\"APP_DB\"), &db);\n";
     print $FHD "\n";
     print $FHD "    std::ostringstream dbstream;\n";
     print $FHD "    dbstream << \"select o.id, o.name, ot.tier, o.log_level ";
