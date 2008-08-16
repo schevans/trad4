@@ -12,8 +12,6 @@ using namespace std;
 
 void calculate_bond( obj_loc_t obj_loc, int id )
 {
-    //cout << "calculate_bond()" << endl;
-
     std::vector<int> _coupon_date_vec;
     std::vector<float> _payment_vec;
     std::vector<float> _payment_vec_01;
@@ -60,7 +58,5 @@ void calculate_bond( obj_loc_t obj_loc, int id )
 
     bond_price = ( price );
     bond_dv01 = ( price - price_01 );
-
-    cout << "New bond price: " << price << ", dv01: " << ( price - price_01 ) << endl;
 }
 

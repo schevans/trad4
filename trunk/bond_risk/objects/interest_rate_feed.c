@@ -11,5 +11,5 @@ using namespace std;
 
 void calculate_interest_rate_feed( obj_loc_t obj_loc, int id )
 {
-    //cout << "calculate_interest_rate_feed()" << endl;
+    // Does nothing.
 }
