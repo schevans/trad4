@@ -33,7 +33,7 @@ my @coup_pys = ( 1, 2, 4 );
 my @currencies = ( 1, 2, 3 );
 my @chars=( 'A'..'Z' );
 
-my $dummy_data_root="$ENV{DATA_DIR}";
+my $dummy_data_root="$ENV{APP_ROOT}/data/dummy_data";
 my $outright_trades_file=$dummy_data_root."/dummy_outright_trades.sql";
 my $repo_trades_file=$dummy_data_root."/dummy_repo_trades.sql";
 my $fx_rate_file=$dummy_data_root."/dummy_fx_rates.sql";
@@ -48,8 +48,8 @@ generate_currency_curves();
 #generate_fx_rates();
 #generate_books();
 generate_bonds( 10000 );
-generate_outright_trades( 10000 );
-generate_repo_trades( 10000 );
+generate_outright_trades( 350000  );
+generate_repo_trades( 350000  );
 
 sub generate_interest_rates() {
 
@@ -57,20 +57,22 @@ sub generate_interest_rates() {
     my $file = "$dummy_data_root/interest_rate_feeds.sql";
     open FILE, ">$file" or die "Can't open $file";
 
-    print FILE "delete from interest_rate_feed_data;\n";
+    print FILE "delete from interest_rate_feed_rates;\n";
 
     print FILE "insert into object values ( $id, 1, \"LIBOR-USD\", 0, 1 );\n";
 
-    print FILE "insert into interest_rate_feed_data values ( $id, 10000,2.6 );\n";
-    print FILE "insert into interest_rate_feed_data values ( $id, 10010,2.7 );\n";
-    print FILE "insert into interest_rate_feed_data values ( $id, 10100,2.7 );\n";
-    print FILE "insert into interest_rate_feed_data values ( $id, 10200,2.7 );\n";
-    print FILE "insert into interest_rate_feed_data values ( $id, 10300,2.8 );\n";
-    print FILE "insert into interest_rate_feed_data values ( $id, 12000,2.8 );\n";
-    print FILE "insert into interest_rate_feed_data values ( $id, 13000,2.9 );\n";
-    print FILE "insert into interest_rate_feed_data values ( $id, 15000,2.9 );\n";
-    print FILE "insert into interest_rate_feed_data values ( $id, 18000,2.8 );\n";
-    print FILE "insert into interest_rate_feed_data values ( $id, 20000,2.8 );\n";
+    print FILE "insert into interest_rate_feed values ( $id );\n";
+
+    print FILE "insert into interest_rate_feed_rates values ( $id, 10000,2.6 );\n";
+    print FILE "insert into interest_rate_feed_rates values ( $id, 10010,2.7 );\n";
+    print FILE "insert into interest_rate_feed_rates values ( $id, 10100,2.7 );\n";
+    print FILE "insert into interest_rate_feed_rates values ( $id, 10200,2.7 );\n";
+    print FILE "insert into interest_rate_feed_rates values ( $id, 10300,2.8 );\n";
+    print FILE "insert into interest_rate_feed_rates values ( $id, 12000,2.8 );\n";
+    print FILE "insert into interest_rate_feed_rates values ( $id, 13000,2.9 );\n";
+    print FILE "insert into interest_rate_feed_rates values ( $id, 15000,2.9 );\n";
+    print FILE "insert into interest_rate_feed_rates values ( $id, 18000,2.8 );\n";
+    print FILE "insert into interest_rate_feed_rates values ( $id, 20000,2.8 );\n";
 
     push @interest_rate_ids, $id;
     $interest_rate_ccys{$id} = $id;
@@ -79,16 +81,18 @@ sub generate_interest_rates() {
 
     print FILE "insert into object values (  $id, 1, \"LIBOR-GBP\", 0, 1 );\n";
 
-    print FILE "insert into interest_rate_feed_data values ( $id, 10000,5.2 );\n";
-    print FILE "insert into interest_rate_feed_data values ( $id, 10010,5.3 );\n";
-    print FILE "insert into interest_rate_feed_data values ( $id, 10100,5.4 );\n";
-    print FILE "insert into interest_rate_feed_data values ( $id, 10200,5.4 );\n";
-    print FILE "insert into interest_rate_feed_data values ( $id, 10300,5.5 );\n";
-    print FILE "insert into interest_rate_feed_data values ( $id, 12000,5.5 );\n";
-    print FILE "insert into interest_rate_feed_data values ( $id, 13000,5.5 );\n";
-    print FILE "insert into interest_rate_feed_data values ( $id, 15000,5.4 );\n";
-    print FILE "insert into interest_rate_feed_data values ( $id, 18000,5.3 );\n";
-    print FILE "insert into interest_rate_feed_data values ( $id, 20000,5.3 );\n";
+    print FILE "insert into interest_rate_feed values ( $id );\n";
+
+    print FILE "insert into interest_rate_feed_rates values ( $id, 10000,5.2 );\n";
+    print FILE "insert into interest_rate_feed_rates values ( $id, 10010,5.3 );\n";
+    print FILE "insert into interest_rate_feed_rates values ( $id, 10100,5.4 );\n";
+    print FILE "insert into interest_rate_feed_rates values ( $id, 10200,5.4 );\n";
+    print FILE "insert into interest_rate_feed_rates values ( $id, 10300,5.5 );\n";
+    print FILE "insert into interest_rate_feed_rates values ( $id, 12000,5.5 );\n";
+    print FILE "insert into interest_rate_feed_rates values ( $id, 13000,5.5 );\n";
+    print FILE "insert into interest_rate_feed_rates values ( $id, 15000,5.4 );\n";
+    print FILE "insert into interest_rate_feed_rates values ( $id, 18000,5.3 );\n";
+    print FILE "insert into interest_rate_feed_rates values ( $id, 20000,5.3 );\n";
 
     push @interest_rate_ids, $id;
     $interest_rate_ccys{$id} = $id;
@@ -96,16 +100,18 @@ sub generate_interest_rates() {
     $id = 3;
     print FILE "insert into object values (  $id, 1, \"LIBOR-EUR\", 0, 1 );\n";
 
-    print FILE "insert into interest_rate_feed_data values ( $id, 10000,3.6 );\n";
-    print FILE "insert into interest_rate_feed_data values ( $id, 10010,3.7 );\n";
-    print FILE "insert into interest_rate_feed_data values ( $id, 10100,3.7 );\n";
-    print FILE "insert into interest_rate_feed_data values ( $id, 10200,3.7 );\n";
-    print FILE "insert into interest_rate_feed_data values ( $id, 10300,3.8 );\n";
-    print FILE "insert into interest_rate_feed_data values ( $id, 12000,3.8 );\n";
-    print FILE "insert into interest_rate_feed_data values ( $id, 13000,3.9 );\n";
-    print FILE "insert into interest_rate_feed_data values ( $id, 15000,3.9 );\n";
-    print FILE "insert into interest_rate_feed_data values ( $id, 18000,3.8 );\n";
-    print FILE "insert into interest_rate_feed_data values ( $id, 20000,3.8 );\n";
+    print FILE "insert into interest_rate_feed values ( $id );\n";
+
+    print FILE "insert into interest_rate_feed_rates values ( $id, 10000,3.6 );\n";
+    print FILE "insert into interest_rate_feed_rates values ( $id, 10010,3.7 );\n";
+    print FILE "insert into interest_rate_feed_rates values ( $id, 10100,3.7 );\n";
+    print FILE "insert into interest_rate_feed_rates values ( $id, 10200,3.7 );\n";
+    print FILE "insert into interest_rate_feed_rates values ( $id, 10300,3.8 );\n";
+    print FILE "insert into interest_rate_feed_rates values ( $id, 12000,3.8 );\n";
+    print FILE "insert into interest_rate_feed_rates values ( $id, 13000,3.9 );\n";
+    print FILE "insert into interest_rate_feed_rates values ( $id, 15000,3.9 );\n";
+    print FILE "insert into interest_rate_feed_rates values ( $id, 18000,3.8 );\n";
+    print FILE "insert into interest_rate_feed_rates values ( $id, 20000,3.8 );\n";
 
     push @interest_rate_ids, $id;
     $interest_rate_ccys{$id} = $id;
