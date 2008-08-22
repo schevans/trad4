@@ -18,6 +18,8 @@ cd $APP_ROOT/data/$DATA_DIR
 
 for i in `ls *.sql`
 do
+    echo "Loading $i.."
+
     $TRAD4_ROOT/bin/runsql $i
 
     if [ $? != 0 ]
