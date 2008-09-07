@@ -121,11 +121,6 @@ sub generate_table($) {
         print $FHD ",\n    $key ".PreComp::Utilities::Type2Sql($obj_hash->{data}->{static}->{$key});
     }
 
-    foreach $key ( @{$obj_hash->{data}->{feed_in_order}} ) {
-
-        print $FHD ",\n    $key ".PreComp::Utilities::Type2Sql($obj_hash->{data}->{static}->{$key});
-    }
-
     foreach $key ( @{$obj_hash->{data}->{sub_order}} ) {
 
         print $FHD ",\n    $key ".PreComp::Utilities::Type2Sql($obj_hash->{data}->{sub}->{$key});
