@@ -296,9 +296,6 @@ sub LoadDef($) {
 
     close FILE;
 
-if ( $object =~ /trade/ ) {
-#print Dumper( %object_hash );
-}
     return \%object_hash;
 }
 
