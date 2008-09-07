@@ -238,7 +238,9 @@ sub LoadDef($) {
     my %object_hash;
 
     my $line;
-    my $section;
+    my $file_section;
+    my $hash_section;
+    my $hash_section_order;
     my $counter = 0;
 
     my @order;
@@ -260,8 +262,10 @@ sub LoadDef($) {
 
         if ( $line =~ /sub|pub|static|feed_in|feed_out/ ) {
 
-            $section = $line;
-            @order = ();
+            $file_section = $line;
+            $hash_section = $file_section;    
+            $hash_section_order = $file_section;
+            $object_hash->{$hash_section_order} = ();
             next;
         }
 
@@ -273,25 +277,28 @@ sub LoadDef($) {
             ExitOnError();
         }
 
-        if ( $section =~ /static/ and  $var =~ /\[.*]/ ) {
-            $section = "static_vec";
+        if ( $file_section =~ /static/ and $var =~ /\[.*]/ ) {
+            $hash_section = $file_section."_vec";
+            $hash_section_order = $file_section."_order";
+        }
+        elsif ( $file_section =~ /static/ and not $var =~ /\[.*]/ ) {
+            $hash_section = $file_section;
+            $hash_section_order = $file_section."_order";
         }
 
-        if ( $section =~ /static/ and not $var =~ /\[.*]/ ) {
-            $section = "static";
-        }
+        $hash_section_order = $hash_section."_order";
 
-        $object_hash{$section}{$var} = $type;
-        
-        push @order, $var;
-        $temp = $section."_order";
+        $object_hash{$hash_section}{$var} = $type;
 
-        $object_hash{$temp} = [ @order ];
+        push @{$object_hash{$hash_section_order}}, $var;
 
     }
 
     close FILE;
 
+if ( $object =~ /trade/ ) {
+#print Dumper( %object_hash );
+}
     return \%object_hash;
 }
 
