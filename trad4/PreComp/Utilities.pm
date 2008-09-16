@@ -253,12 +253,12 @@ sub LoadDef($) {
 
         chomp $line;
 
+        $line =~ s/^\s+//;
+        $line =~ s/\s+$//;
+
         if ( !$line or $line =~ /#/ ) {
             next;
         }
-
-        $line =~ s/^\s+//;
-        $line =~ s/\s+$//;
 
         if ( $line =~ /sub|pub|static|feed_in|feed_out/ ) {
 
