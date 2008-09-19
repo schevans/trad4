@@ -24,9 +24,9 @@ sub Generate($) {
 
         print $FHD "typedef struct {\n";
 
-        foreach $var ( keys %{$struct_hash->{$key}} ) {
+        foreach $var ( @{$struct_hash->{$key}{order}} ) {
 
-            print $FHD "    $struct_hash->{$key}->{$var} $var;\n";
+            print $FHD "    $struct_hash->{$key}{data}{$var} $var;\n";
 
         }
         print $FHD "} $key;\n";
