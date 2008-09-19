@@ -458,9 +458,9 @@ sub generate_extra_loaders($$$)
 
             my $row_num=1;
 
-            foreach $key ( keys %{$struct_hash->{$static_vec_type}} ) {
+            foreach $key ( @{$struct_hash->{$static_vec_type}{order}} ) {
 
-                print $FHD "    $name"."_$static_vec_short"."_$key(counter) = ".PreComp::Utilities::Type2atoX( $struct_hash->{$static_vec_type}->{$key} )."(row[$row_num]);\n";
+                print $FHD "    $name"."_$static_vec_short"."_$key(counter) = ".PreComp::Utilities::Type2atoX( $struct_hash->{$static_vec_type}{data}{$key} )."(row[$row_num]);\n";
 
                 $row_num = $row_num + 1;
             }
@@ -489,7 +489,7 @@ sub generate_extra_loaders($$$)
     
         if ( $struct_hash->{$static_vec_type} ) {
 
-            foreach $key ( keys %{$struct_hash->{$static_vec_type}} ) {
+            foreach $key ( @{$struct_hash->{$static_vec_type}{order}} ) {
 
                 print $FHD ", $key";
             }

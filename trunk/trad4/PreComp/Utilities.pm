@@ -126,6 +126,7 @@ sub LoadStructures() {
 
     my $line;
     my $struct;
+    my $struct_order;
     my $counter = 0;
 
     my ( $type, $var );
@@ -143,6 +144,7 @@ sub LoadStructures() {
         if ( $line =~ /^[a-z]/ ) {
 
             $struct = $line;
+	    $struct_order = $line."_order";
 
             next;
         }
@@ -158,8 +160,8 @@ sub LoadStructures() {
             ExitOnError();
         }
 
-        $struct_hash{$struct}{$var} = $type;
-
+        $struct_hash{$struct}{data}{$var} = $type;
+	 push @{$struct_hash{$struct}{order}}, $var;
     }
 
     close STRUCTURES_FILE;
@@ -277,11 +279,11 @@ sub LoadDef($) {
             ExitOnError();
         }
 
-        if ( $file_section =~ /static/ and $var =~ /\[.*]/ ) {
+        if ( $var =~ /\[.*]/ ) {
             $hash_section = $file_section."_vec";
             $hash_section_order = $file_section."_order";
         }
-        elsif ( $file_section =~ /static/ and not $var =~ /\[.*]/ ) {
+        elsif ( not $var =~ /\[.*]/ ) {
             $hash_section = $file_section;
             $hash_section_order = $file_section."_order";
         }
