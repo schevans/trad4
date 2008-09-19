@@ -88,9 +88,9 @@ sub generate_vec_tables($$) {
 
         if ( $struct_hash->{$static_vec_type} ) {
 
-            foreach $struct ( keys %{$struct_hash->{$static_vec_type}} ) {
+            foreach $struct ( @{$struct_hash->{$static_vec_type}{order}} ) {
 
-                print $FHD ",\n    $struct ".PreComp::Utilities::Type2Sql( $struct_hash->{$static_vec_type}->{$struct} );
+                print $FHD ",\n    $struct ".PreComp::Utilities::Type2Sql( $struct_hash->{$static_vec_type}{data}{$struct} );
             }
         }
         else {
