@@ -85,6 +85,7 @@ sub Generate($) {
     print $FHD "    // Pub\n";
 
     PreComp::Utilities::PrintSection( $FHD, $obj_hash->{data}->{pub}, "    " );
+    PreComp::Utilities::PrintSection( $FHD, $obj_hash->{data}->{pub_vec}, "    " );
     PreComp::Utilities::PrintSection( $FHD, $obj_hash->{data}->{mem_pub}, "    " );
     PreComp::Utilities::PrintSection( $FHD, $obj_hash->{data}->{feed_in}, "    " );
 
