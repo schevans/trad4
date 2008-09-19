@@ -70,6 +70,8 @@ else {
 }
 
 #print Dumper( $master_hash );
+#print "----------------------------\n";
+#print Dumper( $struct_hash );
 
 my $type;
 
