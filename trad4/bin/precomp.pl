@@ -44,7 +44,18 @@ if (  -f $ENV{APP_ROOT}."/defs/structures.t4s" ) {
     $struct_hash = PreComp::Utilities::LoadStructures();
 }
 
+my $enum_array;
+
+if (  -f $ENV{APP_ROOT}."/defs/enums.t4s" ) {
+
+    $enum_array = PreComp::Utilities::LoadEnums();
+}
+
 my $master_hash = PreComp::Utilities::LoadDefs();
+
+#print Dumper( $enum_array );
+#print "----------------------------\n";
+#print Dumper( $struct_hash );
 
 my %doing;
 
@@ -69,15 +80,11 @@ else {
     }
 }
 
-#print Dumper( $master_hash );
-#print "----------------------------\n";
-#print Dumper( $struct_hash );
-
 my $type;
 
 foreach $type ( keys %doing ) {
 
-    PreComp::Utilities::Validate( $master_hash, $type );
+    PreComp::Utilities::Validate( $master_hash, $type, $struct_hash, $enum_array );
 }
 
 foreach $type ( keys %doing ) {
