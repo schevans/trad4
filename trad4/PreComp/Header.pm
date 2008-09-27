@@ -14,16 +14,9 @@ sub Generate($) {
     my $name = $obj_hash->{name};
 
     my @header = PreComp::Constants::CommomHeader();
-#    my @sub = PreComp::Utilities::GetSub( $obj_hash );
 
     my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::GenObjRoot().$name.".".h );
 
-
-#    open $FHD, ">$gen_root/objects/$h_filename" or die "Can't open $gen_root/objects/$h_filename for writing. Exiting";
-
-    #print_licence_header( $FHD );
-          
-                                          
     print $FHD "\n";
     print $FHD "#ifndef __$name"."__\n";
     print $FHD "#define __$name"."__\n";

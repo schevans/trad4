@@ -144,7 +144,7 @@ sub LoadStructures() {
         if ( $line =~ /^[a-z]/ ) {
 
             $struct = $line;
-	    $struct_order = $line."_order";
+        $struct_order = $line."_order";
 
             next;
         }
@@ -161,7 +161,7 @@ sub LoadStructures() {
         }
 
         $struct_hash{$struct}{data}{$var} = $type;
-	 push @{$struct_hash{$struct}{order}}, $var;
+        push @{$struct_hash{$struct}{order}}, $var;
     }
 
     close STRUCTURES_FILE;

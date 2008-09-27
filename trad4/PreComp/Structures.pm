@@ -11,8 +11,6 @@ use warnings;
 sub Generate($) {
     my $struct_hash = shift;
 
-
-
     my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::GenObjRoot()."structures.h" );
 
     print $FHD "\n";
@@ -34,9 +32,6 @@ sub Generate($) {
     }
     print $FHD "\n";
     print $FHD "#endif\n";
-
-
-
 
     PreComp::Utilities::CloseFile();
 }
