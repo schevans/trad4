@@ -31,9 +31,11 @@ sub Clean() {
     `rm -f $ENV{APP_ROOT}/data/default_set/*`; 
 }    
 
-sub Validate($$) {
+sub Validate($$$$) {
     my $master_hash = shift;
     my $name = shift;
+    my $struct_hash = shift;
+    my $enum_array = shift;
 
     my $obj_hash = $master_hash->{$name};
 
@@ -58,6 +60,47 @@ sub Validate($$) {
                 ExitOnError();
             }
         }
+    }
+
+    foreach $key ( keys %{$obj_hash->{data}} ) {
+
+        if ( not $key =~ /_order/ ) {
+
+            foreach $key2 ( keys %{$obj_hash->{data}->{$key}} ) {
+
+                if ( not $obj_hash->{data}->{$key}->{$key2} =~ /int|double|float/ ) {
+
+                    if ( exists $struct_hash->{$obj_hash->{data}->{$key}->{$key2}} ) {
+        
+                        next;   # next in $key2 loop. My god! A comment!
+                    }
+
+                    my $found_in_enums = 0;
+
+                    foreach $enum ( @$enum_array ) {
+
+                        if ( $enum =~ /$obj_hash->{data}->{$key}->{$key2}/ ) {
+
+                            $found_in_enums = 1;
+                            last;   # last in $enum loop. My god! Another one!
+                        }
+                    }        
+
+                    if ( not $found_in_enums ) {
+
+                        print "Error: Type \'$obj_hash->{data}->{$key}->{$key2}\', referred to in the $key section of $name.t4 not found. It's not:\n";
+                        print "    a) an int, double or float\n";
+                        print "    b) a structure, as defined in structures.t4s\n";
+                        print "    c) an enum, as declared in enums.t4s\n";
+
+                        ExitOnError();
+                    }
+                }
+
+            }
+    
+        }
+
     }
 
     return 1;
@@ -116,6 +159,33 @@ sub CloseFile() {
     else {
         `rm -f $current_obj.t4t`;
     }
+}
+
+sub LoadEnums() {
+
+    open ENUMS_FILE, "$ENV{APP_ROOT}/defs/enums.t4s" or die "Can't open $ENV{APP_ROOT}/defs/enums.t4s for reading";
+
+    my @enum_array;
+
+    my $line;
+
+    while ( $line = <ENUMS_FILE> ) {
+
+        chomp $line;
+
+        if ( !$line or $line =~ /#/ ) {
+            next;
+        }
+
+        if ( $line =~ /^[a-z]/ ) {
+
+            push @enum_array, $line;
+        }
+    }
+
+    close ENUMS_FILE;
+
+    return \@enum_array;
 }
 
 sub LoadStructures() {
@@ -342,7 +412,7 @@ sub Type2atoX($) {
         return "std::atof";
     }
     else {
-        die "Odd type: $type";
+        return "";
     }
 }
 
