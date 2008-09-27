@@ -14,7 +14,6 @@ sub generate_constructor($$);
 sub generate_calculate($$$);
 sub generate_need_refresh($$);
 sub generate_loader_callback($$);
-
 sub generate_extra_loaders($$$);
 
 sub Generate($$$) {
@@ -446,12 +445,21 @@ sub generate_extra_loaders($$$)
         $static_vec_short = $static_vec_name;
         $static_vec_short =~ s/\[.*\]//g;
 
+        $static_vec_size = $static_vec_name;
+        $static_vec_size =~ s/.*\[//g;
+        $static_vec_size =~ s/\]//g;
+
         print $FHD "static int $name"."_load_$static_vec_short"."_callback(void *obj_loc_v, int argc, char **row, char **azColName)\n";
         print $FHD "{\n";
         print $FHD "    unsigned char** obj_loc = (unsigned char**)obj_loc_v;\n";
         print $FHD "    int id = atoi(row[0]);\n";
         print $FHD "\n";
-        print $FHD "\n";
+        print $FHD "    if ( counter > $static_vec_size )\n";
+        print $FHD "    {\n";
+        print $FHD "        cerr << \"Error in $name"."_load_$static_vec_short: The number of rows in $name"."_$static_vec_short.table is greater than $static_vec_size. Truncating data in $name"."_$static_vec_short structure to $static_vec_size elements. Suggest you fix the data or create a new type with larger arrays and migrate your objects across.\" << endl;\n";
+        print $FHD "    }\n";
+        print $FHD "    else\n";
+        print $FHD "    {\n";
 
 
         if ( $struct_hash->{$static_vec_type} ) {
@@ -460,19 +468,20 @@ sub generate_extra_loaders($$$)
 
             foreach $key ( @{$struct_hash->{$static_vec_type}{order}} ) {
 
-                print $FHD "    $name"."_$static_vec_short"."_$key(counter) = ".PreComp::Utilities::Type2atoX( $struct_hash->{$static_vec_type}{data}{$key} )."(row[$row_num]);\n";
+                print $FHD "        $name"."_$static_vec_short"."_$key(counter) = ".PreComp::Utilities::Type2atoX( $struct_hash->{$static_vec_type}{data}{$key} )."(row[$row_num]);\n";
 
                 $row_num = $row_num + 1;
             }
         }
         else {
-            print $FHD "    ($name"."_$static_vec_short"."[counter]) = ".PreComp::Utilities::Type2atoX( $static_vec_type )."(row[1]);\n";
+            print "Not sure this is doing anything..\n";
+            print $FHD "        ($name"."_$static_vec_short"."[counter]) = ".PreComp::Utilities::Type2atoX( $static_vec_type )."(row[1]);\n";
         }
 
         print $FHD "\n";
-        print $FHD "    counter++;\n";
+        print $FHD "        counter++;\n";
         print $FHD "\n";
-        print $FHD "    // Validate\n";
+        print $FHD "    }\n";
         print $FHD "\n";
         print $FHD "    return 0;\n";
         print $FHD "}\n";
@@ -507,6 +516,12 @@ sub generate_extra_loaders($$$)
         print $FHD "        sqlite3_free(zErrMsg);\n";
         print $FHD "    }\n";
         print $FHD "\n";
+
+        foreach $key ( @{$struct_hash->{$static_vec_type}{order}} ) {
+
+            print $FHD "    $name"."_$static_vec_short"."_$key(counter) = 0;\n";
+        }
+
         print $FHD "\n";
         print $FHD "}\n";
         
