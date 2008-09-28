@@ -14,12 +14,13 @@ sub generate_constructor($$);
 sub generate_calculate($$$);
 sub generate_need_refresh($$);
 sub generate_loader_callback($$);
-sub generate_extra_loaders($$$);
+sub generate_extra_loaders($$$$);
 
-sub Generate($$$) {
+sub Generate($$$$) {
     my $master_hash = shift;
     my $name = shift;
     my $struct_hash = shift;
+    my $constants_hash = shift;
 
     my $obj_hash = $master_hash->{$name};
 
@@ -88,7 +89,7 @@ sub Generate($$$) {
 
     if ( %{$obj_hash->{data}->{static_vec}} ) {
 
-        generate_extra_loaders( $obj_hash, $struct_hash, $FHD );
+        generate_extra_loaders( $obj_hash, $struct_hash, $constants_hash, $FHD );
     }
 
     print $FHD "\n";
@@ -425,10 +426,11 @@ sub generate_loader($$)
 
 }
 
-sub generate_extra_loaders($$$)
+sub generate_extra_loaders($$$$)
 {
     my $obj_hash = shift;
     my $struct_hash = shift;
+    my $constants_hash = shift;
     my $FHD = shift;
 
     my $name = $obj_hash->{name};
@@ -456,7 +458,7 @@ sub generate_extra_loaders($$$)
         print $FHD "\n";
         print $FHD "    if ( counter > $static_vec_size )\n";
         print $FHD "    {\n";
-        print $FHD "        cerr << \"Error in $name"."_load_$static_vec_short: The number of rows in $name"."_$static_vec_short.table is greater than $static_vec_size. Truncating data in $name"."_$static_vec_short structure to $static_vec_size elements. Suggest you fix the data or create a new type with larger arrays and migrate your objects across.\" << endl;\n";
+        print $FHD "        cerr << \"Error in $name"."_load_$static_vec_short: The number of rows in $name"."_$static_vec_short.table is greater than ".$constants_hash->{$static_vec_size}.", given by $static_vec_size. Truncating data in $name"."_$static_vec_short structure to $static_vec_size elements. Suggest you fix the data or create a new type with larger arrays and migrate your objects across.\" << endl;\n";
         print $FHD "    }\n";
         print $FHD "    else\n";
         print $FHD "    {\n";
