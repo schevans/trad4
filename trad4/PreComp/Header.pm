@@ -25,6 +25,7 @@ sub Generate($) {
     print $FHD "\n";
     print $FHD "#include \"common.h\"\n";
     print $FHD "#include \"structures.h\"\n";
+    print $FHD "#include \"enums.h\"\n";
     print $FHD "\n";
 
     if ( PreComp::Utilities::HasFeed( $obj_hash ) ) {
