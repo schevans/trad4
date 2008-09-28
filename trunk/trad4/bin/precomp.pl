@@ -14,6 +14,7 @@ use PreComp::SqlCommon;
 use PreComp::Makefiles;
 use PreComp::Macros;
 use PreComp::Structures;
+use PreComp::Enums;
 
 sub usage();
 
@@ -44,16 +45,16 @@ if (  -f $ENV{APP_ROOT}."/defs/structures.t4s" ) {
     $struct_hash = PreComp::Utilities::LoadStructures();
 }
 
-my $enum_array;
+my $enum_hash;
 
 if (  -f $ENV{APP_ROOT}."/defs/enums.t4s" ) {
 
-    $enum_array = PreComp::Utilities::LoadEnums();
+    $enum_hash = PreComp::Utilities::LoadEnums();
 }
 
 my $master_hash = PreComp::Utilities::LoadDefs();
 
-#print Dumper( $enum_array );
+#print Dumper( $enum_hash );
 #print "----------------------------\n";
 #print Dumper( $struct_hash );
 
@@ -84,7 +85,7 @@ my $type;
 
 foreach $type ( keys %doing ) {
 
-    PreComp::Utilities::Validate( $master_hash, $type, $struct_hash, $enum_array );
+    PreComp::Utilities::Validate( $master_hash, $type, $struct_hash, $enum_hash );
 }
 
 foreach $type ( keys %doing ) {
@@ -99,6 +100,7 @@ PreComp::Makefiles::Generate( $master_hash );
 PreComp::Macros::Generate( $master_hash, $struct_hash );
 PreComp::SqlCommon::Generate( $master_hash );
 PreComp::Structures::Generate( $struct_hash );
+PreComp::Enums::Generate( $enum_hash );
 
 if ( ! -f "$ENV{APP_ROOT}/objects/main.c" ) {
 
