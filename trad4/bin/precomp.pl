@@ -15,6 +15,7 @@ use PreComp::Makefiles;
 use PreComp::Macros;
 use PreComp::Structures;
 use PreComp::Enums;
+use PreComp::AppConstants;
 
 sub usage();
 
@@ -52,9 +53,16 @@ if (  -f $ENV{APP_ROOT}."/defs/enums.t4s" ) {
     $enum_hash = PreComp::Utilities::LoadEnums();
 }
 
+my $constants_hash;
+
+if (  -f $ENV{APP_ROOT}."/defs/constants.t4s" ) {
+
+    $constants_hash = PreComp::Utilities::LoadAppConstants();
+}
+
 my $master_hash = PreComp::Utilities::LoadDefs();
 
-#print Dumper( $enum_hash );
+#print Dumper( $constants_hash );
 #print "----------------------------\n";
 #print Dumper( $struct_hash );
 
@@ -91,7 +99,7 @@ foreach $type ( keys %doing ) {
 foreach $type ( keys %doing ) {
 
     PreComp::Header::Generate( $master_hash->{$type} );
-    PreComp::Wrapper::Generate( $master_hash, $type, $struct_hash );
+    PreComp::Wrapper::Generate( $master_hash, $type, $struct_hash, $constants_hash );
     PreComp::Sql::Generate( $master_hash, $struct_hash, $type );
     PreComp::Calculate::Generate( $master_hash->{$type} );
 }
@@ -101,6 +109,7 @@ PreComp::Macros::Generate( $master_hash, $struct_hash );
 PreComp::SqlCommon::Generate( $master_hash );
 PreComp::Structures::Generate( $struct_hash );
 PreComp::Enums::Generate( $enum_hash );
+PreComp::AppConstants::Generate( $constants_hash );
 
 if ( ! -f "$ENV{APP_ROOT}/objects/main.c" ) {
 
