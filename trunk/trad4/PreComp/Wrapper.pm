@@ -463,7 +463,6 @@ sub generate_extra_loaders($$$$)
         print $FHD "    else\n";
         print $FHD "    {\n";
 
-
         if ( $struct_hash->{$static_vec_type} ) {
 
             my $row_num=1;

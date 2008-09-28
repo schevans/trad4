@@ -234,8 +234,7 @@ sub LoadAppConstants() {
 
     }
 
-print Dumper( $constants_hash );
-    return \%constants_hash;
+    return $constants_hash;
 }
 
 sub LoadEnums() {
