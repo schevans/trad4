@@ -157,6 +157,86 @@ sub CloseFile() {
         `rm -f $current_obj.t4t`;
     }
 }
+sub LoadAppConstants() {
+
+    open APP_CONSTANTS_FILE, "$ENV{APP_ROOT}/defs/constants.t4s" or die "Can't open $ENV{APP_ROOT}/defs/constants.t4s for reading";
+
+    my %constants_hash;
+    my %expression_hash;
+    my $constants;
+    my $line;
+
+    while ( $line = <APP_CONSTANTS_FILE> ) {
+
+        chomp $line;
+
+        $line =~ s/#.*//g;
+
+        if ( !$line ) {
+            next;
+        }
+
+        ( $name, $value ) = split /=/, $line;
+        
+        $name =~ s/^\s+//;
+        $name =~ s/\s+$//;
+
+        if ( exists $constants_hash->{$name} ) {
+
+            print "Error: Multiple definitions of \'$name\' in constants.t4s\n";
+            ExitOnError();
+
+        }
+
+        if ( !$value ) {
+
+            print "Error: No value given for constant \'$name\' in constants.t4s\n";
+            ExitOnError();
+        }
+        else {
+
+            $value =~ s/^\s+//;
+            $value =~ s/\s+$//;
+
+            if ( $value =~ /[A-Za-z_]+/ ) {
+
+                $expression_hash->{$name} = $value;
+            }
+            else {
+
+                $constants_hash->{$name} = $value;
+            }
+        }
+    }
+
+    close APP_CONSTANTS_FILE;
+
+
+    foreach $expression_name ( keys %{$expression_hash} ) {
+
+        $expression = $expression_hash->{$expression_name};
+
+        foreach $constant ( keys %{$constants_hash} ) {
+
+            $expression =~ s/$constant/$constants_hash->{$constant}/g;
+        }
+
+        if ( $expression =~ /[A-Za-z_]+/ ) {
+
+            print "Error: Can't evaluate expression \'$expression_name = $expression\' in constants.t4s.\n";
+            ExitOnError();
+
+        }
+        else {
+
+            $constants_hash->{$expression_name} = eval $expression;
+        }
+
+    }
+
+print Dumper( $constants_hash );
+    return \%constants_hash;
+}
 
 sub LoadEnums() {
 
