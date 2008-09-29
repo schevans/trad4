@@ -202,15 +202,19 @@ sub LoadAppConstants() {
 
                 $expression_hash->{$name} = $value;
             }
-            else {
+            elsif ( $value =~ /^[0-9]+$/ or $value =~ /^[0-9]+\.[0-9]+$/ ) {
 
                 $constants_hash->{$name} = $value;
+            }
+            else {
+
+                print "Error: Can't evaluate expression \'$name = $value\' in constants.t4s.\n";
+                ExitOnError();
             }
         }
     }
 
     close APP_CONSTANTS_FILE;
-
 
     foreach $expression_name ( keys %{$expression_hash} ) {
 
@@ -229,7 +233,17 @@ sub LoadAppConstants() {
         }
         else {
 
-            $constants_hash->{$expression_name} = eval $expression;
+            $value = eval $expression;
+    
+            if ( $@ ) {
+
+                print "Error: Can't evaluate expression \'$expression_name = $expression\' in constants.t4s.\n";
+                ExitOnError();
+            }
+            else {
+
+                $constants_hash->{$expression_name} = $value;
+            }
         }
 
     }
