@@ -1,6 +1,6 @@
 #!/bin/sh
 
-
+. $TRAD4_ROOT/trad4.conf > /dev/null
 
 if [ $# -ne 1 ]
 then
