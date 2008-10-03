@@ -18,12 +18,15 @@ use PreComp::Enums;
 use PreComp::AppConstants;
 
 sub usage();
+sub vprint($);
 
 my %opts;
 
-if ( ! getopts( 'o:hck', \%opts ) ) {
+if ( ! getopts( 'o:hvck', \%opts ) ) {
     usage();
 }
+
+my $verbose = $opts{v};
 
 if ( $opts{c} ) {
 
@@ -43,6 +46,7 @@ my $struct_hash;
 
 if (  -f $ENV{APP_ROOT}."/defs/structures.t4s" ) {
 
+    vprint("Loading structures..");
     $struct_hash = PreComp::Utilities::LoadStructures();
 }
 
@@ -50,6 +54,7 @@ my $enum_hash;
 
 if (  -f $ENV{APP_ROOT}."/defs/enums.t4s" ) {
 
+    vprint("Loading enums..");
     $enum_hash = PreComp::Utilities::LoadEnums();
 }
 
@@ -57,9 +62,11 @@ my $constants_hash;
 
 if (  -f $ENV{APP_ROOT}."/defs/constants.t4s" ) {
 
+    vprint("Loading constants..");
     $constants_hash = PreComp::Utilities::LoadAppConstants();
 }
 
+vprint("Loading t4 files..");
 my $master_hash = PreComp::Utilities::LoadDefs();
 
 #print Dumper( $constants_hash );
@@ -71,6 +78,7 @@ my %doing;
 if ( $opts{o} ) {
 
     if ( $master_hash->{$opts{o}} ) {
+
         $doing{$opts{o}} = 1;
     }
     else {
@@ -91,6 +99,8 @@ else {
 
 my $type;
 
+vprint("Validating..");
+
 foreach $type ( keys %doing ) {
 
     PreComp::Utilities::Validate( $master_hash, $type, $struct_hash, $enum_hash );
@@ -98,21 +108,34 @@ foreach $type ( keys %doing ) {
 
 foreach $type ( keys %doing ) {
 
+    vprint("Generating $type..");
     PreComp::Header::Generate( $master_hash->{$type} );
     PreComp::Wrapper::Generate( $master_hash, $type, $struct_hash, $constants_hash );
     PreComp::Sql::Generate( $master_hash, $struct_hash, $type );
     PreComp::Calculate::Generate( $master_hash->{$type} );
 }
 
+vprint("Generating makefiles..");
 PreComp::Makefiles::Generate( $master_hash );
+
+vprint("Generating macros..");
 PreComp::Macros::Generate( $master_hash, $struct_hash );
+
+vprint("Generating sql..");
 PreComp::SqlCommon::Generate( $master_hash );
+
+vprint("Generating structures..");
 PreComp::Structures::Generate( $struct_hash );
+
+vprint("Generating enums..");
 PreComp::Enums::Generate( $enum_hash );
+
+vprint("Generating constants..");
 PreComp::AppConstants::Generate( $constants_hash );
 
 if ( ! -f "$ENV{APP_ROOT}/objects/main.c" ) {
 
+    vprint("Generating main..");
     open MAIN, ">$ENV{APP_ROOT}/objects/main.c" or die "Can't open $ENV{APP_ROOT}/objects/main.c";
 
     print MAIN "#include \"trad4.h\"\n";
@@ -124,6 +147,8 @@ if ( ! -f "$ENV{APP_ROOT}/objects/main.c" ) {
 
 }
 
+vprint("Done.");
+
 sub usage() {
 
     print "Usage: precomp.pl [OPTION]\n";
@@ -132,6 +157,7 @@ sub usage() {
     print "  -o <object>    precompile <object> only\n";
     print "  -k             continue on error\n";
     print "  -c             remove all generated files\n";
+    print "  -v             verbose\n";
     print "  -h             display this help and exit\n";
     print"\n";
 
@@ -139,3 +165,11 @@ sub usage() {
 }
 
 
+sub vprint($) {
+    my $str = shift;
+
+    if ( $verbose ) {
+
+        print "$str\n";
+    }
+}
