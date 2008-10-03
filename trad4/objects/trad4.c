@@ -277,7 +277,7 @@ void set_timestamp( obj_loc_t obj_loc, int id )
 
     //std::cout << "setting timestamp: " << timestamp << std::endl;
 
-    *(int*)obj_loc[id] = timestamp;
+    *(long long*)obj_loc[id] = timestamp;
 
     ((object_header*)obj_loc[id])->status = STOPPED;
 }

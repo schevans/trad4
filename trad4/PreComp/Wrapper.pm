@@ -210,12 +210,12 @@ sub generate_need_refresh($$)
     print $FHD "    DEBUG_LOADS( \"$name"."_need_refresh( \" << id << \")\" );\n";
 
     print $FHD "\n";
-    print $FHD "    DEBUG_LOADS( \"\t$name timestamp: \" <<  *(int*)obj_loc[id] );\n";
+    print $FHD "    DEBUG_LOADS( \"\t$name timestamp: \" <<  *(long long*)obj_loc[id] );\n";
     print $FHD "    DEBUG_LOADS( \"\t$name state: \" << ((object_header*)obj_loc[id])->status );\n";
 
     foreach $key ( keys %{$obj_hash->{data}->{sub}} ) {
 
-        print $FHD "    DEBUG_LOADS( \"\t\t$key timestamp: \" << *(int*)obj_loc[(($name*)obj_loc[id])->$key] );\n";
+        print $FHD "    DEBUG_LOADS( \"\t\t$key timestamp: \" << *(long long*)obj_loc[(($name*)obj_loc[id])->$key] );\n";
     }
 
     print $FHD "\n";
@@ -226,13 +226,8 @@ sub generate_need_refresh($$)
 
     foreach $key ( keys %{$obj_hash->{data}->{sub}} ) {
 
-        print $FHD "( *(int*)obj_loc[id] < *(int*)obj_loc[(($name*)obj_loc[id])->$key] ) || ";
+        print $FHD "( *(long long*)obj_loc[id] < *(long long*)obj_loc[(($name*)obj_loc[id])->$key] ) || ";
 
-
-    }
-    if ( $has_feed eq "in" ) {
-
-                print $FHD "(*(int*)obj_loc[id] < ((($name*)obj_loc[id])->in)->last_published ) ||"
 
     }
     print $FHD " 0 ));\n";
@@ -458,7 +453,7 @@ sub generate_extra_loaders($$$$)
         print $FHD "\n";
         print $FHD "    if ( counter > $static_vec_size )\n";
         print $FHD "    {\n";
-        print $FHD "        cerr << \"Error in $name"."_load_$static_vec_short: The number of rows in $name"."_$static_vec_short.table is greater than ".$constants_hash->{$static_vec_size}.", given by $static_vec_size. Truncating data in $name"."_$static_vec_short structure to $static_vec_size elements. Suggest you fix the data or create a new type with larger arrays and migrate your objects across.\" << endl;\n";
+        print $FHD "        cerr << \"Error in $name"."_load_$static_vec_short: The number of rows in $name"."_$static_vec_short.table is greater than $static_vec_size. Truncating data in $name"."_$static_vec_short structure to ".$constants_hash->{$static_vec_size}." elements. Suggest you fix the data or create a new type with larger arrays and migrate your objects across.\" << endl;\n";
         print $FHD "    }\n";
         print $FHD "    else\n";
         print $FHD "    {\n";
