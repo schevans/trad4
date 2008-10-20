@@ -147,6 +147,11 @@ if ( ! -f "$ENV{APP_ROOT}/objects/main.c" ) {
 
 }
 
+if ( ! -d "$ENV{APP_ROOT}/bin" ) {
+
+    `mkdir $ENV{APP_ROOT}/bin`;
+}
+
 vprint("Done.");
 
 sub usage() {
