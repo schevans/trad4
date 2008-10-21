@@ -43,7 +43,7 @@ sub Validate($$$$) {
 
         if ( ! $master_hash->{$key} ) {
 
-            print "Error: Type \'$name\' has a sub type \'$key\', which is not found in $ENV{APP_ROOT}/defs.\n";
+            print "Error: Type \'$name\' has a sub type \'$key\', which is not found in $ENV{SRC_DIR}.\n";
             ExitOnError();
         }
     }
@@ -159,7 +159,7 @@ sub CloseFile() {
 }
 sub LoadAppConstants() {
 
-    open APP_CONSTANTS_FILE, "$ENV{APP_ROOT}/defs/constants.t4s" or die "Can't open $ENV{APP_ROOT}/defs/constants.t4s for reading";
+    open APP_CONSTANTS_FILE, "$ENV{SRC_DIR}/constants.t4s" or die "Can't open $ENV{SRC_DIR}/constants.t4s for reading";
 
     my %constants_hash;
     my %expression_hash;
@@ -253,7 +253,7 @@ sub LoadAppConstants() {
 
 sub LoadEnums() {
 
-    open ENUMS_FILE, "$ENV{APP_ROOT}/defs/enums.t4s" or die "Can't open $ENV{APP_ROOT}/defs/enums.t4s for reading";
+    open ENUMS_FILE, "$ENV{SRC_DIR}/enums.t4s" or die "Can't open $ENV{SRC_DIR}/enums.t4s for reading";
 
     my %enum_hash;
     my $enum;
@@ -287,7 +287,7 @@ sub LoadEnums() {
 
 sub LoadStructures() {
 
-    open STRUCTURES_FILE, "$ENV{APP_ROOT}/defs/structures.t4s" or die "Can't open $ENV{APP_ROOT}/defs/structures.t4s for reading";
+    open STRUCTURES_FILE, "$ENV{SRC_DIR}/structures.t4s" or die "Can't open $ENV{SRC_DIR}/structures.t4s for reading";
 
     my %struct_hash;
 
@@ -340,13 +340,13 @@ sub LoadDefs() {
 
     my %master_hash;
 
-    if ( ! -f $ENV{APP_ROOT}."/defs/object_types.t4s" ) {
+    if ( ! -f $ENV{SRC_DIR}."/object_types.t4s" ) {
 
-        print "Error: File $ENV{APP_ROOT}/defs/object_types.t4s not found.\n";
+        print "Error: File $ENV{SRC_DIR}/object_types.t4s not found.\n";
         ExitOnError();
     }
 
-    open TYPES_FILE, "$ENV{APP_ROOT}/defs/object_types.t4s" or die "Can't open $ENV{APP_ROOT}/defs/object_types.t4s for reading";
+    open TYPES_FILE, "$ENV{SRC_DIR}/object_types.t4s" or die "Can't open $ENV{SRC_DIR}/object_types.t4s for reading";
 
     while ( $line = <TYPES_FILE> ) {
 
@@ -358,7 +358,7 @@ sub LoadDefs() {
 
         ( $num, $tier, $type ) = split /,/, $line;
 
-        if ( -f $ENV{APP_ROOT}."/defs/$type.t4" ) {
+        if ( -f $ENV{SRC_DIR}."/$type.t4" ) {
 
             $master_hash{$type}{tier} = $tier;
 
@@ -375,11 +375,11 @@ sub LoadDefs() {
         }
         else {
 
-            print "Warning: Type \'$type\' referenced in object_types.t4s but not found in ".$ENV{APP_ROOT}."/defs. Ignoring type.\n";
+            print "Warning: Type \'$type\' referenced in object_types.t4s but not found in ".$ENV{SRC_DIR}.". Ignoring type.\n";
         }
     }
 
-    my @file_list = `cd $ENV{APP_ROOT}/defs && ls *.t4`;
+    my @file_list = `cd $ENV{SRC_DIR} && ls *.t4`;
 
     foreach $file ( @file_list  ) {
 
@@ -400,7 +400,7 @@ sub LoadDefs() {
 sub LoadDef($) {
     my $object = shift;
 
-    my $file = $ENV{APP_ROOT}."/defs/$object.t4";
+    my $file = $ENV{SRC_DIR}."/$object.t4";
 
     open FILE, "$file" or die "Could not open $file for reading";
 
