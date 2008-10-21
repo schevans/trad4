@@ -1,8 +1,8 @@
 # Copyright (c) Steve Evans 2008
 # steve@topaz.myzen.co.uk
 
-sub
-    int interest_rate_feed
+static
+    rate ir_rates[INTEREST_RATE_LEN]
 
 pub
     double interest_rate_interpol[DISCOUNT_RATE_LEN]

@@ -6,6 +6,7 @@
 sub
     int bond
     int currency_curves
+    int fx_rate
 
 pub
     double mtm_pnl
