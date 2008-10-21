@@ -19,4 +19,7 @@ static
     int start_date
     double cash
     int notional
+    buy_sell_enum buy_sell
+
+
 
