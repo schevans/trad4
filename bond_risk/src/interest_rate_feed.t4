@@ -1,6 +1,0 @@
-# Copyright (c) Steve Evans 2008
-# steve@topaz.myzen.co.uk
-
-static
-    rate rates[INTEREST_RATE_LEN]
-
