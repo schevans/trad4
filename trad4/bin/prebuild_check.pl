@@ -15,7 +15,7 @@ my $gen_root=$ENV{APP_ROOT}."/gen";
 sub load_defs($);
 my %object_hash;
 
-open TYPES_FILE, "$ENV{APP_ROOT}/defs/object_types.t4s" or die "Can't open $ENV{APP_ROOT}/defs/object_types.t4s for reading";
+open TYPES_FILE, "$ENV{SRC_ROOT}/object_types.t4s" or die "Can't open $ENV{SRC_ROOT}/object_types.t4s for reading";
 
 while ( $line = <TYPES_FILE> ) {
 
@@ -55,7 +55,7 @@ foreach $object ( keys %object_hash ) {
 sub load_defs($) {
     my $name = shift;
 
-    my $file = $ENV{APP_ROOT}."/defs/$name.t4";
+    my $file = $ENV{SRC_ROOT}."/$name.t4";
 
     open FILE, "$file" or die "Could not open $file for reading";
 
