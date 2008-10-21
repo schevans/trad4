@@ -44,7 +44,7 @@ if( $opts{k} ) {
 
 my $struct_hash;
 
-if (  -f $ENV{APP_ROOT}."/defs/structures.t4s" ) {
+if (  -f $ENV{SRC_DIR}."/structures.t4s" ) {
 
     vprint("Loading structures..");
     $struct_hash = PreComp::Utilities::LoadStructures();
@@ -52,7 +52,7 @@ if (  -f $ENV{APP_ROOT}."/defs/structures.t4s" ) {
 
 my $enum_hash;
 
-if (  -f $ENV{APP_ROOT}."/defs/enums.t4s" ) {
+if (  -f $ENV{SRC_DIR}."/enums.t4s" ) {
 
     vprint("Loading enums..");
     $enum_hash = PreComp::Utilities::LoadEnums();
@@ -60,7 +60,7 @@ if (  -f $ENV{APP_ROOT}."/defs/enums.t4s" ) {
 
 my $constants_hash;
 
-if (  -f $ENV{APP_ROOT}."/defs/constants.t4s" ) {
+if (  -f $ENV{SRC_DIR}."/constants.t4s" ) {
 
     vprint("Loading constants..");
     $constants_hash = PreComp::Utilities::LoadAppConstants();
@@ -124,14 +124,23 @@ PreComp::Macros::Generate( $master_hash, $struct_hash );
 vprint("Generating sql..");
 PreComp::SqlCommon::Generate( $master_hash );
 
-vprint("Generating structures..");
-PreComp::Structures::Generate( $struct_hash );
+if ( $struct_hash ) {
 
-vprint("Generating enums..");
-PreComp::Enums::Generate( $enum_hash );
+    vprint("Generating structures..");
+    PreComp::Structures::Generate( $struct_hash );
+}
 
-vprint("Generating constants..");
-PreComp::AppConstants::Generate( $constants_hash );
+if ( $enum_hash ) {
+
+    vprint("Generating enums..");
+    PreComp::Enums::Generate( $enum_hash );
+}
+
+if ( $constants_hash ) {
+
+    vprint("Generating constants..");
+    PreComp::AppConstants::Generate( $constants_hash );
+}
 
 if ( ! -f "$ENV{APP_ROOT}/objects/main.c" ) {
 

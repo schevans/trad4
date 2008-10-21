@@ -10,8 +10,6 @@ sub SqlRoot { return "$ENV{APP_ROOT}/gen/sql/"; }
 sub GenObjRoot { return "$ENV{APP_ROOT}/gen/objects/"; }
 sub ObjRoot { return "$ENV{APP_ROOT}/objects/"; }
 
-sub DefsRoot { return "$ENV{APP_ROOT}/defs/"; }
-
 sub CommomHeader { 
 
     my @header = ( 
