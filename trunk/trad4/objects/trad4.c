@@ -94,6 +94,24 @@ void run_trad4() {
         }
     }
 
+    char* num_threads_env = getenv("NUM_THREADS");
+
+    if ( num_threads_env ) 
+    {
+        num_threads = atoi(num_threads_env);
+
+        if ( num_threads < 1 or num_threads > MAX_THREADS )
+        {
+            cout << "Warning: NUM_THREADS set to " << num_threads << ". Assuming 1 thread." << endl;
+            num_threads = 1;
+        }
+    }
+    else
+    {
+        cout << "Warning: NUM_THREADS unset. Assuming 1 thread." << endl;
+        num_threads = 1;
+    }
+
     start_threads();
 
     sleep(1);
