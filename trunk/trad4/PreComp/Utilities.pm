@@ -360,7 +360,14 @@ sub LoadDefs() {
 
         if ( -f $ENV{SRC_DIR}."/$type.t4" ) {
 
+            if ( exists $master_hash{$type} ) {
+
+                print "Error: Two objects share the same name in object_types.t4s - $type.\n";
+                ExitOnError();
+            }
+
             $master_hash{$type}{tier} = $tier;
+
 
             if ( $master_hash{$type}{type_num} ) {
 
