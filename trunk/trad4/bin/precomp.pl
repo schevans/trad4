@@ -142,6 +142,12 @@ if ( $constants_hash ) {
     PreComp::AppConstants::Generate( $constants_hash );
 }
 
+# Hack alert
+`touch $ENV{APP_ROOT}/gen/objects/structures.h`;
+`touch $ENV{APP_ROOT}/gen/objects/enums.h`;
+`touch $ENV{APP_ROOT}/gen/objects/constants.h`;
+`touch $ENV{APP_ROOT}/objects/common.h`;
+
 if ( ! -f "$ENV{APP_ROOT}/objects/main.c" ) {
 
     vprint("Generating main..");
