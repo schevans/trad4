@@ -19,6 +19,52 @@ sub SetExitOnError($) {
     $exit_on_error = shift;
 }
 
+sub GenerateSpecs($) {
+    my $master_hash = shift;
+
+    if ( -f $ENV{SRC_DIR}."/specs.csv" ) {
+
+        print "Warning: Generate specs: -s was specified but file already exists. Please move existing file to regenerate specs.csv.\n";
+    }
+    else {
+
+        open SPECS_FILE, ">$ENV{SRC_DIR}/specs.csv";
+
+        print SPECS_FILE "object,section,name,type,given by\n";
+
+        foreach $object ( keys %{$master_hash} ) {
+
+            foreach $section ( "sub", "static", "static_vec", "pub", "pub_vec" ) {
+
+                my $print_section = $section;
+                $print_section =~ s/_vec//;
+
+                foreach $var ( keys %{$master_hash->{$object}->{data}->{$section}} ) {
+
+                    print SPECS_FILE "$object,$print_section,$var,$master_hash->{$object}->{data}->{$section}->{$var},";
+            
+                    if ( $section =~ /sub/ ) {
+
+                        print SPECS_FILE "$var\n";
+                    }
+                    elsif ( $section =~ /static/ ) {
+
+                        print SPECS_FILE "$object\n";
+                    }
+                    else {
+
+                        print SPECS_FILE "write me\n";
+                    }
+
+                }
+            }
+
+        }
+        
+        close SPECS_FILE;
+    }
+}
+
 sub Clean() {
 
     print "Cleaning $ENV{APP_ROOT}/gen/objects..\n";
