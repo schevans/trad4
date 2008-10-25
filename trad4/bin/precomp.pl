@@ -22,7 +22,7 @@ sub vprint($);
 
 my %opts;
 
-if ( ! getopts( 'o:hvck', \%opts ) ) {
+if ( ! getopts( 'o:hvsck', \%opts ) ) {
     usage();
 }
 
@@ -72,6 +72,10 @@ my $master_hash = PreComp::Utilities::LoadDefs();
 #print Dumper( $constants_hash );
 #print "----------------------------\n";
 #print Dumper( $struct_hash );
+
+if ( $opts{s} ) {
+    PreComp::Utilities::GenerateSpecs( $master_hash );
+}
 
 my %doing;
 
@@ -178,6 +182,7 @@ sub usage() {
     print "  -k             continue on error\n";
     print "  -c             remove all generated files\n";
     print "  -v             verbose\n";
+    print "  -s             generate specs\n";
     print "  -h             display this help and exit\n";
     print"\n";
 
