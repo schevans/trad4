@@ -1,7 +1,0 @@
-
-create table interest_rate_feed_data (
-    id int,
-    asof int,
-    rate double
-);
-
