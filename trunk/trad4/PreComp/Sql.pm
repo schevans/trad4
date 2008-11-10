@@ -58,7 +58,7 @@ sub generate_dummy_data($$) {
 
     foreach $key ( @{$obj_hash->{data}->{sub_order}} ) {
 
-        print $FHD ", $master_hash->{$key}->{type_num}";
+        print $FHD ", $master_hash->{$obj_hash->{data}->{sub}->{$key}}->{type_num}";
 
     }
 

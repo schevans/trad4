@@ -58,7 +58,12 @@ sub Generate($) {
     print $FHD "\n";
     print $FHD "    // Sub\n";
 
-    PreComp::Utilities::PrintSection( $FHD, $obj_hash->{data}->{sub}, "    " );
+    foreach $key ( keys %{$obj_hash->{data}->{sub}} ) {
+
+        print $FHD "    int $key;\n";
+
+    }
+
 
     print $FHD "\n";
     print $FHD "    // Feed\n";
