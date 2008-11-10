@@ -12,7 +12,6 @@ sub Generate($$) {
     my $obj_hash = shift;
     my $struct_hash = shift;
 
-print Dumper( $obj_hash ); 
     foreach $name ( keys %{$obj_hash} ) {
 
         my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::GenObjRoot().$name."_macros.h" );
