@@ -87,6 +87,15 @@ sub Validate($$$$) {
 
     my $type_num =  $master_hash->{$name}->{type_num};
 
+    foreach $key ( @{$obj_hash->{data}->{sub_order}} ) {
+
+        if ( ! $master_hash->{$obj_hash->{data}->{sub}->{$key}} ) {
+
+            print "Error: Type \'$name\' has a type \'".$obj_hash->{data}->{sub}->{$key}."\', which is not found in $ENV{SRC_DIR}.\n";
+            ExitOnError();
+        }
+    }
+
     foreach $key ( keys %{$master_hash} ) {
 
         if ( $key ne $name ) {
