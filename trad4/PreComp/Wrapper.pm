@@ -44,9 +44,9 @@ sub Generate($$$$) {
     print $FHD "#include \"$name.h\"\n";
     print $FHD "#include \"$name"."_macros.h\"\n";
 
-    foreach $key ( keys %{$obj_hash->{data}->{sub}} ) {
+    foreach $key ( @{$obj_hash->{data}->{sub_order}} ) {
 
-        print $FHD "#include \"$key.h\"\n";
+        print $FHD "#include \"".$obj_hash->{data}->{sub}->{$key}.".h\"\n";
     }
 
 
@@ -68,15 +68,16 @@ sub Generate($$$$) {
     print $FHD "using namespace std;\n";
     print $FHD "\n";
 
-
     generate_constructor( $obj_hash, $FHD );
     print $FHD "\n";
+
 
     generate_calculate( $master_hash, $name, $FHD );
     print $FHD "\n";
 
     generate_need_refresh( $obj_hash, $FHD );
     print $FHD "\n";
+
 
     generate_validator( $master_hash, $name, $FHD );
     print $FHD "\n";
@@ -134,12 +135,12 @@ sub generate_calculate($$$)
 
         print $FHD "    DEBUG_FINE( \"$key:\" );\n";
 
-        foreach $key2 ( @{$master_hash->{$key}->{data}->{pub_order}} ) {
+        foreach $key2 ( @{$master_hash->{$obj_hash->{data}->{sub}->{$key}}->{data}->{pub_order}} ) {
 
             print $FHD "    DEBUG_FINE( \"\\t$key"."_$key2: \" << $key"."_$key2 );\n";
         }
 
-        foreach $key2 ( @{$master_hash->{$key}->{data}->{static_order}} ) {
+        foreach $key2 ( @{$master_hash->{$obj_hash->{data}->{sub}->{$key}}->{data}->{static_order}} ){ 
 
             print $FHD "    DEBUG_FINE( \"\\t$key"."_$key2: \" << $key"."_$key2 );\n";
         }
@@ -181,16 +182,16 @@ sub generate_validator($$$)
         print $FHD "        exit(0);\n";
         print $FHD "    }\n";
         print $FHD "\n";
-        print $FHD "    if ( ((object_header*)obj_loc[(($name*)obj_loc[id])->$key])->type != $master_hash->{$key}->{type_num} )\n";
+        print $FHD "    if ( ((object_header*)obj_loc[(($name*)obj_loc[id])->$key])->type != $master_hash->{$obj_hash->{data}->{sub}->{$key}}->{type_num} )\n";
         print $FHD "    {\n";
-        print $FHD "        cout << \"Error: Type $name, id \" << id << \" failed validation because a sub object $key, id \" << (($name*)obj_loc[id])->$key << \" is not of type $master_hash->{$key}->{type_num}.\" << endl;\n";
+
+        print $FHD "        cout << \"Error: Type $name, id \" << id << \" failed validation because a sub object $key, id \" << (($name*)obj_loc[id])->$key << \" is not of type $master_hash->{$obj_hash->{data}->{sub}->{$key}}->{type_num}.\" << endl;\n";
         print $FHD "        exit(0);\n";
         print $FHD "    }\n";
         print $FHD "\n";
 
 
     }
-#    if ( $has_feed eq "in" ) {
 
     print $FHD "    return retval;\n";
     print $FHD "\n";
@@ -306,8 +307,7 @@ sub generate_loader_callback($$)
 
     foreach $key ( keys %{$obj_hash->{data}->{sub}} ) {
 
-        print $FHD "    (($name*)obj_loc[id])->$key = ";
-        print $FHD PreComp::Utilities::Type2atoX($obj_hash->{data}->{sub}->{$key})."(row[$counter]);\n";
+        print $FHD "    (($name*)obj_loc[id])->$key = atoi(row[$counter]);\n";
         $counter++
     }
 

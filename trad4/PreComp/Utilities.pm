@@ -85,15 +85,6 @@ sub Validate($$$$) {
 
     my $obj_hash = $master_hash->{$name};
 
-    foreach $key ( keys %{$obj_hash->{data}->{sub}} ) {
-
-        if ( ! $master_hash->{$key} ) {
-
-            print "Error: Type \'$name\' has a sub type \'$key\', which is not found in $ENV{SRC_DIR}.\n";
-            ExitOnError();
-        }
-    }
-
     my $type_num =  $master_hash->{$name}->{type_num};
 
     foreach $key ( keys %{$master_hash} ) {
@@ -119,6 +110,11 @@ sub Validate($$$$) {
                     if ( exists $struct_hash->{$obj_hash->{data}->{$key}->{$key2}} ) {
         
                         next;   # next in $key2 loop. My god! A comment!
+                    }
+
+                    if ( exists $master_hash->{$obj_hash->{data}->{$key}->{$key2}} ) {
+
+                        next;   # next in $key2 loop. 
                     }
 
                     my $found_in_enums = 0;
