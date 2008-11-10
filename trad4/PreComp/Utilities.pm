@@ -30,7 +30,7 @@ sub GenerateSpecs($) {
 
         open SPECS_FILE, ">$ENV{SRC_DIR}/specs.csv";
 
-        print SPECS_FILE "object,section,name,type,given by\n";
+        print SPECS_FILE "Object,Section,Name,Type,Given by\n";
 
         foreach $object ( keys %{$master_hash} ) {
 
