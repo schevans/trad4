@@ -29,5 +29,7 @@ do
     fi
 done
 
+echo "Loading object_types.."
+
 $TRAD4_ROOT/bin/runsql $APP_ROOT/gen/sql/object_types.sql
 
