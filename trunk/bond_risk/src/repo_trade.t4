@@ -4,9 +4,9 @@
 # This code is licenced under the BSD licence. For details see $INSTANCE_ROOT/LICENCE
 
 sub
-    int bond
-    int currency_curves
-    int fx_rate
+    bond sbond
+    currency_curves scurrency_curves
+    fx_rate sfx_rate
 
 pub
     double mtm_pnl
