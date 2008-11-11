@@ -126,6 +126,8 @@ sub Generate($$) {
 
         foreach $var ( keys %{$obj_hash->{$name}->{data}->{sub}} ) {
 
+print "$name: $var\n";
+
             $var_type = $obj_hash->{$name}->{data}->{sub}->{$var};
 
             print $FHD "\n";
@@ -137,14 +139,14 @@ sub Generate($$) {
                 print $FHD "#define $var"."_$var2 (($var_type*)obj_loc[(($name*)obj_loc[id])->$var])->$var2\n";
             }
 
-        print_macro_sub_vec( $FHD, $var_type, $obj_hash, $struct_hash, "pub" );
+        print_macro_sub_vec( $FHD, $var, $var_type, $obj_hash, $struct_hash, "pub" );
 
             foreach $var2 ( keys %{$obj_hash->{$var_type}->{data}->{static}} ) {
 
                 print $FHD "#define $var"."_$var2 (($var_type*)obj_loc[(($name*)obj_loc[id])->$var])->$var2\n";
             }
 
-        print_macro_sub_vec( $FHD, $var_type, $obj_hash, $struct_hash, "static" );
+        print_macro_sub_vec( $FHD, $var, $var_type, $obj_hash, $struct_hash, "static" );
 
         }
 
@@ -159,19 +161,20 @@ sub Generate($$) {
 sub print_macro_sub_vec($) {
     my $FHD = shift;
     my $var = shift;
+    my $var_type = shift;
     my $obj_hash = shift;
     my $struct_hash = shift;
     my $section = shift;
     my $vec_section = $section."_vec";
 
-    foreach $vec_name ( keys %{$obj_hash->{$var}->{data}->{$vec_section}} ) {
+    foreach $vec_name ( keys %{$obj_hash->{$var_type}->{data}->{$vec_section}} ) {
 
-        $vec_type = $obj_hash->{$var}->{data}->{$vec_section}->{$vec_name};
+        $vec_type = $obj_hash->{$var_type}->{data}->{$vec_section}->{$vec_name};
 
         $vec_short = $vec_name;
         $vec_short =~ s/\[.*\]//g;
 
-        print $FHD "#define $var"."_$vec_short (($var*)obj_loc[(($name*)obj_loc[id])->$var])->$vec_short\n";
+        print $FHD "#define $var"."_$vec_short (($var_type*)obj_loc[(($name*)obj_loc[id])->$var])->$vec_short\n";
 
         if ( $struct_hash->{$vec_type} ) {
 
