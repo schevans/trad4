@@ -4,10 +4,11 @@
 # This code is licenced under the BSD licence. For details see $INSTANCE_ROOT/LICENCE
 
 sub
-    int bond
+    bond sbond
 
 pub
     double pv
+    double pv_01
     double pnl
 
 static

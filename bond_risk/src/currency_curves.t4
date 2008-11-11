@@ -7,5 +7,6 @@ static
 pub
     double interest_rate_interpol[DISCOUNT_RATE_LEN]
     double discount_rate[DISCOUNT_RATE_LEN]
-    double discount_rate_01[DISCOUNT_RATE_LEN]
+    double discount_rate_p01[DISCOUNT_RATE_LEN]
+    double discount_rate_m01[DISCOUNT_RATE_LEN]
 
