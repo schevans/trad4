@@ -11,6 +11,7 @@ using namespace std;
 
 void calculate_currency_curves( obj_loc_t obj_loc, int id )
 {
+/*
     int current_period_start;
     int current_period_end;
 
@@ -18,7 +19,6 @@ void calculate_currency_curves( obj_loc_t obj_loc, int id )
     double y_intercept;
 
     // Interpolate the IR first..
-
     for ( int indx = 0; indx < INTEREST_RATE_LEN - 1 ; indx++)
     {
         current_period_start = interest_rate_feed_rates_asof(indx);
@@ -29,7 +29,7 @@ void calculate_currency_curves( obj_loc_t obj_loc, int id )
 
         for ( int i = current_period_start ; i <= current_period_end ; i++ )
         {
-            //cout << "\tDate " << i << " index  " << i - DATE_RANGE_START << " rate: " <<(  i*gradient + y_intercept ) << endl;
+            cout << "\tDate " << i << " index  " << i - DATE_RANGE_START << " rate: " <<(  i*gradient + y_intercept ) << endl;
             currency_curves_interest_rate_interpol[i - DATE_RANGE_START] = (  i*gradient + y_intercept );
         }
 
@@ -45,6 +45,6 @@ void calculate_currency_curves( obj_loc_t obj_loc, int id )
 
         //cout << "currency_curves_discount_rate[ " << i << "]: " << currency_curves_discount_rate[i] << endl;
     }
-
+*/
 }
 

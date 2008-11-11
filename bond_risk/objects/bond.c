@@ -12,6 +12,7 @@ using namespace std;
 
 void calculate_bond( obj_loc_t obj_loc, int id )
 {
+/*
     std::vector<int> _coupon_date_vec;
     std::vector<float> _payment_vec;
     std::vector<float> _payment_vec_01;
@@ -38,12 +39,12 @@ void calculate_bond( obj_loc_t obj_loc, int id )
 
     for( iter = _coupon_date_vec.begin() ; iter < _coupon_date_vec.end() ; iter++ )
     {
-        _payment_vec.push_back( 100.0 * coupon_discount_rate_per_period * currency_curves_discount_rate[*iter - TODAY] );
-        _payment_vec_01.push_back( 100.0 * coupon_discount_rate_per_period * currency_curves_discount_rate_01[*iter - TODAY] );
+        _payment_vec.push_back( 100.0 * coupon_discount_rate_per_period * scurrency_curves_discount_rate[*iter - TODAY] );
+        _payment_vec_01.push_back( 100.0 * coupon_discount_rate_per_period * scurrency_curves_discount_rate_01[*iter - TODAY] );
     }
 
-    _payment_vec.push_back( 100 * currency_curves_discount_rate[_coupon_date_vec[_coupon_date_vec.size() -1] - TODAY] );
-    _payment_vec_01.push_back( 100 * currency_curves_discount_rate_01[_coupon_date_vec[_coupon_date_vec.size() -1] - TODAY] );
+    _payment_vec.push_back( 100 * scurrency_curves_discount_rate[_coupon_date_vec[_coupon_date_vec.size() -1] - TODAY] );
+    _payment_vec_01.push_back( 100 * scurrency_curves_discount_rate_01[_coupon_date_vec[_coupon_date_vec.size() -1] - TODAY] );
 
     float price(0.0);
     float price_01(0.0);
@@ -58,5 +59,6 @@ void calculate_bond( obj_loc_t obj_loc, int id )
 
     bond_price = ( price );
     bond_dv01 = ( price - price_01 );
+*/
 }
 
