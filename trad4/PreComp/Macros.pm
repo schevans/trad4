@@ -126,8 +126,6 @@ sub Generate($$) {
 
         foreach $var ( keys %{$obj_hash->{$name}->{data}->{sub}} ) {
 
-print "$name: $var\n";
-
             $var_type = $obj_hash->{$name}->{data}->{sub}->{$var};
 
             print $FHD "\n";
