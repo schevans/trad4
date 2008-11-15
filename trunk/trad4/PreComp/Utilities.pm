@@ -399,6 +399,8 @@ sub LoadDefs() {
 
     open TYPES_FILE, "$ENV{SRC_DIR}/object_types.t4s" or die "Can't open $ENV{SRC_DIR}/object_types.t4s for reading";
 
+    my $counter = 0;
+
     while ( $line = <TYPES_FILE> ) {
 
         chomp $line;
@@ -430,11 +432,19 @@ sub LoadDefs() {
             $master_hash{$type}{name} = $type;
 
             $master_hash{$type}{data} = LoadDef( $type );
+
+            $counter = $counter + 1;
         }
         else {
 
             print "Warning: Type \'$type\' referenced in object_types.t4s but not found in ".$ENV{SRC_DIR}.". Ignoring type.\n";
         }
+    }
+
+    if ( $counter == 0 ) {
+        
+        print "Error: object_types.t4s is empty.\n";
+        ExitOnError();
     }
 
     my @file_list = `cd $ENV{SRC_DIR} && ls *.t4`;
