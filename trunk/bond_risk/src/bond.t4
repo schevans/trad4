@@ -7,7 +7,7 @@ sub
 
 pub
     double price
-    double dv01
+    double pv01
 
 static
     int start_date
