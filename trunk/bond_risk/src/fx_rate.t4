@@ -1,4 +1,7 @@
 
+
 static
-    double gbp_usd
+    double rate
+    int ccy1
+    int ccy2
 
