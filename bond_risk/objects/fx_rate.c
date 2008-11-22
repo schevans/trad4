@@ -10,6 +10,6 @@ using namespace std;
 
 void calculate_fx_rate( obj_loc_t obj_loc, int id )
 {
-    // Write me.
+    // Does nothing.
 }
 
