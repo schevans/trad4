@@ -13,5 +13,6 @@ void calculate_outright_trade( obj_loc_t obj_loc, int id )
     outright_trade_pv = ( outright_trade_quantity * sbond_price / 100 );
 
     outright_trade_pnl = (( outright_trade_quantity * sbond_price / 100 ) - ( outright_trade_quantity * outright_trade_trade_price / 100 ));
+    outright_trade_pv_01 = ( outright_trade_quantity * sbond_pv01 / 100 );
 }
 
