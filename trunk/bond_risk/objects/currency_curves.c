@@ -11,7 +11,6 @@ using namespace std;
 
 void calculate_currency_curves( obj_loc_t obj_loc, int id )
 {
-/*
     int current_period_start;
     int current_period_end;
 
@@ -21,15 +20,23 @@ void calculate_currency_curves( obj_loc_t obj_loc, int id )
     // Interpolate the IR first..
     for ( int indx = 0; indx < INTEREST_RATE_LEN - 1 ; indx++)
     {
-        current_period_start = interest_rate_feed_rates_asof(indx);
-        current_period_end = interest_rate_feed_rates_asof(indx+1);
+        current_period_start = currency_curves_ir_rates_asof(indx);
+        current_period_end = currency_curves_ir_rates_asof(indx+1);
 
-        gradient = ((  interest_rate_feed_rates_value(indx) -  interest_rate_feed_rates_value(indx+1) ) / (  interest_rate_feed_rates_asof(indx) -  interest_rate_feed_rates_asof(indx+1) ) );
-        y_intercept = interest_rate_feed_rates_value(indx) - gradient * interest_rate_feed_rates_asof(indx);
+        gradient = ((  currency_curves_ir_rates_value(indx) -  currency_curves_ir_rates_value(indx+1) ) / (  currency_curves_ir_rates_asof(indx) -  currency_curves_ir_rates_asof(indx+1) ) );
+        y_intercept = currency_curves_ir_rates_value(indx) - gradient * currency_curves_ir_rates_asof(indx);
 
-        for ( int i = current_period_start ; i <= current_period_end ; i++ )
+/*
+        cout << "current_period_start: " << current_period_start 
+            << ", current_period_end: " << current_period_end 
+            << ", currency_curves_ir_rates_value(indx): " << currency_curves_ir_rates_value(indx)
+            << ", currency_curves_ir_rates_value(indx+1): " << currency_curves_ir_rates_value(indx+1)
+            << ", gradient: " << gradient 
+            << ", y_intercept: " << y_intercept << endl;
+*/
+        for ( int i = current_period_start ; i < current_period_end ; i++ )
         {
-            cout << "\tDate " << i << " index  " << i - DATE_RANGE_START << " rate: " <<(  i*gradient + y_intercept ) << endl;
+            //cout << "\tDate " << i << " index  " << i - DATE_RANGE_START << " rate: " <<(  i*gradient + y_intercept ) << endl;
             currency_curves_interest_rate_interpol[i - DATE_RANGE_START] = (  i*gradient + y_intercept );
         }
 
@@ -41,10 +48,17 @@ void calculate_currency_curves( obj_loc_t obj_loc, int id )
     {
         currency_curves_discount_rate[i] = exp( -currency_curves_interest_rate_interpol[i] * (( i / YEAR_BASIS)/ YEAR_BASIS ) );
 
-        currency_curves_discount_rate_01[i] = exp( -(currency_curves_interest_rate_interpol[i] -0.0001) * (( i / YEAR_BASIS)/ YEAR_BASIS ) );
+        currency_curves_discount_rate_p01[i] = exp( -(currency_curves_interest_rate_interpol[i] +0.0001) * (( i / YEAR_BASIS)/ YEAR_BASIS ) );
 
-        //cout << "currency_curves_discount_rate[ " << i << "]: " << currency_curves_discount_rate[i] << endl;
-    }
+        currency_curves_discount_rate_m01[i] = exp( -(currency_curves_interest_rate_interpol[i] -0.0001) * (( i / YEAR_BASIS)/ YEAR_BASIS ) );
+
+/*
+        cout << "currency_curves_discount_rate[ " << i << "]: " << currency_curves_discount_rate[i]
+            << ", currency_curves_discount_rate_p01[ " << i << "]: " << currency_curves_discount_rate_p01[i]
+            << ", currency_curves_discount_rate_m01[ " << i << "]: " << currency_curves_discount_rate_m01[i]
+            << endl;
 */
+    }
+
 }
 
