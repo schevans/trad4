@@ -171,7 +171,29 @@ if ( ! -f "$ENV{APP_ROOT}/objects/main.c" ) {
     print MAIN "    run_trad4();\n";
     print MAIN "}\n";
 
+    close MAIN;
+
 }
+
+if ( ! -f "$ENV{APP_ROOT}/objects/printer.c" ) {
+
+    print "Generating main..\n";
+    open FILE, ">$ENV{APP_ROOT}/objects/printer.c" or die "Can't open $ENV{APP_ROOT}/objects/printer.c";
+
+    print FILE "\n";
+    print FILE "#include <iostream>\n";
+    print FILE "#include \"trad4.h\"\n";
+    print FILE "\n";
+    print FILE "using namespace std;\n";
+    print FILE "\n";
+    print FILE "extern \"C\" void printer( obj_loc_t obj_loc )\n";
+    print FILE "{\n";
+    print FILE "    cout << \"Printing..\" << endl;\n";
+    print FILE "}\n";
+
+    close FILE;
+}
+
 
 if ( ! -d "$ENV{APP_ROOT}/bin" ) {
 
