@@ -22,6 +22,7 @@ int thread_contoller[MAX_THREADS+1];
 object_type_struct_t* object_type_struct[MAX_TYPES+1];
 sqlite3* db;
 char *zErrMsg = 0;  // ??
+printer_fpointer printer;
 
 int num_tiers(MAX_TIERS);   // Will be dynamic.
 int num_threads(MAX_THREADS);   // Will be dynamic.
@@ -38,6 +39,7 @@ int run_tier( int tier );
 void reload_handler( int sig_num );
 void load_objects( int initial_load );
 void load_types( int initial_load );
+void load_printer() ;
 
 void run_trad4() {
 
@@ -67,6 +69,8 @@ void run_trad4() {
     load_types( 1 );
 
     load_objects( 1 );
+
+    load_printer();
 
     for ( int i = 0 ; i < MAX_OBJECTS+1 ; i++ )
     {
@@ -161,6 +165,7 @@ void run_trad4() {
 
             cout << endl << "All tiers ran " << num_objects_run << " objects in " << end_time-start_time << " seconds." << endl;
 
+            printer( obj_loc );
         }
         else
         {
@@ -460,5 +465,25 @@ void load_objects( int initial_load )
     if( sqlite3_exec(db, dbstream.str().c_str(), load_objects_callback, (void*)&initial_load, &zErrMsg) != SQLITE_OK ){
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
         sqlite3_free(zErrMsg);
+    }
+}
+
+void load_printer() 
+{
+    char *error;
+
+    ostringstream lib_name;
+    lib_name << getenv("APP_ROOT") << "/lib/libprinter.so";
+
+    void* lib_handle = dlopen (lib_name.str().c_str(), RTLD_LAZY);
+    if (!lib_handle) {
+        fputs (dlerror(), stderr);
+        exit(1);
+    }
+
+    printer = (printer_fpointer)dlsym(lib_handle, "printer");
+    if ((error = dlerror()) != NULL)  {
+        fputs(error, stderr);
+        exit(1);
     }
 }

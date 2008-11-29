@@ -23,6 +23,7 @@ typedef void (*calculate_fpointer)( obj_loc_t obj_loc, int id );
 typedef int (*need_refresh_fpointer)( obj_loc_t obj_loc, int id );
 typedef void (*load_objects_fpointer)( obj_loc_t obj_loc, int initial_load );
 typedef int (*validate_fpointer)( obj_loc_t obj_loc, int initial_load );
+typedef void (*printer_fpointer)( obj_loc_t obj_loc );
 
 void run_trad4();
 
