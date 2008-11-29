@@ -11,7 +11,21 @@ using namespace std;
 
 void calculate_d2f( obj_loc_t obj_loc, int id )
 {
-    d2f_d2f = ( df1_df - df2_df ) / df1_dx;
+    switch ( d2f_node_type ) {
+
+        case START:
+            d2f_d2f = df2_df / df1_dx;
+            break;
+        case MID:
+            d2f_d2f = ( df1_df - df2_df ) / df1_dx;
+            break;
+        case END:
+            d2f_d2f = df1_df / df1_dx;
+            break;
+        default:
+            cout << "Hit default case in switch - bad static graph. Exiting." << endl;
+            exit(0);
+    }
 
     if ( fabs( d2f_d2f ) < 1.0e-10 )
         d2f_d2f = 0;

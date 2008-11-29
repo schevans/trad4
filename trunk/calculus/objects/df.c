@@ -12,7 +12,22 @@ using namespace std;
 void calculate_df( obj_loc_t obj_loc, int id )
 {
     df_dx = f1_x - f2_x;
-    df_df = ( f1_y - f2_y ) / df_dx;
+
+    switch ( df_node_type ) {
+
+        case START:
+            df_df = f2_y / df_dx;
+            break;
+        case MID:
+            df_df = ( f1_y - f2_y ) / df_dx;
+            break;
+        case END:
+            df_df = f1_y / df_dx;
+            break;
+        default:
+            cout << "Hit default case in switch - bad static graph. Exiting." << endl;
+            exit(0);
+    }
 
     if ( fabs( df_df ) < 1.0e-10 )
         df_df = 0;

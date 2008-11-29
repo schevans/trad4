@@ -4,6 +4,9 @@ sub
     f f1
     f f2
 
+static
+    node_type_enum node_type
+
 pub
     double df
     double dx

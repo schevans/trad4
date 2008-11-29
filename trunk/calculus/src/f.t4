@@ -2,6 +2,7 @@
 
 static
     double x
+    node_type_enum node_type
 
 pub
     double y

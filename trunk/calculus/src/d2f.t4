@@ -4,5 +4,8 @@ sub
     df df1
     df df2
 
+static
+    node_type_enum node_type
+
 pub
     double d2f
