@@ -165,7 +165,7 @@ void run_trad4() {
 
             cout << endl << "All tiers ran " << num_objects_run << " objects in " << end_time-start_time << " seconds." << endl;
 
-            printer( obj_loc );
+            printer( obj_loc, tier_manager );
         }
         else
         {
