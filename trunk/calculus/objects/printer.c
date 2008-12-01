@@ -21,7 +21,7 @@ extern "C" void printer( obj_loc_t obj_loc, tier_manager_t tier_manager )
 
     int id;
 
-cout << "TM: " << tier_manager[1][0] << endl;
+    cout << "x,";
 
     for ( int i=1 ; i <= tier_manager[1][0] ; i++ )
     {
@@ -34,6 +34,8 @@ cout << "TM: " << tier_manager[1][0] << endl;
 
     cout << endl;
 
+    cout << "fx,";
+
     for ( int i=1 ; i <= tier_manager[1][0] ; i++ )
     {
         if ( obj_loc[tier_manager[1][i]] )
@@ -45,6 +47,8 @@ cout << "TM: " << tier_manager[1][0] << endl;
 
     cout << endl;
 
+    cout << "df,";
+
     for ( int i=1 ; i <= tier_manager[2][0] ; i++ )
     {
         if ( obj_loc[tier_manager[2][i]] )
@@ -55,6 +59,8 @@ cout << "TM: " << tier_manager[1][0] << endl;
     }
 
     cout << endl;
+
+    cout << "d2f,";
 
     for ( int i=1 ; i <= tier_manager[3][0] ; i++ )
     {
