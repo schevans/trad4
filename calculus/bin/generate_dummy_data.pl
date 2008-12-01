@@ -34,19 +34,9 @@ my $counter = 1;
 
 while ( $counter <= $length ) {
 
-    print FILE "insert into object values ( $counter, 1, \"f_$counter\", 1, 1 );\n";
+    print FILE "insert into object values ( $counter, 1, \"f_$counter\", 0, 1 );\n";
 
-    my $node_type_enum = 1;
-
-    if ( $counter == 1 ) {
-        $node_type_enum = 0;
-    }
-
-    if ( $counter == $length ) {
-        $node_type_enum = 2;
-    }
-
-    print FILE "insert into f values ( $counter, ".funk( $counter ).", $node_type_enum );\n";
+    print FILE "insert into f values ( $counter, ".funk( $counter )." );\n";
 
     $counter = $counter + 1;
 }
@@ -62,23 +52,20 @@ print FILE "delete from df;\n";
 
 while ( $counter <= $length * 2 ) {
 
-    print FILE "insert into object values ( $counter, 2, \"df_1\", 1, 1 );\n";
+    print FILE "insert into object values ( $counter, 2, \"df_1\", 0, 1 );\n";
 
     my $sub_up = $counter - $length + 1;
     my $sub_down = $counter - $length - 1;
-    my $node_type_enum = 1;
 
     if ( $sub_down == 0 ) {
-        $sub_down = 2;
-        $node_type_enum = 0;
+        $sub_down = 1;
     }
 
     if ( $sub_up == $length + 1 ) {
-        $sub_up = $length - 1;
-        $node_type_enum = 2;
+        $sub_up = $length;
     }
 
-    print FILE "insert into df values ( $counter, $node_type_enum, $sub_up, $sub_down );\n";
+    print FILE "insert into df values ( $counter, $sub_up, $sub_down );\n";
 
     $counter = $counter + 1;
 }
@@ -93,23 +80,20 @@ print FILE "delete from d2f;\n";
 
 while ( $counter <= $length * 3 ) {
 
-    print FILE "insert into object values ( $counter, 3, \"d2f_1\", 1, 1 );\n";
+    print FILE "insert into object values ( $counter, 3, \"d2f_1\", 0, 1 );\n";
 
     my $sub_up = $counter - $length + 1;
     my $sub_down = $counter - $length - 1;
-    my $node_type_enum = 1;
 
     if ( $sub_down == $length ) {
-        $sub_down = $length + 2;
-        $node_type_enum = 0;
+        $sub_down = $length + 1;
     }
 
     if ( $sub_up == ($length*2) + 1 ) {
-        $sub_up = ($length*2) - 1;
-        $node_type_enum = 2;
+        $sub_up = ($length*2);
     }
 
-    print FILE "insert into d2f values ( $counter, $node_type_enum, $sub_up, $sub_down );\n";
+    print FILE "insert into d2f values ( $counter, $sub_up, $sub_down );\n";
 
     $counter = $counter + 1;
 }
