@@ -1,9 +1,9 @@
 
 sub
-    int option
-    int stock
-    int rate_trade
-    int bs_delta
+    option soption
+    stock sstock
+    rate_trade srate_trade
+    bs_delta sbs_delta
 
 pub
     double theta

@@ -1,7 +1,7 @@
 
 sub
-    int option
-    int risk_free_rate
+    option soption
+    risk_free_rate srisk_free_rate
 
 pub
     double rT

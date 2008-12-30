@@ -10,6 +10,6 @@ using namespace std;
 
 void calculate_gamma( obj_loc_t obj_loc, int id )
 {
-    gamma_gamma = bs_delta_N_pd1 / ( stock_S * stock_trade_vRtT );
+    gamma_gamma = sbs_delta_N_pd1 / ( sstock_S * sstock_trade_vRtT );
 }
 

@@ -1,7 +1,7 @@
 
 sub
-    int option
-    int stock
+    option soption
+    stock sstock
 
 pub
     double ln_SK

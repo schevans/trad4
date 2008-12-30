@@ -13,9 +13,9 @@ double CumeNormDist(const double x);
 
 void calculate_bs_delta( obj_loc_t obj_loc, int id )
 {
-    double d1 =  ( stock_trade_ln_SK + rate_trade_rT  + stock_trade_vvT_2 ) / stock_trade_vRtT;
+    double d1 =  ( sstock_trade_ln_SK + srate_trade_rT  + sstock_trade_vvT_2 ) / sstock_trade_vRtT;
 
-    double d2 = d1 - stock_trade_vRtT;
+    double d2 = d1 - sstock_trade_vRtT;
 
     bs_delta_N_pd1 = CumeNormDist( d1 );
 
@@ -25,7 +25,7 @@ void calculate_bs_delta( obj_loc_t obj_loc, int id )
 
     bs_delta_N_md2 = CumeNormDist( - d2 );
 
-    if ( option_call_or_put == CALL )
+    if ( soption_call_or_put == CALL )
     {
         bs_delta_delta = bs_delta_N_pd1;
     }

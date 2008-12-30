@@ -11,11 +11,11 @@ using namespace std;
 
 void calculate_stock_trade( obj_loc_t obj_loc, int id )
 {
-    stock_trade_ln_SK = log( stock_S / option_K );
+    stock_trade_ln_SK = log( sstock_S / soption_K );
 
-    stock_trade_vvT_2 = ( stock_vv * option_T ) / 2.0;
+    stock_trade_vvT_2 = ( sstock_vv * soption_T ) / 2.0;
 
-    stock_trade_vRtT = stock_v * option_RtT;
+    stock_trade_vRtT = sstock_v * soption_RtT;
 
 }
 

@@ -1,8 +1,8 @@
 
 sub
-    int bs_delta
-    int stock_trade
-    int stock
+    bs_delta sbs_delta
+    stock_trade sstock_trade
+    stock sstock
 
 pub
     double gamma
