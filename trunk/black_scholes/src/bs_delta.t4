@@ -1,8 +1,8 @@
 
 sub
-    int rate_trade
-    int stock_trade
-    int option
+    rate_trade srate_trade
+    stock_trade sstock_trade
+    option soption
 
 pub
     double N_pd1

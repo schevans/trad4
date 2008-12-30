@@ -1,8 +1,8 @@
 
 sub
-    int option
-    int rate_trade
-    int bs_delta
+    option soption
+    rate_trade srate_trade
+    bs_delta sbs_delta
 
 pub
     double rho
