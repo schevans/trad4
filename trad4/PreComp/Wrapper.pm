@@ -121,7 +121,7 @@ sub generate_calculate($$$)
     print $FHD "{\n";
     print $FHD "    DEBUG( \"calculate_$obj_hash->{name}( \" << id << \" )\" );\n";
     print $FHD "\n";
-    print $FHD "    DEBUG_FINE( \"Static:\" );\n";
+    print $FHD "    DEBUG_FINE( \"static:\" );\n";
 
     foreach $key ( @{$obj_hash->{data}->{static_order}} ) {
 
@@ -130,26 +130,27 @@ sub generate_calculate($$$)
     }
 
     print $FHD "\n";
+    print $FHD "    DEBUG_FINE( \"sub:\" );\n";
 
     foreach $key ( @{$obj_hash->{data}->{sub_order}} ) {
 
-        print $FHD "    DEBUG_FINE( \"$key:\" );\n";
+        print $FHD "    DEBUG_FINE( \"\t$key:\" );\n";
 
         foreach $key2 ( @{$master_hash->{$obj_hash->{data}->{sub}->{$key}}->{data}->{pub_order}} ) {
 
-            print $FHD "    DEBUG_FINE( \"\\t$key"."_$key2: \" << $key"."_$key2 );\n";
+            print $FHD "    DEBUG_FINE( \"\\t\\t$key"."_$key2: \" << $key"."_$key2 );\n";
         }
 
         foreach $key2 ( @{$master_hash->{$obj_hash->{data}->{sub}->{$key}}->{data}->{static_order}} ){ 
 
-            print $FHD "    DEBUG_FINE( \"\\t$key"."_$key2: \" << $key"."_$key2 );\n";
+            print $FHD "    DEBUG_FINE( \"\\t\\t$key"."_$key2: \" << $key"."_$key2 );\n";
         }
     }
 
     print $FHD "\n";
     print $FHD "    calculate_$obj_hash->{name}( obj_loc, id );\n";
     print $FHD "\n";
-    print $FHD "    DEBUG_FINE( \"Pub:\");\n";
+    print $FHD "    DEBUG_FINE( \"pub:\");\n";
 
     foreach $key ( @{$obj_hash->{data}->{pub_order}} ) {
 
