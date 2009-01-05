@@ -50,9 +50,9 @@ generate_currency_curves_ir_rates();
 generate_currency_curves();
 generate_fx_rates();
 #generate_books();
-generate_bonds( 3 );
-generate_outright_trades( 3  );
-generate_repo_trades( 3  );
+generate_bonds( 20 );
+generate_outright_trades( 100 );
+generate_repo_trades( 100 );
 
 sub generate_currency_curves_ir_rates() {
 
@@ -283,7 +283,7 @@ sub generate_bonds($) {
             int( 6000 + rand(  8000 - 6000 )).",".
             int( 18000 + rand( 20000 - 18000 )).",".
             $coup_pys[ int( rand( @coup_pys )) ].",".
-            sprintf("%.2f", (rand( 8 - 2 ) + 2)).",".
+            sprintf("%.2f", (rand( 2))).",".
             $currency_curve.");\n";
             
         push @bond_ids, $id;
@@ -382,6 +382,11 @@ sub open_file($$) {
     my $type = shift;
 
     my $file = "$dummy_data_root/$id.$type.t4o";
+
+    if ( ! -d $dummy_data_root ) {
+
+        `mkdir $dummy_data_root`;
+    }
 
     open FILE, ">$file" or die "Can't open $file";
     

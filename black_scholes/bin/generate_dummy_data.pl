@@ -40,7 +40,7 @@ my %option_rho;
 
 generate_risk_free_rates();
 generate_stocks();
-generate_options( 110000 );
+generate_options( 132000 );
 generate_rate_trades();
 generate_stock_trades();
 generate_bs_delta();
@@ -56,6 +56,7 @@ sub generate_price() {
     my $FILE = open_file( "price" );
 
     print $FILE "delete from price;\n";
+    print $FILE "BEGIN;\n";
 
     my ( $option, $id );
 
@@ -70,6 +71,8 @@ sub generate_price() {
 
     }
 
+    print $FILE "COMMIT;\n";
+
     close $FILE;
 }
 
@@ -79,6 +82,7 @@ sub generate_gamma() {
     my $FILE = open_file( "gamma" );
 
     print $FILE "delete from gamma;\n";
+    print $FILE "BEGIN;\n";
 
     my ( $option, $id );
 
@@ -93,6 +97,8 @@ sub generate_gamma() {
 
     }
 
+    print $FILE "COMMIT;\n";
+
     close $FILE;
 }
 
@@ -101,6 +107,7 @@ sub generate_rho() {
     my $FILE = open_file( "rho" );
 
     print $FILE "delete from rho;\n";
+    print $FILE "BEGIN;\n";
 
     my ( $option, $id );
 
@@ -116,6 +123,8 @@ sub generate_rho() {
 
     }
 
+    print $FILE "COMMIT;\n";
+
     close $FILE;
 }
 
@@ -126,6 +135,7 @@ sub generate_theta() {
     my $FILE = open_file( "theta" );
 
     print $FILE "delete from theta;\n";
+    print $FILE "BEGIN;\n";
 
     my ( $option, $id );
 
@@ -140,6 +150,7 @@ sub generate_theta() {
 
     }
 
+    print $FILE "COMMIT;\n";
 
     close $FILE;
 
@@ -150,6 +161,7 @@ sub generate_vega() {
     my $FILE = open_file( "vega" );
 
     print $FILE "delete from vega;\n";
+    print $FILE "BEGIN;\n";
 
     my ( $option, $id );
 
@@ -164,6 +176,7 @@ sub generate_vega() {
 
     }
 
+    print $FILE "COMMIT;\n";
 
     close $FILE;
 
@@ -175,6 +188,7 @@ sub generate_bs_delta() {
     my $FILE = open_file( "bs_delta" );
 
     print $FILE "delete from bs_delta;\n";
+    print $FILE "BEGIN;\n";
 
     my ( $option, $id );
 
@@ -190,6 +204,7 @@ sub generate_bs_delta() {
 
     }
 
+    print $FILE "COMMIT;\n";
 
     close $FILE;
 
@@ -201,6 +216,7 @@ sub generate_stock_trades() {
     my $FILE = open_file( "stock_trade" );
 
     print $FILE "delete from stock_trade;\n";
+    print $FILE "BEGIN;\n";
 
     my ( $option, $id );
 
@@ -216,6 +232,7 @@ sub generate_stock_trades() {
 
     }
 
+    print $FILE "COMMIT;\n";
 
     close $FILE;
 }
@@ -226,6 +243,7 @@ sub generate_rate_trades() {
     my $FILE = open_file( "rate_trade" );
 
     print $FILE "delete from rate_trade;\n";
+    print $FILE "BEGIN;\n";
 
     my ( $option, $id );
 
@@ -240,6 +258,7 @@ sub generate_rate_trades() {
         $option_rate_trade{$option} = $id;
     }
 
+    print $FILE "COMMIT;\n";
 
     close $FILE;
 }
@@ -252,6 +271,7 @@ sub generate_options($) {
     $FILE = open_file( "option" );
 
     print $FILE "delete from option;\n";
+    print $FILE "BEGIN;\n";
 
 
     while ( $num_options > 0 ) {
@@ -288,6 +308,9 @@ sub generate_options($) {
     
         $num_options--;
     }
+
+    print $FILE "COMMIT;\n";
+
     close $FILE; 
 
 }
@@ -304,6 +327,7 @@ sub generate_stocks()
     $FILE = open_file( "stock" );
 
     print $FILE "delete from stock;\n";
+    print $FILE "BEGIN;\n";
 
     while ( $line = <IN_FILE> ) {
 
@@ -323,6 +347,10 @@ sub generate_stocks()
 
     }
 
+    print $FILE "COMMIT;\n";
+
+    close $FILE;
+
 }
 
 sub generate_risk_free_rates() {
@@ -332,6 +360,7 @@ sub generate_risk_free_rates() {
     $FILE = open_file( "risk_free_rate" );
 
     print $FILE "delete from risk_free_rate;\n";
+    print $FILE "BEGIN;\n";
 
     print $FILE "insert into object values ( 1, 2, \"RFR-USD\", 0, 1 );\n";
     print $FILE "insert into risk_free_rate values ( 1, 0.035 );\n";
@@ -341,6 +370,8 @@ sub generate_risk_free_rates() {
 
     print $FILE "insert into object values ( 3, 2, \"RFR-EUR\", 0, 1 );\n";
     print $FILE "insert into risk_free_rate values ( 3, 0.0475 );\n";
+
+    print $FILE "COMMIT;\n";
 
     close $FILE;
 
@@ -356,6 +387,11 @@ sub open_file($) {
     my $name = shift;
 
     my $file = "$dummy_data_root/$name.sql";
+
+    if ( ! -d $dummy_data_root ) {
+        
+        `mkdir $dummy_data_root`;
+    }
 
     open FILE, ">$file" or die "Can't open $file";
 
