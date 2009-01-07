@@ -12,15 +12,11 @@ using namespace std;
 void calculate_d2f( obj_loc_t obj_loc, int id )
 {
 
-    if ( df1_dx > df2_dx ) 
-        d2f_dx2 = df2_dx;
-    else
-        d2f_dx2 = df1_dx;
+    d2f_dx2 = ( d2f_dx2 - df2_dx );
 
     d2f_d2f = ( df1_df - df2_df ) / d2f_dx2;
 
     if ( fabs( d2f_d2f ) < 1.0e-10 )
         d2f_d2f = 0;
-
 }
 
