@@ -39,6 +39,7 @@ heat_equation_1d
 </h1>
 <ul>
 <li><a href="#introduction">Introduction</a></li>
+<li><a href="#implementation">Implementation</a></li>
 
 </ul>
 
@@ -52,6 +53,81 @@ The heat equation is part of an important class of problems known as Partial Dif
 <p>
 This approach will scale for 2D, 3D or nD models, all of which are coming soon.
 </p>
+<p>
+While the 1D heat equation has been discussed extensively elsewhere, I will briefly summarise the problem here.
+</p>
+<p>
+Take a fully insulated metal bar with one dimension (think of a lagged copper wire). Provide an initial heat distribution across the bar, and hold each end at a specific temperature (i.e., using Dirichlet boundary conditions). Now let this bar settle into a steady state, taking snapshots of the temperature distribution across the bar as it evolves over time. We should see the temperature converge on a linear slope between the start and end temperatures.
+</p>
+<h2><a name="implementation">Implementation</a></h2>
+<p>
+As discussed, we'll be using FDMs for this model.
+</p>
+<p>
+Firstly, we need to create our grid. For this example (worked_example1) we'll be using a very rough grid of 10 elements. Each element will have an x value which won't change through the life of the object, and an y value which will start with our initial conditions and then evolve into equilibrium. 
+</p>
+<p>
+Let's look at the starting values first. Each object has an id, an x value and a y value, where y = cos(2*x), and where y = 0.0 if y < 0.0.
+</p>
+<table border="1">
+<tr>
+<td>id</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>6</td>
+<td>7</td>
+<td>8</td>
+<td>9</td>
+<td>10</td>
+</tr>
+<tr>
+<td>x</td>
+<td>0.1</td>
+<td>0.2</td>
+<td>0.3</td>
+<td>0.4</td>
+<td>0.5</td>
+<td>0.6</td>
+<td>0.7</td>
+<td>0.8</td>
+<td>0.9</td>
+<td>1.0</td>
+</tr>
+<tr>
+<td>y</td>
+<td>0.980067</td>
+<td>0.921061</td>
+<td>0.825336</td>
+<td>0.696707</td>
+<td>0.540302</td>
+<td>0.362358</td>
+<td>0.169967</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+</table>
+</p>
+<p>
+Now we need to compute the next cycle of the system's evolution, and for this well be using the Central Difference Method, the derivation of which won't be given here.
+</p>
+<p>
 
+We have the state at t=n. At t=n+1, the change in any given element is given by:
+
+<blockquote><pre>
+my_change_change = _K * ( up_element_y - 2*this_element_y + down_element_y );
+</pre></blockquote>
+<p>
+So that y at t+1 is given by:
+<blockquote><pre>
+element_y = element_y + my_change_change;
+</pre></blockquote>
+<p>
+
+At this point we should briefly discuss boundary conditions.
+</p>
 </body>
      </html>
