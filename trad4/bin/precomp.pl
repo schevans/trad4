@@ -186,7 +186,7 @@ if ( ! -f "$ENV{APP_ROOT}/objects/printer.c" ) {
     print FILE "\n";
     print FILE "using namespace std;\n";
     print FILE "\n";
-    print FILE "extern \"C\" void printer( obj_loc_t obj_loc )\n";
+    print FILE "extern \"C\" void printer( obj_loc_t obj_loc, tier_manager_t tier_manager )\n";
     print FILE "{\n";
     print FILE "    //cout << \"Printing..\" << endl;\n";
     print FILE "}\n";
