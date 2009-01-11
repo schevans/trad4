@@ -20,7 +20,7 @@ extern "C" void printer( obj_loc_t obj_loc, tier_manager_t tier_manager )
         if ( obj_loc[tier_manager[1][i]] )
         {
             id = tier_manager[1][i];
-            cout << element_value << ",";
+            cout << element_y << ",";
         }
     }
 
