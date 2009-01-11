@@ -15,11 +15,14 @@ void calculate_element( obj_loc_t obj_loc, int id )
     {
         element_init = 1;
 
-        element_value = cos(2*element_x);
+        element_y = cos(2*element_x);
     }
     else
     {
-        element_value = element_value + my_change_change;
+        element_y = element_y + my_change_change;
     }
+
+    if ( element_y < 0.0 ) 
+        element_y = 0.0;
 }
 
