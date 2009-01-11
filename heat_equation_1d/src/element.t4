@@ -9,4 +9,4 @@ sub
     change my_change
 
 pub
-    double value 
+    double y 
