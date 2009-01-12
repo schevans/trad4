@@ -13,7 +13,7 @@ extern "C" void printer( obj_loc_t obj_loc, tier_manager_t tier_manager )
 {
     int id;
    
-    cout << "REZ,";
+    cout << endl << "REZ,";
  
     for ( int i=1 ; i <= tier_manager[1][0] ; i++ )
     {
