@@ -24,5 +24,20 @@ extern "C" void printer( obj_loc_t obj_loc, tier_manager_t tier_manager )
         }
     }
 
+    cout << endl;
+
+    cout << "DELTA,";
+ 
+    for ( int i=1 ; i <= tier_manager[2][0] ; i++ )
+    {
+        if ( obj_loc[tier_manager[2][i]] )
+        {
+            id = tier_manager[2][i];
+            cout << change_change << ",";
+        }
+    }
+
+    cout << endl;
+
     sleep(1);
 }
