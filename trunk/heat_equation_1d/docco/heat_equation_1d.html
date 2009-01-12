@@ -24,7 +24,7 @@
      <head>
  
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-    <link rel="stylesheet" type="text/css" href="/gnu.css" />
+    <link rel="stylesheet" type="text/css" href="http://trad4.sourceforge.net/gnu.css" />
 <title>
 heat_equation_1d - a trad4 application</title>
    </head>
@@ -39,6 +39,7 @@ heat_equation_1d
 </h1>
 <ul>
 <li><a href="#introduction">Introduction</a></li>
+<li><a href="#the_model">The Model</a></li>
 <li><a href="#implementation">Implementation</a></li>
 
 </ul>
@@ -59,7 +60,7 @@ While the 1D heat equation has been discussed extensively elsewhere, I will brie
 <p>
 Take a fully insulated metal bar with one dimension (think of a lagged copper wire). Provide an initial heat distribution across the bar, and hold each end at a specific temperature (i.e., using Dirichlet boundary conditions). Now let this bar settle into a steady state, taking snapshots of the temperature distribution across the bar as it evolves over time. We should see the temperature converge on a linear slope between the start and end temperatures.
 </p>
-<h2><a name="implementation">Implementation</a></h2>
+<h2><a name="the_model">The Model</a></h2>
 <p>
 As discussed, we'll be using FDMs for this model.
 </p>
@@ -126,8 +127,88 @@ So that y at t+1 is given by:
 element_y = element_y + my_change_change;
 </pre></blockquote>
 <p>
-
-At this point we should briefly discuss boundary conditions.
+As discussed above, this first model uses the Dirichlet boundary conditions. This just means that the ends of the bar are held at a specific temperature. The way we visualise this is by imagining an extra ghost element at the edges of our bar, like so:
 </p>
+<table border="1">
+<tr>
+<td>id</td>
+<td>ghost1</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>6</td>
+<td>7</td>
+<td>8</td>
+<td>9</td>
+<td>10</td>
+<td>ghost2</td>
+</tr>
+<tr>
+<td>x</td>
+<td>n/a</td>
+<td>0.1</td>
+<td>0.2</td>
+<td>0.3</td>
+<td>0.4</td>
+<td>0.5</td>
+<td>0.6</td>
+<td>0.7</td>
+<td>0.8</td>
+<td>0.9</td>
+<td>1.0</td>
+<td>n/a</td>
+</tr>
+<tr>
+<td>y</td>
+<td>0.980067</td>
+<td>0.980067</td>
+<td>0.921061</td>
+<td>0.825336</td>
+<td>0.696707</td>
+<td>0.540302</td>
+<td>0.362358</td>
+<td>0.169967</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+</table>
+<p>
+In this model the edges are given somewhat arbitrary values of ALPHA=0.980067 and BETA=0.0 respectively.
+</p>
+<p>
+It's important to stress that these ghost nodes don't actually exists - they just allow for the equation above to work at the edges. In this way the equation above becomes, for element id=1:
+
+<blockquote><pre>
+change_change = _K * ( up_element_y - 2*this_element_y + 0.980067 );
+</pre></blockquote>
+
+</p>
+<p>
+</p>
+</p>
+<h2><a name="implementation">Implementation</a></h2>
+<p>
+<h3>The concrete diagram</h3>
+<img src="heat1d_concrete.jpeg" alt="Heat 1D Concrete Diagram">
+<h3>The t4 files</h3>
+<p>
+element.t4:
+</p>
+<blockquote><pre>
+static
+    int init
+    element_type_enum element_type
+    double x
+    
+sub
+    change my_change
+
+pub
+    double y 
+</pre></blockquote>
+
 </body>
      </html>
