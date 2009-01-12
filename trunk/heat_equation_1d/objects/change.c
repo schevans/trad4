@@ -13,15 +13,15 @@ void calculate_change( obj_loc_t obj_loc, int id )
     switch ( this_element_element_type )
     {
         case MIDDLE:
-            change_change = _K * ( up_element_y - 2*this_element_y + down_element_y );
+            change_change = K * ( up_element_y - 2*this_element_y + down_element_y );
             break;
 
         case START:
-            change_change = _K * ( up_element_y - 2*this_element_y + _A );
+            change_change = K * ( up_element_y - 2*this_element_y + ALPHA );
             break;
 
         case END:
-            change_change = _K * ( _B - 2*this_element_y + down_element_y );
+            change_change = K * ( BETA - 2*this_element_y + down_element_y );
             break;
 
         default:
