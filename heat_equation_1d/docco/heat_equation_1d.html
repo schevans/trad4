@@ -126,7 +126,7 @@ my_change_change = K * ( up_element_y - 2*this_element_y + down_element_y );    
 <p>
 So that y at t+1 is given by:
 <blockquote><pre>
-element_y = element_y + my_change_change;
+element_y = element_y + my_change_change;          (2)
 </pre></blockquote>
 <p>
 As discussed above, this first model uses the Dirichlet boundary conditions. This just means that the ends of the bar are held at a specific temperature. The way we visualise this is by imagining an extra ghost element at the edges of our bar, like so:
@@ -247,7 +247,346 @@ pub
 <li>down_element is the element to the left of this_element along the bar</li>
 <li>change is the change that should be applied to this_element</li>
 </ul>
-<h2><a name="Operation">Operation</a></h2>
+<h3>A note on the printer</h3>
+<p>
+An undocumented feature of trad4 has been exploited in this model, and this is heat_equation_1d/objects/printer.c. This is a 'feature' I hacked in to deal with the lack of support for any feeds out of the system. It's undocumented as it takes far too much knowledge of the trad4 internals to use, but I've used it a it's become vital that I get the object order correct when I'm outputting csv files. The trick to using it to get a csv is run the app as:
+</p>
+<blockquote><pre>
+$ heat_equation_1d | egrep '(REZ|DELTA)'
+</pre></blockquote>
+<p>
+As I say it's a hack, but I thought I should at least explain..
+</p>
+<h2><a name="operation">Operation</a></h2>
+<p>
+We'll now step through a couple of iterations, examining the log file as we go. The full log file is <a href="https://sourceforge.net/docman/display_doc.php?docid=137336&group_id=202177">here</a> - egrep for '(REZ|DELTA)' if you just want the csv.
+</p>
+<h3>Start-up</h3>
+<blockquote><pre>
+</pre></blockquote>
+<p>
+As per usual, the types are created and their shared objects loaded:
+</p>
+<blockquote><pre>
+Creating new type change, type id: 2, tier: 2
+Creating new type element, type id: 1, tier: 1
+</pre></blockquote>
+<p>
+Then, the data is loaded:
+</p>
+<blockquote><pre>
+load_all_changes()
+load_all_elements()
+</pre></blockquote>
+<p>
+Next, the system is checked and it's constituents reported:
+</p>
+<blockquote><pre>
+Checking tier 1. Num objects this tier: 10
+Checking tier 2. Num objects this tier: 10
+Checking tier 3. Num objects this tier: 0
+Checking tier 4. Num objects this tier: 0
+Checking tier 5. Num objects this tier: 0
+</pre></blockquote>
+<p>
+Next, the objects are validated:
+</p>
+<blockquote><pre>
+Validating objects...
+</pre></blockquote>
+<p>
+Then the threads start:
+</p>
+<blockquote><pre>
+Starting thread 1
+Starting thread 2
+Starting thread 3
+Starting thread 4
+</pre></blockquote>
+<p>
+Then tier1 runs:
+</p>
+<blockquote><pre>
+Tier 1 running.
+Tier 1 ran 10 objects in 0.000613928 seconds.
+</pre></blockquote>
+<p>
+At this stage, as it's the first time the system has been run, the init flag will not have been set so the element just calculate their y-values using the equation defined in their calculate method - in this case y = cos(2*x) and where y = 0.0 if y < 0.0. We've seen this before above:
+</p>
+<table border="1">
+<tr>
+<td>id</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>6</td>
+<td>7</td>
+<td>8</td>
+<td>9</td>
+<td>10</td>
+</tr>
+<tr>
+<td>x</td>
+<td>0.1</td>
+<td>0.2</td>
+<td>0.3</td>
+<td>0.4</td>
+<td>0.5</td>
+<td>0.6</td>
+<td>0.7</td>
+<td>0.8</td>
+<td>0.9</td>
+<td>1.0</td>
+</tr>
+<tr>
+<td>y(t)</td>
+<td>0.980067</td>
+<td>0.921061</td>
+<td>0.825336</td>
+<td>0.696707</td>
+<td>0.540302</td>
+<td>0.362358</td>
+<td>0.169967</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+</table>
+<p>
+</p>
+<p>
+Then tier 2 runs:
+</p>
+<blockquote><pre>
+Tier 2 running.
+Tier 2 ran 10 objects in 0.000543118 seconds.
+</pre></blockquote>
+<p>
+At this stage the deltas are calculated. This is done using equation (1) above, but bear in mind the ghost elements caused by the boundary conditions we've selected. Running this tier will give:
+</p>
+<table border="1">
+<tr>
+<td>id</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>6</td>
+<td>7</td>
+<td>8</td>
+<td>9</td>
+<td>10</td>
+</tr>
+<tr>
+<td>x</td>
+<td>0.1</td>
+<td>0.2</td>
+<td>0.3</td>
+<td>0.4</td>
+<td>0.5</td>
+<td>0.6</td>
+<td>0.7</td>
+<td>0.8</td>
+<td>0.9</td>
+<td>1.0</td>
+</tr>
+<tr>
+<td>y(t)</td>
+<td>0.980067</td>
+<td>0.921061</td>
+<td>0.825336</td>
+<td>0.696707</td>
+<td>0.540302</td>
+<td>0.362358</td>
+<td>0.169967</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<tr>
+<td>change(t)</td>
+<td>-0.0236062</td>
+<td>-0.0146879</td>
+<td>-0.0131614</td>
+<td>-0.0111102</td>
+<td>-0.00861606</td>
+<td>-0.00577842</td>
+<td>0.00896939</td>
+<td>0.0679869</td>
+<td>0.000000</td>
+<td>0.000000</td>
+</tr>
+</table>
+<p>
+And lastly the printer runs, giving the results we've just seen:
+</p>
+<blockquote><pre>
+REZ,0.980067,0.921061,0.825336,0.696707,0.540302,0.362358,0.169967,0,0,0,
+DELTA,-0.0236062,-0.0146879,-0.0131614,-0.0111102,-0.00861606,-0.00577842,0.00896939,0.0679869,0,0,
+</pre></blockquote>
+<p>
+<h3>Next iteration</h3>
+</p>
+Due to the presence of the feedback loop, the system needs no external influence to continue to run. When the T1 element's tier is run, they will see that the objects they subscribe to - the T2 objects - have changed, and that they therefore need to fire. 
+<p>
+The next thing they will see is that their init flag's been set, and that therefore they will not need to seed themselves, but rather to update their published values given the delta they pull up from the change objects to which they subscribe. This means that equation (2) above runs, which results in:
+</p>
+<p>
+<table border="1">
+<tr>
+<td>id</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>6</td>
+<td>7</td>
+<td>8</td>
+<td>9</td>
+<td>10</td>
+</tr>
+<tr>
+<td>x</td>
+<td>0.1</td>
+<td>0.2</td>
+<td>0.3</td>
+<td>0.4</td>
+<td>0.5</td>
+<td>0.6</td>
+<td>0.7</td>
+<td>0.8</td>
+<td>0.9</td>
+<td>1.0</td>
+</tr>
+<tr>
+<td>y(t)</td>
+<td>0.980067</td>
+<td>0.921061</td>
+<td>0.825336</td>
+<td>0.696707</td>
+<td>0.540302</td>
+<td>0.362358</td>
+<td>0.169967</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+</tr>
+<tr>
+<td>change(t)</td>
+<td>-0.0236062</td>
+<td>-0.0146879</td>
+<td>-0.0131614</td>
+<td>-0.0111102</td>
+<td>-0.00861606</td>
+<td>-0.00577842</td>
+<td>0.00896939</td>
+<td>0.0679869</td>
+<td>0.000000</td>
+<td>0.000000</td>
+</tr>
+<td>y(t+1)</td>
+<td>0.95646</td>
+<td>0.906373</td>
+<td>0.812174</td>
+<td>0.685597</td>
+<td>0.531686</td>
+<td>0.356579</td>
+<td>0.178937</td>
+<td>0.0679869</td>
+<td>0.000000</td>
+<td>0.000000</td>
+</tr>
+</table>
+</p>
+<p>
+The change object then fires again as discussed above, which produces:
+</p>
+<p>
+<table border="1">
+<tr>
+<td>id</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>6</td>
+<td>7</td>
+<td>8</td>
+<td>9</td>
+<td>10</td>
+</tr>
+<tr>
+<td>x</td>
+<td>0.1</td>
+<td>0.2</td>
+<td>0.3</td>
+<td>0.4</td>
+<td>0.5</td>
+<td>0.6</td>
+<td>0.7</td>
+<td>0.8</td>
+<td>0.9</td>
+<td>1.0</td>
+</tr>
+<tr>
+<td>y(t)</td>
+<td>0.980067</td>
+<td>0.921061</td>
+<td>0.825336</td>
+<td>0.696707</td>
+<td>0.540302</td>
+<td>0.362358</td>
+<td>0.169967</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+</tr>
+<tr>
+<td>change(t)</td>
+<td>-0.0236062</td>
+<td>-0.0146879</td>
+<td>-0.0131614</td>
+<td>-0.0111102</td>
+<td>-0.00861606</td>
+<td>-0.00577842</td>
+<td>0.00896939</td>
+<td>0.0679869</td>
+<td>0.000000</td>
+<td>0.000000</td>
+</tr>
+<td>y(t+1)</td>
+<td>0.95646</td>
+<td>0.906373</td>
+<td>0.812174</td>
+<td>0.685597</td>
+<td>0.531686</td>
+<td>0.356579</td>
+<td>0.178937</td>
+<td>0.0679869</td>
+<td>0.000000</td>
+<td>0.000000</td>
+</tr>
+</tr>
+<td>change(t+1)</td>
+<td>-0.0105964</td>
+<td>-0.0176446</td>
+<td>-0.0129515</td>
+<td>-0.010933</td>
+<td>-0.00847866</td>
+<td>-0.00101435</td>
+<td>0.0266773</td>
+<td>0.0171851</td>
+<td>0.0271947</td>
+<td>0.000000</td>
+</tr>
+</table>
+</p>
+<p>
+These changes continue to ripple round the system until the system reaches equilibrium (more on this below).
+</p>
 <h2><a name="errors_and_stability">Errors and Stability</a></h2>
 </body>
      </html>
