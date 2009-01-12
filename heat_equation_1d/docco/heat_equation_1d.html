@@ -41,6 +41,8 @@ heat_equation_1d
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#the_model">The Model</a></li>
 <li><a href="#implementation">Implementation</a></li>
+<li><a href="#operation">Operation</a></li>
+<li><a href="#errors_and_stability">Errors and Stability</a></li>
 
 </ul>
 
@@ -119,7 +121,7 @@ Now we need to compute the next cycle of the system's evolution, and for this we
 We have the state at t=n. At t=n+1, the change in any given element is given by:
 
 <blockquote><pre>
-my_change_change = _K * ( up_element_y - 2*this_element_y + down_element_y );
+my_change_change = K * ( up_element_y - 2*this_element_y + down_element_y );          (1)
 </pre></blockquote>
 <p>
 So that y at t+1 is given by:
@@ -182,7 +184,7 @@ In this model the edges are given somewhat arbitrary values of ALPHA=0.980067 an
 It's important to stress that these ghost nodes don't actually exists - they just allow for the equation above to work at the edges. In this way the equation above becomes, for element id=1:
 
 <blockquote><pre>
-change_change = _K * ( up_element_y - 2*this_element_y + 0.980067 );
+change_change = K * ( up_element_y - 2*this_element_y + ALPHA );
 </pre></blockquote>
 
 </p>
@@ -192,7 +194,14 @@ change_change = _K * ( up_element_y - 2*this_element_y + 0.980067 );
 <h2><a name="implementation">Implementation</a></h2>
 <p>
 <h3>The concrete diagram</h3>
+<p>
+Only 5 nodes are shown below when there are ten nodes in worked_example1.
+</p>
 <img src="heat1d_concrete.jpeg" alt="Heat 1D Concrete Diagram">
+</p>
+<p>
+As you can see from the concrete diagram, a change object subscribes to three element objects so that it is able to calculate equation (1) above. This change gets fed back in to the element object. As such, this is the first application we've seen that has a feedback loop.
+</p>
 <h3>The t4 files</h3>
 <p>
 element.t4:
@@ -209,6 +218,36 @@ sub
 pub
     double y 
 </pre></blockquote>
+<p>
+<ul>
+<li>init is a flag that indicates whether the system has just started up. If it is a fresh start, the element will seed itself with it's function, in this case y = cos(2*x). If the init flag has been set then element will update itself with the change, so that y = y + change.</li>
+<li>element_type controls whether the element is at the START, MIDDLE or END of the bar, and therefore what to do w.r.t. the ghost elements.</li>
+<li>x is the input value and is fixed in the database. In worked_example1 this runs from 0.1 to 1.0.</li>
+<li>my_change is the change object to which the elemnt subscribes</li>
+<li>y is the published values. If the system has just been started this will be cos(2*x). If the system has run through once this will be y = y + change.</li>
+</ul>
+</p>
 
+
+<p>
+change.t4:
+</p>
+<blockquote><pre>
+sub
+    element up_element
+    element this_element
+    element down_element
+   
+pub
+    double change
+</pre></blockquote>
+<ul>
+<li>up_element is the element to the right of this_element along the bar</li>
+<li>this_element it the element to which this change applies</li>
+<li>down_element is the element to the left of this_element along the bar</li>
+<li>change is the change that should be applied to this_element</li>
+</ul>
+<h2><a name="Operation">Operation</a></h2>
+<h2><a name="errors_and_stability">Errors and Stability</a></h2>
 </body>
      </html>
