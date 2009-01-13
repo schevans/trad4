@@ -33,6 +33,9 @@ sub Generate($$$$) {
     print $FHD "\n";
     print $FHD "#include <iostream>\n";
     print $FHD "#include <sstream>\n";
+    print $FHD "#include <cstdlib>\n";
+    print $FHD "#include <cstring>\n";
+    print $FHD "#include <sstream>\n";
 
     if ( %{$obj_hash->{data}->{static_vec}} ) {
         print $FHD "#include <vector>\n";
