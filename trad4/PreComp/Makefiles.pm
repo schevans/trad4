@@ -32,7 +32,7 @@ sub generate_top_lvl_make($) {
     #print_licence_header( $FHD );
 
     print $FHD "\n";
-    print $FHD "CXX = g++\n";
+    print $FHD "CXX = g++ -m32\n";
     print $FHD "\n";
     print $FHD "CXXFLAGS = $all_headers\n";
     print $FHD "\n";
@@ -46,7 +46,7 @@ sub generate_top_lvl_make($) {
     print $FHD "all: objs $ENV{APP}\n";
     print $FHD "\n";
     print $FHD "$ENV{APP}: objects/main.o\n";
-    print $FHD "	g++ objects/main.o \$(TRAD4_ROOT)/objects/sqlite3.o -o bin/$ENV{APP} -ltrad4 -L\$(TRAD4_ROOT)/objects -lpthread -ldl -L\$(APP_ROOT)/lib\n";
+    print $FHD "	g++ -m32 objects/main.o \$(TRAD4_ROOT)/objects/sqlite3.o -o bin/$ENV{APP} -ltrad4 -L\$(TRAD4_ROOT)/objects -lpthread -ldl -L\$(APP_ROOT)/lib\n";
     print $FHD "\n";
     print $FHD "objs:\n";
 
@@ -75,7 +75,7 @@ sub generate_object_make($) {
     #print_licence_header( $FHD );
 
     print $FHD "\n";
-    print $FHD "CXX = g++\n";
+    print $FHD "CXX = g++ -m32\n";
     print $FHD "\n";
     print $FHD "CXXFLAGS =  -Wall -c\n";
     print $FHD "\n";
@@ -121,7 +121,7 @@ sub generate_lib_make($) {
     #print_licence_header( $FHD );
           
     print $FHD "\n";
-    print $FHD "CXX = g++\n";
+    print $FHD "CXX = g++ -m32\n";
     print $FHD "\n";
     print $FHD "CXXFLAGS = $all_headers\n";
     print $FHD "\n";
@@ -148,13 +148,13 @@ sub generate_lib_make($) {
         $name = $obj_hash->{$type}->{name};
 
         print $FHD "lib$name.so: ../objects/$type.c ../gen/objects/$type"."_wrapper.c\n";
-        print $FHD "	g++ -shared -Wl,-soname,lib$name.so -o lib$name.so \$(TRAD4_ROOT)/objects/sqlite3.o ../objects/$type.o\n";
+        print $FHD "	g++ -m32 -shared -Wl,-soname,lib$name.so -o lib$name.so \$(TRAD4_ROOT)/objects/sqlite3.o ../objects/$type.o\n";
         print $FHD "\n";
     
     }
 
     print $FHD "libprinter.so: ../objects/printer.c\n";
-    print $FHD "	g++ -shared -Wl,-soname,libprinter.so -o libprinter.so \$(TRAD4_ROOT)/objects/sqlite3.o ../objects/printer.o\n";
+    print $FHD "	g++ -m32 -shared -Wl,-soname,libprinter.so -o libprinter.so \$(TRAD4_ROOT)/objects/sqlite3.o ../objects/printer.o\n";
     print $FHD "\n";
     print $FHD "clean:\n";
     print $FHD "	rm -f \$(LIBS)\n";
