@@ -8,7 +8,7 @@
 #include <sys/types.h>
 
 #define MAX_OBJECTS 1400000
-#define MAX_THREADS 32
+#define MAX_THREADS 128
 #define MAX_TIERS 5
 #define MAX_TYPES 15
 
