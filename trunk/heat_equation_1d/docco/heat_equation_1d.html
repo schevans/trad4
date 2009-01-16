@@ -120,7 +120,7 @@ Now we need to compute the next cycle of the system's evolution, and for this we
 We have the state at t=n. At t=n+1, the change in any given element is given by:
 
 <blockquote><pre>
-my_change_change = K * ( up_element_y - 2*this_element_y + down_element_y );          (1)
+my_change_change = my_static_k * ( up_element_y - 2*this_element_y + down_element_y );          (1)
 </pre></blockquote>
 <p>
 So that y at t+1 is given by:
@@ -177,13 +177,13 @@ As discussed above, this first model uses the Dirichlet boundary conditions. Thi
 <td>0.000000</td>
 </table>
 <p>
-In this model the edges are given somewhat arbitrary values of ALPHA=0.980067 and BETA=0.0 respectively.
+In this model the edges are given somewhat arbitrary values of alpha=0.980067 and beta=0.0 respectively.
 </p>
 <p>
 It's important to stress that these ghost nodes don't actually exists - they just allow for the equation above to work at the edges. In this way the equation above becomes, for element id=1:
 
 <blockquote><pre>
-change_change = K * ( up_element_y - 2*this_element_y + ALPHA );
+change_change = my_static_k * ( up_element_y - 2*this_element_y + my_static_alpha );
 </pre></blockquote>
 
 </p>
@@ -254,7 +254,22 @@ pub
 <li>down_element is the element to the left of this_element along the bar</li>
 <li>change is the change that should be applied to this_element</li>
 </ul>
-<h3>A note on the printer</h3>
+<p>
+data_server.t4:
+</p>
+<blockquote><pre>
+static
+    double k
+    double alpha
+    double beta
+</pre></blockquote>
+<ul>
+<li>k it the thermal conductivity of the bar</li>
+<li>alpha is the given Dirichlet boundry value for the left end of the bar</li>
+<li>beta is the given Dirichlet boundry value for the right end of the bar</li>
+</ul>
+
+    <h3>A note on the printer</h3>
 <p>
 An undocumented feature of trad4 has been exploited in this model, and this is heat_equation_1d/objects/printer.c. This is a 'feature' I hacked in to deal with the lack of support for any feeds out of the system. It's undocumented as it takes far too much knowledge of the trad4 internals to use, but I've used it a it's become vital that I get the object order correct when I'm outputting csv files. The trick to using it to get a csv is run the app as:
 </p>
