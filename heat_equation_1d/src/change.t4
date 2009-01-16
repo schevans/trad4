@@ -1,5 +1,6 @@
 
 sub
+    data_server my_static
     element up_element
     element this_element
     element down_element

@@ -8,6 +8,7 @@ use warnings;
 use strict;
 
 my $length = 10;
+my $data_server_id = 99999;
 
 sub funk($) {
     my $x = shift;
@@ -49,7 +50,7 @@ while ( $counter <= $length ) {
 
     $change_id = $counter+$length;
 
-    print FILE "insert into object values ( $counter, 1, \"element_$counter\", 0, 1 );\n";
+    print FILE "insert into object values ( $counter, 2, \"element_$counter\", 0, 1 );\n";
 
     print FILE "insert into element values ( $counter, 0, $element_type, ".funk( $counter ).", $change_id );\n";
 
@@ -67,7 +68,7 @@ print FILE "delete from change;\n";
 
 while ( $counter <= $length * 2 ) {
 
-    print FILE "insert into object values ( $counter, 2, \"change_$counter\", 0, 1 );\n";
+    print FILE "insert into object values ( $counter, 3, \"change_$counter\", 0, 1 );\n";
 
     my $sub_this = $counter - $length;
     my $sub_up = $counter - $length + 1;
@@ -81,10 +82,21 @@ while ( $counter <= $length * 2 ) {
         $sub_up = $length;
     }
 
-    print FILE "insert into change values ( $counter, $sub_up, $sub_this, $sub_down );\n";
+    print FILE "insert into change values ( $counter, $data_server_id, $sub_up, $sub_this, $sub_down );\n";
 
     $counter = $counter + 1;
 }
 
 close FILE;
 
+$file = "$dummy_data_root/data_server.sql";
+
+open FILE, ">$file" or die "Can't open $file";
+
+print FILE "delete from data_server;\n";
+
+print FILE "insert into object values ( $data_server_id, 1, \"data_server\", 0, 1 );\n";
+
+print FILE "insert into data_server values ( $data_server_id, 0.4, 0.9800567, 0.0 );\n";
+
+close FILE;
