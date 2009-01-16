@@ -42,7 +42,6 @@ heat_equation_1d
 <li><a href="#the_model">The Model</a></li>
 <li><a href="#implementation">Implementation</a></li>
 <li><a href="#operation">Operation</a></li>
-<li><a href="#errors_and_stability">Errors and Stability</a></li>
 
 </ul>
 
@@ -193,9 +192,17 @@ change_change = K * ( up_element_y - 2*this_element_y + ALPHA );
 </p>
 <h2><a name="implementation">Implementation</a></h2>
 <p>
-<h3>The concrete diagram</h3>
+<h3>The abstract diagram</h3>
 <p>
-Only 5 nodes are shown below when there are ten nodes in worked_example1.
+<img src="heat1d_abstract.jpeg" alt="Heat 1D Abstract Diagram">
+</p>
+<p>
+The change object calculates the change that is applied to the object that subscribes to that change object. It uses the y-value of the object that subscribes to it, plus the y-values of it's neighbouring elements. The change object also subscribes to the singleton data_server object.
+</p>
+<h3>The concrete diagram</h3>
+</p>
+<p>
+Only 5 nodes are shown below when there are ten nodes in worked_example1. The data_server is not shown on this to keep things simple, but remember every change object also subscribes to a single instance of the data_server.
 </p>
 <img src="heat1d_concrete.jpeg" alt="Heat 1D Concrete Diagram">
 </p>
@@ -587,6 +594,5 @@ The change object then fires again as discussed above, which produces:
 <p>
 These changes continue to ripple round the system until the system reaches equilibrium (more on this below).
 </p>
-<h2><a name="errors_and_stability">Errors and Stability</a></h2>
 </body>
      </html>
