@@ -120,7 +120,7 @@ Now we need to compute the next cycle of the system's evolution, and for this we
 We have the state at t=n. At t=n+1, the change in any given element is given by:
 
 <blockquote><pre>
-my_change_change = my_static_k * ( up_element_y - 2*this_element_y + down_element_y );          (1)
+my_change_change = my_data_server_k * ( up_element_y - 2*this_element_y + down_element_y );          (1)
 </pre></blockquote>
 <p>
 So that y at t+1 is given by:
@@ -183,7 +183,7 @@ In this model the edges are given somewhat arbitrary values of alpha=0.980067 an
 It's important to stress that these ghost nodes don't actually exists - they just allow for the equation above to work at the edges. In this way the equation above becomes, for element id=1:
 
 <blockquote><pre>
-change_change = my_static_k * ( up_element_y - 2*this_element_y + my_static_alpha );
+change_change = my_data_server_k * ( up_element_y - 2*this_element_y + my_data_server_alpha );
 </pre></blockquote>
 
 </p>
