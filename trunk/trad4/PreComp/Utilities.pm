@@ -544,13 +544,6 @@ sub HasStruct($$) {
 
 }
 
-sub HasFeed($) {
-    my $obj_hash = shift;
-
-    return $obj_hash{feed_in} or  $obj_hash{feed_out};
-
-}
-
 sub PrintSection($$$) {
     my $fh = shift;
     my $section_ref = shift;

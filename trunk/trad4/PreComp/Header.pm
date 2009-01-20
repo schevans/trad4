@@ -29,19 +29,6 @@ sub Generate($) {
     print $FHD "#include \"constants.h\"\n";
     print $FHD "\n";
 
-    if ( PreComp::Utilities::HasFeed( $obj_hash ) ) {
-
-        print $FHD "typedef struct {\n";
-
-        PreComp::Utilities::PrintSection( $FHD, $obj_hash->{data}->{feed_in}, "    " );
-        PreComp::Utilities::PrintSection( $FHD, $obj_hash->{data}->{feed_out}, "    " );
-
-        print $FHD "    int last_published;\n";
-        print $FHD "} $name"."_$has_feed;\n";
-        print $FHD "\n";
-
-    }
-
     print $FHD "typedef struct {\n";
 
     print $FHD "    // Header\n";
@@ -62,16 +49,6 @@ sub Generate($) {
 
         print $FHD "    int $key;\n";
 
-    }
-
-
-    print $FHD "\n";
-    print $FHD "    // Feed\n";
-
-    if ( PreComp::Utilities::HasFeed( $obj_hash ) ) {
-
-        print $FHD "    int shmid;\n";
-        print $FHD "    $name"."_$has_feed* $has_feed;\n";
     }
 
     print $FHD "\n";

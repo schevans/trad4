@@ -284,14 +284,6 @@ sub generate_loader_callback($$)
     print $FHD "    (($name*)obj_loc[id])->tier = atoi(row[2]);\n";
     print $FHD "    \n";
 
-    if ( $has_feed ) {
-
-        print $FHD "    (($name*)obj_loc[id])->shmid = create_shmem( \&tmp, sizeof( $name"."_$has_feed ) );;\n";
-        print $FHD "    (($name*)obj_loc[id])->$has_feed = ($name"."_$has_feed*)tmp;\n";
-        print $FHD "    ((($name*)obj_loc[id])->$has_feed)->last_published = 0;\n";
-
-    }
-
     my $counter=4;
 
 
@@ -389,11 +381,6 @@ sub generate_loader($$)
     print $FHD "        sqlite3_free(zErrMsg);\n";
     print $FHD "    }\n";
     print $FHD "\n";
-
-    if ( $has_feed ) {
-        print $FHD "     void* tmp;\n";
-        print $FHD "\n";
-    }
 
     if ( %{$obj_hash->{data}->{static_vec}} ) {
 
