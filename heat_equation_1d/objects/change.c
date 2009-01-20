@@ -3,6 +3,7 @@
 //  to see what's in-scope.
 
 #include <iostream>
+#include <math.h>
 
 #include "change_wrapper.c"
 
@@ -28,5 +29,8 @@ void calculate_change( obj_loc_t obj_loc, int id )
             cerr << "Default case reached in switch. Exiting" << endl;
             exit(0);
     }
+
+    if ( fabs( change_change ) < 1.0e-10 )
+        change_change = 0;
 }
 
