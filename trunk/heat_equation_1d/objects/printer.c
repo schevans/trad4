@@ -41,5 +41,5 @@ extern "C" void printer( obj_loc_t obj_loc, tier_manager_t tier_manager )
 
     cout << endl;
 
-    sleep(1);
+    usleep(500);
 }
