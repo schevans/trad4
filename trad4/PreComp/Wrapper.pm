@@ -12,7 +12,7 @@ sub generate_validator($$$);
 sub generate_loader($$);
 sub generate_constructor($$);
 sub generate_calculate($$$);
-sub generate_need_refresh($$);
+sub generate_need_refresh($$$);
 sub generate_loader_callback($$);
 sub generate_extra_loaders($$$$);
 
@@ -37,10 +37,6 @@ sub Generate($$$$) {
     print $FHD "#include <cstring>\n";
     print $FHD "#include <sstream>\n";
 
-    if ( %{$obj_hash->{data}->{static_vec}} ) {
-        print $FHD "#include <vector>\n";
-    }
-
     print $FHD "\n";
     print $FHD "\n";
     print $FHD "#include \"trad4.h\"\n";
@@ -59,12 +55,12 @@ sub Generate($$$$) {
     print $FHD "\n";
     print $FHD "void calculate_$obj_hash->{name}( obj_loc_t obj_loc, int id );\n";
 
-    foreach $static_vec_name ( keys %{$obj_hash->{data}->{static_vec}} ) {
+    foreach $vec_name ( ( keys %{$obj_hash->{data}->{static_vec}} , keys %{$obj_hash->{data}->{sub_vec}} )) {
 
-            $static_vec_short = $static_vec_name;
-            $static_vec_short =~ s/\[.*\]//g;
+            $vec_short = $vec_name;
+            $vec_short =~ s/\[.*\]//g;
 
-            print $FHD "void $name"."_load_$static_vec_short( obj_loc_t obj_loc, int i, sqlite3* db, int initial_load );\n";
+            print $FHD "void $name"."_load_$vec_short( obj_loc_t obj_loc, int i, sqlite3* db, int initial_load );\n";
     }
 
     print $FHD "\n";
@@ -78,7 +74,7 @@ sub Generate($$$$) {
     generate_calculate( $master_hash, $name, $FHD );
     print $FHD "\n";
 
-    generate_need_refresh( $obj_hash, $FHD );
+    generate_need_refresh( $obj_hash, $constants_hash, $FHD );
     print $FHD "\n";
 
 
@@ -91,7 +87,7 @@ sub Generate($$$$) {
     generate_loader( $obj_hash, $FHD );
     print $FHD "\n";
 
-    if ( %{$obj_hash->{data}->{static_vec}} ) {
+    if ( %{$obj_hash->{data}->{static_vec}} or %{$obj_hash->{data}->{sub_vec}} ) {
 
         generate_extra_loaders( $obj_hash, $struct_hash, $constants_hash, $FHD );
     }
@@ -202,9 +198,10 @@ sub generate_validator($$$)
     print $FHD "}\n";
 }
 
-sub generate_need_refresh($$)
+sub generate_need_refresh($$$)
 {
     my $obj_hash = shift;
+    my $constants_hash = shift;
     my $FHD = shift;
 
     my $name = $obj_hash->{name};
@@ -235,6 +232,27 @@ sub generate_need_refresh($$)
 
 
     }
+
+    foreach $vec ( keys %{$obj_hash->{data}->{sub_vec}} ) {
+
+        $vec_type = $obj_hash->{data}->{sub_vec}->{$vec};
+
+        my $vec_short = $vec;
+        $vec_short =~ s/\[.*]$//;
+
+        $vec_size = $vec;
+        $vec_size =~ s/.*\[//g;
+        $vec_size =~ s/\]//g;
+
+        my $counter=0;
+
+        while ( $counter < $constants_hash->{$vec_size}) { 
+
+            print $FHD "(object_timestamp(id) < object_timestamp( $name"."_$vec_short\[$counter\] )) || ";
+            $counter = $counter+1;
+        }
+    }
+
     print $FHD " 0 ));\n";
 
     print $FHD "\n";
@@ -371,7 +389,7 @@ sub generate_loader($$)
     print $FHD "    }\n";
     print $FHD "\n";
 
-    if ( %{$obj_hash->{data}->{static_vec}} ) {
+    if ( %{$obj_hash->{data}->{static_vec}} or %{$obj_hash->{data}->{sub_vec}} ) {
 
         print $FHD "\n";
         print $FHD "    for ( int i = 0 ; i < MAX_OBJECTS+1 ; i++ )\n";
@@ -379,14 +397,14 @@ sub generate_loader($$)
         print $FHD "        if ( obj_loc[i] && ((object_header*)obj_loc[i])->type == $obj_hash->{type_num} && ((object_header*)obj_loc[i])->status == RELOADED)\n";
         print $FHD "        {\n";
 
-        my $static_vec_short;
+        my $vec_short;
 
-        foreach $static_vec_name ( keys %{$obj_hash->{data}->{static_vec}} ) {
+        foreach $vec_name ( ( keys %{$obj_hash->{data}->{static_vec}}, keys %{$obj_hash->{data}->{sub_vec}} )) {
 
-                $static_vec_short = $static_vec_name;
-                $static_vec_short =~ s/\[.*\]//g;
+                $vec_short = $vec_name;
+                $vec_short =~ s/\[.*\]//g;
 
-                print $FHD "            $name"."_load_$static_vec_short( obj_loc, i, db, 0 );\n";
+                print $FHD "            $name"."_load_$vec_short( obj_loc, i, db, 0 );\n";
         }
 
         print $FHD "        }\n";
@@ -413,45 +431,45 @@ sub generate_extra_loaders($$$$)
     print $FHD "static int counter(0);\n";
     print $FHD "\n";
 
-    my ( $static_vec_type, $static_vec_short ); 
+    my ( $vec_type, $vec_short ); 
 
-    foreach $static_vec_name ( keys %{$obj_hash->{data}->{static_vec}} ) {
+    foreach $vec_name ( keys %{$obj_hash->{data}->{static_vec}} ) {
        
-        $static_vec_type = $obj_hash->{data}->{static_vec}->{$static_vec_name};
+        $vec_type = $obj_hash->{data}->{static_vec}->{$vec_name};
 
-        $static_vec_short = $static_vec_name;
-        $static_vec_short =~ s/\[.*\]//g;
+        $vec_short = $vec_name;
+        $vec_short =~ s/\[.*\]//g;
 
-        $static_vec_size = $static_vec_name;
-        $static_vec_size =~ s/.*\[//g;
-        $static_vec_size =~ s/\]//g;
+        $vec_size = $vec_name;
+        $vec_size =~ s/.*\[//g;
+        $vec_size =~ s/\]//g;
 
-        print $FHD "static int $name"."_load_$static_vec_short"."_callback(void *obj_loc_v, int argc, char **row, char **azColName)\n";
+        print $FHD "static int $name"."_load_$vec_short"."_callback(void *obj_loc_v, int argc, char **row, char **azColName)\n";
         print $FHD "{\n";
         print $FHD "    unsigned char** obj_loc = (unsigned char**)obj_loc_v;\n";
         print $FHD "    int id = atoi(row[0]);\n";
         print $FHD "\n";
-        print $FHD "    if ( counter > $static_vec_size )\n";
+        print $FHD "    if ( counter > $vec_size )\n";
         print $FHD "    {\n";
-        print $FHD "        cerr << \"Error in $name"."_load_$static_vec_short: The number of rows in $name"."_$static_vec_short.table is greater than $static_vec_size. Truncating data in $name"."_$static_vec_short structure to ".$constants_hash->{$static_vec_size}." elements. Suggest you fix the data or create a new type with larger arrays and migrate your objects across.\" << endl;\n";
+        print $FHD "        cerr << \"Error in $name"."_load_$vec_short: The number of rows in $name"."_$vec_short.table is greater than $vec_size. Truncating data in $name"."_$vec_short structure to ".$constants_hash->{$vec_size}." elements. Suggest you fix the data or create a new type with larger arrays and migrate your objects across.\" << endl;\n";
         print $FHD "    }\n";
         print $FHD "    else\n";
         print $FHD "    {\n";
 
-        if ( $struct_hash->{$static_vec_type} ) {
+        if ( $struct_hash->{$vec_type} ) {
 
             my $row_num=1;
 
-            foreach $key ( @{$struct_hash->{$static_vec_type}{order}} ) {
+            foreach $key ( @{$struct_hash->{$vec_type}{order}} ) {
 
-                print $FHD "        $name"."_$static_vec_short"."_$key(counter) = ".PreComp::Utilities::Type2atoX( $struct_hash->{$static_vec_type}{data}{$key} )."(row[$row_num]);\n";
+                print $FHD "        $name"."_$vec_short"."_$key(counter) = ".PreComp::Utilities::Type2atoX( $struct_hash->{$vec_type}{data}{$key} )."(row[$row_num]);\n";
 
                 $row_num = $row_num + 1;
             }
         }
         else {
             print "Not sure this is doing anything..\n";
-            print $FHD "        ($name"."_$static_vec_short"."[counter]) = ".PreComp::Utilities::Type2atoX( $static_vec_type )."(row[1]);\n";
+            print $FHD "        ($name"."_$vec_short"."[counter]) = ".PreComp::Utilities::Type2atoX( $vec_type )."(row[1]);\n";
         }
 
         print $FHD "\n";
@@ -462,9 +480,9 @@ sub generate_extra_loaders($$$$)
         print $FHD "    return 0;\n";
         print $FHD "}\n";
         print $FHD "\n";
-        print $FHD "void $name"."_load_$static_vec_short( obj_loc_t obj_loc, int id, sqlite3* db, int initial_load )\n";
+        print $FHD "void $name"."_load_$vec_short( obj_loc_t obj_loc, int id, sqlite3* db, int initial_load )\n";
         print $FHD "{\n";
-        print $FHD "    cout << \"$name"."_load_$static_vec_short\" << endl;\n";
+        print $FHD "    cout << \"$name"."_load_$vec_short\" << endl;\n";
         print $FHD "\n";
         print $FHD "    counter = 0;\n";
         print $FHD "    char *zErrMsg = 0;\n";
@@ -472,30 +490,104 @@ sub generate_extra_loaders($$$$)
         print $FHD "    std::ostringstream dbstream;\n";
         print $FHD "    dbstream << \"select id";
     
-        if ( $struct_hash->{$static_vec_type} ) {
+        if ( $struct_hash->{$vec_type} ) {
 
-            foreach $key ( @{$struct_hash->{$static_vec_type}{order}} ) {
+            foreach $key ( @{$struct_hash->{$vec_type}{order}} ) {
 
                 print $FHD ", $key";
             }
         }
         else {
 
-            print $FHD ", $static_vec_short";
+            print $FHD ", $vec_short";
         }
 
-        print $FHD " from $name"."_$static_vec_short where id = \" << id;\n";
+        print $FHD " from $name"."_$vec_short where id = \" << id;\n";
 
         print $FHD "\n";
-        print $FHD "    if( sqlite3_exec(db, dbstream.str().c_str(), $name"."_load_$static_vec_short"."_callback, obj_loc, &zErrMsg) != SQLITE_OK ){\n";
+        print $FHD "    if( sqlite3_exec(db, dbstream.str().c_str(), $name"."_load_$vec_short"."_callback, obj_loc, &zErrMsg) != SQLITE_OK ){\n";
         print $FHD "        fprintf(stderr, \"SQL error: %s\\n\", zErrMsg);\n";
         print $FHD "        sqlite3_free(zErrMsg);\n";
         print $FHD "    }\n";
         print $FHD "\n";
 
-        foreach $key ( @{$struct_hash->{$static_vec_type}{order}} ) {
+        foreach $key ( @{$struct_hash->{$vec_type}{order}} ) {
 
-            print $FHD "    $name"."_$static_vec_short"."_$key(counter) = 0;\n";
+            print $FHD "    $name"."_$vec_short"."_$key(counter) = 0;\n";
+        }
+
+        print $FHD "\n";
+        print $FHD "}\n";
+        
+    }
+
+    foreach $vec_name ( keys %{$obj_hash->{data}->{sub_vec}} ) {
+       
+        $vec_type = $obj_hash->{data}->{sub_vec}->{$vec_name};
+
+        $vec_short = $vec_name;
+        $vec_short =~ s/\[.*\]//g;
+
+        $vec_size = $vec_name;
+        $vec_size =~ s/.*\[//g;
+        $vec_size =~ s/\]//g;
+
+        print $FHD "static int $name"."_load_$vec_short"."_callback(void *obj_loc_v, int argc, char **row, char **azColName)\n";
+        print $FHD "{\n";
+        print $FHD "    unsigned char** obj_loc = (unsigned char**)obj_loc_v;\n";
+        print $FHD "    int id = atoi(row[0]);\n";
+        print $FHD "\n";
+        print $FHD "    if ( counter > $vec_size )\n";
+        print $FHD "    {\n";
+        print $FHD "        cerr << \"Error in $name"."_load_$vec_short: The number of rows in $name"."_$vec_short.table is greater than $vec_size. Truncating data in $name"."_$vec_short structure to ".$constants_hash->{$vec_size}." elements. Suggest you fix the data or create a new type with larger arrays and migrate your objects across.\" << endl;\n";
+        print $FHD "    }\n";
+        print $FHD "    else\n";
+        print $FHD "    {\n";
+
+        print $FHD "        ($name"."_$vec_short"."[counter]) = atoi(row[1]);\n";
+
+        print $FHD "\n";
+        print $FHD "        counter++;\n";
+        print $FHD "\n";
+        print $FHD "    }\n";
+        print $FHD "\n";
+        print $FHD "    return 0;\n";
+        print $FHD "}\n";
+        print $FHD "\n";
+        print $FHD "void $name"."_load_$vec_short( obj_loc_t obj_loc, int id, sqlite3* db, int initial_load )\n";
+        print $FHD "{\n";
+        print $FHD "    cout << \"$name"."_load_$vec_short\" << endl;\n";
+        print $FHD "\n";
+        print $FHD "    counter = 0;\n";
+        print $FHD "    char *zErrMsg = 0;\n";
+        print $FHD "\n";
+        print $FHD "    std::ostringstream dbstream;\n";
+        print $FHD "    dbstream << \"select id";
+    
+        if ( $struct_hash->{$vec_type} ) {
+
+            foreach $key ( @{$struct_hash->{$vec_type}{order}} ) {
+
+                print $FHD ", $key";
+            }
+        }
+        else {
+
+            print $FHD ", $vec_short";
+        }
+
+        print $FHD " from $name"."_$vec_short where id = \" << id;\n";
+
+        print $FHD "\n";
+        print $FHD "    if( sqlite3_exec(db, dbstream.str().c_str(), $name"."_load_$vec_short"."_callback, obj_loc, &zErrMsg) != SQLITE_OK ){\n";
+        print $FHD "        fprintf(stderr, \"SQL error: %s\\n\", zErrMsg);\n";
+        print $FHD "        sqlite3_free(zErrMsg);\n";
+        print $FHD "    }\n";
+        print $FHD "\n";
+
+        foreach $key ( @{$struct_hash->{$vec_type}{order}} ) {
+
+            print $FHD "    $name"."_$vec_short"."_$key(counter) = 0;\n";
         }
 
         print $FHD "\n";

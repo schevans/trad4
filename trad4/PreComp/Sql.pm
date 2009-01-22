@@ -24,7 +24,7 @@ sub Generate($$$) {
 
     generate_dummy_data( $master_hash, $name );
 
-    if ( defined $obj_hash->{data}->{static_vec} ) {
+    if ( defined $obj_hash->{data}->{static_vec} or defined $obj_hash->{data}->{sub_vec} ) {
 
         generate_vec_tables( $obj_hash, $struct_hash );
         generate_vec_dummy_data( $master_hash, $name, $struct_hash );
@@ -96,6 +96,28 @@ sub generate_vec_tables($$) {
         else {
             print $FHD ",\n    ".PreComp::Utilities::Type2Sql( $static_vec_short )." $static_vec_short";
         }
+
+        print $FHD "\n);\n";
+
+        PreComp::Utilities::CloseFile();
+
+    }
+
+    foreach $key ( keys %{$obj_hash->{data}->{sub_vec}} ) {
+
+        $static_vec_short = $key;
+        $static_vec_short =~ s/\[.*\]//g;
+
+        my $name = $obj_hash->{name}."_".$static_vec_short;
+
+        my $static_vec_type = $obj_hash->{data}->{sub_vec}->{$key};
+
+        my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::SqlRoot()."$name.table" );
+
+        print $FHD "create table $name (\n";
+        print $FHD "    id int";
+
+        print $FHD ",\n    $static_vec_short int";
 
         print $FHD "\n);\n";
 

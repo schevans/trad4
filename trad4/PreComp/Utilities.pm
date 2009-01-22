@@ -546,12 +546,19 @@ sub HasStruct($$) {
 
 sub PrintSection($$$) {
     my $fh = shift;
-    my $section_ref = shift;
-    my $indent = shift;
+    my $obj_hash_ref = shift;
+    my $section = shift;
 
-    foreach $key ( keys %{$section_ref} ) {
+    foreach $key ( keys %{$obj_hash_ref->{data}->{$section}} ) {
 
-        print $fh "$indent$section_ref->{$key} $key;\n";
+        if ( $section =~ /sub/ ) {
+
+            print $fh "    int $key;\n";
+        }
+        else {
+
+            print $fh "    $obj_hash_ref->{data}->{$section}->{$key} $key;\n";
+        }
 
     }
 

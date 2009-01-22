@@ -45,23 +45,20 @@ sub Generate($) {
     print $FHD "\n";
     print $FHD "    // Sub\n";
 
-    foreach $key ( keys %{$obj_hash->{data}->{sub}} ) {
-
-        print $FHD "    int $key;\n";
-
-    }
+    PreComp::Utilities::PrintSection( $FHD, $obj_hash, "sub" );
+    PreComp::Utilities::PrintSection( $FHD, $obj_hash, "sub_vec" );
 
     print $FHD "\n";
     print $FHD "    // Static\n";
 
-    PreComp::Utilities::PrintSection( $FHD, $obj_hash->{data}->{static}, "    " );
-    PreComp::Utilities::PrintSection( $FHD, $obj_hash->{data}->{static_vec}, "    " );
+    PreComp::Utilities::PrintSection( $FHD, $obj_hash, "static" );
+    PreComp::Utilities::PrintSection( $FHD, $obj_hash, "static_vec" );
 
     print $FHD "\n";
     print $FHD "    // Pub\n";
 
-    PreComp::Utilities::PrintSection( $FHD, $obj_hash->{data}->{pub}, "    " );
-    PreComp::Utilities::PrintSection( $FHD, $obj_hash->{data}->{pub_vec}, "    " );
+    PreComp::Utilities::PrintSection( $FHD, $obj_hash, "pub" );
+    PreComp::Utilities::PrintSection( $FHD, $obj_hash, "pub_vec" );
 
     print $FHD "} $name;\n";
     print $FHD "\n";
