@@ -167,6 +167,29 @@ sub Generate($$) {
 
         }
 
+        print_macro_vec( $FHD, $name, $obj_hash, $struct_hash, "sub" );
+
+        foreach $var ( keys %{$obj_hash->{$name}->{data}->{sub_vec}} ) {
+
+            $var_type = $obj_hash->{$name}->{data}->{sub_vec}->{$var};
+
+            my $var_short = $var;
+            $var_short =~ s/\[.*]$//;
+
+            print $FHD "\n";
+            print $FHD "// sub $var macros\n";
+
+            foreach $var2 ( keys %{$obj_hash->{$var_type}->{data}->{pub}} ) {
+
+                $var2 =~ s/\[.*]$//;
+
+                print $FHD "#define $name"."_$var_short"."_$var2(index) (($var_type*)obj_loc[$name"."_$var_short\[index\]])->$var2\n";
+
+            }
+
+
+        }
+
         print $FHD "\n";
         print $FHD "#endif\n";
         print $FHD "\n";
