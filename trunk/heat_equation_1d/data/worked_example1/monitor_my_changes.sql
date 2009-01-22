@@ -1,0 +1,11 @@
+delete from monitor_my_changes;
+insert into monitor_my_changes values ( 99998, 11 );
+insert into monitor_my_changes values ( 99998, 12 );
+insert into monitor_my_changes values ( 99998, 13 );
+insert into monitor_my_changes values ( 99998, 14 );
+insert into monitor_my_changes values ( 99998, 15 );
+insert into monitor_my_changes values ( 99998, 16 );
+insert into monitor_my_changes values ( 99998, 17 );
+insert into monitor_my_changes values ( 99998, 18 );
+insert into monitor_my_changes values ( 99998, 19 );
+insert into monitor_my_changes values ( 99998, 20 );
