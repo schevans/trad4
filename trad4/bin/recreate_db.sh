@@ -1,5 +1,11 @@
 #!/bin/sh
 
+if [ -f $APP_DB ]
+then
+    echo "Dropping $APP_DB..."
+    rm $APP_DB
+fi
+
 echo "Loading all in $TRAD4_ROOT/sql..."
 
 cd $TRAD4_ROOT/sql
