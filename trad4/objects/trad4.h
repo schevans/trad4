@@ -75,6 +75,8 @@ typedef struct {
     int log_level; 
 } object_header;
 
+#define object_timestamp(index) ((object_header*)obj_loc[index])->last_published
+
 #define DBG cout << __FILE__ << ": " << __LINE__ << endl;
 
 #endif
