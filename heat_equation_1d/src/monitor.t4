@@ -1,0 +1,7 @@
+
+
+sub
+    change my_changes[NUM_CHANGES]
+
+static
+    int counter
