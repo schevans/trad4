@@ -294,13 +294,6 @@ sub generate_loader_callback($$)
         $counter++
     }
 
-    foreach $key ( keys %{$obj_hash->{data}->{feed_in}} ) {
-
-        print $FHD "    (($name*)obj_loc[id])->$key = ";
-        print $FHD PreComp::Utilities::Type2atoX($obj_hash->{data}->{feed_in}->{$key})."(row[$counter]);\n";
-        $counter++
-    }
-
     foreach $key ( keys %{$obj_hash->{data}->{sub}} ) {
 
         print $FHD "    (($name*)obj_loc[id])->$key = atoi(row[$counter]);\n";
@@ -347,23 +340,19 @@ sub generate_loader($$)
         print $FHD ", t.$key ";
     }
 
-    foreach $key ( keys %{$obj_hash->{data}->{feed_in}} ) {
-        print $FHD ", t.$key ";
-    }
-
     foreach $key ( keys %{$obj_hash->{data}->{sub}} ) {
         print $FHD ", t.$key ";
     }
 
     print $FHD " from object o, object_types ot";
 
-    if ( %{$obj_hash->{data}->{static}} or %{$obj_hash->{data}->{feed_in}} or %{$obj_hash->{data}->{sub}} ) {
+    if ( %{$obj_hash->{data}->{static}} or %{$obj_hash->{data}->{sub}} ) {
         print $FHD ", $name t ";
     }
 
     print $FHD " where ";
 
-    if ( %{$obj_hash->{data}->{static}} or %{$obj_hash->{data}->{feed_in}} or %{$obj_hash->{data}->{sub}} ) {
+    if ( %{$obj_hash->{data}->{static}} or %{$obj_hash->{data}->{sub}} ) {
         print $FHD " o.id = t.id and ";
 
     }

@@ -56,15 +56,12 @@ sub Generate($) {
 
     PreComp::Utilities::PrintSection( $FHD, $obj_hash->{data}->{static}, "    " );
     PreComp::Utilities::PrintSection( $FHD, $obj_hash->{data}->{static_vec}, "    " );
-    PreComp::Utilities::PrintSection( $FHD, $obj_hash->{data}->{feed_in}, "    " );
 
     print $FHD "\n";
     print $FHD "    // Pub\n";
 
     PreComp::Utilities::PrintSection( $FHD, $obj_hash->{data}->{pub}, "    " );
     PreComp::Utilities::PrintSection( $FHD, $obj_hash->{data}->{pub_vec}, "    " );
-    PreComp::Utilities::PrintSection( $FHD, $obj_hash->{data}->{mem_pub}, "    " );
-    PreComp::Utilities::PrintSection( $FHD, $obj_hash->{data}->{feed_in}, "    " );
 
     print $FHD "} $name;\n";
     print $FHD "\n";
