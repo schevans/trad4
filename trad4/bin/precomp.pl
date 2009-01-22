@@ -21,7 +21,7 @@ sub usage();
 
 my %opts;
 
-if ( ! getopts( 'o:hvsck', \%opts ) ) {
+if ( ! getopts( 'o:hvscka', \%opts ) ) {
     usage();
 }
 
@@ -31,6 +31,11 @@ if ( $opts{c} ) {
 
     PreComp::Utilities::Clean();
     exit 0;
+}
+
+if ( $opts{a} ) {
+
+    PreComp::Utilities::Clean();
 }
 
 if( $opts{h} ) {
@@ -210,6 +215,7 @@ sub usage() {
     print "  -o <object>    precompile <object> only\n";
     print "  -k             continue on error\n";
     print "  -c             remove all generated files\n";
+    print "  -a             remove all generated files and regenerate\n";
     print "  -v             verbose - dumps internal structures\n";
     print "  -s             generate specs\n";
     print "  -h             display this help and exit\n";
