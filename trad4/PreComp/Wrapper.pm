@@ -48,6 +48,10 @@ sub Generate($$$$) {
         print $FHD "#include \"".$obj_hash->{data}->{sub}->{$key}.".h\"\n";
     }
 
+    foreach $key ( @{$obj_hash->{data}->{sub_vec_order}} ) {
+
+        print $FHD "#include \"".$obj_hash->{data}->{sub_vec}->{$key}.".h\"\n";
+    }
 
     print $FHD "\n";
     print $FHD "#include <sqlite3.h>\n";
