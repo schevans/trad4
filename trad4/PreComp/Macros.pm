@@ -179,7 +179,7 @@ sub Generate($$) {
             print $FHD "\n";
             print $FHD "// sub $var macros\n";
 
-            foreach $var2 ( keys %{$obj_hash->{$var_type}->{data}->{pub}} ) {
+            foreach $var2 ( ( keys %{$obj_hash->{$var_type}->{data}->{pub}}, keys %{$obj_hash->{$var_type}->{data}->{static}} ) ) {
 
                 $var2 =~ s/\[.*]$//;
 
