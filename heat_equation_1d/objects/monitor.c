@@ -7,9 +7,10 @@
 
 
 #include "monitor_wrapper.c"
-#include "change.h"
 
 using namespace std;
+
+void print_data( obj_loc_t obj_loc, int id );
 
 void calculate_monitor( obj_loc_t obj_loc, int id )
 {
@@ -19,7 +20,7 @@ void calculate_monitor( obj_loc_t obj_loc, int id )
     double converged_limit =  1.0e-6;
     double diverged_limit =  1.0;
 
-    for ( int i=0 ; i < NUM_CHANGES ; i++ )
+    for ( int i=0 ; i < NUM_NODES ; i++ )
     {
         if ( fabs( monitor_my_changes_change(i) ) > diverged_limit )
         {
@@ -35,16 +36,48 @@ void calculate_monitor( obj_loc_t obj_loc, int id )
 
     if ( converged )
     {
+
+        print_data( obj_loc, id );
         cout << "Converged in " << monitor_counter << " Steps" << endl;
+
         exit(0);
     }
 
     if ( diverged )
     {
+        print_data( obj_loc, id );
         cout << "Diverged in " << monitor_counter << " Steps" << endl;
         exit(0);
     }
 
     monitor_counter = monitor_counter + 1;
 }
+
+void print_data( obj_loc_t obj_loc, int id )
+{
+    cout << "x";
+
+    for ( int i=0 ; i < NUM_NODES ; i++ )
+    {
+        cout << "," << monitor_my_elements_x(i);
+    }
+
+    cout << endl << "y";
+
+    for ( int i=0 ; i < NUM_NODES ; i++ )
+    {
+        cout << "," << monitor_my_elements_y(i);
+    }
+
+    cout << endl << "change";
+
+    for ( int i=0 ; i < NUM_NODES ; i++ )
+    {
+        cout << "," << monitor_my_changes_change(i);
+    }
+
+    cout << endl;
+}
+
+
 
