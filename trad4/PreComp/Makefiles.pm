@@ -82,7 +82,7 @@ sub generate_object_make($) {
     print $FHD "COMPILE = \$(CXX) \$(CXXFLAGS)\n";
     print $FHD "\n";
 
-    print $FHD "all: main.o printer.o";
+    print $FHD "all: main.o ";
 
     foreach $type ( keys %{$obj_hash} ) {
 
@@ -101,13 +101,6 @@ sub generate_object_make($) {
         print $FHD "	\$(COMPILE) -I\$(APP_ROOT)/objects -I\$(APP_ROOT)/gen/objects -I\$(TRAD4_ROOT)/objects -c $type.c -o $type.o\n";
         print $FHD "\n";
     }
-
-    print $FHD "printer.o: printer.c\n";
-    print $FHD "	\$(COMPILE) -I\$(APP_ROOT)/objects -I\$(APP_ROOT)/gen/objects -I\$(TRAD4_ROOT)/objects -c printer.c -o printer.o\n";
-    print $FHD "\n";
-    print $FHD "clean:\n";
-    print $FHD "	rm -f *.o\n";
-    print $FHD "\n";
 
     PreComp::Utilities::CloseFile();
 }
@@ -137,7 +130,6 @@ sub generate_lib_make($) {
         print $FHD " lib$name.so";
     }
 
-    print $FHD " libprinter.so\n";
     print $FHD "\n";
     print $FHD "all: \$(LIBS)\n";
     print $FHD "\n";
@@ -152,13 +144,6 @@ sub generate_lib_make($) {
         print $FHD "\n";
     
     }
-
-    print $FHD "libprinter.so: ../objects/printer.c\n";
-    print $FHD "	g++ -m32 -shared -Wl,-soname,libprinter.so -o libprinter.so \$(TRAD4_ROOT)/objects/sqlite3.o ../objects/printer.o\n";
-    print $FHD "\n";
-    print $FHD "clean:\n";
-    print $FHD "	rm -f \$(LIBS)\n";
-    print $FHD "\n";
 
     PreComp::Utilities::CloseFile();
 }
