@@ -8,7 +8,12 @@ use warnings;
 use strict;
 
 my $length = 10;
+my $k = 0.1;
+my $alpha = 1.0;
+my $beta = 0;
+
 my $data_server_id = 99999;
+my $monitor_id = 99998;
 
 sub funk($) {
     my $x = shift;
@@ -17,7 +22,7 @@ sub funk($) {
 }
 
 
-my $dummy_data_root="$ENV{APP_ROOT}/data/dummy_data";
+my $dummy_data_root="$ENV{APP_ROOT}/data/gen_data";
 
 if ( ! -d $dummy_data_root ) {
 
@@ -97,6 +102,40 @@ print FILE "delete from data_server;\n";
 
 print FILE "insert into object values ( $data_server_id, 1, \"data_server\", 0, 1 );\n";
 
-print FILE "insert into data_server values ( $data_server_id, 0.4, 0.9800567, 0.0 );\n";
+print FILE "insert into data_server values ( $data_server_id, $k, $alpha, $beta, ".1/$length." );\n";
 
 close FILE;
+
+$file = "$dummy_data_root/monitor.sql";
+
+open FILE, ">$file" or die "Can't open $file";
+
+print FILE "delete from monitor;\n";
+print FILE "insert into object values ( $monitor_id, 4, \"monitor\", 0, 1 );\n";
+print FILE "insert into monitor values ( $monitor_id, 0 );\n";
+
+close FILE;
+
+my $changes_file = "$dummy_data_root/monitor_my_changes.sql";
+my $elements_file = "$dummy_data_root/monitor_my_elements.sql";
+
+open CHANGES_FILE, ">$changes_file" or die "Can't open $changes_file";
+open ELEMENTS_FILE, ">$elements_file" or die "Can't open $elements_file";
+
+print CHANGES_FILE "delete from monitor_my_changes;\n";
+print ELEMENTS_FILE "delete from monitor_my_elements;\n";
+
+$counter = 1;
+
+while ( $counter <= $length ) {
+
+
+    print CHANGES_FILE "insert into monitor_my_changes values ( $monitor_id, ".($length+$counter)." );\n";
+    print ELEMENTS_FILE "insert into monitor_my_elements values ( $monitor_id, ".$counter." );\n";
+
+    $counter = $counter+1;
+}
+
+close CHANGES_FILE;
+close ELEMENTS_FILE;
+
