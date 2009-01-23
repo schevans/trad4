@@ -1,7 +1,8 @@
 
 
 sub
-    change my_changes[NUM_CHANGES]
+    change my_changes[NUM_NODES]
+    element my_elements[NUM_NODES]
 
 static
     int counter
