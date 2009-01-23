@@ -102,6 +102,11 @@ sub generate_object_make($) {
         print $FHD "\n";
     }
 
+    print $FHD "\n";
+    print $FHD "clean:\n";
+    print $FHD "	rm -f *.o\n";
+    print $FHD "\n";
+
     PreComp::Utilities::CloseFile();
 }
 
@@ -144,6 +149,11 @@ sub generate_lib_make($) {
         print $FHD "\n";
     
     }
+
+    print $FHD "\n";
+    print $FHD "clean:\n";
+    print $FHD "	rm -f \$(LIBS)\n";
+    print $FHD "\n";
 
     PreComp::Utilities::CloseFile();
 }
