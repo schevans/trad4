@@ -30,7 +30,6 @@ void calculate_change( obj_loc_t obj_loc, int id )
             exit(0);
     }
 
-    if ( fabs( change_change ) < 1.0e-10 )
-        change_change = 0;
+    change_change = change_change / ( 2.0 * my_data_server_step_size );
 }
 
