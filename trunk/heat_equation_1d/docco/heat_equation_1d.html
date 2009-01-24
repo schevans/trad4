@@ -37,6 +37,11 @@ heat_equation_1d - a trad4 application</title>
 <h1 align="center">
 heat_equation_1d
 </h1>
+<strong>
+<a href="https://sourceforge.net/project/showfiles.php?group_id=202177&package_id=280540&release_id=654225">Download heat_equation_1d_beta01</a></br>
+</p>
+</strong>
+
 <ul>
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#the_model">The Model</a></li>
@@ -211,7 +216,7 @@ As you can see from the concrete diagram, a change object subscribes to three el
 </p>
 <h3>The t4 files</h3>
 <p>
-element.t4:
+<h4>element.t4:</h4>
 </p>
 <blockquote><pre>
 static
@@ -237,7 +242,7 @@ pub
 
 
 <p>
-change.t4:
+<h4>change.t4:</h4>
 </p>
 <blockquote><pre>
 sub
@@ -255,29 +260,50 @@ pub
 <li>change is the change that should be applied to this_element</li>
 </ul>
 <p>
-data_server.t4:
+<h4>data_server.t4:</h4>
 </p>
 <blockquote><pre>
 static
     double k
     double alpha
     double beta
+    double step_size
 </pre></blockquote>
 <ul>
 <li>k it the thermal conductivity of the bar</li>
 <li>alpha is the given Dirichlet boundry value for the left end of the bar</li>
 <li>beta is the given Dirichlet boundry value for the right end of the bar</li>
+<li>step_size is the width of each element, which in worked_example1 is set to 0.1</li>
 </ul>
 
-    <h3>A note on the printer</h3>
 <p>
-An undocumented feature of trad4 has been exploited in this model, and this is heat_equation_1d/objects/printer.c. This is a 'feature' I hacked in to deal with the lack of support for any feeds out of the system. It's undocumented as it takes far too much knowledge of the trad4 internals to use, but I've used it a it's become vital that I get the object order correct when I'm outputting csv files. The trick to using it to get a csv is run the app as:
+<h4>monitor.t4:</h4>
 </p>
 <blockquote><pre>
-$ heat_equation_1d | egrep '(REZ|DELTA)'
+sub
+    change my_changes[NUM_NODES]
+    element my_elements[NUM_NODES]
+
+static
+    int counter
 </pre></blockquote>
 <p>
-As I say it's a hack, but I thought I should at least explain..
+<ul>
+<li>my_elements is an array containing the ids of all the element objects</li>
+<li>my_changes is an array containing the ids of all the change objects</li>
+<li>counter allows for the monitor to keep track of how many cycles run before convergance/divergence</li>
+</p>
+<p>
+The monitor has two jobs in this system. The first is to subscribe to all the change objects and after each T1 is run, check to see if the system has converged, diverged or still running. The system is considered to have converged if all the change_change values are below a certain threshold, and diverged if the change_change values are above a certain threshold. (At time of writing these thresholds are hard-coded to 1.0e-6 and 1.0 respectively, but these are expected to be derived from the step_size in the near future.)
+</p>
+<p>
+The monitor is unusual in a few respects. Firstly, it is a singleton like data_server, but unlike data_server which is a T1 object along with all the elements, the monitor object is the only T3 object. This is because it needs to check all the published change_change values to test for convergence. As such it could be viewed as a concurrency bottleneck, but it need not be as the option exists to either a) create a bunch of T3 monitors all subscribing to a sub-set of the T2 objects with a T4 uber_monitor aggregating those monitors, or b) split the functionality of the monitor into two - one to check for convergence and one to check for divergence.
+</p>
+<p>
+Secondly, it it the first object we've seen that uses the new (in trad4v2.1) sub vector mechanism which allows for an object to subscribe to many or all objects of a particular type. The list of change object to which the monitor object subscribes is given in the DB table 'monitor_my_changes'.
+</p>
+<p>
+Lastly, the monitor object has the job of printing out the data in a consumable format. This is somewhat of a work-around for the lack of support for any feed out of trad4, but it works ok, so expect to see this again in other applications. There is a consequence of this that isn't covered in the above abstract and concrete diagrams but the sharp-eyed amongst you may have spotted in the .t4 definition above, and that is in order to print the element's data it must subscribe to them too. An indeed it does - as given in the DB table 'monitor_my_elements'. These links are not shown in the above two diagrams mainly because they make a hell of a mess of the diagrams, but also, arguably, because the act of printing the system is not relevent to it's function.
 </p>
 <h2><a name="operation">Operation</a></h2>
 <p>
@@ -287,26 +313,32 @@ We'll now step through a couple of iterations, examining the log file as we go. 
 <blockquote><pre>
 </pre></blockquote>
 <p>
-As per usual, the types are created and their shared objects loaded:
+As usual on startup, the types are created and their shared objects loaded:
 </p>
 <blockquote><pre>
-Creating new type change, type id: 2, tier: 2
-Creating new type element, type id: 1, tier: 1
+Creating new type data_server, type id: 1, tier: 1
+Creating new type change, type id: 3, tier: 2
+Creating new type monitor, type id: 4, tier: 3
+Creating new type element, type id: 2, tier: 1
 </pre></blockquote>
 <p>
 Then, the data is loaded:
 </p>
 <blockquote><pre>
+load_all_data_servers()
 load_all_changes()
+load_all_monitors()
+        load_monitor_my_changes()
+        load_monitor_my_elements()
 load_all_elements()
 </pre></blockquote>
 <p>
 Next, the system is checked and it's constituents reported:
 </p>
 <blockquote><pre>
-Checking tier 1. Num objects this tier: 10
+Checking tier 1. Num objects this tier: 11
 Checking tier 2. Num objects this tier: 10
-Checking tier 3. Num objects this tier: 0
+Checking tier 3. Num objects this tier: 1
 Checking tier 4. Num objects this tier: 0
 Checking tier 5. Num objects this tier: 0
 </pre></blockquote>
@@ -330,7 +362,7 @@ Then tier1 runs:
 </p>
 <blockquote><pre>
 Tier 1 running.
-Tier 1 ran 10 objects in 0.000613928 seconds.
+Tier 1 ran 11 objects in 0.000523806 seconds.
 </pre></blockquote>
 <p>
 At this stage, as it's the first time the system has been run, the init flag will not have been set so the element just calculate their y-values using the equation defined in their calculate method - in this case y = cos(2*x) and where y = 0.0 if y < 0.0. We've seen this before above:
