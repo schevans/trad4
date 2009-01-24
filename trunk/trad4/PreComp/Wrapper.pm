@@ -486,7 +486,7 @@ sub generate_extra_loaders($$$$)
         print $FHD "\n";
         print $FHD "void $name"."_load_$vec_short( obj_loc_t obj_loc, int id, sqlite3* db, int initial_load )\n";
         print $FHD "{\n";
-        print $FHD "    cout << \"$name"."_load_$vec_short\" << endl;\n";
+        print $FHD "    cout << \"\tload_$name"."_$vec_short()\" << endl;\n";
         print $FHD "\n";
         print $FHD "    counter = 0;\n";
         print $FHD "    char *zErrMsg = 0;\n";
@@ -560,7 +560,7 @@ sub generate_extra_loaders($$$$)
         print $FHD "\n";
         print $FHD "void $name"."_load_$vec_short( obj_loc_t obj_loc, int id, sqlite3* db, int initial_load )\n";
         print $FHD "{\n";
-        print $FHD "    cout << \"$name"."_load_$vec_short\" << endl;\n";
+        print $FHD "    cout << \"\tload_$name"."_$vec_short()\" << endl;\n";
         print $FHD "\n";
         print $FHD "    counter = 0;\n";
         print $FHD "    char *zErrMsg = 0;\n";
