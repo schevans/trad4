@@ -3,10 +3,10 @@
 static
     int init
     element_type_enum element_type
-    double x
     
 sub
     change my_change
 
 pub
     double y 
+    double x
