@@ -6,3 +6,6 @@ sub
 
 static
     int counter
+
+pub
+    double start_time
