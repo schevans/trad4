@@ -4,16 +4,26 @@
 
 #include <iostream>
 #include <math.h>
-
+#include <sys/time.h>
 
 #include "monitor_wrapper.c"
 
 using namespace std;
 
 void print_data( obj_loc_t obj_loc, int id );
+double get_timestamp();
 
 void calculate_monitor( obj_loc_t obj_loc, int id )
 {
+
+    if ( monitor_counter == 0 )
+    {
+        print_data( obj_loc, id );
+        cout << endl;
+
+        monitor_start_time = get_timestamp();
+    }
+
     int converged = 1;
     int diverged = 0;
 
@@ -38,7 +48,10 @@ void calculate_monitor( obj_loc_t obj_loc, int id )
     {
 
         print_data( obj_loc, id );
-        cout << "Converged in " << monitor_counter << " Steps" << endl;
+
+        double local_end_time = get_timestamp();
+
+        cout << "Converged in " << monitor_counter << " steps which took " << local_end_time - monitor_start_time << " seconds." << endl;
 
         exit(0);
     }
@@ -46,11 +59,16 @@ void calculate_monitor( obj_loc_t obj_loc, int id )
     if ( diverged )
     {
         print_data( obj_loc, id );
-        cout << "Diverged in " << monitor_counter << " Steps" << endl;
+
+        double local_end_time = get_timestamp();
+
+        cout << "Diverged in " << monitor_counter << " steps which took " << local_end_time - monitor_start_time << " seconds." << endl;
+
         exit(0);
     }
 
     monitor_counter = monitor_counter + 1;
+
 }
 
 void print_data( obj_loc_t obj_loc, int id )
@@ -79,5 +97,10 @@ void print_data( obj_loc_t obj_loc, int id )
     cout << endl;
 }
 
-
+double get_timestamp()
+{
+    timeval tim;
+    gettimeofday(&tim, NULL);
+    return tim.tv_sec + ( tim.tv_usec / 1000000.0 );
+}
 
