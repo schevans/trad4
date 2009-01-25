@@ -15,13 +15,6 @@ my $beta = 0;
 my $data_server_id = 99999;
 my $monitor_id = 99998;
 
-sub funk($) {
-    my $x = shift;
-
-    return $x/$length;
-}
-
-
 my $dummy_data_root="$ENV{APP_ROOT}/data/gen_data";
 
 if ( ! -d $dummy_data_root ) {
@@ -29,7 +22,6 @@ if ( ! -d $dummy_data_root ) {
     print "Creating directory $dummy_data_root\n";
     mkdir( $dummy_data_root );
 }
-
 
 my $file = $dummy_data_root."/element.sql";
 
@@ -57,7 +49,7 @@ while ( $counter <= $length ) {
 
     print FILE "insert into object values ( $counter, 2, \"element_$counter\", 0, 1 );\n";
 
-    print FILE "insert into element values ( $counter, 0, $element_type, ".funk( $counter ).", $change_id );\n";
+    print FILE "insert into element values ( $counter, 0, $element_type, $change_id );\n";
 
     $counter = $counter + 1;
 }
