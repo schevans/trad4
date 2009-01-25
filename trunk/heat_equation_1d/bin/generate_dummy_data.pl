@@ -94,7 +94,7 @@ print FILE "delete from data_server;\n";
 
 print FILE "insert into object values ( $data_server_id, 1, \"data_server\", 0, 1 );\n";
 
-print FILE "insert into data_server values ( $data_server_id, $k, $alpha, $beta, ".1/$length." );\n";
+print FILE "insert into data_server values ( $data_server_id, $k, $alpha, $beta );\n";
 
 close FILE;
 

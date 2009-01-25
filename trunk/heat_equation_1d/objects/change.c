@@ -11,25 +11,21 @@ using namespace std;
 
 void calculate_change( obj_loc_t obj_loc, int id )
 {
-    switch ( this_element_element_type )
+    double local_2dx = up_element_x - down_element_x;
+    double local_down_element_y = down_element_y;
+    double local_up_element_y = up_element_y;
+
+    if ( this_element_element_type == START )
     {
-        case MIDDLE:
-            change_change = my_data_server_k * ( up_element_y - 2*this_element_y + down_element_y );
-            break;
-
-        case START:
-            change_change = my_data_server_k * ( up_element_y - 2*this_element_y + my_data_server_alpha );
-            break;
-
-        case END:
-            change_change = my_data_server_k * ( my_data_server_beta - 2*this_element_y + down_element_y );
-            break;
-
-        default:
-            cerr << "Default case reached in switch. Exiting" << endl;
-            exit(0);
+        local_2dx = 2 * ( up_element_x - this_element_x );
+        local_down_element_y = my_data_server_alpha;
     }
-
-    change_change = change_change / ( 2.0 * my_data_server_step_size );
+    else if ( this_element_element_type == END )
+    {
+        local_2dx = 2 * ( this_element_x - down_element_x );
+        local_up_element_y = my_data_server_beta;
+    }
+        
+    change_change = my_data_server_k * ( local_down_element_y - 2*this_element_y + local_up_element_y ) / local_2dx;;
 }
 

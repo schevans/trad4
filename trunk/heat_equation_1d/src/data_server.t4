@@ -3,5 +3,4 @@ static
     double k
     double alpha
     double beta
-    double step_size
 
