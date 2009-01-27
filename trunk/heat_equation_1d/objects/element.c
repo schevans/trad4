@@ -15,9 +15,13 @@ void calculate_element( obj_loc_t obj_loc, int id )
     {
         element_init = 1;
 
-        element_x = id;
+//      Use for id = 0.1 - 1.0
+        element_x = (id*1.0)/NUM_NODES;
+        element_y = cos( 2*(element_x) );
 
-        element_y = cos( 2*((element_x*1.0)/(NUM_NODES)) );
+//      Use for id = 1 - 10
+//        element_x = id;
+//        element_y = cos( 2*((element_x*1.0)/(NUM_NODES)) );
     }
     else
     {
