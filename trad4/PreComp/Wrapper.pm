@@ -64,7 +64,7 @@ sub Generate($$$$) {
             $vec_short = $vec_name;
             $vec_short =~ s/\[.*\]//g;
 
-            print $FHD "void $name"."_load_$vec_short( obj_loc_t obj_loc, int i, sqlite3* db, int initial_load );\n";
+            print $FHD "void load_$name"."_$vec_short( obj_loc_t obj_loc, int i, sqlite3* db, int initial_load );\n";
     }
 
     print $FHD "\n";
@@ -408,7 +408,7 @@ sub generate_loader($$)
                 $vec_short = $vec_name;
                 $vec_short =~ s/\[.*\]//g;
 
-                print $FHD "            $name"."_load_$vec_short( obj_loc, i, db, 0 );\n";
+                print $FHD "            load_$name"."_$vec_short( obj_loc, i, db, 0 );\n";
         }
 
         print $FHD "        }\n";
@@ -448,14 +448,14 @@ sub generate_extra_loaders($$$$)
         $vec_size =~ s/.*\[//g;
         $vec_size =~ s/\]//g;
 
-        print $FHD "static int $name"."_load_$vec_short"."_callback(void *obj_loc_v, int argc, char **row, char **azColName)\n";
+        print $FHD "static int load_$name"."_$vec_short"."_callback(void *obj_loc_v, int argc, char **row, char **azColName)\n";
         print $FHD "{\n";
         print $FHD "    unsigned char** obj_loc = (unsigned char**)obj_loc_v;\n";
         print $FHD "    int id = atoi(row[0]);\n";
         print $FHD "\n";
         print $FHD "    if ( counter > $vec_size )\n";
         print $FHD "    {\n";
-        print $FHD "        cerr << \"Error in $name"."_load_$vec_short: The number of rows in $name"."_$vec_short.table is greater than $vec_size. Truncating data in $name"."_$vec_short structure to ".$constants_hash->{$vec_size}." elements. Suggest you fix the data or create a new type with larger arrays and migrate your objects across.\" << endl;\n";
+        print $FHD "        cerr << \"Error in load_$name"."_$vec_short: The number of rows in $name"."_$vec_short.table is greater than $vec_size. Truncating data in $name"."_$vec_short structure to ".$constants_hash->{$vec_size}." elements. Suggest you fix the data or create a new type with larger arrays and migrate your objects across.\" << endl;\n";
         print $FHD "    }\n";
         print $FHD "    else\n";
         print $FHD "    {\n";
@@ -484,7 +484,7 @@ sub generate_extra_loaders($$$$)
         print $FHD "    return 0;\n";
         print $FHD "}\n";
         print $FHD "\n";
-        print $FHD "void $name"."_load_$vec_short( obj_loc_t obj_loc, int id, sqlite3* db, int initial_load )\n";
+        print $FHD "void load_$name"."_$vec_short( obj_loc_t obj_loc, int id, sqlite3* db, int initial_load )\n";
         print $FHD "{\n";
         print $FHD "    cout << \"\tload_$name"."_$vec_short()\" << endl;\n";
         print $FHD "\n";
@@ -509,7 +509,7 @@ sub generate_extra_loaders($$$$)
         print $FHD " from $name"."_$vec_short where id = \" << id;\n";
 
         print $FHD "\n";
-        print $FHD "    if( sqlite3_exec(db, dbstream.str().c_str(), $name"."_load_$vec_short"."_callback, obj_loc, &zErrMsg) != SQLITE_OK ){\n";
+        print $FHD "    if( sqlite3_exec(db, dbstream.str().c_str(), load_$name"."_$vec_short"."_callback, obj_loc, &zErrMsg) != SQLITE_OK ){\n";
         print $FHD "        fprintf(stderr, \"SQL error: %s\\n\", zErrMsg);\n";
         print $FHD "        sqlite3_free(zErrMsg);\n";
         print $FHD "    }\n";
@@ -536,14 +536,14 @@ sub generate_extra_loaders($$$$)
         $vec_size =~ s/.*\[//g;
         $vec_size =~ s/\]//g;
 
-        print $FHD "static int $name"."_load_$vec_short"."_callback(void *obj_loc_v, int argc, char **row, char **azColName)\n";
+        print $FHD "static int load_$name"."_$vec_short"."_callback(void *obj_loc_v, int argc, char **row, char **azColName)\n";
         print $FHD "{\n";
         print $FHD "    unsigned char** obj_loc = (unsigned char**)obj_loc_v;\n";
         print $FHD "    int id = atoi(row[0]);\n";
         print $FHD "\n";
         print $FHD "    if ( counter > $vec_size )\n";
         print $FHD "    {\n";
-        print $FHD "        cerr << \"Error in $name"."_load_$vec_short: The number of rows in $name"."_$vec_short.table is greater than $vec_size. Truncating data in $name"."_$vec_short structure to ".$constants_hash->{$vec_size}." elements. Suggest you fix the data or create a new type with larger arrays and migrate your objects across.\" << endl;\n";
+        print $FHD "        cerr << \"Error in load_$name"."_$vec_short: The number of rows in $name"."_$vec_short.table is greater than $vec_size. Truncating data in $name"."_$vec_short structure to ".$constants_hash->{$vec_size}." elements. Suggest you fix the data or create a new type with larger arrays and migrate your objects across.\" << endl;\n";
         print $FHD "    }\n";
         print $FHD "    else\n";
         print $FHD "    {\n";
@@ -558,7 +558,7 @@ sub generate_extra_loaders($$$$)
         print $FHD "    return 0;\n";
         print $FHD "}\n";
         print $FHD "\n";
-        print $FHD "void $name"."_load_$vec_short( obj_loc_t obj_loc, int id, sqlite3* db, int initial_load )\n";
+        print $FHD "void load_$name"."_$vec_short( obj_loc_t obj_loc, int id, sqlite3* db, int initial_load )\n";
         print $FHD "{\n";
         print $FHD "    cout << \"\tload_$name"."_$vec_short()\" << endl;\n";
         print $FHD "\n";
@@ -583,7 +583,7 @@ sub generate_extra_loaders($$$$)
         print $FHD " from $name"."_$vec_short where id = \" << id;\n";
 
         print $FHD "\n";
-        print $FHD "    if( sqlite3_exec(db, dbstream.str().c_str(), $name"."_load_$vec_short"."_callback, obj_loc, &zErrMsg) != SQLITE_OK ){\n";
+        print $FHD "    if( sqlite3_exec(db, dbstream.str().c_str(), load_$name"."_$vec_short"."_callback, obj_loc, &zErrMsg) != SQLITE_OK ){\n";
         print $FHD "        fprintf(stderr, \"SQL error: %s\\n\", zErrMsg);\n";
         print $FHD "        sqlite3_free(zErrMsg);\n";
         print $FHD "    }\n";
