@@ -104,7 +104,7 @@ open FILE, ">$file" or die "Can't open $file";
 
 print FILE "delete from monitor;\n";
 print FILE "insert into object values ( $monitor_id, 4, \"monitor\", 0, 1 );\n";
-print FILE "insert into monitor values ( $monitor_id, 0 );\n";
+print FILE "insert into monitor values ( $monitor_id, 0, 0 );\n";
 
 close FILE;
 
