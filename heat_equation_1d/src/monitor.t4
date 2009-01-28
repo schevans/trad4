@@ -6,6 +6,7 @@ sub
 
 static
     int counter
+    int print_each_cycle
 
 pub
     double start_time

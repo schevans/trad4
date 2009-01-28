@@ -16,12 +16,17 @@ double get_timestamp();
 void calculate_monitor( obj_loc_t obj_loc, int id )
 {
 
-    if ( monitor_counter == 0 )
+    if ( monitor_counter == 0 && ! monitor_print_each_cycle )
     {
         print_data( obj_loc, id );
         cout << endl;
 
         monitor_start_time = get_timestamp();
+    }
+
+    if ( monitor_print_each_cycle )
+    {
+        print_data( obj_loc, id );
     }
 
     int converged = 1;
