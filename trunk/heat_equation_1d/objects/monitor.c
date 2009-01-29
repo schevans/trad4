@@ -56,7 +56,7 @@ void calculate_monitor( obj_loc_t obj_loc, int id )
 
         double local_end_time = get_timestamp();
 
-        cout << "Converged in " << monitor_counter << " steps which took " << local_end_time - monitor_start_time << " seconds." << endl;
+        cout << "Converged in " << monitor_counter << " steps which took " << local_end_time - monitor_start_time << " seconds with k = " << my_data_server_k << endl;
 
         exit(0);
     }
@@ -67,7 +67,7 @@ void calculate_monitor( obj_loc_t obj_loc, int id )
 
         double local_end_time = get_timestamp();
 
-        cout << "Diverged in " << monitor_counter << " steps which took " << local_end_time - monitor_start_time << " seconds." << endl;
+        cout << "Diverged in " << monitor_counter << " steps which took " << local_end_time - monitor_start_time << " seconds with k = "<< my_data_server_k  << endl;
 
         exit(0);
     }
