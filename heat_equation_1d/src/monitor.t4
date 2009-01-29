@@ -8,6 +8,8 @@ sub
 static
     int counter
     int print_each_cycle
+    double converged_limit
+    double diverged_limit
 
 pub
     double start_time
