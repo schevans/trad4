@@ -136,7 +136,9 @@ void run_trad4() {
 
             num_objects_run = num_object_run_this_tier;
 
-            cout << setprecision(6) << "Tier " << 1 << " ran " << num_object_run_this_tier << " objects in " << tier_end_time - tier_start_time << " seconds." << endl;
+            #ifdef TIMING_DEBUG
+                cout << setprecision(6) << "Tier " << 1 << " ran " << num_object_run_this_tier << " objects in " << tier_end_time - tier_start_time << " seconds." << endl;
+            #endif
 
             for ( int tier=2 ; tier < num_tiers+1 ; tier++ )
             {
@@ -153,13 +155,17 @@ void run_trad4() {
 
                 num_objects_run = num_objects_run + num_object_run_this_tier;
 
-                cout << setprecision(6) << "Tier " << tier << " ran " << num_object_run_this_tier << " objects in " << tier_end_time - tier_start_time << " seconds." << endl;
+                #ifdef TIMING_DEBUG
+                    cout << setprecision(6) << "Tier " << tier << " ran " << num_object_run_this_tier << " objects in " << tier_end_time - tier_start_time << " seconds." << endl;
+                #endif
 
             }
 
             get_timestamp( end_time );
 
-            cout << endl << "All tiers ran " << num_objects_run << " objects in " << end_time-start_time << " seconds." << endl;
+            #ifdef TIMING_DEBUG
+                cout << endl << "All tiers ran " << num_objects_run << " objects in " << end_time-start_time << " seconds." << endl;
+            #endif
 
         }
         else
@@ -206,7 +212,9 @@ int run_tier( int tier ) {
 
                 if ( num_objects_fired == 0 ) 
                 {
-                    cout << endl << "Tier " << tier << " running." << endl;
+                    #ifdef TIMING_DEBUG
+                        cout << endl << "Tier " << tier << " running." << endl;
+                    #endif
                 }
 
                 while ( ! fire_object( tier_manager[tier][i] ) )
