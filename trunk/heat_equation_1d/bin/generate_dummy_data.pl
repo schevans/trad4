@@ -11,6 +11,8 @@ my $length = 10;
 my $k = 0.1;
 my $alpha = 1.0;
 my $beta = 0;
+my $converged_limit = 1.0e-6;
+my $diverged_limit = 1.0;
 
 my $data_server_id = 99999;
 my $monitor_id = 99998;
@@ -104,7 +106,7 @@ open FILE, ">$file" or die "Can't open $file";
 
 print FILE "delete from monitor;\n";
 print FILE "insert into object values ( $monitor_id, 4, \"monitor\", 0, 1 );\n";
-print FILE "insert into monitor values ( $monitor_id, 0, 0, $data_server_id );\n";
+print FILE "insert into monitor values ( $monitor_id, 0, 0, $converged_limit, $diverged_limit, $data_server_id );\n";
 
 close FILE;
 
