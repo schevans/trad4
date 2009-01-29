@@ -115,6 +115,30 @@ sub Generate($$) {
 
         }
 
+        foreach $var ( @{$obj_hash->{$name}->{data}->{sub_vec_order}} ) {
+
+            $var_short = $var;
+            $var_short =~ s/\[.*\]//g;
+
+            $var_type = $obj_hash->{$name}->{data}->{sub_vec}->{$var};
+
+            print $FHD "    $var_type $name"."_$var\n";
+
+            foreach $var2 ( keys %{$obj_hash->{$obj_hash->{$name}->{data}->{sub_vec}->{$var}}->{data}->{pub}} ) {
+
+                print $FHD "    $obj_hash->{$obj_hash->{$name}->{data}->{sub_vec}->{$var}}->{data}->{pub}->{$var2} $name"."_$var_short"."_$var2( index )\n";
+            }
+
+            foreach $var2 ( keys %{$obj_hash->{$obj_hash->{$name}->{data}->{sub_vec}->{$var}}->{data}->{static}} ) {
+
+                print $FHD "    $obj_hash->{$obj_hash->{$name}->{data}->{sub_vec}->{$var}}->{data}->{static}->{$var2} $name"."_$var_short"."_$var2( index )\n";
+            }
+
+            print $FHD "\n";
+
+        }
+
+
         print $FHD "======================================================================*/\n";
         print $FHD "\n";
         print $FHD "#ifndef __$name"."_macros_h__\n";
