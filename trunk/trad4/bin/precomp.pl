@@ -164,19 +164,23 @@ if ( $constants_hash ) {
 `touch $ENV{APP_ROOT}/gen/objects/constants.h`;
 `touch $ENV{APP_ROOT}/objects/common.h`;
 
-if ( ! -f "$ENV{APP_ROOT}/objects/main.c" ) {
+my $main_file = "$ENV{APP_ROOT}/objects/main.c";
+
+if ( ! -f $main_file ) {
 
     print "Generating main..\n";
-    open MAIN, ">$ENV{APP_ROOT}/objects/main.c" or die "Can't open $ENV{APP_ROOT}/objects/main.c";
 
-    print MAIN "#include \"trad4.h\"\n";
-    print MAIN "\n";
-    print MAIN "int main()\n";
-    print MAIN "{\n";
-    print MAIN "    run_trad4();\n";
-    print MAIN "}\n";
+    my $FHD = PreComp::Utilities::OpenFile( $main_file );
 
-    close MAIN;
+    print $FHD "\n";
+    print $FHD "#include \"trad4.h\"\n";
+    print $FHD "\n";
+    print $FHD "int main()\n";
+    print $FHD "{\n";
+    print $FHD "    run_trad4();\n";
+    print $FHD "}\n";
+
+    PreComp::Utilities::CloseFile();
 
 }
 

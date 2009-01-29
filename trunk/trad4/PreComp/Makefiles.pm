@@ -29,8 +29,6 @@ sub generate_top_lvl_make($) {
 
     my $FHD = PreComp::Utilities::OpenFile( "$ENV{APP_ROOT}/Makefile" );
 
-    #print_licence_header( $FHD );
-
     print $FHD "\n";
     print $FHD "CXX = g++ -m32\n";
     print $FHD "\n";
@@ -71,8 +69,6 @@ sub generate_object_make($) {
     my $obj_hash = shift;
 
     my $FHD = PreComp::Utilities::OpenFile( "$ENV{APP_ROOT}/objects/Makefile" );
-
-    #print_licence_header( $FHD );
 
     print $FHD "\n";
     print $FHD "CXX = g++ -m32\n";
@@ -116,8 +112,6 @@ sub generate_lib_make($) {
 
     my $FHD = PreComp::Utilities::OpenFile( "$ENV{APP_ROOT}/lib/Makefile" );
 
-    #print_licence_header( $FHD );
-          
     print $FHD "\n";
     print $FHD "CXX = g++ -m32\n";
     print $FHD "\n";

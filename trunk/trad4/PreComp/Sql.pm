@@ -45,8 +45,6 @@ sub generate_dummy_data($$) {
 
     my $FHD = PreComp::Utilities::OpenFile( $ENV{APP_ROOT}."/data/default_set/$name.sql" );
 
-    #print_licence_header( $FHD );
-
     print $FHD "delete from $name;\n";
     print $FHD "insert into object values ( $type_num, $type_num, \"$name"."_$type_num\", 0, 1 );\n";
     print $FHD "insert into $name values ( $type_num";
@@ -132,8 +130,6 @@ sub generate_table($) {
     my $name = $obj_hash->{name};
 
     my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::SqlRoot()."$name.table" );
-
-    #print_licence_header( $FHD );
 
     print $FHD "create table $name (\n";
     print $FHD "    id int";

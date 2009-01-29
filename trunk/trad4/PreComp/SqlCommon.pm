@@ -44,8 +44,6 @@ sub generate_object_types($) {
     
     my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::SqlRoot()."object_types.sql" );
 
-    #print_licence_header( $FHD );
-
     my $object_type;
 
     print $FHD "delete from object_types;\n";
