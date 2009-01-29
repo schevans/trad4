@@ -28,8 +28,6 @@ sub Generate($$$$) {
 
     my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::GenObjRoot()."$name"."_wrapper.c" );
 
-    #print_licence_header( $FHD );
-
     print $FHD "\n";
     print $FHD "#include <iostream>\n";
     print $FHD "#include <sstream>\n";

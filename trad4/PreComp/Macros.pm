@@ -16,10 +16,6 @@ sub Generate($$) {
 
         my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::GenObjRoot().$name."_macros.h" );
 
-
-        #print_licence_header( $FHD );
-             
-                                              
         print $FHD "\n";
         print $FHD "/*======================================================================\n";
         print $FHD "\n";

@@ -24,8 +24,6 @@ sub Generate($) {
 
     my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::ObjRoot()."$name.c" );
 
-    #print_licence_header( $FHD );
-
     print $FHD "\n";
     print $FHD "// Please see the comment at the top of $ENV{APP}/gen/objects/$name"."_macros.c\n";
     print $FHD "//  to see what's in-scope.\n";

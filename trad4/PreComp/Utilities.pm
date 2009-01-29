@@ -14,6 +14,25 @@ my %file_handle_map;
 
 my $exit_on_error=1;
 
+my @licence_header_array;
+
+BEGIN {
+
+    my $licence_header_file = "$ENV{APP_ROOT}/LICENCE_HEADER";
+    
+    if ( -f $licence_header_file ) {
+
+        open LICENCE_HEADER_FILE, "$ENV{APP_ROOT}/LICENCE_HEADER";
+
+        while ( $line = <LICENCE_HEADER_FILE> ) {
+
+            push @licence_header_array, $line;
+        }
+
+        close LICENCE_HEADER_FILE;
+    }
+}
+
 sub SetExitOnError($) {
     
     $exit_on_error = shift;
@@ -186,7 +205,32 @@ sub OpenFile($) {
         }
     }
 
+
+    my $file_type = $file;
+    $file_type =~ s/^.*\.//g;
+
+    my $comment_string;
+
+    if ( $file =~ /Makefile/ ) {
+        $comment_string = "#";
+    }
+    elsif ( $file_type =~ /h|c/ ) {
+        $comment_string = "//";
+    }
+    elsif ( $file_type =~ /table|sql/ ) {
+        $comment_string = "--";
+    }
+    else
+    {
+        print "Unknown file type $file_type\n";
+    }
+        
     open $current_file, ">$file.t4t" or die "Can't open file $file";
+
+    foreach $line ( @licence_header_array ) {
+
+        print $current_file "$comment_string $line";
+    }
 
     return $current_file;
 
