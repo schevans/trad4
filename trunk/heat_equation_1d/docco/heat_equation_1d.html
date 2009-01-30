@@ -38,9 +38,6 @@ heat_equation_1d - a trad4 application</title>
 heat_equation_1d
 </h1>
 <table border="1">
-<p>
-<strong>Note:</strong> This document is still in beta.
-</p>
 <tr>
 <td>Download version</td>
 <td><a  href="https://sourceforge.net/project/showfiles.php?group_id=202177&package_id=307767&release_id=656662">1.0</a></td>
@@ -69,9 +66,8 @@ heat_equation_1d
 <li><a href="#the_model">The Model</a></li>
 <li><a href="#implementation">Implementation</a></li>
 <li><a href="#operation">Operation</a></li>
-<li><a href="#usage">Usage</a></li>
 <li><a href="#stability">Stability</a></li>
-<li><a href="#further_work">Further work</a></li>
+<li><a href="#usage">Usage</a></li>
 </ul>
 
 <hr />
@@ -89,6 +85,9 @@ While the 1D heat equation has been discussed extensively elsewhere, I will brie
 </p>
 <p>
 Take a fully insulated metal bar with one dimension (think of a lagged copper wire). Provide an initial heat distribution across the bar, and hold each end at a specific temperature (i.e., using Dirichlet boundary conditions). Now let this bar settle into a steady state, taking snapshots of the temperature distribution across the bar as it evolves over time. We should see the temperature converge on a linear slope between the start and end temperatures.
+</p>
+<p>
+There is a parameter k that gives the thermal conductivity of the bar, i.e. the rate at which heat dissipates through the bar.
 </p>
 <h2><a name="the_model">The Model</a></h2>
 <p>
@@ -267,8 +266,8 @@ pub
 </ul>
 <li>pub:</li>
 <ul>
-<li>foxme</li>
-<li>y is the published values. If the system has just been started this will be cos(2*x). If the system has run through once this will be y = y + change.</li>
+<li>x is the x-value of the element. It is derived from the element's id in the calculate function. In the default distribution these are set from 0.1 to 1.0</li>
+<li>y is the y-value for the element. If the system has just been started this will be cos(2*x). If the system has run through once this will be y = y + change.</li>
 </ul>
 </ul>
 </p>
@@ -359,8 +358,8 @@ pub
 <ul>
 <li>counter allows for the monitor to keep track of how many cycles run before convergence/divergence</li>
 <li>print_each_cycle controls wether the monitor prints out the system each cycle</li>
-<li>converged_limit is the threshold evey change_change value has to be less than for the system to be conidered converged. In worked_example1 this is set to 1.0e-06</li>
-<li>diverged_limit is the threshold any change_change value has to be greater than for the system to be conidered diverged. In worked_example1 this is set to 1.0</li>
+<li>converged_limit is the threshold every change_change value has to be less than for the system to be considered converged. In worked_example1 this is set to 1.0e-06</li>
+<li>diverged_limit is the threshold any change_change value has to be greater than for the system to be considered diverged. In worked_example1 this is set to 1.0</li>
 </ul>
 <li>pub:</li>
 <ul>
@@ -369,7 +368,7 @@ pub
 </ul>
 </p>
 <p>
-The monitor has two jobs in this system. The first is to subscribe to all the change objects and after each T1 is run, check to see if the system has converged, diverged or still running. The system is considered to have converged if all the change_change values are below a certain threshold, and diverged if the change_change values are above a certain threshold. (At time of writing these thresholds are hard-coded to 1.0e-6 and 1.0 respectively, but these are expected to be derived from the step_size in the near future.)
+The monitor has two jobs in this system. The first is to subscribe to all the change objects and after each change tier (T2) is run, check to see if the system has converged, diverged or still running. The system is considered to have converged if all the change_change values are below converged_limit, and diverged if the change_change values are above diverged_limit.
 </p>
 <p>
 The monitor is unusual in a few respects. Firstly, it is a singleton like data_server, but unlike data_server which is a T1 object along with all the elements, the monitor object is the only T3 object. This is because it needs to check all the published change_change values to test for convergence. As such it could be viewed as a concurrency bottleneck, but it need not be as the option exists to either a) create a bunch of T3 monitors all subscribing to a sub-set of the T2 objects with a T4 uber_monitor aggregating those monitors, or b) split the functionality of the monitor into two - one to check for convergence and one to check for divergence.
@@ -378,11 +377,11 @@ The monitor is unusual in a few respects. Firstly, it is a singleton like data_s
 Secondly, it it the first object we've seen that uses the new (in trad4v2.0.1) sub vector mechanism which allows for an object to subscribe to many or all objects of a particular type. The list of change object to which the monitor object subscribes is given in the DB table 'monitor_my_changes'.
 </p>
 <p>
-Lastly, the monitor object has the job of printing out the data in a consumable format. This is somewhat of a work-around for the lack of support for any feed out of trad4, but it works ok, so expect to see this again in other applications. There is a consequence of this that isn't covered in the above abstract and concrete diagrams but the sharp-eyed amongst you may have spotted in the .t4 definition above, and that is in order to print the element's data it must subscribe to them too. An indeed it does - as given in the DB table 'monitor_my_elements'. These links are not shown in the above two diagrams mainly because they make a hell of a mess of the diagrams, but also, arguably, because the act of printing the system is not relevent to it's function.
+Lastly, the monitor object has the job of printing out the data in a consumable format. This is somewhat of a work-around for the lack of support for any feed out of trad4, but it works ok, so expect to see this again in other applications. There is a consequence of this that isn't covered in the above abstract and concrete diagrams and that is in order to print the element's data it must subscribe to them too. An indeed it does - as given in the DB table 'monitor_my_elements'. These links are not shown in the above two diagrams mainly because they make a hell of a mess of the diagrams, but also, arguably, because the act of printing the system is not relevent to it's function.
 </p>
 <h2><a name="operation">Operation</a></h2>
 <p>
-We'll now step through a couple of iterations, examining the log file as we go. The runtime logs are online in full -. there is one with <a  href="https://sourceforge.net/docman/display_doc.php?docid=138993&group_id=202177">print_each_cycle=0</a>, one with <a  href="https://sourceforge.net/docman/display_doc.php?docid=138994&group_id=202177">print_each_cycle=1</a> and a full set of data in <a  href="https://sourceforge.net/docman/display_doc.php?docid=138995&group_id=202177">csv format</a>.
+We'll now step through a couple of iterations, examining the log file as we go. The runtime logs are on-line in full -. there is one with <a  href="https://sourceforge.net/docman/display_doc.php?docid=138993&group_id=202177">print_each_cycle=0</a>, one with <a  href="https://sourceforge.net/docman/display_doc.php?docid=138994&group_id=202177">print_each_cycle=1</a> and a full set of data in <a  href="https://sourceforge.net/docman/display_doc.php?docid=138995&group_id=202177">csv format</a>.
 </p>
 <h3>Start-up</h3>
 <blockquote><pre>
@@ -725,6 +724,12 @@ Database values like k, alpha and beta are simple to change through a sql-prompt
 $ $SQLITE -column -header $APP_DB
 SQL> update data_server set k=0.3;
 </blockquote></pre>
+<p>
+You can update the monitor static in the same way:
+</p>
+<blockquote><pre>
+SQL> update monitor set print_each_cycle=1;
+</blockquote></pre>
 <h3>Functional changes</h3>
 <p>
 To change the shape of the initial heat distribution you will have to modify the calculate_element function (found in heat_equation_1d/objects/element.c). There you will be able to change both how the x and y values are derived from the object's id. So if you wanted x = 3-30 you would set x as:
@@ -741,17 +746,29 @@ element_y = sin( 2 * element_x );
 
 <h3>Extending the grid</h3>
 <p>
-There is a 100-node grid checked in to worked_example2 but due to a limitation in the trad4 infrastructure you will need to increase the value of NUM_NODES in heat_equation_1d/src/constants.t4s, run the precompiler and recompile: 
+There is a 100-node grid checked in to worked_example2 but due to a limitation in the current trad4 infrastructure you will need to increase the value of NUM_NODES in heat_equation_1d/src/constants.t4s, run the precompiler and recompile: 
 </p>
 <blockquote><pre>
 heat_equation_1d$ t4p
 heat_equation_1d$ make all
 </blockquote></pre>
 <p>
-This is discussed below in the 'Further Work' section.
+I realise this situation is far from ideal and I will be addressing this in the near future.
 </p>
+<!-- ==================================================================== -->
 
-<h2><a name="further_work">Further work</a></h2>
+<div align="center" class="copyright">
+Copyright (c) Steve Evans 2009
+</div>
+
+<!-- ==================================================================== -->
+
+<br />
+<center>
+<!--
+<a href="http://sourceforge.net"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=202177&amp;type=4" width="125" height="37" border="0" alt="SourceForge.net Logo" /></a>
+-->
+</center>
 
 </body>
      </html>
