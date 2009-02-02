@@ -266,6 +266,7 @@ sub CloseFile() {
         `rm -f $current_obj.t4t`;
     }
 }
+
 sub LoadAppConstants() {
 
     open APP_CONSTANTS_FILE, "$ENV{SRC_DIR}/constants.t4s" or die "Can't open $ENV{SRC_DIR}/constants.t4s for reading";
@@ -334,27 +335,33 @@ sub LoadAppConstants() {
             $expression =~ s/$constant/$constants_hash->{$constant}/g;
         }
 
-        if ( $expression =~ /[A-Za-z_]+/ ) {
+        $value = eval $expression;
 
-            print "Error: Can't evaluate expression \'$expression_name = $expression\' in constants.t4s.\n";
+        if ( ! $@ ) {
+
+            $constants_hash->{$expression_name} = $value;
+        }
+    }
+
+    foreach $expression_name ( keys %{$constants_hash} ) {
+
+        if ( $constants_hash->{$expression_name} =~ /[A-Za-z_]+/ ) {
+
+
+           if ( $constants_hash->{$constants_hash->{$expression_name}} =~ /^(\d+\.?\d*|\.\d+)$/ ) {
+
+                $constants_hash->{$expression_name} = $constants_hash->{$constants_hash->{$expression_name}};
+            } 
+        }
+    }
+
+    foreach $expression_name ( keys %{$constants_hash} ) {
+ 
+        if ( $constants_hash->{$expression_name} =~ /[A-Za-z_]+/ ) {
+
+            print "NEW Error: Can't evaluate expression \'$expression_name = $constants_hash->{$expression_name}\' in constants.t4s.\n";
             ExitOnError();
-
         }
-        else {
-
-            $value = eval $expression;
-    
-            if ( $@ ) {
-
-                print "Error: Can't evaluate expression \'$expression_name = $expression\' in constants.t4s.\n";
-                ExitOnError();
-            }
-            else {
-
-                $constants_hash->{$expression_name} = $value;
-            }
-        }
-
     }
 
     return $constants_hash;
