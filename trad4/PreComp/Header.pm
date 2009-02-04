@@ -31,7 +31,7 @@ sub Generate($) {
 
     print $FHD "typedef struct {\n";
 
-    print $FHD "    // Header\n";
+    print $FHD "    // header\n";
 
     foreach $tuple ( @header ) {
 
@@ -41,24 +41,15 @@ sub Generate($) {
 
     }
 
+    foreach $section ( "sub", "sub_vec", "static", "static_vec", "pub", "pub_vec" ) {
 
-    print $FHD "\n";
-    print $FHD "    // Sub\n";
+        if ( $section !~ /\_vec/ ) {
 
-    PreComp::Utilities::PrintSection( $FHD, $obj_hash, "sub" );
-    PreComp::Utilities::PrintSection( $FHD, $obj_hash, "sub_vec" );
+            print $FHD "\n    // $section\n";
+        }
 
-    print $FHD "\n";
-    print $FHD "    // Static\n";
-
-    PreComp::Utilities::PrintSection( $FHD, $obj_hash, "static" );
-    PreComp::Utilities::PrintSection( $FHD, $obj_hash, "static_vec" );
-
-    print $FHD "\n";
-    print $FHD "    // Pub\n";
-
-    PreComp::Utilities::PrintSection( $FHD, $obj_hash, "pub" );
-    PreComp::Utilities::PrintSection( $FHD, $obj_hash, "pub_vec" );
+        PreComp::Utilities::PrintHeader( $FHD, $obj_hash, $section );
+    }
 
     print $FHD "} $name;\n";
     print $FHD "\n";

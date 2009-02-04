@@ -609,7 +609,7 @@ sub HasStruct($$) {
 
 }
 
-sub PrintSection($$$) {
+sub PrintHeader($$$) {
     my $fh = shift;
     my $obj_hash_ref = shift;
     my $section = shift;
