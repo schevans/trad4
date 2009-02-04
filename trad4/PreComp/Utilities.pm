@@ -562,7 +562,7 @@ sub LoadDef($) {
             next;
         }
 
-        if ( $line =~ /sub|pub|static/ ) {
+        if ( $line =~ /^sub|pub|static$/ ) {
 
             $file_section = $line;
             $hash_section = $file_section;    
