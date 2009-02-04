@@ -10,7 +10,7 @@ fi
 
 if [ $NUM_APPS != 1 ]
 then
-    echo "Error: More than one $APP found running under ps. Suggest you kill both and start again."
+    echo "Error: More than one $APP found running under ps. Suggest you kill them all and start again."
     exit 0
 fi
 
