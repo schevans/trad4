@@ -50,7 +50,7 @@ sub generate_object_types($) {
 
     foreach $object_type ( keys %{$master_hash} ) {
 
-        print $FHD "insert into object_types values ( $master_hash->{$object_type}->{type_num}, \"$master_hash->{$object_type}->{name}\", $master_hash->{$object_type}->{tier}, 1 );\n";
+        print $FHD "insert into object_types values ( $master_hash->{$object_type}->{type_num}, \"$master_hash->{$object_type}->{name}\", 1 );\n";
     }
 
     PreComp::Utilities::CloseFile();
