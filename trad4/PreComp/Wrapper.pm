@@ -320,6 +320,11 @@ sub generate_loader_callback($$)
         $counter++
     }
 
+    foreach $key ( keys %{$obj_hash->{data}->{pub}} ) {
+
+        print $FHD "    (($name*)obj_loc[id])->$key = 0;\n";
+    }
+
     print $FHD "\n";
     print $FHD "    //calculate_$name"."_wrapper((void*)id);\n";
 
