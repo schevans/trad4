@@ -372,14 +372,14 @@ static int load_types_callback(void *NotUsed, int argc, char **row, char **azCol
 
     if ( object_type_struct[obj_num] == 0 )
     {
-        cout << "Creating new type " << name << ", type id: " << obj_num << ", tier: " << atoi(row[2]) << endl;
+        cout << "Creating new type " << name << ", type id: " << obj_num << ", tier: N/A" << endl;
 
         object_type_struct[obj_num] = new object_type_struct_t;
     }
     else 
     {
 // Validate
-        cout << "Reloading type " << name << ", id: " << obj_num << ", tier: " << atoi(row[2]) << endl;
+        cout << "Reloading type " << name << ", id: " << obj_num << ", tier: N/A" << endl;
 
         dlclose(object_type_struct[obj_num]->lib_handle);
         object_type_struct[obj_num]->constructor_fpointer = 0;
@@ -437,12 +437,10 @@ void load_types( int initial_load )
     std::ostringstream dbstream;
 
     if ( initial_load ) 
-        dbstream << "select type_id, name, tier from object_types";
+        dbstream << "select type_id, name from object_types";
     else
-        dbstream << "select type_id, name, tier from object_types where need_reload=1";
+        dbstream << "select type_id, name from object_types where need_reload=1";
         
-DBG
-
     if( sqlite3_exec(db, dbstream.str().c_str(), load_types_callback, 0, &zErrMsg) != SQLITE_OK ){
         fprintf(stderr, "SQL error: %s. File %s, line %d.\n", zErrMsg, __FILE__, __LINE__);
         sqlite3_free(zErrMsg);
@@ -461,7 +459,7 @@ static int load_objects_callback(void* initial_load_v, int argc, char **row, cha
 void load_objects( int initial_load )
 {
     std::ostringstream dbstream;
-    dbstream << "select type_id, tier from object_types";
+    dbstream << "select type_id from object_types";
 
     if ( initial_load != 1 )
         dbstream << " where need_reload=1";

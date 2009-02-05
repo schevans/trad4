@@ -2,7 +2,6 @@
 create table object_types (
     type_id int,
     name char(32),
-    tier int,
     need_reload int
 );
 
