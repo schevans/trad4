@@ -45,6 +45,6 @@ fi
 
 if [ ! -f ../../$NEW_APP/src/object_types.t4s ]
 then
-    echo "#id, tier, name" > ../../$NEW_APP/src/object_types.t4s
+    echo "#type_id, tier, name" > ../../$NEW_APP/src/object_types.t4s
 fi
 
