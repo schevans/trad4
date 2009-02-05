@@ -384,9 +384,8 @@ sub generate_loader($$)
     print $FHD "        dbstream << \" and o.need_reload=1\";\n";
     print $FHD "\n";
 
-    print $FHD "\n";
     print $FHD "    if( sqlite3_exec(db, dbstream.str().c_str(), load_objects_callback, obj_loc, &zErrMsg) != SQLITE_OK ){\n";
-    print $FHD "        fprintf(stderr, \"SQL error: %s\\n\", zErrMsg);\n";
+    print $FHD "        fprintf(stderr, \"SQL error: %s. File %s, line %d.\\n\", zErrMsg, __FILE__, __LINE__);\n";
     print $FHD "        sqlite3_free(zErrMsg);\n";
     print $FHD "    }\n";
     print $FHD "\n";
@@ -508,7 +507,7 @@ sub generate_extra_loaders($$$$)
 
         print $FHD "\n";
         print $FHD "    if( sqlite3_exec(db, dbstream.str().c_str(), load_$name"."_$vec_short"."_callback, obj_loc, &zErrMsg) != SQLITE_OK ){\n";
-        print $FHD "        fprintf(stderr, \"SQL error: %s\\n\", zErrMsg);\n";
+        print $FHD "        fprintf(stderr, \"SQL error: %s. File %s, line %d.\\n\", zErrMsg, __FILE__, __LINE__);\n";
         print $FHD "        sqlite3_free(zErrMsg);\n";
         print $FHD "    }\n";
         print $FHD "\n";
@@ -582,7 +581,7 @@ sub generate_extra_loaders($$$$)
 
         print $FHD "\n";
         print $FHD "    if( sqlite3_exec(db, dbstream.str().c_str(), load_$name"."_$vec_short"."_callback, obj_loc, &zErrMsg) != SQLITE_OK ){\n";
-        print $FHD "        fprintf(stderr, \"SQL error: %s\\n\", zErrMsg);\n";
+        print $FHD "        fprintf(stderr, \"SQL error: %s. File %s, line %d.\\n\", zErrMsg, __FILE__, __LINE__);\n";
         print $FHD "        sqlite3_free(zErrMsg);\n";
         print $FHD "    }\n";
         print $FHD "\n";
