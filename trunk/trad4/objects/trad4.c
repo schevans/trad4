@@ -441,9 +441,10 @@ void load_types( int initial_load )
     else
         dbstream << "select type_id, name, tier from object_types where need_reload=1";
         
+DBG
 
     if( sqlite3_exec(db, dbstream.str().c_str(), load_types_callback, 0, &zErrMsg) != SQLITE_OK ){
-        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        fprintf(stderr, "SQL error: %s. File %s, line %d.\n", zErrMsg, __FILE__, __LINE__);
         sqlite3_free(zErrMsg);
     }
 }
@@ -466,7 +467,7 @@ void load_objects( int initial_load )
         dbstream << " where need_reload=1";
 
     if( sqlite3_exec(db, dbstream.str().c_str(), load_objects_callback, (void*)&initial_load, &zErrMsg) != SQLITE_OK ){
-        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        fprintf(stderr, "SQL error: %s. File %s, line %d.\n", zErrMsg, __FILE__, __LINE__);
         sqlite3_free(zErrMsg);
     }
 }
