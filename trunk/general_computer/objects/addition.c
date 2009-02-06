@@ -10,10 +10,6 @@ using namespace std;
 
 void calculate_addition( obj_loc_t obj_loc, int id )
 {
-    // Write me.
-
-    
-
     if ( numeric1_output == 0 ) {
         
         addition_output = 1;
@@ -21,8 +17,7 @@ void calculate_addition( obj_loc_t obj_loc, int id )
     else {
 
         addition_output = numeric1_output + numeric2_output;
-    }
 
-cout << addition_output << endl;
+    }
 }
 
