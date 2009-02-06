@@ -36,9 +36,6 @@ sub generate_dummy_data($$) {
     my $master_hash = shift;
     my $name = shift;
   
-print "NOTE: generate_dummy_data temporarily disabled for the IoI Phase2 stuff\n";
-return;
- 
     my $obj_hash = $master_hash->{$name};
 
     my $PI = 3.14;
@@ -49,7 +46,7 @@ return;
     my $FHD = PreComp::Utilities::OpenFile( $ENV{APP_ROOT}."/data/default_set/$name.sql" );
 
     print $FHD "delete from $name;\n";
-    print $FHD "insert into object values ( $type_num, $type_num, \"$name"."_$type_num\", 0, 1 );\n";
+    print $FHD "insert into object values ( $type_num, $type_num, 0, \"$name"."_$type_num\", 0, 1 );\n";
     print $FHD "insert into $name values ( $type_num";
 
     foreach $key ( @{$obj_hash->{data}->{static_order}} ) {
