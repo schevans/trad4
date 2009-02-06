@@ -1,10 +1,5 @@
 
 
-sub
-    numeric numeric1
-    numeric numeric2
+implements numeric
 
-
-pub
-    double output
 

@@ -8,11 +8,3 @@ sub
 pub
     double output
 
-
-#implements
-#    plus
-#    minus
-#    mult
-#    div
-
-    
