@@ -474,7 +474,18 @@ sub LoadDefs() {
             next;
         }
 
-        ( $num, $tier, $type ) = split /,/, $line;
+        ( $num, $type ) = split /,/, $line;
+
+        $num =~ s/^\s+//;
+        $num =~ s/\s+$//;
+        $type =~ s/^\s+//;
+        $type =~ s/\s+$//;
+
+        if ( $num !~ /\d+/ or $type !~ /\D/ ) {
+
+            print "Error: Malformed definition in object_types.t4s. Type name given as '$type', type num given as '$num'.\n";
+            ExitOnError();
+        }
 
         if ( -f $ENV{SRC_DIR}."/$type.t4" ) {
 
@@ -483,9 +494,6 @@ sub LoadDefs() {
                 print "Error: Two objects share the same name in object_types.t4s - $type.\n";
                 ExitOnError();
             }
-
-            $master_hash{$type}{tier} = $tier;
-
 
             if ( $master_hash{$type}{type_num} ) {
 

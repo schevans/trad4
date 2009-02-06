@@ -35,7 +35,10 @@ sub Generate($$$) {
 sub generate_dummy_data($$) {
     my $master_hash = shift;
     my $name = shift;
-   
+  
+print "NOTE: generate_dummy_data temporarily disabled for the IoI Phase2 stuff\n";
+return;
+ 
     my $obj_hash = $master_hash->{$name};
 
     my $PI = 3.14;
