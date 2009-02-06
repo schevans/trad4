@@ -541,6 +541,11 @@ sub LoadDefs() {
                 }
 
             }
+            else {
+
+                print "Error: Type '$type' is defined as implementing '$master_hash{$type}{data}{implements}' which is an unknown type.\n";
+                ExitOnError();
+            }
 
         }
         else {
