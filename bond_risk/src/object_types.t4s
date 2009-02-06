@@ -1,4 +1,4 @@
-#type_id, tier, name
+#type_id, name
 1,currency_curves
 2,fx_rate
 3,bond
