@@ -1,3 +1,7 @@
 #type_id, name
 1,numeric
-2,addition
+2,feed
+3,addition
+4,subtraction
+5,multiplication
+6,division
