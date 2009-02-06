@@ -514,6 +514,41 @@ sub LoadDefs() {
         }
     }
 
+    foreach $type ( keys %master_hash ) {
+
+        if ( defined $master_hash{$type}{data}{implements} ) {
+
+            if ( defined $master_hash{$master_hash{$type}{data}{implements}} ) {
+
+                my $temp = $master_hash{$master_hash{$type}{data}{implements}}{data};
+
+                foreach $section ( "sub", "static", "pub" ) {
+
+                    foreach $var ( keys %{$master_hash{$master_hash{$type}{data}{implements}}{data}{$section}} ) {
+                    
+                        $master_hash{$type}{data}{$section}{$var} = $master_hash{$master_hash{$type}{data}{implements}}{data}{$section}{$var};
+                    }
+
+                }
+
+                foreach $section ( "sub_order", "static_order", "pub_order" ) {
+
+                    foreach $var ( @{$master_hash{$master_hash{$type}{data}{implements}}{data}{$section}} ) {
+
+                        push @{$master_hash{$type}{data}{$section}}, $var;
+
+                    }
+                }
+
+            }
+
+        }
+        else {
+
+            $master_hash{$type}{data}{implements} = $type;
+        }
+    }
+
     if ( $counter == 0 ) {
         
         print "Error: object_types.t4s is empty.\n";
@@ -568,6 +603,15 @@ sub LoadDef($) {
 
         if ( !$line or $line =~ /#/ ) {
             next;
+        }
+
+        if ( $line =~ /^implements \w/ ) {
+
+            ( $ignore, $implements ) = split / /, $line;
+
+            $object_hash{implements} = $implements;
+
+            last;
         }
 
         if ( $line =~ /^sub|pub|static$/ ) {
