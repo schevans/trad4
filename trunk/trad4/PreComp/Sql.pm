@@ -46,7 +46,7 @@ sub generate_dummy_data($$) {
     my $FHD = PreComp::Utilities::OpenFile( $ENV{APP_ROOT}."/data/default_set/$name.sql" );
 
     print $FHD "delete from $name;\n";
-    print $FHD "insert into object values ( $type_num, $type_num, 0, \"$name"."_$type_num\", 0, 1 );\n";
+    print $FHD "insert into object values ( $type_num, $type_num, 0, \"$name"."_$type_num\", 1, 1 );\n";
     print $FHD "insert into $name values ( $type_num";
 
     foreach $key ( @{$obj_hash->{data}->{static_order}} ) {
