@@ -302,17 +302,12 @@ sub generate_loader_callback($$$)
     print $FHD "    //(($name*)obj_loc[id])->need_refresh_fpointer = &$name"."_need_refresh;\n";
     print $FHD "    (($name*)obj_loc[id])->type = ".$obj_hash->{type_num}.";\n";
 
-#print Dumper( $obj_hash );
-
-print "KK $obj_hash->{data}->{implements}\n";
-
     print $FHD "    (($name*)obj_loc[id])->implements = ".$master_hash->{$obj_hash->{data}->{implements}}->{type_num}.";\n";
     print $FHD "    memcpy( (($name*)obj_loc[id])->name, row[1], 32 );\n";
     print $FHD "    (($name*)obj_loc[id])->tier = atoi(row[2]);\n";
     print $FHD "    \n";
 
     my $counter=4;
-
 
     foreach $key ( keys %{$obj_hash->{data}->{static}} ) {
 
