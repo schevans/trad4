@@ -372,14 +372,14 @@ static int load_types_callback(void *NotUsed, int argc, char **row, char **azCol
 
     if ( object_type_struct[obj_num] == 0 )
     {
-        cout << "Creating new type " << name << ", type id: " << obj_num << ", tier: N/A" << endl;
+        cout << "Creating new type " << name << ", type_id: " << obj_num << endl;
 
         object_type_struct[obj_num] = new object_type_struct_t;
     }
     else 
     {
 // Validate
-        cout << "Reloading type " << name << ", id: " << obj_num << ", tier: N/A" << endl;
+        cout << "Reloading type " << name << ", type_id: " << obj_num << endl;
 
         dlclose(object_type_struct[obj_num]->lib_handle);
         object_type_struct[obj_num]->constructor_fpointer = 0;
