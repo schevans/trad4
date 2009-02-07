@@ -19,7 +19,8 @@ sub CommomHeader {
         "int type" ,
         "int tier" ,
         "char name[OBJECT_NAME_LEN]",
-        "int log_level"
+        "int log_level",
+        "int implements"
     );
 
     return @header;
