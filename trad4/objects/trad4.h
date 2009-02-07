@@ -73,6 +73,7 @@ typedef struct {
     int tier;
     char name[OBJECT_NAME_LEN];
     int log_level; 
+    int implements;
 } object_header;
 
 #define object_timestamp(index) ((object_header*)obj_loc[index])->last_published

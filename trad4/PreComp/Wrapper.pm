@@ -13,7 +13,7 @@ sub generate_loader($$);
 sub generate_constructor($$);
 sub generate_calculate($$$);
 sub generate_need_refresh($$$);
-sub generate_loader_callback($$);
+sub generate_loader_callback($$$);
 sub generate_extra_loaders($$$$);
 
 sub Generate($$$$) {
@@ -83,7 +83,7 @@ sub Generate($$$$) {
     generate_validator( $master_hash, $name, $FHD );
     print $FHD "\n";
 
-    generate_loader_callback( $obj_hash, $FHD );
+    generate_loader_callback( $master_hash, $obj_hash, $FHD );
     print $FHD "\n";
 
     generate_loader( $obj_hash, $FHD );
@@ -184,14 +184,12 @@ sub generate_validator($$$)
         print $FHD "        exit(0);\n";
         print $FHD "    }\n";
         print $FHD "\n";
-        print $FHD "cout << \"NOTE: Type checking validation suspended for inheritance-of-interface stuff.\" << endl;\n";
-        print $FHD "\n";
-        print $FHD "    //if ( ((object_header*)obj_loc[(($name*)obj_loc[id])->$key])->type != $master_hash->{$obj_hash->{data}->{sub}->{$key}}->{type_num} )\n";
-        print $FHD "    //n";
+        print $FHD "    if ( ((object_header*)obj_loc[(($name*)obj_loc[id])->$key])->implements != $master_hash->{$obj_hash->{data}->{sub}->{$key}}->{type_num} )\n";
+        print $FHD "    {\n";
 
-        print $FHD "    //    cout << \"Error: Type $name, id \" << id << \" failed validation because a sub object $key, id \" << (($name*)obj_loc[id])->$key << \" is not of type $master_hash->{$obj_hash->{data}->{sub}->{$key}}->{type_num}.\" << endl;\n";
-        print $FHD "    //    exit(0);\n";
-        print $FHD "    //}\n";
+        print $FHD "        cout << \"Error: Type $name, id \" << id << \" failed validation because a sub object $key, id \" << (($name*)obj_loc[id])->$key << \" is not of type $master_hash->{$obj_hash->{data}->{sub}->{$key}}->{type_num}.\" << endl;\n";
+        print $FHD "        exit(0);\n";
+        print $FHD "    }\n";
         print $FHD "\n";
 
 
@@ -268,8 +266,9 @@ sub generate_need_refresh($$$)
 
 }
 
-sub generate_loader_callback($$)
+sub generate_loader_callback($$$)
 {
+    my $master_hash = shift;
     my $obj_hash = shift;
     my $FHD = shift;
 
@@ -302,6 +301,12 @@ sub generate_loader_callback($$)
     print $FHD "    //(($name*)obj_loc[id])->calculator_fpointer = &calculate_$name"."_wrapper;\n";
     print $FHD "    //(($name*)obj_loc[id])->need_refresh_fpointer = &$name"."_need_refresh;\n";
     print $FHD "    (($name*)obj_loc[id])->type = ".$obj_hash->{type_num}.";\n";
+
+#print Dumper( $obj_hash );
+
+print "KK $obj_hash->{data}->{implements}\n";
+
+    print $FHD "    (($name*)obj_loc[id])->implements = ".$master_hash->{$obj_hash->{data}->{implements}}->{type_num}.";\n";
     print $FHD "    memcpy( (($name*)obj_loc[id])->name, row[1], 32 );\n";
     print $FHD "    (($name*)obj_loc[id])->tier = atoi(row[2]);\n";
     print $FHD "    \n";
