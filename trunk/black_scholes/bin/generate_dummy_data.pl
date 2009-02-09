@@ -38,9 +38,24 @@ my %option_rate_trade;
 my %option_bs_delta;
 my %option_rho;
 
+my %tiers = (
+    option => 1,
+    risk_free_rate => 1,
+    stock => 1,
+    stock_trade => 2,
+    rate_trade => 2,
+    bs_delta => 3,
+    theta => 4,
+    rho => 4,
+    vega => 4,
+    gamma => 4,
+    price => 4
+);
+
+
 generate_risk_free_rates();
 generate_stocks();
-generate_options( 132000 );
+generate_options( 13200 );
 generate_rate_trades();
 generate_stock_trades();
 generate_bs_delta();
@@ -64,7 +79,7 @@ sub generate_price() {
 
         $id = get_next_id();
 
-        print $FILE "insert into object values ( $id, 11, \"$option_name{$option}_price\", 0, 0 );\n";
+        print $FILE "insert into object values ( $id, 11, $tiers{price}, \"$option_name{$option}_price\", 0, 0 );\n";
 
         print $FILE "insert into price values ( $id, $option_bs_delta{$option}, $option_stock_ids{$option}, $option, $option_rate_trade{$option} );\n";
 
@@ -90,7 +105,7 @@ sub generate_gamma() {
 
         $id = get_next_id();
 
-        print $FILE "insert into object values ( $id, 10, \"$option_name{$option}_gamma\", 0, 0 );\n";
+        print $FILE "insert into object values ( $id, 10, $tiers{gamma}, \"$option_name{$option}_gamma\", 0, 0 );\n";
 
         print $FILE "insert into gamma values ( $id, $option_bs_delta{$option}, $option_stock_trade{$option}, $option_stock_ids{$option} );\n";
 
@@ -115,7 +130,7 @@ sub generate_rho() {
 
         $id = get_next_id();
 
-        print $FILE "insert into object values ( $id, 8, \"$option_name{$option}_rho\", 0, 0 );\n";
+        print $FILE "insert into object values ( $id, 8, $tiers{rho}, \"$option_name{$option}_rho\", 0, 0 );\n";
 
         print $FILE "insert into rho values ( $id, $option, $option_rate_trade{$option}, $option_bs_delta{$option} );\n";
 
@@ -143,7 +158,7 @@ sub generate_theta() {
 
         $id = get_next_id();
 
-        print $FILE "insert into object values ( $id, 7, \"$option_name{$option}_theta\", 0, 0 );\n";
+        print $FILE "insert into object values ( $id, 7, $tiers{theta}, \"$option_name{$option}_theta\", 0, 0 );\n";
 
         print $FILE "insert into theta values ( $id, $option, $option_stock_ids{$option}, $option_rate_trade{$option}, $option_bs_delta{$option} );\n";
 
@@ -169,7 +184,7 @@ sub generate_vega() {
 
         $id = get_next_id();
 
-        print $FILE "insert into object values ( $id, 9, \"$option_name{$option}_vega\", 0, 0 );\n";
+        print $FILE "insert into object values ( $id, 9, $tiers{vega}, \"$option_name{$option}_vega\", 0, 0 );\n";
 
         print $FILE "insert into vega values ( $id, $option_bs_delta{$option}, $option_stock_ids{$option}, $option );\n";
 
@@ -196,7 +211,7 @@ sub generate_bs_delta() {
 
         $id = get_next_id();
 
-        print $FILE "insert into object values ( $id, 6, \"$option_name{$option}_BS\", 0, 0 );\n";
+        print $FILE "insert into object values ( $id, 6, $tiers{bs_delta}, \"$option_name{$option}_BS\", 0, 0 );\n";
 
         print $FILE "insert into bs_delta values ( $id, $option_rate_trade{$option}, $option_stock_trade{$option}, $option );\n";
 
@@ -224,7 +239,7 @@ sub generate_stock_trades() {
 
         $id = get_next_id();
 
-        print $FILE "insert into object values ( $id, 4, \"$option_name{$option}_ST\", 0, 0 );\n";
+        print $FILE "insert into object values ( $id, 4, $tiers{stock_trade}, \"$option_name{$option}_ST\", 0, 0 );\n";
 
         print $FILE "insert into stock_trade values ( $id, $option, $option_stock_ids{$option} );\n";
 
@@ -251,7 +266,8 @@ sub generate_rate_trades() {
 
         $id = get_next_id();
 
-        print $FILE "insert into object values ( $id, 5, \"$option_name{$option}_RT\", 0, 0 );\n";
+        print $FILE "insert into object values ( $id, 5, $tiers{rate_trade}, \"$option_name{$option}_RT\", 0, 0 );\n";
+
 
         print $FILE "insert into rate_trade values ( $id, $option, $option_rfr_ids{$option} );\n";
 
@@ -298,7 +314,7 @@ sub generate_options($) {
 
         $strike_price = $stock_price + ( int ( rand ( $stock_price / 20 )) * $mult );
 
-        print $FILE "insert into object values ( $id, 1, \"$name\", 0, 0 );\n";
+        print $FILE "insert into object values ( $id, 1, $tiers{option}, \"$name\", 0, 0 );\n";
 
         print $FILE "insert into option values ( $id, $time_to_maturity, $strike_price, $call_or_put );\n";
         $option_name{$id} = $name;
@@ -337,7 +353,7 @@ sub generate_stocks()
         
         $id = get_next_id();
 
-        print $FILE "insert into object values ( $id, 3, \"$line_array[0]\", 0, 1 );\n";
+        print $FILE "insert into object values ( $id, 3, $tiers{stock}, \"$line_array[0]\", 0, 1 );\n";
         print $FILE "insert into stock values ( $id, $line_array[2], $line_array[3] );\n";
 
         push @stock_ids, $id;
@@ -362,13 +378,13 @@ sub generate_risk_free_rates() {
     print $FILE "delete from risk_free_rate;\n";
     print $FILE "BEGIN;\n";
 
-    print $FILE "insert into object values ( 1, 2, \"RFR-USD\", 0, 1 );\n";
+    print $FILE "insert into object values ( 1, 2, $tiers{risk_free_rate}, \"RFR-USD\", 0, 1 );\n";
     print $FILE "insert into risk_free_rate values ( 1, 0.035 );\n";
 
-    print $FILE "insert into object values ( 2, 2, \"RFR-GBP\", 0, 1 );\n";
+    print $FILE "insert into object values ( 2, 2, $tiers{risk_free_rate}, \"RFR-GBP\", 0, 1 );\n";
     print $FILE "insert into risk_free_rate values ( 2, 0.045 );\n";
 
-    print $FILE "insert into object values ( 3, 2, \"RFR-EUR\", 0, 1 );\n";
+    print $FILE "insert into object values ( 3, 2, $tiers{risk_free_rate}, \"RFR-EUR\", 0, 1 );\n";
     print $FILE "insert into risk_free_rate values ( 3, 0.0475 );\n";
 
     print $FILE "COMMIT;\n";
