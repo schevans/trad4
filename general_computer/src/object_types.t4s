@@ -5,3 +5,6 @@
 4,subtraction
 5,multiplication
 6,division
+7,natural_log
+8,cume_norm_dist
+9,square_root
