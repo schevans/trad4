@@ -16,12 +16,13 @@ use PreComp::Macros;
 use PreComp::Structures;
 use PreComp::Enums;
 use PreComp::AppConstants;
+use PreComp::Docco;
 
 sub usage();
 
 my %opts;
 
-if ( ! getopts( 'o:hvscka', \%opts ) ) {
+if ( ! getopts( 'o:hvdscka', \%opts ) ) {
     usage();
 }
 
@@ -158,6 +159,13 @@ if ( $constants_hash ) {
     PreComp::AppConstants::Generate( $constants_hash );
 }
 
+if( $opts{d} ) {
+
+    print "Generating docco..\n";
+    PreComp::Docco::Generate( $master_hash );
+}
+
+
 # Hack alert
 `touch $ENV{APP_ROOT}/gen/objects/structures.h`;
 `touch $ENV{APP_ROOT}/gen/objects/enums.h`;
@@ -202,6 +210,7 @@ sub usage() {
     print "  -a             remove all generated files and regenerate\n";
     print "  -v             verbose - dumps internal structures\n";
     print "  -s             generate specs\n";
+    print "  -d             generate documentation\n";
     print "  -h             display this help and exit\n";
     print"\n";
 
