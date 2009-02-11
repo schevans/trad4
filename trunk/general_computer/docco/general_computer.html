@@ -57,6 +57,7 @@ This is a working model of what was a thought-experiment discussed in Appendix C
 <p>
 The plan is to create a series of objects that perform primitive mathematical functions – plus, minus, natural_log, cume_norm_dist etc., and configure the relationship between these objects to solve a particular problem. The interesting thing about this approach is that once we've created the application, we can configure the relationship between the objects at run-time by manipulating data in the database.
 </p>
+<h3>The Problem</h3>
 <p>
 Throughout this document we'll be referring to the data set "bs_delta" which will solve for delta in the closed-form Black-Scholes for European call options on non-dividend paying stocks. This is given by:
 <blockquote><pre>
@@ -75,11 +76,11 @@ and
 	vv = volatility squared
 	T = time to maturity
 </pre></blockquote>
-It doesn't matter if you're not familiar with this equation - it's the arithmatic itself we're interested in - not what any of it actually means.
+It doesn't matter if you're not familiar with this equation - it's the arithmetic itself we're interested in - not what any of it actually means.
 </p>
 <h3>Inheritance of Interface (IoI)</h3>
 <p>
-Inheitance of interface was introduced to allow for this model to be built. 
+Inheritance of interface was introduced to allow for this model to be built. IoI allows for types with different functions to share the same interface to a base type (analogous to a pure virtual base class in C++). In this model our base type is called 'numeric', and this in turn allows for any type to connect to any other because any derived type 'is a' numeric. This will be covered further below and in much greater detail once I get round to updating The Manual.
 </p>
 <h2><a name="the_model">The Model</a></h2>
 <p>
@@ -99,9 +100,15 @@ For completeness, we may as well add subtraction as while it's not used in the a
 
 
 <h2><a name="implementation">Implementation</a></h2>
+<h3>The abstract diagram</h3>
 <p>
 
 </p>
+<h3>The concrete diagram</h3>
+<p>
+<img src="gc_concrete.jpeg" alt="GC Concrete Diagram (bs_delta)">
+</p>
+
 <h3>The t4 files</h3>
 <p>
 <h4>numeric.t4:</h4>
