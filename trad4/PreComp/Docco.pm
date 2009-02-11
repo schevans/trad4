@@ -94,13 +94,19 @@ sub Generate($) {
         print $FHD "</p>\n";
         print $FHD "<blockquote><pre>\n";
 
-        foreach $section ( "sub", "static", "pub" ) {
+        if ( $master_hash->{$type}->{data}->{implements} eq $type ) {
 
-            PrintT4Section( $master_hash, $section, $type, $FHD );
+            foreach $section ( "sub", "static", "pub" ) {
 
+                PrintT4Section( $master_hash, $section, $type, $FHD );
+
+            }
+        }
+        else {
+
+            print $FHD "implements $master_hash->{$type}->{data}->{implements}\n";
         }
 
-        print $FHD "\n";
         print $FHD "</pre></blockquote>\n";
 
         print $FHD "<p>\n";
