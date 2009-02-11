@@ -62,6 +62,7 @@ sub Generate($) {
     print $FHD "<li><a href=\"#introduction\">Introduction</a></li>\n";
     print $FHD "<li><a href=\"#the_model\">The Model</a></li>\n";
     print $FHD "<li><a href=\"#implementation\">Implementation</a></li>\n";
+    print $FHD "</ul>\n";
     print $FHD "\n";
     print $FHD "<hr />\n";
     print $FHD "\n";
@@ -79,7 +80,14 @@ sub Generate($) {
     print $FHD "</p>\n";
     print $FHD "<h3>The t4 files</h3>\n";
 
+    my %simple_hash;
+
     foreach $type ( keys %{$master_hash} ) {
+
+        $simple_hash{$type} = $master_hash->{$type}->{type_num};
+    }
+
+    foreach $type ( sort{ $simple_hash{$a} <=> $simple_hash{$b} } keys %simple_hash ) {
 
         print $FHD "<p>\n";
         print $FHD "<h4>$type.t4:</h4>\n";
