@@ -75,6 +75,11 @@ sub Generate($) {
     print $FHD "\n";
     print $FHD "</p>\n";
     print $FHD "<h2><a name=\"implementation\">Implementation</a></h2>\n";
+    print $FHD "<h3>The abstract diagram</h3>\n";
+    print $FHD "<p>\n";
+    print $FHD "\n";
+    print $FHD "</p>\n";
+    print $FHD "<h3>The concrete diagram</h3>\n";
     print $FHD "<p>\n";
     print $FHD "\n";
     print $FHD "</p>\n";
