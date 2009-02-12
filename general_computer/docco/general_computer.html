@@ -48,6 +48,7 @@ general_computer
 <li><a href="#problem2">Problem2 - bs_delta</a></li>
 <li><a href="#the_model">The Model</a></li>
 <li><a href="#implementation">Implementation</a></li>
+<li><a href="#opertaion">Operation</a></li>
 </ul>
 
 <hr />
@@ -161,7 +162,7 @@ First we start by identifying the operations we'll need. Looking at the equation
 <li>cume_norm_dist</li>
 </ul>
 <p>
-For completeness, we may as well add subtraction as while it's not used in the above equation it may be used in other configurations.
+For completeness, we may as well include subtraction as while it's not used in the above equation it may be used in other configurations.
 </p>
 
 
@@ -191,8 +192,9 @@ Lastly, the numeric type itself is not shown as it doesn't do anything - it exis
 
 <h3>The t4 files</h3>
 <p>
-<h4>numeric.t4:</h4>
+As discussed, this model uses inheritance of interface. The syntax of this is pretty straighforward. Firstly, the base type is defined as normal:
 </p>
+<h4>numeric.t4:</h4>
 <blockquote><pre>
 sub
     numeric numeric1
@@ -206,81 +208,92 @@ pub
 
 </pre></blockquote>
 <p>
-
+The rest of the types are defined as implementing this type. The syntax for this is simply, looking at addition:
 </p>
-<p>
-<h4>feed.t4:</h4>
-</p>
-<blockquote><pre>
-implements numeric
-</pre></blockquote>
-<p>
-
-</p>
-<p>
 <h4>addition.t4:</h4>
 </p>
 <blockquote><pre>
 implements numeric
 </pre></blockquote>
 <p>
-
+The rest of the types are defined in the same way and are omitted for brevity.
 </p>
+<h2><a name="operation">Operation</a></h2>
 <p>
-<h4>subtraction.t4:</h4>
+The actual mechanics of a trad4 system should be familiar to you by now, but I include an excerpt from the logfile so you can see it's opearion. Again, only one thread was used to keep the output clear.
 </p>
 <blockquote><pre>
-implements numeric
+Tier 1 running.
+calculate_feed( S )
+        feed_output: 42
+calculate_feed( K )
+        feed_output: 40
+calculate_feed( r )
+        feed_output: 0.1
+calculate_feed( T )
+        feed_output: 0.5
+calculate_feed( v )
+        feed_output: 0.2
+calculate_feed( 2 )
+        feed_output: 2
+Tier 1 ran 6 objects in 0.00551391 seconds.
+
+Tier 2 running.
+calculate_division( S/K )
+        division_output: 1.05
+calculate_multiplication( rT )
+        multiplication_output: 0.05
+calculate_square_root( RtT )
+        square_root_output: 0.707107
+calculate_multiplication( vv )
+        multiplication_output: 0.04
+Tier 2 ran 4 objects in 0.00329208 seconds.
+
+Tier 3 running.
+calculate_natural_log( ln(S/K) )
+        natural_log_output: 0.0487902
+calculate_multiplication( vRtT )
+        multiplication_output: 0.141421
+calculate_division( vv/2 )
+        division_output: 0.02
+Tier 3 ran 3 objects in 0.00077486 seconds.
+
+Tier 4 running.
+calculate_addition( ln(s/K)+rT )
+        addition_output: 0.0987902
+calculate_multiplication( (vv/2)T )
+        multiplication_output: 0.01
+Tier 4 ran 2 objects in 0.000144958 seconds.
+
+Tier 5 running.
+calculate_addition( ln(s/K)+rT+(vv/2)T )
+        addition_output: 0.10879
+Tier 5 ran 1 objects in 6.8903e-05 seconds.
+
+Tier 6 running.
+calculate_division( d1 )
+        division_output: 0.769263
+Tier 6 ran 1 objects in 6.79493e-05 seconds.
+
+Tier 7 running.
+calculate_cume_norm_dist( DELTA )
+        cume_norm_dist_output: 0.779131
+Tier 7 ran 1 objects in 7.00951e-05 seconds.
+
+All tiers ran 18 objects in 0.0105832 seconds.
 </pre></blockquote>
 <p>
+For the record, the value of delta=0.779131 is correct, as described in black_scholes/spreadsheets/WorkedExample1.ods
+</p>
+<!-- ==================================================================== -->
 
-</p>
-<p>
-<h4>multiplication.t4:</h4>
-</p>
-<blockquote><pre>
-implements numeric
-</pre></blockquote>
-<p>
+<div align="center" class="copyright">
+Copyright (c) Steve Evans 2009
+</div>
 
-</p>
-<p>
-<h4>division.t4:</h4>
-</p>
-<blockquote><pre>
-implements numeric
-</pre></blockquote>
-<p>
+<!-- ==================================================================== -->
 
-</p>
-<p>
-<h4>natural_log.t4:</h4>
-</p>
-<blockquote><pre>
-implements numeric
-</pre></blockquote>
-<p>
-
-</p>
-<p>
-<h4>cume_norm_dist.t4:</h4>
-</p>
-<blockquote><pre>
-implements numeric
-</pre></blockquote>
-<p>
-
-</p>
-<p>
-<h4>square_root.t4:</h4>
-</p>
-<blockquote><pre>
-implements numeric
-</pre></blockquote>
-<p>
-
-</p>
-
+<br />
 
 
 </body>
