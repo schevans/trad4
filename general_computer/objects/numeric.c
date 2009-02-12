@@ -10,6 +10,6 @@ using namespace std;
 
 void calculate_numeric( obj_loc_t obj_loc, int id )
 {
-    // Write me.
+    cout << "Warning: calculate_numeric is being called. Doing nothing" << endl;
 }
 
