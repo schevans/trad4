@@ -120,7 +120,7 @@ sub generate_calculate($$$)
 
     print $FHD "extern \"C\" void calculate( obj_loc_t obj_loc, int id )\n";
     print $FHD "{\n";
-    print $FHD "    DEBUG( \"calculate_$obj_hash->{name}( \" << id << \" )\" );\n";
+    print $FHD "    DEBUG( \"calculate_$obj_hash->{name}( \" << (($name*)obj_loc[id])->name << \" )\" );\n";
     print $FHD "\n";
     print $FHD "    DEBUG_FINE( \"static:\" );\n";
 
