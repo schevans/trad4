@@ -49,6 +49,7 @@ general_computer
 <li><a href="#the_model">The Model</a></li>
 <li><a href="#implementation">Implementation</a></li>
 <li><a href="#opertaion">Operation</a></li>
+<li><a href="#further_work">Further work</a></li>
 </ul>
 
 <hr />
@@ -58,13 +59,13 @@ general_computer
 This is a working model of what was a thought-experiment discussed in Appendix C of The Manual v2_Beta_04. It was a thought experiment then as there were limitations in the trad4 infrastructure that meant it could not be built. Those limitations have now been fixed and the model is presented here.
 </p>
 <p>
-The plan is to create a series of objects that perform primitive mathematical functions – plus, minus, natural_log, cume_norm_dist etc., and configure the relationship between these objects to solve a particular problem. The interesting thing about this approach is that once we've created the application, we can configure the relationship between the objects at run-time by manipulating data in the database.
+The plan is to create a series of objects that perform primitive mathematical functions - plus, minus, natural_log, cume_norm_dist etc., and configure the relationship between these objects to solve a particular problem. The interesting thing about this approach is that once we've created the application, we can configure the relationship between the objects at run-time by manipulating data in the database.
 </p>
 <p>
-Inheritance of interface was introduced to allow for this model to be built. IoI allows for types with different functions to share the same interface to a base type (analogous to a pure virtual base class in C++). In this model our base type is called 'numeric', and this in turn allows for any type to connect to any other because any derived type 'is a' numeric. This will be covered further below and in much greater detail once I get round to updating The Manual.
+Inheritance of interface was introduced to allow for this model to be built. This allows for types with different functions to share the same interface to a base type (analogous to a pure virtual base class in C++). In this model our base type is called 'numeric', and this in turn allows for any type to connect to any other because any derived type 'is a' numeric. This will be covered further below and in much greater detail once I get round to updating The Manual.
 </p>
 <p>
-We'll start with a simple arithmetical example before moving onto the more complex problems of bs_delta as discussed in Appendix C. To switch between these data sets set the APP_DB env var to point to the database you want to run against and restart the application:
+We'll start with a simple arithmetical example before moving onto the more complex problem of bs_delta as discussed in Appendix C. To switch between these data sets set the APP_DB env var to point to the database you want to run against and restart the application:
 </p>
 <blockquote><pre>
 general_computer$ export APP_DB=data/general_computer_bs_delta.db
@@ -147,11 +148,11 @@ and
 	vv = volatility squared
 	T = time to maturity
 </pre></blockquote>
-It doesn't matter if you're not familiar with this equation - it's the arithmetic itself we're interested in - not what any of it actually means.
+It doesn't matter if you're not familiar with this equation - it's the arithmetic itself we're interested in, not what any of it actually means or how this equation was arrived at.
 </p>
 <h2><a name="the_model">The Model</a></h2>
 <p>
-First we start by identifying the operations we'll need. Looking at the equation above this give us
+First we start by identifying the operations we'll need. Looking at the equation above this gives us
 </p>
 <ul>
 <li>addition</li>
@@ -162,7 +163,7 @@ First we start by identifying the operations we'll need. Looking at the equation
 <li>cume_norm_dist</li>
 </ul>
 <p>
-For completeness, we may as well include subtraction as while it's not used in the above equation it may be used in other configurations.
+For completeness, we may as well include subtraction as while it's not used in the above equation it will be used in other configurations.
 </p>
 
 
@@ -171,7 +172,7 @@ For completeness, we may as well include subtraction as while it's not used in t
 <p>
 As discussed, this model uses inheritance of interface, so our abstract diagram looks a little strange. This is because as each type isa numeric, any object can connect to any other two objects. 
 <p>
-There are a couple of exceptions to this. Firstly there are the feed objects which, looking at the concrete diagrams don't subscribe to anything. But as a feed isa numeric, and numeric subscribes to two objects, how is this achieved? The answer is we define the feeds as subscribing to themselves. As it's last_published timestamp will never be greater than it's last_publish timestamp the object will never fire after it's initialised.
+There are a couple of exceptions to this. Firstly there are the feed objects which, looking at the concrete diagrams don't subscribe to anything. But as a feed isa numeric, and numeric subscribes to two objects, how is this achieved? The answer is we define the feeds as subscribing to themselves. As it's last_published timestamp will never be greater than it's last_publish timestamp, the object will only ever fire at start-up or on reload.
 <p>
 The second exception are the square_root, natural_log and cume_norm_dist types as these have only one input. These are handled in a similar manner to the feeds where the second spare input is tied up to itself.
 </p>
@@ -180,14 +181,16 @@ The second exception are the square_root, natural_log and cume_norm_dist types a
 It's important to understand that these self-loops have nothing to do with the feedback loops encountered in heat_equation_1d - they are simply a device to tie up the unused inputs and they have no effect on the operation of the system. Arguably they shouldn't be shown on any diagram but I've included them for completeness.
 </p>
 <p>
-It's also worth mentioning the axis. As any object can connect to any other object below it in the hierarchy the axis labels are given as relative. While in theory a feed object could exist at any tier, it is customary to keep them on T1.
+It's also worth mentioning the axis. As any object can connect to any other object below it in the hierarchy, the axis labels are given as relative. While in theory a feed object could exist at any tier, it is customary to keep them on T1.
 </p>
 <p>
 Lastly, the numeric type itself is not shown as it doesn't do anything - it exists solely so that the rest of the types can inherit it's interface.
 </p>
 <h3>The concrete diagram</h3>
-<p>
+
 <img src="gc_concrete_bs_delta.jpeg" alt="GC Concrete Diagram (bs_delta)">
+<p>
+You'll notice that this graph differs quite substantially from that presented in Appendix C. The first reason for this is that there were many errors in the graph in Appendix C which did not show up until I tried to implement it. The second reason is as this is a concrete graph showing actual objects - i.e. instantiated types - the correct notation is to use ovals. Rectangles are used in the abstract diagram which shows the types independent of any data.
 </p>
 
 <h3>The t4 files</h3>
@@ -207,6 +210,27 @@ pub
     double output
 
 </pre></blockquote>
+<p>
+<ul>
+<li>sub:</li>
+<ul>
+<li>numeric1 is the first of the two numeric to which this object subscribes. This is used by the 2-input and 1-input types, but not the feeds.</li>
+<li>numeric2 is the second of the two numeric to which this object subscribes. This is only used by the 2-input types.</li>
+</ul>
+<li>static:</li>
+<ul>
+<li>value is only used by the feed types and it's used to store the feed value which is copied onto output on start-up or reload.</li>
+</ul>
+<li>pub:</li>
+<ul>
+<li>output is the output of the type. This is used by all types.</li>
+</ul>
+</ul>
+</p>
+<p>
+This 'one size fits all' approach is not ideal - for example the 'value' variable is only used for the feeds and thus redundant on the 1-input and 2-input types. This approach is required so that the isa covenant is not violated in the trad4 internals. This may be addressed in later trad4 versions, but there are some subtleties here that may not be related to the trad4 architecture.
+</p>
+
 <p>
 The rest of the types are defined as implementing this type. The syntax for this is simply, looking at addition:
 </p>
@@ -285,6 +309,13 @@ All tiers ran 18 objects in 0.0105832 seconds.
 <p>
 For the record, the value of delta=0.779131 is correct, as described in black_scholes/spreadsheets/WorkedExample1.ods
 </p>
+<h2><a name="further_work">Further work</a></h2>
+<p>
+Firstly, I'll be the first to admit that setting up the data is very fiddly work, and I've been thinking about writing/adapting an equation parser to generate the data sets.
+</p>
+<p>
+Second, the model itself could be extended to include trigonometric operators etc.
+</p>
 <!-- ==================================================================== -->
 
 <div align="center" class="copyright">
@@ -294,6 +325,9 @@ Copyright (c) Steve Evans 2009
 <!-- ==================================================================== -->
 
 <br />
+<center>
+<a href="http://sourceforge.net"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=202177&amp;type=4" width="125" height="37" border="0" alt="SourceForge.net Logo" /></a>
+</center>
 
 
 </body>
