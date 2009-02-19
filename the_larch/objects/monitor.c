@@ -10,7 +10,7 @@ using namespace std;
 
 void calculate_monitor( obj_loc_t obj_loc, int id )
 {
-    cout << "Glucose in trunk: " << my_trunk_glucose << endl;
+    cout << "Trunk glucose: " << my_trunk_glucose << ", trunk water: " << my_trunk_water << endl;
 
     sleep(1);
 }

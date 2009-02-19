@@ -4,12 +4,15 @@ sub
     trunk my_trunk
 
 static
-    double co2
-    double light
+    double co2_absorbed_per_leaf
+    double light_absorbed_per_leaf
+    double water_absorbed_per_leaf
+    int start_num_leaves
 
 pub
     double glucose
     double water_taken
+    int num_leaves
 
 
 
