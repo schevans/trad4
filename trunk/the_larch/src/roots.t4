@@ -1,0 +1,15 @@
+
+
+sub
+    trunk my_trunk
+
+static
+    double water
+
+pub
+    double glucose_taken
+
+
+
+
+
