@@ -8,6 +8,7 @@ static
     double start_width
     double glucose_per_square_millimeter
     double glucose_absorbed_coeff
+    double shear_strenght_Pa
 
 pub
     double water_published

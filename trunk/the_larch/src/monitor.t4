@@ -5,3 +5,5 @@ sub
     roots my_roots
     trunk my_trunk
 
+pub
+    int counter
