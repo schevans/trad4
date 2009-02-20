@@ -1,6 +1,6 @@
-#type_id, name
-1,roots
-2,trunk
-3,crown
-4,monitor
+#type_id,tier,name
+1,1,roots
+2,2,trunk
+3,1,crown
+4,3,monitor
 
