@@ -4,11 +4,15 @@ sub
     trunk my_trunk
 
 static
-    double water
+    double water_absorbed_per_rootlet
+    double glucose_per_rootlet
+    int start_num_rootlets
 
 pub
     double glucose_taken
-
+    double glucose_store
+    double water_published
+    int num_rootlets
 
 
 
