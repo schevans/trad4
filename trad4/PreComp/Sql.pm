@@ -41,12 +41,13 @@ sub generate_dummy_data($$) {
     my $PI = 3.14;
 
     my $name = $obj_hash->{name};
+    my $tier = $obj_hash->{tier};
     my $type_num = $obj_hash->{type_num};
 
     my $FHD = PreComp::Utilities::OpenFile( $ENV{APP_ROOT}."/data/default_set/$name.sql" );
 
     print $FHD "delete from $name;\n";
-    print $FHD "insert into object values ( $type_num, $type_num, 0, \"$name"."_$type_num\", 1, 1 );\n";
+    print $FHD "insert into object values ( $type_num, $type_num, $tier, \"$name"."_$type_num\", 1, 1 );\n";
     print $FHD "insert into $name values ( $type_num";
 
     foreach $key ( @{$obj_hash->{data}->{static_order}} ) {

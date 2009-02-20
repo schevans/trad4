@@ -474,10 +474,12 @@ sub LoadDefs() {
             next;
         }
 
-        ( $num, $type ) = split /,/, $line;
+        ( $num, $tier, $type ) = split /,/, $line;
 
         $num =~ s/^\s+//;
         $num =~ s/\s+$//;
+        $tier =~ s/^\s+//;
+        $tier =~ s/\s+$//;
         $type =~ s/^\s+//;
         $type =~ s/\s+$//;
 
@@ -502,6 +504,7 @@ sub LoadDefs() {
             }
 
             $master_hash{$type}{type_num} = $num;
+            $master_hash{$type}{tier} = $tier;
             $master_hash{$type}{name} = $type;
 
             $master_hash{$type}{data} = LoadDef( $type );
