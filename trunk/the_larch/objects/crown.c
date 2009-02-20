@@ -16,9 +16,9 @@ void calculate_crown( obj_loc_t obj_loc, int id )
         crown_num_leaves = crown_start_num_leaves;
     }
 
-    crown_water_taken = crown_water_absorbed_per_leaf * crown_num_leaves;
+    crown_water_taken = my_trunk_water;
 
-    double local_glucose_produced = ( crown_water_absorbed_per_leaf + crown_light_absorbed_per_leaf + crown_co2_absorbed_per_leaf ) * crown_num_leaves;
+    double local_glucose_produced = ( ( crown_water_taken / crown_num_leaves ) + crown_light_absorbed_per_leaf + crown_co2_absorbed_per_leaf ) * crown_num_leaves;
 
     crown_glucose_published = local_glucose_produced * crown_glucose_published_coeff;
 
