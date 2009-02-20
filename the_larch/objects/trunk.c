@@ -30,5 +30,16 @@ void calculate_trunk( obj_loc_t obj_loc, int id )
 
         trunk_glucose_store = trunk_glucose_store - ( trunk_glucose_per_square_millimeter * local_num_new_square_millimeters );
     }
+
+    double local_trunk_area = 3.14 * (( trunk_width / 1000.0 ) / 2.0 );
+
+    double local_shear = (( my_crown_total_mass / 0.001 )* 9.80665 ) / local_trunk_area;
+
+    if ( local_shear > trunk_shear_strenght_Pa )
+    {
+        cout << "Tree falls over." << endl;
+        exit(0);
+    } 
+
 }
 

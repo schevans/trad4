@@ -31,5 +31,7 @@ void calculate_crown( obj_loc_t obj_loc, int id )
         crown_num_leaves = crown_num_leaves + local_num_new_leaves;
         crown_glucose_store = crown_glucose_store - ( crown_glucose_per_leaf * local_num_new_leaves );
     }
+
+    crown_total_mass = crown_num_leaves * crown_mass_per_leaf;
 }
 

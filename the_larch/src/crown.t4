@@ -8,12 +8,14 @@ static
     double light_absorbed_per_leaf
     double glucose_published_coeff
     double glucose_per_leaf
+    double mass_per_leaf
     int start_num_leaves
 
 pub
     double glucose_store
     double glucose_published 
     double water_taken
+    double total_mass
     int num_leaves
 
 
