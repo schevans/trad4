@@ -3,6 +3,7 @@
 //  to see what's in-scope.
 
 #include <iostream>
+#include <math.h>
 
 #include "trunk_wrapper.c"
 
@@ -10,19 +11,24 @@ using namespace std;
 
 void calculate_trunk( obj_loc_t obj_loc, int id )
 {
-    trunk_glucose = trunk_glucose + my_crown_glucose_published - my_roots_glucose_taken;
-    trunk_water = trunk_water + my_roots_water_published - my_crown_water_taken;
-
-    if ( trunk_water < 0.0 )
+    if ( trunk_width == 0 ) 
     {
-        cout << "Run out of water! Tree dies." << endl;
-        exit(0);
+        trunk_width = trunk_start_width;
     }
 
-    if ( trunk_glucose < 0.0 )
+    trunk_water_published = my_roots_water_published;
+
+    double local_glucose_taken = my_crown_glucose_published * trunk_glucose_absorbed_coeff;
+    trunk_glucose_published = my_crown_glucose_published - local_glucose_taken;
+    trunk_glucose_store = trunk_glucose_store + local_glucose_taken;
+
+    if ( trunk_glucose_store > trunk_glucose_per_square_millimeter )
     {
-        cout << "Run out of glucose! Tree dies." << endl;
-        exit(0);
+        int local_num_new_square_millimeters = (int)(( trunk_glucose_store - fmod( trunk_glucose_store, trunk_glucose_per_square_millimeter ) ) / trunk_glucose_per_square_millimeter );
+
+        trunk_width = trunk_width + sqrt( local_num_new_square_millimeters );
+
+        trunk_glucose_store = trunk_glucose_store - ( trunk_glucose_per_square_millimeter * local_num_new_square_millimeters );
     }
 }
 
