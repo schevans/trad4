@@ -4,8 +4,15 @@ sub
     crown my_crown
     roots my_roots
 
+static
+    double start_width
+    double glucose_per_square_millimeter
+    double glucose_absorbed_coeff
+
 pub
-    double water
-    double glucose
+    double water_published
+    double glucose_published
+    double glucose_store
+    double width
 
 

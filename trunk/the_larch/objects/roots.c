@@ -18,7 +18,7 @@ void calculate_roots( obj_loc_t obj_loc, int id )
 
     roots_water_published = roots_water_absorbed_per_rootlet * roots_num_rootlets;
 
-    roots_glucose_taken = my_trunk_glucose;
+    roots_glucose_taken = my_trunk_glucose_published;
 
     roots_glucose_store = roots_glucose_store + roots_glucose_taken;
 
