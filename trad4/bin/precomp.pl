@@ -74,6 +74,36 @@ if (  -f $ENV{SRC_DIR}."/constants.t4s" ) {
 print "Loading t4 files..\n";
 my $master_hash = PreComp::Utilities::LoadDefs();
 
+if ( $opts{s} ) {
+    PreComp::Utilities::GenerateSpecs( $master_hash );
+}
+
+my %doing;
+
+if ( $opts{o} ) {
+
+    if ( $master_hash->{$opts{o}} ) {
+
+        $doing{$opts{o}} = 1;
+    }
+    else {
+    
+        print "Error: Type $opts{o} not found. Exiting.\n";
+        exit(1);
+    }
+}
+else {
+
+    my $key;
+
+    foreach $key ( keys %{$master_hash} ) {
+
+        $doing{$key} = 1;
+    }
+}
+
+my $type;
+
 if ( $verbose ) {
 
     print "Dumping internal structures..\n\n";
@@ -105,41 +135,36 @@ if ( $verbose ) {
 
     }
 
-    print "Master hash:\n";
-    print "------------\n";
-    print Dumper( $master_hash );
-    print "\n";
-}
+    if ( $opts{o} ) {
 
-if ( $opts{s} ) {
-    PreComp::Utilities::GenerateSpecs( $master_hash );
-}
+        foreach $type ( keys %doing ) {
 
-my %doing;
+            my $header_string = "Type $type:";
 
-if ( $opts{o} ) {
+            print "$header_string\n";
 
-    if ( $master_hash->{$opts{o}} ) {
+            my $counter = 0;
 
-        $doing{$opts{o}} = 1;
+            while ( $counter < length( $header_string ) ) {
+
+                print "-";
+                $counter = $counter + 1;
+            }
+            print "\n"; 
+
+            print Dumper( $master_hash->{$type} );
+            print "\n";
+
+        }
     }
     else {
-    
-        print "Error: Type $opts{o} not found. Exiting.\n";
-        exit(1);
+
+        print "Master hash:\n";
+        print "------------\n";
+        print Dumper( $master_hash );
+        print "\n";
     }
 }
-else {
-
-    my $key;
-
-    foreach $key ( keys %{$master_hash} ) {
-
-        $doing{$key} = 1;
-    }
-}
-
-my $type;
 
 print "Validating..\n";
 
