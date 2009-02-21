@@ -464,7 +464,7 @@ sub LoadDefs() {
 
     open TYPES_FILE, "$ENV{SRC_DIR}/object_types.t4s" or die "Can't open $ENV{SRC_DIR}/object_types.t4s for reading";
 
-    my $counter = 0;
+    my $counter = 1;
 
     while ( $line = <TYPES_FILE> ) {
 
@@ -474,46 +474,48 @@ sub LoadDefs() {
             next;
         }
 
-        ( $num, $tier, $type ) = split /,/, $line;
+        if ( $line =~ /^\d+,\d+,\w+$/ ) {
 
-        $num =~ s/^\s+//;
-        $num =~ s/\s+$//;
-        $tier =~ s/^\s+//;
-        $tier =~ s/\s+$//;
-        $type =~ s/^\s+//;
-        $type =~ s/\s+$//;
+            ( $num, $tier, $type ) = split /,/, $line;
 
-        if ( $num !~ /\d+/ or $type !~ /\D/ ) {
+            $num =~ s/^\s+//;
+            $num =~ s/\s+$//;
+            $tier =~ s/^\s+//;
+            $tier =~ s/\s+$//;
+            $type =~ s/^\s+//;
+            $type =~ s/\s+$//;
 
-            print "Error: Malformed definition in object_types.t4s. Type name given as '$type', type num given as '$num'.\n";
-            ExitOnError();
-        }
+            if ( -f $ENV{SRC_DIR}."/$type.t4" ) {
 
-        if ( -f $ENV{SRC_DIR}."/$type.t4" ) {
+                if ( exists $master_hash{$type} ) {
 
-            if ( exists $master_hash{$type} ) {
+                    print "Error: Two objects share the same name in object_types.t4s - $type.\n";
+                    ExitOnError();
+                }
 
-                print "Error: Two objects share the same name in object_types.t4s - $type.\n";
-                ExitOnError();
+                if ( $master_hash{$type}{type_num} ) {
+
+                    print "Error: Two objects share the same type_id - $master_hash{$type} and $master_hash{$master_hash{$type}{type_num}}.\n";
+                    ExitOnError();
+                }
+
+                $master_hash{$type}{type_num} = $num;
+                $master_hash{$type}{tier} = $tier;
+                $master_hash{$type}{name} = $type;
+
+                $master_hash{$type}{data} = LoadDef( $type );
+
+                $counter = $counter + 1;
             }
+            else {
 
-            if ( $master_hash{$type}{type_num} ) {
-
-                print "Error: Two objects share the same type_id - $master_hash{$type} and $master_hash{$master_hash{$type}{type_num}}.\n";
-                ExitOnError();
+                print "Warning: Type \'$type\' referenced in object_types.t4s but not found in ".$ENV{SRC_DIR}.". Ignoring type.\n";
             }
-
-            $master_hash{$type}{type_num} = $num;
-            $master_hash{$type}{tier} = $tier;
-            $master_hash{$type}{name} = $type;
-
-            $master_hash{$type}{data} = LoadDef( $type );
-
-            $counter = $counter + 1;
         }
         else {
 
-            print "Warning: Type \'$type\' referenced in object_types.t4s but not found in ".$ENV{SRC_DIR}.". Ignoring type.\n";
+            print "Error: Malformed line in object_types.t4s, line $counter.\n";
+            ExitOnError();
         }
     }
 
