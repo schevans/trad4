@@ -1,0 +1,11 @@
+delete from monitor_my_df;
+insert into monitor_my_df values ( 9999, 11 );
+insert into monitor_my_df values ( 9999, 12 );
+insert into monitor_my_df values ( 9999, 13 );
+insert into monitor_my_df values ( 9999, 14 );
+insert into monitor_my_df values ( 9999, 15 );
+insert into monitor_my_df values ( 9999, 16 );
+insert into monitor_my_df values ( 9999, 17 );
+insert into monitor_my_df values ( 9999, 18 );
+insert into monitor_my_df values ( 9999, 19 );
+insert into monitor_my_df values ( 9999, 20 );

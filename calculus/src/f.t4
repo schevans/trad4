@@ -1,8 +1,6 @@
 
 
-static
-    double x
-
 pub
+    double x
     double y
 
