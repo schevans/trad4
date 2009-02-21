@@ -76,13 +76,39 @@ my $master_hash = PreComp::Utilities::LoadDefs();
 
 if ( $verbose ) {
 
-    print Dumper( $constants_hash );
-    print "----------------------------\n";
-    print Dumper( $enum_hash );
-    print "----------------------------\n";
-    print Dumper( $struct_hash );
-    print "----------------------------\n";
+    print "Dumping internal structures..\n\n";
+
+    if ( $constants_hash ) {
+
+        print "Constants:\n";
+        print "----------\n";
+        print Dumper( $constants_hash );
+        print "\n";
+
+    }
+
+    if ( $enum_hash ) {
+
+        print "Enums:\n";
+        print "------\n";
+        print Dumper( $enum_hash );
+        print "\n";
+
+    }
+    
+    if ( $struct_hash ) {
+
+        print "Structures:\n";
+        print "----------\n";
+        print Dumper( $struct_hash );
+        print "\n";
+
+    }
+
+    print "Master hash:\n";
+    print "------------\n";
     print Dumper( $master_hash );
+    print "\n";
 }
 
 if ( $opts{s} ) {
