@@ -28,6 +28,7 @@ int num_threads(MAX_THREADS);   // Will be dynamic.
 int current_thread(1);
 int num_threads_fired(0);
 bool need_reload(false);
+char* timing_debug = 0;
 void set_timestamp( obj_loc_t obj_loc, int id );
 
 bool fire_object( int id );
@@ -48,6 +49,8 @@ void run_trad4() {
         cout << "Unable to open " << getenv("APP_DB") << endl;
         exit(1);
     }
+
+    timing_debug = getenv("TIMING_DEBUG");
 
     for ( int i = 0 ; i < MAX_OBJECTS+1 ; i++ )
     {
@@ -136,9 +139,8 @@ void run_trad4() {
 
             num_objects_run = num_object_run_this_tier;
 
-            #ifdef TIMING_DEBUG
+            if ( timing_debug )
                 cout << setprecision(6) << "Tier " << 1 << " ran " << num_object_run_this_tier << " objects in " << tier_end_time - tier_start_time << " seconds." << endl;
-            #endif
 
             for ( int tier=2 ; tier < num_tiers+1 ; tier++ )
             {
@@ -155,17 +157,15 @@ void run_trad4() {
 
                 num_objects_run = num_objects_run + num_object_run_this_tier;
 
-                #ifdef TIMING_DEBUG
+                if ( timing_debug ) 
                     cout << setprecision(6) << "Tier " << tier << " ran " << num_object_run_this_tier << " objects in " << tier_end_time - tier_start_time << " seconds." << endl;
-                #endif
 
             }
 
             get_timestamp( end_time );
 
-            #ifdef TIMING_DEBUG
+            if ( timing_debug ) 
                 cout << endl << "All tiers ran " << num_objects_run << " objects in " << end_time-start_time << " seconds." << endl;
-            #endif
 
         }
         else
@@ -212,9 +212,8 @@ int run_tier( int tier ) {
 
                 if ( num_objects_fired == 0 ) 
                 {
-                    #ifdef TIMING_DEBUG
+                    if ( timing_debug ) 
                         cout << endl << "Tier " << tier << " running." << endl;
-                    #endif
                 }
 
                 while ( ! fire_object( tier_manager[tier][i] ) )
