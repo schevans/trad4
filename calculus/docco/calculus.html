@@ -44,8 +44,11 @@ calculus
 
 <ul>
 <li><a href="#introduction">Introduction</a></li>
+<li><a href="#the_problem">The Problem</a></li>
 <li><a href="#the_model">The Model</a></li>
 <li><a href="#implementation">Implementation</a></li>
+<li><a href="#examples">Examples</a></li>
+<li><a href="#accuracy">Accuracy</a></li>
 <li><a href="#further_work">Further Work</a></li>
 </ul>
 
@@ -53,11 +56,33 @@ calculus
 
 <h2><a name="introduction">Introduction</a></h2>
 <p>
-In this model we'll be applying trad4 to the problem of ordinaly differential equations, again using numerical methods in a similar vein to heat_equation_1d. We'll define a function, and get the first and second order differentials of that function.
+In this model we'll be applying trad4 to the problem of ordinary differential equations, again using numerical methods in a similar vein to heat_equation_1d. We'll define a function, and get the first and second order differentials of that function.
 </p>
-<h2><a name="the_model">The Model</a></h2>
+<h2><a name="the_problem">The Problem</a></h2>
+<p>
+The diagram below shows the curve f and two lines a and b.
+</p>
 <p>
 <img src="curve.jpeg" alt="Curve Example">
+</p>
+<p>
+First, we're going to find the first differential at point x=2. This can be approximated using the centred difference method which gives us the slope of line a. This is given by:
+</p>
+<blockquote><pre>
+df = ( f(x3) - f(x1) ) / ( x3 - x1)
+</blockquote></pre>
+<p>
+The first differential at point x=0 can be approximated by the forwards difference method which gives us the slope of line b. The forward difference method is less accurate than the centred difference method for reasons discussed below, but for now, this is given by:
+</p>
+<blockquote><pre>
+df = ( f(x1) - f(x0) ) / ( x1 - x0)
+</blockquote></pre>
+<p>
+The first differential at the last point on the curve (not shown) is given by the backwards difference method. This is not show on the above diagram as it's essentially the same as the forwards difference method.
+<p/>
+<h2><a name="the_model">The Model</a></h2>
+<p>
+
 </p>
 <h2><a name="implementation">Implementation</a></h2>
 <h3>The abstract diagram</h3>
@@ -80,8 +105,8 @@ pub
 <ul>
 <li>pub:</li>
 <ul>
-<li>x</li>
-<li>y</li>
+<li>x is the x-value of each node. As in heat_equation_1d this is derived from the object's id, and for all the equations discussed in this document runs from 0.0-1.0, with various step-sizes.</li>
+<li>y is the value of the function we're differentiating. In our stock example this is sin(5x)</li>
 </ul>
 
 </ul>
@@ -105,15 +130,15 @@ pub
 <ul>
 <li>sub:</li>
 <ul>
-<li>f_down</li>
-<li>f_this</li>
-<li>f_up</li>
+<li>f_down is the f-object to the below left of this object</li>
+<li>f_this is the f-object below this object</li>
+<li>f_up is the f-object below right of this object</li>
 </ul>
 
 <li>pub:</li>
 <ul>
-<li>df</li>
-<li>dx</li>
+<li>df is the first order differential of the f_this object</li>
+<li>dx is the step-size of the f_this object</li>
 </ul>
 
 </ul>
@@ -136,14 +161,14 @@ pub
 <ul>
 <li>sub:</li>
 <ul>
-<li>df_down</li>
-<li>df_this</li>
-<li>df_up</li>
+<li>df_down is the df-object to the below left of this object</li>
+<li>df_this is the df-object below this object</li>
+<li>df_up is the df-object below right of this object </li>
 </ul>
 
 <li>pub:</li>
 <ul>
-<li>d2f</li>
+<li>d2f is the second differential of the f_this object</li>
 </ul>
 
 </ul>
@@ -163,20 +188,39 @@ sub
 <ul>
 <li>sub:</li>
 <ul>
-<li>my_f[NUM_NODES]</li>
-<li>my_df[NUM_NODES]</li>
-<li>my_d2f[NUM_NODES]</li>
+<li>my_f[NUM_NODES] holds the ids of all the f objects</li>
+<li>my_df[NUM_NODES] holds the ids of all the df objects</li>
+<li>my_d2f[NUM_NODES] holds the ids of all the d2f objects</li>
 </ul>
 
 </ul>
 </p>
+<p>
+
+</p>
+<h2><a name="examples">Examples</a></h2>
+<h3>sin(5x)</h3>
+<p>
+
+</p>
+<h3>x squared</h3>
+<p>
+
+</p>
+
+<h2><a name="accuracy">Accuracy</a></h2>
+<h3>The Edges</h3>
+<p>
+
+</p>
+<h3>Step Size</h3>
 <p>
 
 </p>
 <h2><a name="further_work">Further Work</a></h2>
 <h3>Big graphs and the monitor</h3>
 <p>
-The need_refresh function in the trad4 internals explicidly lists each object to which any type subscribes. This has worked well until now, but presents a problem with the monito and big graphs. As the monito subscribes to 3*NUM_NODES object (as there are 3 tiers), big graphs, for example NUM_NODES=10k, mean a massive need_refresh function as 30k objects are listed in this function. This means for a long compile time and a big binary - monitor.o is 3meg. This doesn't actually affect run-time as because eveery object to which the monitor subscribes will have changed, lazy evaluation kicks in so only the first object needs to be tested.
+The need_refresh function in the trad4 internals explicitly lists each object to which any type subscribes. This has worked well until now, but presents a problem with the monitor and big graphs. As the monitor subscribes to 3*NUM_NODES object (as there are 3 tiers), big graphs, for example NUM_NODES=10k, mean a massive need_refresh function as 30k objects are listed in this function by the precompiler. This means for a long compile time and a big binary - monitor.o is 3meg. This doesn't actually affect run-time as because every object to which the monitor subscribes will have changed, lazy evaluation kicks in so only the first object needs to be tested.
 </p>
 
 </body>
