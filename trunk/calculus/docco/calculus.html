@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+  <!DOCTYPE html
+            PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+            "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+     <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<link rel="stylesheet" type="text/css" href="http://trad4.sourceforge.net/gcc.css" />
+<title>
+calculus - a trad4 application
+</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000" link="#1F00FF" alink="#FF0000" vlink="#9900DD">
+
+<h1 align="center">
+calculus
+</h1>
+
+<table border="1">
+<tr>
+<td>Download version</td>
+<td>1.0</td>
+</tr>
+<tr>
+<td>Download licence</td>
+<td>BSD</td>
+</tr>
+<tr>
+<td>Trad4 version</td>
+<td>2.0.3</td>
+</tr>
+<tr>
+<td>Author</td>
+<td>schevans</td>
+</tr>
+<tr>
+<td>Date</td>
+<td></td>
+</tr>
+</table>
+
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#the_model">The Model</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#further_work">Further Work</a></li>
+</ul>
+
+<hr />
+
+<h2><a name="introduction">Introduction</a></h2>
+<p>
+In this model we'll be applying trad4 to the problem of ordinaly differential equations, again using numerical methods in a similar vein to heat_equation_1d. We'll define a function, and get the first and second order differentials of that function.
+</p>
+<h2><a name="the_model">The Model</a></h2>
+<p>
+<img src="curve.jpeg" alt="Curve Example">
+</p>
+<h2><a name="implementation">Implementation</a></h2>
+<h3>The abstract diagram</h3>
+<p>
+
+</p>
+<h3>The concrete diagram</h3>
+<p>
+
+</p>
+<h3>The t4 files</h3>
+<h4>f.t4:</h4>
+<blockquote><pre>
+pub
+    double x
+    double y
+
+</pre></blockquote>
+<p>
+<ul>
+<li>pub:</li>
+<ul>
+<li>x</li>
+<li>y</li>
+</ul>
+
+</ul>
+</p>
+<p>
+
+</p>
+<h4>df.t4:</h4>
+<blockquote><pre>
+sub
+    f f_down
+    f f_this
+    f f_up
+
+pub
+    double df
+    double dx
+
+</pre></blockquote>
+<p>
+<ul>
+<li>sub:</li>
+<ul>
+<li>f_down</li>
+<li>f_this</li>
+<li>f_up</li>
+</ul>
+
+<li>pub:</li>
+<ul>
+<li>df</li>
+<li>dx</li>
+</ul>
+
+</ul>
+</p>
+<p>
+
+</p>
+<h4>d2f.t4:</h4>
+<blockquote><pre>
+sub
+    df df_down
+    df df_this
+    df df_up
+
+pub
+    double d2f
+
+</pre></blockquote>
+<p>
+<ul>
+<li>sub:</li>
+<ul>
+<li>df_down</li>
+<li>df_this</li>
+<li>df_up</li>
+</ul>
+
+<li>pub:</li>
+<ul>
+<li>d2f</li>
+</ul>
+
+</ul>
+</p>
+<p>
+
+</p>
+<h4>monitor.t4:</h4>
+<blockquote><pre>
+sub
+    f my_f[NUM_NODES]
+    df my_df[NUM_NODES]
+    d2f my_d2f[NUM_NODES]
+
+</pre></blockquote>
+<p>
+<ul>
+<li>sub:</li>
+<ul>
+<li>my_f[NUM_NODES]</li>
+<li>my_df[NUM_NODES]</li>
+<li>my_d2f[NUM_NODES]</li>
+</ul>
+
+</ul>
+</p>
+<p>
+
+</p>
+<h2><a name="further_work">Further Work</a></h2>
+<h3>Big graphs and the monitor</h3>
+<p>
+The need_refresh function in the trad4 internals explicidly lists each object to which any type subscribes. This has worked well until now, but presents a problem with the monito and big graphs. As the monito subscribes to 3*NUM_NODES object (as there are 3 tiers), big graphs, for example NUM_NODES=10k, mean a massive need_refresh function as 30k objects are listed in this function. This means for a long compile time and a big binary - monitor.o is 3meg. This doesn't actually affect run-time as because eveery object to which the monitor subscribes will have changed, lazy evaluation kicks in so only the first object needs to be tested.
+</p>
+
+</body>
+</html>
