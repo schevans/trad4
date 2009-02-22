@@ -7,7 +7,7 @@
 use warnings;
 use strict;
 
-my $length = 1000;
+my $length = 100;
 my $monitor_id = 9999;
 
 my $dummy_data_root="$ENV{APP_ROOT}/data/dummy_data";
@@ -50,6 +50,7 @@ while ( $counter <= $length * 2 ) {
     print FILE "insert into object values ( $counter, 2, 2, \"df_1\", 0, 1 );\n";
 
     my $sub_up = $counter - $length + 1;
+    my $sub_this = $counter - $length;
     my $sub_down = $counter - $length - 1;
 
     if ( $sub_down == 0 ) {
@@ -60,7 +61,7 @@ while ( $counter <= $length * 2 ) {
         $sub_up = $length;
     }
 
-    print FILE "insert into df values ( $counter, $sub_up, $sub_down );\n";
+    print FILE "insert into df values ( $counter, $sub_down, $sub_this, $sub_up );\n";
 
     $counter = $counter + 1;
 }
@@ -78,6 +79,7 @@ while ( $counter <= $length * 3 ) {
     print FILE "insert into object values ( $counter, 3, 3, \"d2f_1\", 0, 1 );\n";
 
     my $sub_up = $counter - $length + 1;
+    my $sub_this = $counter - $length;
     my $sub_down = $counter - $length - 1;
 
     if ( $sub_down == $length ) {
@@ -88,7 +90,7 @@ while ( $counter <= $length * 3 ) {
         $sub_up = ($length*2);
     }
 
-    print FILE "insert into d2f values ( $counter, $sub_up, $sub_down );\n";
+    print FILE "insert into d2f values ( $counter, $sub_down, $sub_this, $sub_up );\n";
 
     $counter = $counter + 1;
 }
