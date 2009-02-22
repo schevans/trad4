@@ -24,6 +24,7 @@ my $file = $dummy_data_root."/f.sql";
 open FILE, ">$file" or die "Can't open $file";
 
 print FILE "delete from f;\n";
+print FILE "BEGIN;\n";
 
 my $counter = 1;
 
@@ -36,6 +37,7 @@ while ( $counter <= $length ) {
     $counter = $counter + 1;
 }
 
+print FILE "COMMIT;\n";
 close FILE;
 
 $file = "$dummy_data_root/df.sql";
@@ -43,6 +45,7 @@ $file = "$dummy_data_root/df.sql";
 open FILE, ">$file" or die "Can't open $file";
 
 print FILE "delete from df;\n";
+print FILE "BEGIN;\n";
 
 
 while ( $counter <= $length * 2 ) {
@@ -66,6 +69,7 @@ while ( $counter <= $length * 2 ) {
     $counter = $counter + 1;
 }
 
+print FILE "COMMIT;\n";
 close FILE;
 
 $file = "$dummy_data_root/d2f.sql";
@@ -73,6 +77,7 @@ $file = "$dummy_data_root/d2f.sql";
 open FILE, ">$file" or die "Can't open $file";
 
 print FILE "delete from d2f;\n";
+print FILE "BEGIN;\n";
 
 while ( $counter <= $length * 3 ) {
 
@@ -95,6 +100,7 @@ while ( $counter <= $length * 3 ) {
     $counter = $counter + 1;
 }
 
+print FILE "COMMIT;\n";
 close FILE;
 
 $file = "$dummy_data_root/monitor.sql";
@@ -116,8 +122,11 @@ open MON_DF, ">$monitor_my_df_file" or die "Can't open $monitor_my_df_file";
 open MON_D2F, ">$monitor_my_d2f_file" or die "Can't open $monitor_my_d2f_file";
 
 print MON_F "delete from monitor_my_f;\n";
+print MON_F "BEGIN;\n";
 print MON_DF "delete from monitor_my_df;\n";
+print MON_DF "BEGIN;\n";
 print MON_D2F "delete from monitor_my_d2f;\n";
+print MON_D2F "BEGIN;\n";
 
 $counter = 1;
 
@@ -130,7 +139,10 @@ while ( $counter <= $length ) {
     $counter = $counter+1;
 }
 
+print MON_F "COMMIT;\n";
 close MON_F;
+print MON_DF "COMMIT;\n";
 close MON_DF;
+print MON_D2F "COMMIT;\n";
 close MON_D2F;
 
