@@ -94,16 +94,16 @@ sub Generate($) {
 
     foreach $type ( sort{ $simple_hash{$a} <=> $simple_hash{$b} } keys %simple_hash ) {
 
-        print $FHD "<p>\n";
+        my $is_ul_list = 0;
+
         print $FHD "<h4>$type.t4:</h4>\n";
-        print $FHD "</p>\n";
         print $FHD "<blockquote><pre>\n";
 
         if ( $master_hash->{$type}->{data}->{implements} eq $type ) {
 
             foreach $section ( "sub", "static", "pub" ) {
 
-                PrintT4Section( $master_hash, $section, $type, $FHD );
+                PrintT4Section( $master_hash, $section, $type, $is_ul_list, $FHD );
 
             }
         }
@@ -113,6 +113,24 @@ sub Generate($) {
         }
 
         print $FHD "</pre></blockquote>\n";
+
+        $is_ul_list = 1;
+
+        if ( $master_hash->{$type}->{data}->{implements} eq $type ) {
+
+            print $FHD "<p>\n";
+            print $FHD "<ul>\n";
+
+            foreach $section ( "sub", "static", "pub" ) {
+
+                PrintT4Section( $master_hash, $section, $type, $is_ul_list, $FHD );
+
+            }
+
+            print $FHD "</ul>\n";
+            print $FHD "</p>\n";
+
+        }
 
         print $FHD "<p>\n";
         print $FHD "\n";
@@ -133,6 +151,7 @@ sub PrintT4Section($$$$) {
     my $master_hash = shift;
     my $section_type = shift;
     my $type = shift;
+    my $is_ul_list = shift;
     my $FHD = shift;
 
     my $section = $section_type;
@@ -140,16 +159,35 @@ sub PrintT4Section($$$$) {
     my $section_order = $section_type."_order";
     my $section_vec_order = $section_type."_vec_order";
 
-    if ( exists $master_hash->{$type}->{data}->{$section} or exists $master_hash->{$type}->{data}->{$section_vec} )
+    if ( keys %{$master_hash->{$type}->{data}->{$section}} or keys %{$master_hash->{$type}->{data}->{$section_vec}} )
     {
-        print $FHD "$section\n";
+        if ( $is_ul_list ) {
+
+            print $FHD "<li>$section:</li>\n";
+        }
+        else {
+    
+            print $FHD "$section\n";
+        }
+    }
+
+    if ( ( keys %{$master_hash->{$type}->{data}->{$section}} || keys %{$master_hash->{$type}->{data}->{$section_vec}} ) && $is_ul_list ) {
+
+        print $FHD "<ul>\n";
     }
 
     if ( exists $master_hash->{$type}->{data}->{$section} ) {
 
         foreach $var ( @{$master_hash->{$type}->{data}->{$section_order}} ) {
 
-            print $FHD "    $master_hash->{$type}->{data}->{$section}->{$var} $var\n";
+            if ( $is_ul_list ) {
+
+                print $FHD "<li>$var</li>\n";
+            }
+            else {
+
+                print $FHD "    $master_hash->{$type}->{data}->{$section}->{$var} $var\n";  
+            }
         }
     }
 
@@ -157,11 +195,23 @@ sub PrintT4Section($$$$) {
 
         foreach $var ( @{$master_hash->{$type}->{data}->{$section_vec_order}} ) {
 
-            print $FHD "    $master_hash->{$type}->{data}->{$section_vec}->{$var} $var\n";
+            if ( $is_ul_list ) {
+
+                print $FHD "<li>$var</li>\n";
+            }
+            else {
+
+                print $FHD "    $master_hash->{$type}->{data}->{$section_vec}->{$var} $var\n";
+            }
         }
     }
 
-    if ( exists $master_hash->{$type}->{data}->{$section} or exists $master_hash->{$type}->{data}->{$section_vec} )
+    if ( ( keys %{$master_hash->{$type}->{data}->{$section}} or keys %{$master_hash->{$type}->{data}->{$section_vec}} ) and $is_ul_list ) {
+
+        print $FHD "</ul>\n";
+    }
+
+    if ( keys %{$master_hash->{$type}->{data}->{$section}} or keys %{$master_hash->{$type}->{data}->{$section_vec}} )
     {
         print $FHD "\n";
     }
