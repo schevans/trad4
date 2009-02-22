@@ -12,9 +12,9 @@ using namespace std;
 void calculate_d2f( obj_loc_t obj_loc, int id )
 {
 
-    d2f_dx2 = ( d2f_dx2 - df2_dx );
+    double local_d2x = df_up_dx - df_down_dx;
 
-    d2f_d2f = ( df1_df - df2_df ) / d2f_dx2;
+    d2f_d2f = ( df_up_df - df_down_df ) / local_d2x;
 
     if ( fabs( d2f_d2f ) < 1.0e-10 )
         d2f_d2f = 0;

@@ -11,11 +11,13 @@ using namespace std;
 
 void calculate_df( obj_loc_t obj_loc, int id )
 {
-    df_dx = (f1_x - f2_x );
+    double local_dx = f_up_x - f_down_x;
 
-    df_df = ( f1_y - f2_y ) / df_dx;
+    df_df = ( f_up_y - f_down_y ) / local_dx;
 
     if ( fabs( df_df ) < 1.0e-10 )
         df_df = 0;
+
+    df_dx = f_this_x;
 }
 

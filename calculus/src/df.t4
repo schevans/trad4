@@ -1,8 +1,9 @@
 
 
 sub
-    f f1
-    f f2
+    f f_down
+    f f_this
+    f f_up
 
 pub
     double df

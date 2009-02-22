@@ -1,9 +1,9 @@
 
 
 sub
-    df df1
-    df df2
+    df df_down
+    df df_this
+    df df_up
 
 pub
     double d2f
-    double dx2
