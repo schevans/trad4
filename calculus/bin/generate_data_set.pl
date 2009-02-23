@@ -7,10 +7,16 @@
 use warnings;
 use strict;
 
-my $length = 100;
-my $monitor_id = 9999;
+if ( $#ARGV != 0 )
+{
+    print "generate_data_set.pl <num_nodes>\n";
+    exit 0;
+}
 
-my $dummy_data_root="$ENV{APP_ROOT}/data/dummy_data";
+my $length = $ARGV[0];
+my $monitor_id = 999999;
+
+my $dummy_data_root="$ENV{APP_ROOT}/data/generated_data_set";
 
 if ( ! -d $dummy_data_root ) {
 
