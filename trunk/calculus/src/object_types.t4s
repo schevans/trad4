@@ -1,3 +1,7 @@
+# Copyright (c) Steve Evans 2009
+# steve@topaz.myzen.co.uk
+# This code is released under the BSD licence. For details see $APP_ROOT/LICENCE
+
 #id, tier, name
 1,1,f
 2,2,df
