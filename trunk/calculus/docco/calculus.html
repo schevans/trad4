@@ -82,7 +82,191 @@ The first differential at the last point on the curve (not shown) is given by th
 <p/>
 <h2><a name="the_model">The Model</a></h2>
 <p>
-
+Now we're going to walk through how a 10-node implementation works. First we need to define our 10 f-objects. We start in the calculate_f function where we first define our x-values from their object id, and these run from 0.1 to 1.0. Next the y-values are derived, and for this we're using the default y = sin(5x).
+</p>
+<table border="1">
+<tr>
+<td>id</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>6</td>
+<td>7</td>
+<td>8</td>
+<td>9</td>
+<td>10</td>
+</tr>
+<tr>
+<td>x</td>
+<td>0.1</td>
+<td>0.2</td>
+<td>0.3</td>
+<td>0.4</td>
+<td>0.5</td>
+<td>0.6</td>
+<td>0.7</td>
+<td>0.8</td>
+<td>0.9</td>
+<td>1</td>
+</tr>
+<tr>
+<td>y</td>
+<td>0.479426</td>
+<td>0.841471</td>
+<td>0.997495</td>
+<td>0.909297</td>
+<td>0.598472</td>
+<td>0.14112</td>
+<td>-0.350783</td>
+<td>-0.756802</td>
+<td>-0.97753</td>
+<td>-0.958924</td>
+</tr>
+</table>
+<p>
+Next, we move on to the df objects. The published values of these objects are the first derivative of f (given analytically as y = 5cos(5x)), and are given by the foreward and centred difference methods described above:
+</p>
+<table border="1">
+<tr>
+<td>id</td>
+<td>11</td>
+<td>12</td>
+<td>13</td>
+<td>14</td>
+<td>15</td>
+<td>16</td>
+<td>17</td>
+<td>18</td>
+<td>19</td>
+<td>20</td>
+</tr>
+<tr>
+<td>df</td>
+<td>3.62045</td>
+<td>2.59035</td>
+<td>0.339132</td>
+<td>-1.99511</td>
+<td>-3.84089</td>
+<td>-4.74628</td>
+<td>-4.48961</td>
+<td>-3.13373</td>
+<td>-1.01061</td>
+<td>0.186058</td>
+</tr>
+</table>
+<p>
+Finally we add our third tier d2f. This applies the same forward and centred difference methods, but applied to df rather than f. This gives us our second derivative (given analytically by y = -5*5sin(5x)):
+</p>
+<table border="1">
+<tr>
+<td>id</td>
+<td>21</td>
+<td>22</td>
+<td>23</td>
+<td>24</td>
+<td>25</td>
+<td>26</td>
+<td>27</td>
+<td>28</td>
+<td>29</td>
+<td>30</td>
+</tr>
+<tr>
+<td>d2f</td>
+<td>-10.3011</td>
+<td>-16.4066</td>
+<td>-22.9273</td>
+<td>-20.9001</td>
+<td>-13.7558</td>
+<td>-3.24363</td>
+<td>8.06271</td>
+<td>17.395</td>
+<td>16.599</td>
+<td>11.9667</td>
+</tr>
+</table>
+<p>
+We can see this working using spot-checks. Take the full data set of this run:
+</p>
+<table border="1">
+<tr>
+<td>x</td>
+<td>0.1</td>
+<td>0.2</td>
+<td>0.3</td>
+<td>0.4</td>
+<td>0.5</td>
+<td>0.6</td>
+<td>0.7</td>
+<td>0.8</td>
+<td>0.9</td>
+<td>1</td>
+</tr>
+<tr>
+<td>y</td>
+<td>0.479426</td>
+<td>0.841471</td>
+<td>0.997495</td>
+<td>0.909297</td>
+<td>0.598472</td>
+<td>0.14112</td>
+<td>-0.350783</td>
+<td>-0.756802</td>
+<td>-0.97753</td>
+<td>-0.958924</td>
+</tr>
+<tr>
+<td>df</td>
+<td>3.62045</td>
+<td>2.59035</td>
+<td bgcolor="#00FF99">0.339132</td>
+<td>-1.99511</td>
+<td>-3.84089</td>
+<td>-4.74628</td>
+<td>-4.48961</td>
+<td>-3.13373</td>
+<td>-1.01061</td>
+<td>0.186058</td>
+</tr>
+<tr>
+<td>d2f</td>
+<td bgcolor="#FFFF66">-10.3011</td>
+<td>-16.4066</td>
+<td>-22.9273</td>
+<td>-20.9001</td>
+<td>-13.7558</td>
+<td>-3.24363</td>
+<td>8.06271</td>
+<td bgcolor="#33CCFF">17.395</td>
+<td>16.599</td>
+<td>11.9667</td>
+</tr>
+</table>
+<p>
+First we'll look at the green cell. According to the centred difference formula, this is given by:
+</p>
+<blockquote><pre>
+	df = ( 0.909297 - 0.841471 ) / ( 0.4 - 0.2 )
+	df = 0.339130
+</pre></blockquote>
+<p>
+Next,the yellow cell which uses the forward difference method, which means that d2f is given by:
+</p>
+<blockquote><pre>
+	df = ( 2.59035 - 3.62045 ) / ( 0.2 - 0.1 )
+	df = -10.301000
+</pre></blockquote>
+<p>
+Lastly we'll check the blue cell, which uses the centred difference method:
+</p>
+<blockquote><pre>
+	df = ( -1.01061 - -4.48961 ) / ( 0.9 - 0.7 )
+	df = 17.395000
+</pre></blockquote>
+<p>
+The small differences you see are because the tabular output above is the result of 32-bit floating point calculations whereas we've taken the rounded output to plug into the equations in the three worked examples above.
 </p>
 <h2><a name="implementation">Implementation</a></h2>
 <h3>The abstract diagram</h3>
