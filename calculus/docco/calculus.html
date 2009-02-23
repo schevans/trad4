@@ -98,6 +98,9 @@ The first differential at the last point on the curve (not shown) is given by th
 <h3>The t4 files</h3>
 <h4>f.t4:</h4>
 <blockquote><pre>
+static
+    int mode
+
 pub
     double x
     double y
@@ -105,6 +108,10 @@ pub
 </pre></blockquote>
 <p>
 <ul>
+<li>static:</li>
+<ul>
+<li>mode is used to easily switch between (if mode == 0 ) y = sin(5x) else y = x*x</li>
+</ul>
 <li>pub:</li>
 <ul>
 <li>x is the x-value of each node. As in heat_equation_1d this is derived from the object's id, and for all the equations discussed in this document runs from 0.0-1.0, with various step-sizes.</li>
@@ -114,7 +121,7 @@ pub
 </ul>
 </p>
 <p>
-
+The mode switch is just to allow you to switch between the two demo functions without having to recompile. Arguably it shouldn't be on every f-object but on a singleton data_server. See the Usage section below for how to use this.
 </p>
 <h4>df.t4:</h4>
 <blockquote><pre>
@@ -140,13 +147,13 @@ pub
 <li>pub:</li>
 <ul>
 <li>df is the first order differential of the f_this object</li>
-<li>dx is the step-size of the f_this object</li>
+<li>dx is the step-size of the f_this object. This is a pass-through, discussed below.</li>
 </ul>
 
 </ul>
 </p>
 <p>
-
+The pub element dx is described as a pass-through above. This is required as d2x needs to know the step-size of the f of which it's finding the second differential. While it's theoretically possible for d2x to read x directly from f (by using another level of indirection of the kind used in the sub macros) this is not formally supported - any object only has access to the data of objects to which it directly subscribes. For this reason dx has to copy x and publish it to d2x unmolested. This is known as a pass-through.
 </p>
 <h4>d2f.t4:</h4>
 <blockquote><pre>
