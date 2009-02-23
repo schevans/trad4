@@ -13,8 +13,13 @@ void calculate_f( obj_loc_t obj_loc, int id )
 {
     f_x = (id*1.0) / NUM_NODES;
 
-    // Change me.
-    f_y = sin(5*f_x);
-
+    if ( f_mode == 0 )
+    {
+        f_y = sin(5*f_x);
+    }
+    else 
+    {
+        f_y = f_x * f_x;
+    }
 }
 

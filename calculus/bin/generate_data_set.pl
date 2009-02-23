@@ -38,7 +38,7 @@ while ( $counter <= $length ) {
 
     print FILE "insert into object values ( $counter, 1, 1, \"f_$counter\", 0, 1 );\n";
 
-    print FILE "insert into f values ( $counter );\n";
+    print FILE "insert into f values ( $counter, 0 );\n";
 
     $counter = $counter + 1;
 }
