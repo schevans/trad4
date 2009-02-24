@@ -659,14 +659,59 @@ Below, the graph for the 1000-node data set. You can see the backwards error sti
 <img src="sin_numeric_1000.jpeg" alt="Numeric Solution 1k">
 <h2><a name="usage">Usage</a></h2>
 <p>
+The default distribution is set up with a 100-node graph and y = sin(5x). You can switch between sin(5x) and x_squared by toggling the mode var on f:
 
+</p>
+<blockquote><pre>
+$ t4db
+SQL> update f set mode=1;
+</blockquote></pre>
+<p>
+And then send the reload signal (there's no need to restart):
+</p>
+<blockquote><pre>
+$ send_reload.sh
+</blockquote></pre>
+<p>
+If you want to try a different function, modify the calculate_f function in f.c as appropriate, recompile and restart:
+<blockquote><pre>
+calculus$ make
+calculus$ calculus
+</blockquote></pre>
+<p>
+If you want to change the x-rage, again modify the calculate_f as appropriate, recompile and restart.
 </p>
 <h2><a name="further_work">Further Work</a></h2>
 <h3>Big graphs and the monitor</h3>
 <p>
-The need_refresh function in the trad4 internals explicitly lists each object to which any type subscribes. This has worked well until now, but presents a problem with the monitor and big graphs. As the monitor subscribes to 3*NUM_NODES objects (as there are 3 tiers), big graphs, for example NUM_NODES=10k, mean a massive need_refresh function as 30k objects are listed in this function by the precompiler. This means for a long compile time and a big binary - monitor.o is 3meg. This doesn't actually affect run-time as because every object to which the monitor subscribes will have changed, lazy evaluation kicks in so only the first object needs to be tested.
+The need_refresh function in the trad4 internals explicitly lists each object to which any type subscribes. This has worked well until now, but presents a problem with the monitor and big graphs. As the monitor subscribes to 3*NUM_NODES objects (as there are 3 tiers), big graphs, for example NUM_NODES=10k, mean a massive need_refresh function as 30k objects are listed in this function by the precompiler. This means for a long compile time and a big binary - monitor.o is 3MB for 10k nodes whereas the rest of the object files weigh in at a few KB.
 </p>
-<h3>N-differentials</h3>
+<p>
+This doesn't actually affect run-time performance as because every object to which the monitor subscribes will have changed, lazy evaluation kicks in so only the first object needs to be tested. It's almost certainly the compiler resolving the implication of the lazy evaluation that takes it so long and makes the binary so big.
+</p>
+
+<h3>Nth-differentials</h3>
+<p>
+Should you need the 3rd differential or above it's pretty trivial to add another tier.
+</p>
 <h3>Switching between data sets</h3>
+<p>
+Due to a limitation in the current trad4 infrastructure if want to run against the 10 or 1000 node data sets you'll have to increase the value of NUM_NODES in calculus/src/constants.t4s, run the precompiler and recompile:
+</p>
+<blockquote><pre>
+heat_equation_1d$ t4p
+heat_equation_1d$ make all
+</blockquote></pre>
+<p>
+This will be resolved in trad4v2.1 (slated for early April, replete with an updated version of The Manual), probably by introducing limited support for the stl vector type in the t4 files.
+</p>
+<!-- ==================================================================== -->
+
+<div align="center" class="copyright">
+Copyright (c) Steve Evans 2009
+</div>
+
+<!-- ==================================================================== -->
+
 </body>
 </html>
