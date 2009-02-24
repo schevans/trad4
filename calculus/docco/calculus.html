@@ -278,7 +278,7 @@ The small differences you see are because the tabular output above is the result
 <h3>The concrete diagram</h3>
 <img src="concrete.jpeg" alt="Concrete Diagram"/>
 <p>
-
+The monitor is not shown.
 </p>
 <h3>The t4 files</h3>
 <h4>f.t4:</h4>
@@ -305,7 +305,7 @@ pub
 </li>
 </ul>
 <p>
-The mode switch is just to allow you to switch between the two demo functions without having to recompile. Arguably it shouldn't be on every f-object but on a singleton data_server. See the Usage section below for how to use this.
+The mode switch is just to allow you to switch between the two demo functions without having to recompile. Arguably it shouldn't exist on every f-object but on a singleton data_server. See the Usage section below for how to use this.
 </p>
 <h4>df.t4:</h4>
 <blockquote><pre>
@@ -337,7 +337,7 @@ pub
 </ul>
 
 <p>
-The pub element dx is described as a pass-through above. This is required as d2x needs to know the step-size of the f of which it's finding the second differential. While it's theoretically possible for d2x to read x directly from f (by using another level of indirection of the kind used in the sub macros) this is not formally supported - any object only has access to the data of objects to which it directly subscribes. For this reason dx has to copy x and publish it to d2x unmolested. This is known as a pass-through.
+The pub element dx is described as a pass-through above. This is required as d2f needs to know the step-size of the f of which it's finding the second differential. While it's theoretically possible for d2x to read x directly from f (by using another level of indirection of the kind used in the sub macros) this is not formally supported - any object only has access to the data of objects to which it directly subscribes. For this reason dx has to copy x and publish it to d2f unmolested. This is known as a pass-through.
 </p>
 <h4>d2f.t4:</h4>
 <blockquote><pre>
@@ -418,7 +418,7 @@ You'll see the same glitch at the start and end of the d2f graph - discussed fur
 <h2><a name="accuracy">Accuracy</a></h2>
 <h3>The Edges</h3>
 <p>
-We're not going to look at where those glitches at the edges come from, why the forwards/backwards difference methods produce these artifacts and why there's nothing we can do about it.
+We're now going to look at where those glitches at the edges come from, why the forwards/backwards difference methods produce these artifacts and why there's nothing we can do about it.
 </p>
 <p>
 Firstly, you might wonder why only d2f is affected. The answer is it's not - df has this artifact too, it's just not as visible when looking at the graph. Take a look at the right-hand end of the 100-node data for the sin(5x) function. You can see the df error in yellow, and the d2f errors in green and blue:
@@ -518,23 +518,23 @@ Take a look at the curve below. This looks at the start of an arbitrary graph bu
 </p>
 <img src="curve_error.jpeg" alt="Glitch Curve"/>
 <p>
-The actual method used - the forward difference method - corresponds to the slope of line a. If the imaginary x=-1 point existed we could use the centred difference method which would give us the slope of line b. Looking at this we can see that b gives us a better approximation of df(0), but the problem is point x=-1 doesn't exist - we're only given the curve from 0 onwards - for all we know the function could be discontinuous for x &lt; 0. So short of any complex curve extrapoloation we are forced to use the forward difference method which we can see gives us a less good approximation of df(0).
+The actual method used - the forward difference method - corresponds to the slope of line a. If the imaginary x=-1 point existed we could use the centred difference method which would give us the slope of line b. Looking at this we can see that b gives us a better approximation of df(0), but the problem is that the point x=-1 doesn't exist as we're only given the curve from 0 onwards - for all we know the function could be discontinuous for x &lt; 0. So short of any complex curve extrapolation we are forced to use the forward difference method which we can see gives us a less good approximation of df(0).
 </p>
 <p>
-I hope that explains why we're forced to use the less-accurate forwards/backwards method at the ends of the graph. The next thing we need to understand is a) why this error propagates inwards for d2f (i.e. the blue cells in the table above) and b) why the d2f curve for x_squared shows such a marked jump at both ends.
+I hope that explains why we're forced to use the less-accurate forwards/backwards method at the ends of the graph. The next thing we need to understand is a) why this error propagates inwards for d2f (i.e. the blue and green cells in the table above) and b) why the d2f curve for x_squared shows such a marked jump at both ends.
 </p>
 <p>
-The reason this error propagates inward is because the green cell subscribes to the yellow one and the yellow one has the error, the error is propagated. The blue cell has two problems - it also subscribes to the yellow cell but it also suffers from the backwards diffenc error, which explains why it's error is larger than the green cell.
+The reason this error propagates inward is because the green cell subscribes to the yellow one and the yellow one has the error, the error is propagated. The blue cell has two problems - it also subscribes to the yellow cell but it also suffers from the backwards difference error, which explains why it's error is greater than the green cell.
 </p>
 <p>
-The reason the d2f error is so marked for the graph x_squared is that the underlying curve (df) for which we're trying to find the derivative is (or should be, analytically) flat. As it's not due to the 1st order problem described above, the d2f curve which says "there is no rate of change in df" actually does see a rate of change for the first and last elements due to the forwards/backwards error, and for this reason, plus the propagation issue, it shows a marked jump.
+The reason the d2f error is so marked for the graph x_squared is that the underlying curve (df) for which we're trying to find the derivative is (or should be, analytically) a linear slope. As it's not, due to the 1st order problem described above, the d2f curve which says "there is no rate of change in df" actually does see a rate of change for the first and last elements due to the forwards/backwards error, and for this reason, plus the propagation issue, it shows a marked jump.
 </p>
 <p>
-Apologies if you think I've laboured this point but it took me a long time to figure out what was happening here and convince myself there weren't bugs in my code and I wanted to save you the trouble.
+Apologies if you think I've laboured this point but it took me a long time to figure out what was happening here and convince myself that these errors weren't due to bugs in my code, and I wanted to save you the trouble.
 </p>
 <h3>Step Size</h3>
 <p>
-The error across the first derivative is a known quantity of the finite difference method and is proportional to the step-size squared, so the smaller your step size (i.e. the greater NUM_NODES) the better approximation you get. Below, an abridged table showing the sin(5x) data for a 1000-node graph.
+The error across the first derivative is a known quantity of the finite difference method and is proportional to the step-size squared, so the smaller your step size (i.e. the greater NUM_NODES) the better approximation you get. Below, an abridged table showing the sin(5x) data for a 1000-node graph where you can see that the diffs are smaller compared to the 100-node graph above. The full 1000-node outputs for <a  href="https://sourceforge.net/docman/display_doc.php?docid=154469&amp;group_id=202177">sin(5x)</a> and <a  href="https://sourceforge.net/docman/display_doc.php?docid=154470&group_id=202177">x_squared</a> are on-line.
 </p>
 <table border="1">
 <tr>
@@ -677,7 +677,7 @@ calculus$ make
 calculus$ calculus
 </pre></blockquote>
 <p>
-If you want to change the x-rage, again modify the calculate_f as appropriate, recompile and restart.
+If you want to change the x-range, again modify the calculate_f as appropriate, recompile and restart.
 </p>
 <h2><a name="further_work">Further Work</a></h2>
 <h3>Big graphs and the monitor</h3>
@@ -694,7 +694,7 @@ Should you need the 3rd differential or above it's pretty trivial to add another
 </p>
 <h3>Switching between data sets</h3>
 <p>
-Due to a limitation in the current trad4 infrastructure if want to run against the 10 or 1000 node data sets you'll have to increase the value of NUM_NODES in calculus/src/constants.t4s, run the precompiler and recompile:
+Due to a limitation in the current trad4 infrastructure, if you want to run against the 10 or 1000 node data sets you'll have to set the value of NUM_NODES in calculus/src/constants.t4s as appropriate, run the precompiler and recompile:
 </p>
 <blockquote><pre>
 heat_equation_1d$ t4p
@@ -710,6 +710,10 @@ Copyright (c) Steve Evans 2009
 </div>
 
 <!-- ==================================================================== -->
+<br />
+<center>
+<a href="http://sourceforge.net"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=202177&amp;type=4" width="125" height="37" border="0" alt="SourceForge.net Logo" /></a>
+</center>
 
 </body>
 </html>
