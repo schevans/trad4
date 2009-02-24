@@ -22,7 +22,7 @@ calculus
 <table border="1">
 <tr>
 <td>Download version</td>
-<td><a  href="https://sourceforge.net/project/showfiles.php?group_id=202177&package_id=311343">1.0</a></td>
+<td><a  href="https://sourceforge.net/project/showfiles.php?group_id=202177&amp;package_id=311343">1.0</a></td>
 </tr>
 <tr>
 <td>Download licence</td>
@@ -30,7 +30,7 @@ calculus
 </tr>
 <tr>
 <td>Trad4 version</td>
-<td><a  href="https://sourceforge.net/project/showfiles.php?group_id=202177&package_id=311343">2.0.3</a></td>
+<td><a  href="https://sourceforge.net/project/showfiles.php?group_id=202177&amp;package_id=311343">2.0.3</a></td>
 </tr>
 <tr>
 <td>Author</td>
@@ -64,23 +64,23 @@ In this model we'll be applying trad4 to the problem of ordinary differential eq
 The diagram below shows the curve f and two lines a and b.
 </p>
 <p>
-<img src="curve.jpeg" alt="Curve Example">
+<img src="curve.jpeg" alt="Curve Example"/>
 </p>
 <p>
 First, we're going to find the first differential at point x=2. This can be approximated using the centred difference method which gives us the slope of line a. This is given by:
 </p>
 <blockquote><pre>
 df = ( f(x3) - f(x1) ) / ( x3 - x1)
-</blockquote></pre>
+</pre></blockquote>
 <p>
 The first differential at point x=0 can be approximated by the forwards difference method which gives us the slope of line b. The forward difference method is less accurate than the centred difference method for reasons discussed below, but for now, this is given by:
 </p>
 <blockquote><pre>
 df = ( f(x1) - f(x0) ) / ( x1 - x0)
-</blockquote></pre>
+</pre></blockquote>
 <p>
 The first differential at the last point on the curve (not shown) is given by the backwards difference method. This is not show on the above diagram as it's essentially the same as the forwards difference method.
-<p/>
+</p>
 <h2><a name="the_model">The Model</a></h2>
 <p>
 Now we're going to walk through how a 10-node implementation works. First we need to define our 10 f-objects. We start in the calculate_f function where we first derive our x-values from their object id, and these run from 0.1 to 1.0. Next the y-values are derived, and for this we're using the default y = sin(5x).
@@ -271,12 +271,12 @@ The small differences you see are because the tabular output above is the result
 </p>
 <h2><a name="implementation">Implementation</a></h2>
 <h3>The abstract diagram</h3>
-<img src="abstract.jpeg" alt="Abstract Diagram">
+<img src="abstract.jpeg" alt="Abstract Diagram"/>
 <p>
 
 </p>
 <h3>The concrete diagram</h3>
-<img src="concrete.jpeg" alt="Concrete Diagram">
+<img src="concrete.jpeg" alt="Concrete Diagram"/>
 <p>
 
 </p>
@@ -291,20 +291,19 @@ pub
     double y
 
 </pre></blockquote>
-<p>
 <ul>
-<li>static:</li>
-<ul>
-<li>mode is used to easily switch between if ( mode == 0 ) y = sin(5x) else y = x*x</li>
+<li>static:
+    <ul>
+    <li>mode is used to easily switch between if ( mode == 0 ) y = sin(5x) else y = x*x</li>
+    </ul>
+</li>
+<li>pub:
+    <ul>
+    <li>x is the x-value of each node. As in heat_equation_1d this is derived from the object's id, and for all the models discussed in this document runs from 0.0-1.0, with various step-sizes.</li>
+    <li>y is the value of the function we're differentiating. In our stock example this is sin(5x)</li>
+    </ul>
+</li>
 </ul>
-<li>pub:</li>
-<ul>
-<li>x is the x-value of each node. As in heat_equation_1d this is derived from the object's id, and for all the models discussed in this document runs from 0.0-1.0, with various step-sizes.</li>
-<li>y is the value of the function we're differentiating. In our stock example this is sin(5x)</li>
-</ul>
-
-</ul>
-</p>
 <p>
 The mode switch is just to allow you to switch between the two demo functions without having to recompile. Arguably it shouldn't be on every f-object but on a singleton data_server. See the Usage section below for how to use this.
 </p>
@@ -320,23 +319,23 @@ pub
     double dx
 
 </pre></blockquote>
-<p>
 <ul>
-<li>sub:</li>
-<ul>
-<li>f_down is the f-object to the below left of this object</li>
-<li>f_this is the f-object below this object</li>
-<li>f_up is the f-object below right of this object</li>
+<li>sub:
+    <ul>
+    <li>f_down is the f-object to the below left of this object</li>
+    <li>f_this is the f-object below this object</li>
+    <li>f_up is the f-object below right of this object</li>
+    </ul>
+</li>
+
+<li>pub:
+    <ul>
+    <li>df is the first order differential of the f_this object</li>
+    <li>dx is the step-size of the f_this object. This is a pass-through, discussed below.</li>
+    </ul>
+</li>
 </ul>
 
-<li>pub:</li>
-<ul>
-<li>df is the first order differential of the f_this object</li>
-<li>dx is the step-size of the f_this object. This is a pass-through, discussed below.</li>
-</ul>
-
-</ul>
-</p>
 <p>
 The pub element dx is described as a pass-through above. This is required as d2x needs to know the step-size of the f of which it's finding the second differential. While it's theoretically possible for d2x to read x directly from f (by using another level of indirection of the kind used in the sub macros) this is not formally supported - any object only has access to the data of objects to which it directly subscribes. For this reason dx has to copy x and publish it to d2x unmolested. This is known as a pass-through.
 </p>
@@ -351,22 +350,21 @@ pub
     double d2f
 
 </pre></blockquote>
-<p>
 <ul>
-<li>sub:</li>
-<ul>
-<li>df_down is the df-object to the below left of this object</li>
-<li>df_this is the df-object below this object</li>
-<li>df_up is the df-object below right of this object </li>
-</ul>
+<li>sub:
+    <ul>
+    <li>df_down is the df-object to the below left of this object</li>
+    <li>df_this is the df-object below this object</li>
+    <li>df_up is the df-object below right of this object </li>
+    </ul>
+</li>
 
-<li>pub:</li>
-<ul>
-<li>d2f is the second differential of the f_this object</li>
+<li>pub:
+    <ul>
+    <li>d2f is the second differential of the f_this object</li>
+    </ul>
+</li>
 </ul>
-
-</ul>
-</p>
 <p>
 
 </p>
@@ -378,17 +376,16 @@ sub
     d2f my_d2f[NUM_NODES]
 
 </pre></blockquote>
-<p>
 <ul>
-<li>sub:</li>
-<ul>
-<li>my_f[NUM_NODES] holds the ids of all the f objects</li>
-<li>my_df[NUM_NODES] holds the ids of all the df objects</li>
-<li>my_d2f[NUM_NODES] holds the ids of all the d2f objects</li>
-</ul>
+<li>sub:
+    <ul>
+    <li>my_f[NUM_NODES] holds the ids of all the f objects</li>
+    <li>my_df[NUM_NODES] holds the ids of all the df objects</li>
+    <li>my_d2f[NUM_NODES] holds the ids of all the d2f objects</li>
+    </ul>
+</li>
 
 </ul>
-</p>
 <p>
 
 </p>
@@ -398,22 +395,22 @@ For this section we're switching to a 100-node graph. This will provide smoother
 </p>
 <h3>sin(5x)</h3>
 <p>
-The full 100-node data set is available <a  href="https://sourceforge.net/docman/display_doc.php?docid=153510&group_id=202177">here</a>.
+The full 100-node data set is available <a  href="https://sourceforge.net/docman/display_doc.php?docid=153510&amp;group_id=202177">here</a>.
 </p>
 <p>
-<img src="sin_numeric.jpeg" alt="Numeric Solution">
-<img src="sin_analytic.jpeg" alt="Analytic Solution">
+<img src="sin_numeric.jpeg" alt="Numeric Solution"/>
+<img src="sin_analytic.jpeg" alt="Analytic Solution"/>
 </p>
 <p>
 You'll notice a glitch at the end of the numeric d2f graph. This is down to the fact the forwards/backwards difference methods are not as accurate as the central difference method. This will be discussed in the next section.
 </p>
 <h3>x squared</h3>
 <p>
-The full 100-node data set is available <a  href="https://sourceforge.net/docman/display_doc.php?docid=153511&group_id=202177">here</a>.
+The full 100-node data set is available <a  href="https://sourceforge.net/docman/display_doc.php?docid=153511&amp;group_id=202177">here</a>.
 </p>
 <p>
-<img src="x_squared_numeric.jpeg" alt="Numeric Solution">
-<img src="x_squared_analytic.jpeg" alt="Analytic Solution">
+<img src="x_squared_numeric.jpeg" alt="Numeric Solution"/>
+<img src="x_squared_analytic.jpeg" alt="Analytic Solution"/>
 </p>
 <p>
 You'll see the same glitch at the start and end of the d2f graph - discussed further below.
@@ -519,9 +516,9 @@ Firstly, you might wonder why only d2f is affected. The answer is it's not - df 
 <p>
 Take a look at the curve below. This looks at the start of an arbitrary graph but as already explained the problems at the start and the ends are identical. As above we have a curve f, and two lines a and b. We're trying to find the slope of the curve at x=0.
 </p>
-<img src="curve_error.jpeg" alt="Glitch Curve">
+<img src="curve_error.jpeg" alt="Glitch Curve"/>
 <p>
-The actual method used - the forward difference method - corresponds to the slope of line a. If the imaginary x=-1 point existed we could use the centred difference method which would give us the slope of line b. Looking at this we can see that b gives us a better approximation of df(0), but the problem is point x=-1 doesn't exist - we're only given the curve from 0 onwards - for all we know the function could be discontinuous for x < 0. So short of any complex curve extrapoloation we are forced to use the forward difference method which we can see gives us a less good approximation of df(0).
+The actual method used - the forward difference method - corresponds to the slope of line a. If the imaginary x=-1 point existed we could use the centred difference method which would give us the slope of line b. Looking at this we can see that b gives us a better approximation of df(0), but the problem is point x=-1 doesn't exist - we're only given the curve from 0 onwards - for all we know the function could be discontinuous for x &lt; 0. So short of any complex curve extrapoloation we are forced to use the forward difference method which we can see gives us a less good approximation of df(0).
 </p>
 <p>
 I hope that explains why we're forced to use the less-accurate forwards/backwards method at the ends of the graph. The next thing we need to understand is a) why this error propagates inwards for d2f (i.e. the blue cells in the table above) and b) why the d2f curve for x_squared shows such a marked jump at both ends.
@@ -656,7 +653,7 @@ The error across the first derivative is a known quantity of the finite differen
 <p>
 Below, the graph for the 1000-node data set. You can see the backwards error still exists but for a much smaller part of the graph.
 </p>
-<img src="sin_numeric_1000.jpeg" alt="Numeric Solution 1k">
+<img src="sin_numeric_1000.jpeg" alt="Numeric Solution 1k"/>
 <h2><a name="usage">Usage</a></h2>
 <p>
 The default distribution is set up with a 100-node graph and y = sin(5x). You can switch between sin(5x) and x_squared by toggling the mode var on f:
@@ -665,19 +662,20 @@ The default distribution is set up with a 100-node graph and y = sin(5x). You ca
 <blockquote><pre>
 $ t4db
 SQL> update f set mode=1;
-</blockquote></pre>
+</pre></blockquote>
 <p>
 And then send the reload signal (there's no need to restart):
 </p>
 <blockquote><pre>
 $ send_reload.sh
-</blockquote></pre>
+</pre></blockquote>
 <p>
 If you want to try a different function, modify the calculate_f function in f.c as appropriate, recompile and restart:
+</p>
 <blockquote><pre>
 calculus$ make
 calculus$ calculus
-</blockquote></pre>
+</pre></blockquote>
 <p>
 If you want to change the x-rage, again modify the calculate_f as appropriate, recompile and restart.
 </p>
@@ -701,7 +699,7 @@ Due to a limitation in the current trad4 infrastructure if want to run against t
 <blockquote><pre>
 heat_equation_1d$ t4p
 heat_equation_1d$ make all
-</blockquote></pre>
+</pre></blockquote>
 <p>
 This will be resolved in trad4v2.1 (slated for early April, replete with an updated version of The Manual), probably by introducing limited support for the stl vector type in the t4 files.
 </p>
