@@ -83,7 +83,7 @@ The first differential at the last point on the curve (not shown) is given by th
 <p/>
 <h2><a name="the_model">The Model</a></h2>
 <p>
-Now we're going to walk through how a 10-node implementation works. First we need to de our 10 f-objects. We start in the calculate_f function where we first derive our x-values from their object id, and these run from 0.1 to 1.0. Next the y-values are derived, and for this we're using the default y = sin(5x).
+Now we're going to walk through how a 10-node implementation works. First we need to define our 10 f-objects. We start in the calculate_f function where we first derive our x-values from their object id, and these run from 0.1 to 1.0. Next the y-values are derived, and for this we're using the default y = sin(5x).
 </p>
 <table border="1">
 <tr>
@@ -421,11 +421,123 @@ You'll see the same glitch at the start and end of the d2f graph - discussed fur
 <h2><a name="accuracy">Accuracy</a></h2>
 <h3>The Edges</h3>
 <p>
-
+We're not going to look at where those glitches at the edges come from, why the forwards/backwards difference methods produce these artifacts and why there's nothing we can do about it.
+</p>
+<p>
+Firstly, you might wonder why only d2f is affected. The answer is it's not - df has this artifact too, it's just not as visible when looking at the graph. Take a look at the right-hand end of the 100-node data for the sin(5x) function. You can see the df error in yellow, and the d2f errors in green and blue:
+</p>
+<table border="1">
+<tr>
+<td>x</td>
+<td>..</td>
+<td>0.940000</td>
+<td>0.950000</td>
+<td>0.960000</td>
+<td>0.970000</td>
+<td>0.980000</td>
+<td>0.990000</td>
+<td>1.000000</td>
+</tr>
+<tr>
+<td>y</td>
+<td>..</td>
+<td>-0.999923</td>
+<td>-0.999293</td>
+<td>-0.996165</td>
+<td>-0.990547</td>
+<td>-0.982453</td>
+<td>-0.971903</td>
+<td>-0.958924</td>
+</tr>
+<tr>
+<td>df numeric</td>
+<td>..</td>
+<td>-0.061918</td>
+<td>0.187932</td>
+<td>0.437313</td>
+<td>0.685600</td>
+<td>0.932173</td>
+<td>1.176420</td>
+<td>1.297880</td>
+</tr>
+<tr>
+<td>d2f numeric</td>
+<td>..</td>
+<td>24.977300</td>
+<td>24.961500</td>
+<td>24.883400</td>
+<td>24.743000</td>
+<td>24.540900</td>
+<td>18.285300</td>
+<td>12.146300</td>
+</tr>
+<tr>
+<td>df analytic</td>
+<td>..</td>
+<td>-0.061943</td>
+<td>0.188011</td>
+<td>0.437495</td>
+<td>0.685886</td>
+<td>0.932562</td>
+<td>1.176907</td>
+<td>1.418311</td>
+</tr>
+<tr>
+<td>d2f analytic</td>
+<td>..</td>
+<td>24.998081</td>
+<td>24.982320</td>
+<td>24.904115</td>
+<td>24.763663</td>
+<td>24.561315</td>
+<td>24.297577</td>
+<td>23.973107</td>
+</tr>
+<tr>
+<td>df diffs</td>
+<td>..</td>
+<td>0.000025</td>
+<td>-0.000079</td>
+<td>-0.000182</td>
+<td>-0.000286</td>
+<td>-0.000389</td>
+<td>-0.000487</td>
+<td bgcolor="#FFFF66">-0.120431</td>
+</tr>
+<tr>
+<td>d2f diffs</td>
+<td>..</td>
+<td>-0.020781</td>
+<td>-0.020820</td>
+<td>-0.020715</td>
+<td>-0.020663</td>
+<td>-0.020415</td>
+<td bgcolor="#00FF99">-6.012277</td>
+<td bgcolor="#33CCFF">-11.826807</td>
+</tr>
+</table>
+<p>
+Take a look at the curve below. This looks at the start of an arbitrary graph but as already explained the problems at the start and the ends are identical. As above we have a curve f, and two lines a and b. We're trying to find the slope of the curve at x=0.
+</p>
+<img src="curve_error.jpeg" alt="Glitch Curve">
+<p>
+The actual method used - the forward difference method - corresponds to the slope of line a. If the imaginary x=-1 point existed we could use the centred difference method which would give us the slope of line b. Looking at this we can see that b gives us a better approximation of df(0), but the problem is point x=-1 doesn't exist - we're only given the curve from 0 onwards - for all we know the function could be discontinuous for x < 0. So short of any complex curve extrapoloation we are forced to use the forward difference method which we can see gives us a less good approximation of df(0).
+</p>
+<p>
+I hope that explains why we're forced to use the less-accurate forwards/backwards method at the ends of the graph. The next thing we need to understand is a) why this error propagates inwards for d2f (i.e. the blue cells in the table above) and b) why the d2f curve for x_squared shows such a marked jump at both ends.
+</p>
+<p>
+The reason this error propagates inward is because the green cell subscribes to the yellow one and the yellow one has the error, the error is propagated. The blue cell has two problems - it also subscribes to the yellow cell but it also suffers from the backwards diffenc error, which explains why it's error is larger than the green cell.
+</p>
+<p>
+The reason the d2f error is so marked for the graph x_squared is that the underlying curve (df) for which we're trying to find the derivative is (or should be, analytically) flat. As it's not due to the 1st order problem described above, the d2f curve which says "there is no rate of change in df" actually does see a rate of change for the first and last elements due to the forwards/backwards error, and for this reason, plus the propagation issue it shows a marked jump.
+</p>
+<p>
+Apologies if you think I've laboured this point but it took me a long time to figure out what was happening here and convince myself there weren't bugs in my code and I wanted to save you the trouble.
 </p>
 <h3>Step Size</h3>
 <p>
-
+The error across the first derivative is a known quantity of the finite difference method and is proportional to the step-size squared, so the smaller your step size (i.e. the greater NUM_NODES the better approximation you get.
 </p>
 <h2><a name="usage">Usage</a></h2>
 <p>
