@@ -22,7 +22,7 @@ calculus
 <table border="1">
 <tr>
 <td>Download version</td>
-<td>1.0</td>
+<td><a  href="https://sourceforge.net/project/showfiles.php?group_id=202177&package_id=311343">1.0</a></td>
 </tr>
 <tr>
 <td>Download licence</td>
@@ -30,7 +30,7 @@ calculus
 </tr>
 <tr>
 <td>Trad4 version</td>
-<td>2.0.3</td>
+<td><a  href="https://sourceforge.net/project/showfiles.php?group_id=202177&package_id=311343">2.0.3</a></td>
 </tr>
 <tr>
 <td>Author</td>
@@ -49,6 +49,7 @@ calculus
 <li><a href="#implementation">Implementation</a></li>
 <li><a href="#examples">Examples</a></li>
 <li><a href="#accuracy">Accuracy</a></li>
+<li><a href="#usage">Usage</a></li>
 <li><a href="#further_work">Further Work</a></li>
 </ul>
 
@@ -82,7 +83,7 @@ The first differential at the last point on the curve (not shown) is given by th
 <p/>
 <h2><a name="the_model">The Model</a></h2>
 <p>
-Now we're going to walk through how a 10-node implementation works. First we need to define our 10 f-objects. We start in the calculate_f function where we first define our x-values from their object id, and these run from 0.1 to 1.0. Next the y-values are derived, and for this we're using the default y = sin(5x).
+Now we're going to walk through how a 10-node implementation works. First we need to de our 10 f-objects. We start in the calculate_f function where we first derive our x-values from their object id, and these run from 0.1 to 1.0. Next the y-values are derived, and for this we're using the default y = sin(5x).
 </p>
 <table border="1">
 <tr>
@@ -255,15 +256,15 @@ First we'll look at the green cell. According to the centred difference formula,
 Next,the yellow cell which uses the forward difference method, which means that d2f is given by:
 </p>
 <blockquote><pre>
-	df = ( 2.59035 - 3.62045 ) / ( 0.2 - 0.1 )
-	df = -10.301000
+	d2f = ( 2.59035 - 3.62045 ) / ( 0.2 - 0.1 )
+	d2f = -10.301000
 </pre></blockquote>
 <p>
-Lastly we'll check the blue cell, which uses the centred difference method:
+Lastly we'll check the blue cell, which uses the centred difference method again:
 </p>
 <blockquote><pre>
-	df = ( -1.01061 - -4.48961 ) / ( 0.9 - 0.7 )
-	df = 17.395000
+	d2f = ( -1.01061 - -4.48961 ) / ( 0.9 - 0.7 )
+	d2f = 17.395000
 </pre></blockquote>
 <p>
 The small differences you see are because the tabular output above is the result of 32-bit floating point calculations whereas we've taken the rounded output to plug into the three worked examples above.
@@ -294,11 +295,11 @@ pub
 <ul>
 <li>static:</li>
 <ul>
-<li>mode is used to easily switch between (if mode == 0 ) y = sin(5x) else y = x*x</li>
+<li>mode is used to easily switch between if ( mode == 0 ) y = sin(5x) else y = x*x</li>
 </ul>
 <li>pub:</li>
 <ul>
-<li>x is the x-value of each node. As in heat_equation_1d this is derived from the object's id, and for all the equations discussed in this document runs from 0.0-1.0, with various step-sizes.</li>
+<li>x is the x-value of each node. As in heat_equation_1d this is derived from the object's id, and for all the models discussed in this document runs from 0.0-1.0, with various step-sizes.</li>
 <li>y is the value of the function we're differentiating. In our stock example this is sin(5x)</li>
 </ul>
 
@@ -397,15 +398,26 @@ For this section we're switching to a 100-node graph. This will provide smoother
 </p>
 <h3>sin(5x)</h3>
 <p>
+The full 100-node data set is available <a  href="https://sourceforge.net/docman/display_doc.php?docid=153510&group_id=202177">here</a>.
+</p>
+<p>
 <img src="sin_numeric.jpeg" alt="Numeric Solution">
 <img src="sin_analytic.jpeg" alt="Analytic Solution">
 </p>
+<p>
+You'll notice a glitch at the end of the numeric d2f graph. This is down to the fact the forwards/backwards difference methods are not as accurate as the central difference method. This will be discussed in the next section.
+</p>
 <h3>x squared</h3>
+<p>
+The full 100-node data set is available <a  href="https://sourceforge.net/docman/display_doc.php?docid=153511&group_id=202177">here</a>.
+</p>
 <p>
 <img src="x_squared_numeric.jpeg" alt="Numeric Solution">
 <img src="x_squared_analytic.jpeg" alt="Analytic Solution">
 </p>
-
+<p>
+You'll see the same glitch at the start and end of the d2f graph - discussed further below.
+</p>
 <h2><a name="accuracy">Accuracy</a></h2>
 <h3>The Edges</h3>
 <p>
@@ -415,10 +427,14 @@ For this section we're switching to a 100-node graph. This will provide smoother
 <p>
 
 </p>
+<h2><a name="usage">Usage</a></h2>
+<p>
+
+</p>
 <h2><a name="further_work">Further Work</a></h2>
 <h3>Big graphs and the monitor</h3>
 <p>
-The need_refresh function in the trad4 internals explicitly lists each object to which any type subscribes. This has worked well until now, but presents a problem with the monitor and big graphs. As the monitor subscribes to 3*NUM_NODES object (as there are 3 tiers), big graphs, for example NUM_NODES=10k, mean a massive need_refresh function as 30k objects are listed in this function by the precompiler. This means for a long compile time and a big binary - monitor.o is 3meg. This doesn't actually affect run-time as because every object to which the monitor subscribes will have changed, lazy evaluation kicks in so only the first object needs to be tested.
+The need_refresh function in the trad4 internals explicitly lists each object to which any type subscribes. This has worked well until now, but presents a problem with the monitor and big graphs. As the monitor subscribes to 3*NUM_NODES objects (as there are 3 tiers), big graphs, for example NUM_NODES=10k, mean a massive need_refresh function as 30k objects are listed in this function by the precompiler. This means for a long compile time and a big binary - monitor.o is 3meg. This doesn't actually affect run-time as because every object to which the monitor subscribes will have changed, lazy evaluation kicks in so only the first object needs to be tested.
 </p>
 <h3>N-differentials</h3>
 <h3>Switching between data sets</h3>
