@@ -530,15 +530,133 @@ I hope that explains why we're forced to use the less-accurate forwards/backward
 The reason this error propagates inward is because the green cell subscribes to the yellow one and the yellow one has the error, the error is propagated. The blue cell has two problems - it also subscribes to the yellow cell but it also suffers from the backwards diffenc error, which explains why it's error is larger than the green cell.
 </p>
 <p>
-The reason the d2f error is so marked for the graph x_squared is that the underlying curve (df) for which we're trying to find the derivative is (or should be, analytically) flat. As it's not due to the 1st order problem described above, the d2f curve which says "there is no rate of change in df" actually does see a rate of change for the first and last elements due to the forwards/backwards error, and for this reason, plus the propagation issue it shows a marked jump.
+The reason the d2f error is so marked for the graph x_squared is that the underlying curve (df) for which we're trying to find the derivative is (or should be, analytically) flat. As it's not due to the 1st order problem described above, the d2f curve which says "there is no rate of change in df" actually does see a rate of change for the first and last elements due to the forwards/backwards error, and for this reason, plus the propagation issue, it shows a marked jump.
 </p>
 <p>
 Apologies if you think I've laboured this point but it took me a long time to figure out what was happening here and convince myself there weren't bugs in my code and I wanted to save you the trouble.
 </p>
 <h3>Step Size</h3>
 <p>
-The error across the first derivative is a known quantity of the finite difference method and is proportional to the step-size squared, so the smaller your step size (i.e. the greater NUM_NODES the better approximation you get.
+The error across the first derivative is a known quantity of the finite difference method and is proportional to the step-size squared, so the smaller your step size (i.e. the greater NUM_NODES) the better approximation you get. Below, an abridged table showing the sin(5x) data for a 1000-node graph.
 </p>
+<table border="1">
+<tr>
+<td>x</td>
+<td>0.00100000</td>
+<td>0.00200000</td>
+<td>0.00300000</td>
+<td>0.00400000</td>
+<td>0.00500000</td>
+<td>..</td>
+<td>0.99600000</td>
+<td>0.99700000</td>
+<td>0.99800000</td>
+<td>0.99900000</td>
+<td>1.00000000</td>
+</tr>
+<tr>
+<td>y</td>
+<td>0.00499998</td>
+<td>0.00999983</td>
+<td>0.01499944</td>
+<td>0.01999867</td>
+<td>0.02499740</td>
+<td>..</td>
+<td>-0.96440536</td>
+<td>-0.96307117</td>
+<td>-0.96171290</td>
+<td>-0.96033059</td>
+<td>-0.95892428</td>
+</tr>
+<tr>
+<td>df numeric</td>
+<td>4.99985417</td>
+<td>4.99972917</td>
+<td>4.99941668</td>
+<td>4.99897920</td>
+<td>4.99841675</td>
+<td>..</td>
+<td>1.32213573</td>
+<td>1.34622914</td>
+<td>1.37028889</td>
+<td>1.39431438</td>
+<td>1.40631849</td>
+</tr>
+<tr>
+<td>d2f numeric</td>
+<td>-0.12499766</td>
+<td>-0.21874395</td>
+<td>-0.37498281</td>
+<td>-0.49996250</td>
+<td>-0.62492969</td>
+<td>..</td>
+<td>24.10993310</td>
+<td>24.07657860</td>
+<td>24.04262220</td>
+<td>18.01480050</td>
+<td>12.00410740</td>
+</tr>
+<tr>
+<td>df analytic</td>
+<td>4.99993750</td>
+<td>4.99975000</td>
+<td>4.99943751</td>
+<td>4.99900003</td>
+<td>4.99843758</td>
+<td>..</td>
+<td>1.32214124</td>
+<td>1.34623475</td>
+<td>1.37029460</td>
+<td>1.39432019</td>
+<td>1.41831093</td>
+</tr>
+<tr>
+<td>d2f analytic</td>
+<td>-0.12499948</td>
+<td>-0.24999583</td>
+<td>-0.37498594</td>
+<td>-0.49996667</td>
+<td>-0.62493490</td>
+<td>..</td>
+<td>24.11013404</td>
+<td>24.07677927</td>
+<td>24.04282259</td>
+<td>24.00826483</td>
+<td>23.97310687</td>
+</tr>
+<tr>
+<td>df diff</td>
+<td>-0.00008333</td>
+<td>-0.00002083</td>
+<td>-0.00002083</td>
+<td>-0.00002083</td>
+<td>-0.00002083</td>
+<td>..</td>
+<td>-0.00000551</td>
+<td>-0.00000561</td>
+<td>-0.00000571</td>
+<td>-0.00000581</td>
+<td>-0.01199244</td>
+</tr>
+<tr>
+<td>d2f diff</td>
+<td>0.00000182</td>
+<td>0.03125189</td>
+<td>0.00000312</td>
+<td>0.00000417</td>
+<td>0.00000521</td>
+<td>..</td>
+<td>-0.00020094</td>
+<td>-0.00020067</td>
+<td>-0.00020039</td>
+<td>-5.99346433</td>
+<td>-11.96899947</td>
+</tr>
+</table>
+<p>
+Below, the graph for the 1000-node data set. You can see the backwards error still exists but for a much smaller part of the graph.
+</p>
+<img src="sin_numeric_1000.jpeg" alt="Numeric Solution 1k">
 <h2><a name="usage">Usage</a></h2>
 <p>
 
