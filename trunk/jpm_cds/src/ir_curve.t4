@@ -1,0 +1,11 @@
+
+
+
+static
+    int fNumItems
+    tRatePt fArray[MAX_RATEPT]  # should be TRatePt
+    long fBaseDate              # should be TDate
+    double fBasis
+    double fDayCountConv        # should be long
+
+
