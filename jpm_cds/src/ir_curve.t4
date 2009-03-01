@@ -1,10 +1,14 @@
 
+static
+    double rate[NUM_RATES]
+    TDate baseDate
+    int mmDCC 
+    int dcc
+    double freq
+    int ibadDayConv
+    int iholidays
 
 pub
-    int fNumItems
-    TRatePt fArray[MAX_RATEPT]
-    TDate fBaseDate              
-    double fBasis
-    long fDayCountConv
+    TCurve pTCurve
 
 
