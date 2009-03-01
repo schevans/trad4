@@ -101,11 +101,12 @@ sub Clean() {
     `rm -f $ENV{APP_ROOT}/objects/Makefile`;
 }    
 
-sub Validate($$$$) {
+sub Validate($$$$$) {
     my $master_hash = shift;
     my $name = shift;
     my $struct_hash = shift;
     my $enum_hash = shift;
+    my $alias_hash = shift;
 
     my $obj_hash = $master_hash->{$name};
 
@@ -147,24 +148,26 @@ sub Validate($$$$) {
 
             foreach $key2 ( keys %{$obj_hash->{data}->{$key}} ) {
 
-                if ( not $obj_hash->{data}->{$key}->{$key2} =~ /int|double|float/ ) {
+                if ( not $obj_hash->{data}->{$key}->{$key2} =~ /int|double|float|long/ ) {
 
                     if ( exists $struct_hash->{$obj_hash->{data}->{$key}->{$key2}} ) {
         
-                        next;   # next in $key2 loop. My god! A comment!
+                        next;
                     }
 
                     if ( exists $master_hash->{$obj_hash->{data}->{$key}->{$key2}} ) {
 
-                        next;   # next in $key2 loop. 
+                        next;
                     }
-
-                    my $found_in_enums = 0;
 
                     if ( exists $enum_hash->{$obj_hash->{data}->{$key}->{$key2}} ) {
 
-                        next;   # next in $key2 loop. 
+                        next;
+                    }
 
+                    if ( exists $alias_hash->{$obj_hash->{data}->{$key}->{$key2}} ) {
+
+                        next;
                     }
 
                     if ( not $found_in_enums ) {
@@ -173,6 +176,7 @@ sub Validate($$$$) {
                         print "    a) an int, double or float\n";
                         print "    b) a structure, as defined in structures.t4s\n";
                         print "    c) an enum, as defined in enums.t4s\n";
+                        print "    d) an alias, as defined in aliases.t4s\n";
 
                         ExitOnError();
                     }
@@ -401,6 +405,54 @@ sub LoadEnums() {
     return \%enum_hash;
 }
 
+sub LoadAliases() {
+
+    open ALIAS_FILE, "$ENV{SRC_DIR}/aliases.t4s" or die "Can't open $ENV{SRC_DIR}/aliases.t4s for reading";
+
+    my %alias_hash;
+
+    my $line;
+    my $counter = 0;
+
+    while ( $line = <ALIAS_FILE> ) {
+
+        chomp $line;
+
+        $line =~ s/#.*//g;
+
+        if ( !$line ) {
+            next;
+        }
+
+        ( $name, $value ) = split /=/, $line;
+
+        $name =~ s/^\s+//;
+        $name =~ s/\s+$//;
+
+        if ( exists $alias_hash->{$name} ) {
+
+            print "Error: Multiple definitions of \'$name\' in aliass.t4s\n";
+            ExitOnError();
+
+        }
+
+        if ( !$value ) {
+
+            print "Error: No alias given for thing \'$name\' in aliases.t4s\n";
+            ExitOnError();
+        }
+        else {
+
+            $value =~ s/^\s+//;
+            $value =~ s/\s+$//;
+
+            $alias_hash->{$name} = $value;
+        }
+    }
+
+    return $alias_hash;
+}
+
 sub LoadStructures() {
 
     open STRUCTURES_FILE, "$ENV{SRC_DIR}/structures.t4s" or die "Can't open $ENV{SRC_DIR}/structures.t4s for reading";
@@ -424,10 +476,10 @@ sub LoadStructures() {
             next;
         }
 
-        if ( $line =~ /^[a-z]/ ) {
+        if ( $line =~ /^[a-z]/i ) {
 
             $struct = $line;
-        $struct_order = $line."_order";
+            $struct_order = $line."_order";
 
             next;
         }
@@ -703,8 +755,29 @@ sub Type2atoX($) {
     elsif ( $type =~ /double/ ) {
         return "std::atof";
     }
+    elsif ( $type =~ /long/ ) {
+        return "std::atoi";
+    }
     else {
-        return "";
+
+        if ( defined $alias_hash->{$type} ) {
+
+            if ( $alias_hash->{$type} =~ /long int/ ) {
+
+                return "std::atoi";
+            }
+            else {
+
+                print "Error: Unknown type \'$type\' in call to Type2atoX in trad4 internals.\n";
+                ExitOnError();
+            }
+        }
+        else {
+
+            print "Error: Unknown type \'$type\' in call to Type2atoX in trad4 internals.\n";
+            ExitOnError();
+        }
+
     }
 }
 
