@@ -16,7 +16,8 @@ sub generate_top_lvl_make($);
 sub Generate($) {
     my $obj_hash = shift;
 
-    generate_lib_make( $obj_hash );
+print "\t*** Temp: generate_lib_make suspended.\n";
+#    generate_lib_make( $obj_hash );
 
     generate_object_make( $obj_hash );
 
