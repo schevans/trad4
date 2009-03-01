@@ -35,14 +35,14 @@ typedef struct
 /*t
  * Holds a zero-coupon rate curve or clean spread curve.
  */
-typedef struct _TCurve
-{
-    int       fNumItems;     /* Number of TRatePts in fArray */
-    TRatePt  *fArray;        /* Dates & rates */
-    TDate     fBaseDate;     /* Discount date */ 
-    double    fBasis;        /* Number compounding periods / year */
-    long      fDayCountConv; /* How the year fraction is computed */
-} TCurve;
+//typedef struct _TCurve
+//{
+//    int       fNumItems;     /* Number of TRatePts in fArray */
+//    TRatePt  *fArray;        /* Dates & rates */
+//    TDate     fBaseDate;     /* Discount date */ 
+//    double    fBasis;        /* Number compounding periods / year */
+//    long      fDayCountConv; /* How the year fraction is computed */
+//} TCurve;
 
 
 /*t
