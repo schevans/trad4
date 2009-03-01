@@ -4,4 +4,10 @@ TRatePt
     double fDate
     double fRate
 
+TCurve
+    int fNumItems
+    TRatePt fArray[MAX_RATEPT]
+    TDate fBaseDate
+    double fBasis
+    long fDayCountConv
 
