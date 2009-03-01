@@ -324,7 +324,8 @@ sub generate_loader_callback($$$)
 
     foreach $key ( keys %{$obj_hash->{data}->{pub}} ) {
 
-        print $FHD "    (($name*)obj_loc[id])->$key = 0;\n";
+print "\t*** Temp: Suspended pub structs = 0\n";
+#        print $FHD "    (($name*)obj_loc[id])->$key = 0;\n";
     }
 
     print $FHD "\n";
