@@ -17,6 +17,9 @@ sub Generate($) {
     print $FHD "#ifndef __structures_h__\n";
     print $FHD "#define __structures_h__\n";
     print $FHD "\n";
+    print $FHD "#include \"constants.h\"\n";
+    print $FHD "#include \"aliases.h\"\n";
+    print $FHD "\n";
 
     foreach $key ( keys %{$struct_hash} ) {
 
