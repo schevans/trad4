@@ -1,6 +1,6 @@
 
 
-tRatePt
+TRatePt
     double fDate
     double fRate
 
