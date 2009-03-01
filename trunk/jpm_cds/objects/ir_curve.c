@@ -25,78 +25,63 @@ using namespace std;
 
 void calculate_ir_curve( obj_loc_t obj_loc, int id )
 {
-    static char  *routine = "BuildExampleZeroCurve";
-    TCurve       *zc = NULL;
-    char         *types = "MMMMMSSSSSSSSS";
-    char         *expiries[14] = {"1M", "2M", "3M", "6M", "9M", "1Y", "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y", "9Y"};
-    TDate        *dates = NULL;
-//    double        rates[14] = {1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9};
-    double        rates[14] = {1.4, 1.4, 1.4, 1.4, 1.4, 1.4, 1.4, 1.4, 1.4, 1.4, 1.4, 1.4, 1.4, 1.4};
-    TDate         baseDate;
-    long          mmDCC;
-    TDateInterval ivl;
-    long          dcc;
-    double        freq;
-    char          badDayConv = 'M';
-    char         *holidays = "None";
+    // Payment shedule generation stuff. Will revisit this.
+    char         *local_types = "MMMMMSSSSSSSSS";
+    char         *local_expiries[14] = {"1M", "2M", "3M", "6M", "9M", "1Y", "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y", "9Y"};
+    TDate        *local_dates = NULL;
     int           i, n;
 
-    baseDate = JpmcdsDate(2008, 1, 3);
+    // No support for char in trad4 internals, so I've mapped these to ints in the DB and
+    //  hardcoding here for now.
+    char local_badDayConv = 'M';
+    char *local_holidays = "None";
 
-    if (JpmcdsStringToDayCountConv("Act/360", &mmDCC) != SUCCESS)
-        goto done;
-    
-    if (JpmcdsStringToDayCountConv("30/360", &dcc) != SUCCESS)
-        goto done;
+    // I think this is just for the Error log..
+    static char  *local_routine = "BuildExampleZeroCurve";
 
-    if (JpmcdsStringToDateInterval("6M", routine, &ivl) != SUCCESS)
-        goto done;
+    n = strlen(local_types);
 
-    if (JpmcdsDateIntervalToFreq(&ivl, &freq) != SUCCESS)
-        goto done;
-
-    n = strlen(types);
-
-    dates = NEW_ARRAY(TDate, n);
+    local_dates = NEW_ARRAY(TDate, n);
     for (i = 0; i < n; i++)
     {
         TDateInterval tmp;
 
-        if (JpmcdsStringToDateInterval(expiries[i], routine, &tmp) != SUCCESS)
+        if (JpmcdsStringToDateInterval(local_expiries[i], local_routine, &tmp) != SUCCESS)
         {
-            JpmcdsErrMsg ("%s: invalid interval for element[%d].\n", routine, i);
+            JpmcdsErrMsg ("%s: invalid interval for element[%d].\n", local_routine, i);
             goto done;
         }
         
-        if (JpmcdsDateFwdThenAdjust(baseDate, &tmp, JPMCDS_BAD_DAY_NONE, "None", dates+i) != SUCCESS)
+        if (JpmcdsDateFwdThenAdjust(ir_curve_baseDate, &tmp, JPMCDS_BAD_DAY_NONE, "None", local_dates+i) != SUCCESS)
         {
-            JpmcdsErrMsg ("%s: invalid interval for element[%d].\n", routine, i);
+            JpmcdsErrMsg ("%s: invalid interval for element[%d].\n", local_routine, i);
             goto done;
         }
     }
  
     printf("calling JpmcdsBuildIRZeroCurve...\n");
-    zc = JpmcdsBuildIRZeroCurve(
-            baseDate,
-            types,
-            dates,
-            rates,
+    ir_curve_pTCurve = *(JpmcdsBuildIRZeroCurve(
+            ir_curve_baseDate,
+            local_types,
+            local_dates,
+            ir_curve_rate,
             n,
-            mmDCC,
-            (long) freq,
-            (long) freq,
-            dcc,
-            dcc,
-            badDayConv,
-            holidays);
+            ir_curve_mmDCC,
+            (long)ir_curve_freq,
+            (long)ir_curve_freq,
+            ir_curve_dcc,
+            ir_curve_dcc,
+            local_badDayConv,
+            local_holidays));
 
     /* get discount factor */
     printf("\n");
-    printf("Discount factor on 3rd Jan 08 = %f\n", JpmcdsZeroPrice(zc, JpmcdsDate(2008,1,3)));
-    printf("Discount factor on 3rd Jan 09 = %f\n", JpmcdsZeroPrice(zc, JpmcdsDate(2009,1,3)));
-    printf("Discount factor on 3rd Jan 17 = %f\n", JpmcdsZeroPrice(zc, JpmcdsDate(2017,1,3)));
+    printf("Discount factor on 3rd Jan 08 = %f\n", JpmcdsZeroPrice(&ir_curve_pTCurve, JpmcdsDate(2008,1,3)));
+    printf("Discount factor on 3rd Jan 09 = %f\n", JpmcdsZeroPrice(&ir_curve_pTCurve, JpmcdsDate(2009,1,3)));
+    printf("Discount factor on 3rd Jan 17 = %f\n", JpmcdsZeroPrice(&ir_curve_pTCurve, JpmcdsDate(2017,1,3)));
 
 done:
-    FREE(dates);
+    FREE(local_dates);
 }
+
 
