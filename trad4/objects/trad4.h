@@ -12,6 +12,7 @@
 #define MAX_TIERS 10
 #define MAX_TYPES 15
 
+
 #define OBJECT_NAME_LEN 32
 
 typedef void* obj_loc_t[MAX_OBJECTS+1];
