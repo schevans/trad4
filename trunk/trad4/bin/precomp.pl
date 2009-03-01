@@ -16,6 +16,7 @@ use PreComp::Macros;
 use PreComp::Structures;
 use PreComp::Enums;
 use PreComp::AppConstants;
+use PreComp::Aliases;
 use PreComp::Docco;
 
 sub usage();
@@ -49,7 +50,7 @@ if( $opts{k} ) {
 
 my $struct_hash;
 
-if (  -f $ENV{SRC_DIR}."/structures.t4s" ) {
+if ( -f $ENV{SRC_DIR}."/structures.t4s" ) {
 
     print "Loading structures..\n";
     $struct_hash = PreComp::Utilities::LoadStructures();
@@ -69,6 +70,14 @@ if (  -f $ENV{SRC_DIR}."/constants.t4s" ) {
 
     print "Loading constants..\n";
     $constants_hash = PreComp::Utilities::LoadAppConstants();
+}
+
+my $alias_hash;
+
+if ( -f  $ENV{SRC_DIR}."/aliases.t4s" ) {
+
+    print "Loading aliases..\n";
+    $alias_hash = PreComp::Utilities::LoadAliases();
 }
 
 print "Loading t4 files..\n";
@@ -135,6 +144,16 @@ if ( $verbose ) {
 
     }
 
+    if ( $alias_hash ) {
+
+        print "Aliases:\n";
+        print "--------\n";
+        print Dumper( $alias_hash );
+        print "\n";
+
+    }
+
+
     if ( $opts{o} ) {
 
         foreach $type ( keys %doing ) {
@@ -170,7 +189,7 @@ print "Validating..\n";
 
 foreach $type ( keys %doing ) {
 
-    PreComp::Utilities::Validate( $master_hash, $type, $struct_hash, $enum_hash );
+    PreComp::Utilities::Validate( $master_hash, $type, $struct_hash, $enum_hash, $alias_hash );
 }
 
 foreach $type ( keys %doing ) {
@@ -208,6 +227,12 @@ if ( $constants_hash ) {
 
     print "Generating constants..\n";
     PreComp::AppConstants::Generate( $constants_hash );
+}
+
+if ( $alias_hash ) {
+
+    print "Generating aliases..\n";
+    PreComp::Aliases::Generate( $alias_hash );
 }
 
 if( $opts{d} ) {

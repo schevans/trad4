@@ -27,6 +27,7 @@ sub Generate($) {
     print $FHD "#include \"structures.h\"\n";
     print $FHD "#include \"enums.h\"\n";
     print $FHD "#include \"constants.h\"\n";
+    print $FHD "#include \"aliases.h\"\n";
     print $FHD "\n";
 
     print $FHD "typedef struct {\n";
