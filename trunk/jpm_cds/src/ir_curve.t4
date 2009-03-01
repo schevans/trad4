@@ -1,7 +1,6 @@
 
 
-
-static
+pub
     int fNumItems
     TRatePt fArray[MAX_RATEPT]
     TDate fBaseDate              
