@@ -520,9 +520,12 @@ sub generate_extra_loaders($$$$)
         print $FHD "    }\n";
         print $FHD "\n";
 
-        foreach $key ( @{$struct_hash->{$vec_type}{order}} ) {
+        if ( $struct_hash->{$vec_type} ) {
 
-            print $FHD "    $name"."_$vec_short"."_$key(counter) = 0;\n";
+            foreach $key ( @{$struct_hash->{$vec_type}{order}} ) {
+
+                print $FHD "    $name"."_$vec_short"."_$key(counter) = 0;\n";
+            }
         }
 
         print $FHD "\n";
@@ -594,9 +597,12 @@ sub generate_extra_loaders($$$$)
         print $FHD "    }\n";
         print $FHD "\n";
 
-        foreach $key ( @{$struct_hash->{$vec_type}{order}} ) {
+        if ( $struct_hash->{$vec_type} ) {
 
-            print $FHD "    $name"."_$vec_short"."_$key(counter) = 0;\n";
+            foreach $key ( @{$struct_hash->{$vec_type}{order}} ) {
+
+                print $FHD "    $name"."_$vec_short"."_$key(counter) = 0;\n";
+            }
         }
 
         print $FHD "\n";
