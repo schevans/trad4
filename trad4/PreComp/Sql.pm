@@ -93,7 +93,8 @@ sub generate_vec_tables($$) {
             }
         }
         else {
-            print $FHD ",\n    ".PreComp::Utilities::Type2Sql( $static_vec_short )." $static_vec_short";
+
+            print $FHD ",\n    $static_vec_short ".PreComp::Utilities::Type2Sql( $static_vec_type );
         }
 
         print $FHD "\n);\n";
