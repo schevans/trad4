@@ -1,0 +1,25 @@
+
+sub
+    ir_curve s_ir_curve
+
+static
+    TDate today
+    TDate startDate
+    TDate stepinDate
+    TDate cashSettleDate
+    long nbDate
+    TDate endDates[NUM_RATES]
+    double couponRates[NUM_RATES]
+    TBoolean includes[NUM_RATES]
+    double recoveryRate
+    TBoolean payAccOnDefault
+    TDateInterval couponInterval[ONE] 
+    long paymentDcc
+    TStubMethod stubType[ONE]  
+    char badDayConv
+    int icalendar
+
+pub
+    TCurve pTCurve
+
+ 
