@@ -2,3 +2,4 @@
 
 TDate = long int
 
+TBoolean = int
