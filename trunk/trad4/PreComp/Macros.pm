@@ -273,12 +273,8 @@ sub print_macro_vec($) {
                 print $FHD "#define $name"."_$vec_short"."_$key( index ) (($name*)obj_loc[id])->$vec_short\[index\].$key\n";
             }
         }
-        else {
-            print $FHD "#define $name"."_$vec_short (($name*)obj_loc[id])->$vec_short\n";
 
-        }
-
-
+        print $FHD "#define $name"."_$vec_short (($name*)obj_loc[id])->$vec_short\n";
     }
 }
 1;
