@@ -38,27 +38,27 @@ typedef double TDateTime;
 #define JPMCDS_WEEKS_PER_LUNAR_MONTH   4
 
 /* --------- Definition of a date interval -------------------- */
-typedef struct
-{
-    int prd;        /* number of periods from offset date                  */
-    char prd_typ;   /* type of periods                                     */
-                    /* D - day; M - month; W - week                        */
-                    /* Q - 3 months; S - 6 months                          */
-                    /* A - 12 months; Y - 12 months                        */
-                    /* I - quarterly IMM period                            */
-                    /* F - flexible end of month                           */
-                    /* E - end of month                                    */
-                    /* J - monthly IMM period                              */
-                    /* K - quarterly Australian futures period             */
-                    /* L - quarterly New Zealand (kiwi) futures period     */
-                    /* T - equity derivatives expiry - 3rd Friday monthly  */
-                    /* U - Lunar (i.e. 28 Day) period                      */
-
-    int flag;       /* 0 - offset is value date
-                       -1 - offset is the previous date in the date array
-                       x - any other number is index into array of intervals.
-                           the date at that location is an offset */
-} TDateInterval;
+//typedef struct
+//{
+//    int prd;        /* number of periods from offset date                  */
+//    char prd_typ;   /* type of periods                                     */
+//                    /* D - day; M - month; W - week                        */
+//                    /* Q - 3 months; S - 6 months                          */
+//                    /* A - 12 months; Y - 12 months                        */
+//                    /* I - quarterly IMM period                            */
+//                    /* F - flexible end of month                           */
+//                    /* E - end of month                                    */
+//                    /* J - monthly IMM period                              */
+//                    /* K - quarterly Australian futures period             */
+//                    /* L - quarterly New Zealand (kiwi) futures period     */
+//                    /* T - equity derivatives expiry - 3rd Friday monthly  */
+//                    /* U - Lunar (i.e. 28 Day) period                      */
+//
+//    int flag;       /* 0 - offset is value date
+//                       -1 - offset is the previous date in the date array
+//                       x - any other number is index into array of intervals.
+//                           the date at that location is an offset */
+//} TDateInterval;
 
 
 /*
