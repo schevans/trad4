@@ -148,7 +148,7 @@ sub Validate($$$$$) {
 
             foreach $key2 ( keys %{$obj_hash->{data}->{$key}} ) {
 
-                if ( not $obj_hash->{data}->{$key}->{$key2} =~ /int|double|float|long/ ) {
+                if ( not $obj_hash->{data}->{$key}->{$key2} =~ /int|double|float|long|char/ ) {
 
                     if ( exists $struct_hash->{$obj_hash->{data}->{$key}->{$key2}} ) {
         
@@ -758,6 +758,10 @@ sub Type2atoX($) {
     elsif ( $type =~ /long/ ) {
         return "std::atoi";
     }
+    elsif ( $type =~ /char/ )
+    {
+        return "*";
+    }
     else {
 
         if ( defined $alias_hash->{$type} ) {
@@ -792,6 +796,9 @@ sub Type2Sql($) {
 
     if ( $type =~ 'double' ) {
         $sql_type = "float";
+    }
+    elsif ( $type =~ 'char' ) {
+        $sql_type = "char";
     }
     else {
         $sql_type = "int";
