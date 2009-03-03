@@ -11,3 +11,12 @@ TCurve
     double fBasis
     long fDayCountConv
 
+TStubMethod
+    TBoolean stubAtEnd
+    TBoolean longStub
+
+TDateInterval
+    int prd
+    char prd_typ
+    int flag
+
