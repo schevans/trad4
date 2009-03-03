@@ -766,6 +766,10 @@ sub Type2atoX($) {
 
                 return "std::atoi";
             }
+            elsif ( $alias_hash->{$type} =~ /int/ ) {
+
+                return "std::atoi";
+            }
             else {
 
                 print "Error: Unknown type \'$type\' in call to Type2atoX in trad4 internals.\n";
