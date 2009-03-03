@@ -1,0 +1,15 @@
+delete from credit_curve_endDates;
+insert into credit_curve_endDates values ( 2, 148655 );
+insert into credit_curve_endDates values ( 2, 149020 );
+insert into credit_curve_endDates values ( 2, 149385 );
+insert into credit_curve_endDates values ( 2, 149750 );
+insert into credit_curve_endDates values ( 2, 150115 );
+insert into credit_curve_endDates values ( 2, 150480 );
+insert into credit_curve_endDates values ( 2, 150845 );
+insert into credit_curve_endDates values ( 2, 151210 );
+insert into credit_curve_endDates values ( 2, 151575 );
+insert into credit_curve_endDates values ( 2, 151940 );
+insert into credit_curve_endDates values ( 2, 152305 );
+insert into credit_curve_endDates values ( 2, 152670 );
+insert into credit_curve_endDates values ( 2, 153035 );
+insert into credit_curve_endDates values ( 2, 153400 );
