@@ -25,15 +25,14 @@ using namespace std;
 
 void calculate_ir_curve( obj_loc_t obj_loc, int id )
 {
-    // Payment shedule generation stuff. Will revisit this.
+    // Rate type descriptions e.g. swap, FRA I think. Will revisit this.
     char         *local_types = "MMMMMSSSSSSSSS";
     char         *local_expiries[14] = {"1M", "2M", "3M", "6M", "9M", "1Y", "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y", "9Y"};
     TDate        *local_dates = NULL;
     int           i, n;
 
-    // No support for char in trad4 internals, so I've mapped these to ints in the DB and
+    // No support for char* in trad4 internals, so I've mapped this to an int in the DB and
     //  hardcoding here for now.
-    char local_badDayConv = 'M';
     char *local_holidays = "None";
 
     // I think this is just for the Error log..
@@ -71,7 +70,7 @@ void calculate_ir_curve( obj_loc_t obj_loc, int id )
             (long)ir_curve_freq,
             ir_curve_dcc,
             ir_curve_dcc,
-            local_badDayConv,
+            ir_curve_badDayConv,
             local_holidays));
 
     /* get discount factor */
