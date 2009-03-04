@@ -87,27 +87,5 @@ double *couponRates;
 
     FREE(local_endDates);
     
-    char  **lines = NULL;
-
-/*
-    /* print error log contents */
-    printf("\n");
-    printf("Error log contains:\n");
-    printf("------------------:\n");
-
-    lines = JpmcdsErrGetMsgRecord();
-    if (lines == NULL)
-        printf("(no log contents)\n");
-    else
-    {
-        int i;
-        for(i = 0; lines[i] != NULL; i++)
-        {
-            if (strcmp(lines[i],"") != 0)
-                printf("%s\n", lines[i]);
-        }
-    }
-*/
-
 }
 
