@@ -184,13 +184,16 @@ sub generate_validator($$$)
         print $FHD "        exit(0);\n";
         print $FHD "    }\n";
         print $FHD "\n";
-        print $FHD "    if ( ((object_header*)obj_loc[(($name*)obj_loc[id])->$key])->implements != $master_hash->{$obj_hash->{data}->{sub}->{$key}}->{type_num} )\n";
-        print $FHD "    {\n";
 
-        print $FHD "        cout << \"Error: Type $name, id \" << id << \" failed validation because a sub object $key, id \" << (($name*)obj_loc[id])->$key << \" is not of type $master_hash->{$obj_hash->{data}->{sub}->{$key}}->{type_num}.\" << endl;\n";
-        print $FHD "        exit(0);\n";
-        print $FHD "    }\n";
-        print $FHD "\n";
+print "\t*** Temp: Suspended type validation\n";
+
+#        print $FHD "    if ( ((object_header*)obj_loc[(($name*)obj_loc[id])->$key])->implements != $master_hash->{$obj_hash->{data}->{sub}->{$key}}->{type_num} )\n";
+#        print $FHD "    {\n";
+#
+#        print $FHD "        cout << \"Error: Type $name, id \" << id << \" failed validation because a sub object $key, id \" << (($name*)obj_loc[id])->$key << \" is not of type $master_hash->{$obj_hash->{data}->{sub}->{$key}}->{type_num}.\" << endl;\n";
+#        print $FHD "        exit(0);\n";
+#        print $FHD "    }\n";
+#        print $FHD "\n";
 
 
     }
