@@ -1,0 +1,10 @@
+
+
+static
+    TDate startDate
+    TDate endDate
+    double notional
+    double couponRate
+    TBoolean protectStart
+    TBoolean isPriceClean
+    double recoveryRate

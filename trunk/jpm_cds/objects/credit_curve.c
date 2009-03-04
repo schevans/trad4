@@ -25,8 +25,8 @@ using namespace std;
 void calculate_credit_curve( obj_loc_t obj_loc, int id )
 {
 
-if (JpmcdsErrMsgEnableRecord(20, 128) != SUCCESS)
-exit(0);
+//if (JpmcdsErrMsgEnableRecord(20, 128) != SUCCESS)
+//exit(0);
 
 TDate *endDates;
 double *couponRates;
@@ -67,7 +67,7 @@ double *couponRates;
     couponInterval.flag = 0;
 
 
-    TCurve* creditcurve = JpmcdsCleanSpreadCurve(
+     credit_curve_pTCurve = *(JpmcdsCleanSpreadCurve(
         credit_curve_today,
         &s_ir_curve_pTCurve,
         credit_curve_startDate,
@@ -83,45 +83,13 @@ double *couponRates;
         credit_curve_paymentDcc,
         credit_curve_stubType,
         credit_curve_badDayConv,
-        calendar );
-
-    TBoolean local_isPriceClean = FALSE;
-    double local_feeLegPV = 0;
-    TDate local_startDate = 148559;
-    TDate local_endDate = 153400;
-    double local_notional = 10000;
-    double local_couponRate = 0.16;
-    TBoolean local_protectStart = FALSE;
-
-    int result = JpmcdsCdsFeeLegPV(
-        credit_curve_today,
-        credit_curve_today,
-        credit_curve_today,
-        local_startDate,
-        local_endDate,
-        credit_curve_payAccOnDefault,
-        NULL,
-        credit_curve_stubType,
-        local_notional,
-        local_couponRate,
-        credit_curve_paymentDcc,
-        credit_curve_badDayConv,
-        calendar,
-        &s_ir_curve_pTCurve,
-        creditcurve,
-        local_protectStart,
-        local_isPriceClean,
-        &local_feeLegPV
-    );
-
-    printf("result: %d\n", result );
-    printf("local_feeLegPV: %f\n", local_feeLegPV );
-
+        calendar ));
 
     FREE(local_endDates);
     
     char  **lines = NULL;
 
+/*
     /* print error log contents */
     printf("\n");
     printf("Error log contains:\n");
@@ -139,7 +107,7 @@ double *couponRates;
                 printf("%s\n", lines[i]);
         }
     }
-
+*/
 
 }
 
