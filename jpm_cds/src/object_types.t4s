@@ -1,3 +1,9 @@
 #type_id, tier, name
 1,1,ir_curve
 2,2,credit_curve
+3,1,trade
+4,0,leg
+5,3,fee_leg
+6,3,contingent_leg
+7,4,standard_risk
+
