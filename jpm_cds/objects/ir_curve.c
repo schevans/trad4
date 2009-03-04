@@ -38,7 +38,7 @@ void calculate_ir_curve( obj_loc_t obj_loc, int id )
     // I think this is just for the Error log..
     static char  *local_routine = "BuildExampleZeroCurve";
 
-    n = strlen(local_types);
+    n = strlen((const char*)&ir_curve_types);
 
     local_dates = NEW_ARRAY(TDate, n);
     for (i = 0; i < n; i++)
@@ -61,7 +61,7 @@ void calculate_ir_curve( obj_loc_t obj_loc, int id )
     printf("calling JpmcdsBuildIRZeroCurve...\n");
     ir_curve_pTCurve = *(JpmcdsBuildIRZeroCurve(
             ir_curve_baseDate,
-            local_types,
+            (char*)&ir_curve_types,
             local_dates,
             ir_curve_rate,
             n,

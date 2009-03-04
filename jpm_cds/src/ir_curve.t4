@@ -7,6 +7,7 @@ static
     double freq
     char badDayConv
     int iholidays
+    char types[NUM_RATES]
 
 pub
     TCurve pTCurve

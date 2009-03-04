@@ -1,0 +1,15 @@
+delete from ir_curve_types;
+insert into ir_curve_types values ( 1, 'M' );
+insert into ir_curve_types values ( 1, 'M' );
+insert into ir_curve_types values ( 1, 'M' );
+insert into ir_curve_types values ( 1, 'M' );
+insert into ir_curve_types values ( 1, 'M' );
+insert into ir_curve_types values ( 1, 'S' );
+insert into ir_curve_types values ( 1, 'S' );
+insert into ir_curve_types values ( 1, 'S' );
+insert into ir_curve_types values ( 1, 'S' );
+insert into ir_curve_types values ( 1, 'S' );
+insert into ir_curve_types values ( 1, 'S' );
+insert into ir_curve_types values ( 1, 'S' );
+insert into ir_curve_types values ( 1, 'S' );
+insert into ir_curve_types values ( 1, 'S' );
