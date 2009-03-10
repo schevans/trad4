@@ -61,8 +61,6 @@ sub Generate($$) {
 
         foreach $static_vec_name ( keys %{$obj_hash->{$name}->{data}->{static_vec}} ) {
 
-print "SVN: $static_vec_name\n";
-
             $static_vec_type = $obj_hash->{$name}->{data}->{static_vec}->{$static_vec_name};
 
             $static_vec_short = $static_vec_name;
