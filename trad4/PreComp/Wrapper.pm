@@ -142,8 +142,6 @@ sub generate_calculate($$$$)
 
             $key_type = $master_hash->{$obj_hash->{data}->{sub}->{$key}}->{data}->{pub}->{$key2};
 
-print "KK: $key2 X $key_type\n";
-
             if ( $struct_hash->{$key_type} ) {
 
                 foreach $struct_type ( keys %{$struct_hash->{$key_type}->{data}} ) {
@@ -533,7 +531,6 @@ sub generate_extra_loaders($$$$)
             }
         }
         else {
-            print "Not sure this is doing anything..\n";
             print $FHD "        ($name"."_$vec_short"."[counter]) = ".PreComp::Utilities::Type2atoX( $vec_type )."(row[1]);\n";
         }
 
