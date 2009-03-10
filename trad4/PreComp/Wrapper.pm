@@ -13,7 +13,7 @@ sub generate_loader($$);
 sub generate_constructor($$);
 sub generate_calculate($$$);
 sub generate_need_refresh($$$);
-sub generate_loader_callback($$$);
+sub generate_loader_callback($$$$);
 sub generate_extra_loaders($$$$);
 
 sub Generate($$$$) {
@@ -83,7 +83,7 @@ sub Generate($$$$) {
     generate_validator( $master_hash, $name, $FHD );
     print $FHD "\n";
 
-    generate_loader_callback( $master_hash, $obj_hash, $FHD );
+    generate_loader_callback( $master_hash, $obj_hash, $struct_hash, $FHD );
     print $FHD "\n";
 
     generate_loader( $obj_hash, $FHD );
@@ -266,10 +266,11 @@ sub generate_need_refresh($$$)
 
 }
 
-sub generate_loader_callback($$$)
+sub generate_loader_callback($$$$)
 {
     my $master_hash = shift;
     my $obj_hash = shift;
+    my $struct_hash = shift;
     my $FHD = shift;
 
     my $name = $obj_hash->{name};
@@ -322,16 +323,14 @@ sub generate_loader_callback($$$)
         $counter++
     }
 
-    foreach $key ( keys %{$obj_hash->{data}->{pub}} ) {
+    foreach $pub_var ( keys %{$obj_hash->{data}->{pub}} ) {
 
-print "\t*** Temp: Suspended pub structs = 0\n";
-#        print $FHD "    (($name*)obj_loc[id])->$key = 0;\n";
+        if ( not $struct_hash->{$obj_hash->{data}->{pub}->{$pub_var}} ) {
+
+            print $FHD "    (($name*)obj_loc[id])->$pub_var = 0;\n";
+        }
     }
 
-    print $FHD "\n";
-    print $FHD "    //calculate_$name"."_wrapper((void*)id);\n";
-
-    print $FHD "\n";
     print $FHD "\n";
 
     print $FHD "    if ( is_new )\n";
