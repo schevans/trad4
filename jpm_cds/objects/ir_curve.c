@@ -26,7 +26,6 @@ using namespace std;
 void calculate_ir_curve( obj_loc_t obj_loc, int id )
 {
     // Rate type descriptions e.g. swap, FRA I think. Will revisit this.
-    char         *local_types = "MMMMMSSSSSSSSS";
     char         *local_expiries[14] = {"1M", "2M", "3M", "6M", "9M", "1Y", "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y", "9Y"};
     TDate        *local_dates = NULL;
     int           i, n;
