@@ -28,8 +28,6 @@ sub Generate($$) {
 
         foreach $var ( keys %{$obj_hash->{$name}->{data}->{pub}} ) {
 
-#PreComp::Utilities::PrintSection( $FHD, $obj_hash->{$name}->{data}->{pub}, "    " );
-
             print $FHD "    $obj_hash->{$name}->{data}->{pub}->{$var} $name"."_$var\n";
         }
 
@@ -47,9 +45,8 @@ sub Generate($$) {
                     print $FHD "    $struct_hash->{$pub_vec_type}->{data}->{$key} $name"."_$pub_vec_short"."_$key( index );\n";
                 }
             }
-            else {
-                print $FHD "    $pub_vec_type $pub_vec_name;\n";
-            }
+
+            print $FHD "    $pub_vec_type $name"."_$pub_vec_name;\n";
         }
 
         if ( keys %{$obj_hash->{$name}->{data}->{static}} or keys %{$obj_hash->{$name}->{data}->{static_vec}} ) {
@@ -64,6 +61,8 @@ sub Generate($$) {
 
         foreach $static_vec_name ( keys %{$obj_hash->{$name}->{data}->{static_vec}} ) {
 
+print "SVN: $static_vec_name\n";
+
             $static_vec_type = $obj_hash->{$name}->{data}->{static_vec}->{$static_vec_name};
 
             $static_vec_short = $static_vec_name;
@@ -76,10 +75,8 @@ sub Generate($$) {
                     print $FHD "    $struct_hash->{$static_vec_type}->{data}->{$key} $name"."_$static_vec_short"."_$key( index );\n";
                 }
             }
-            else {
-                print $FHD "    $static_vec_type $static_vec_name;\n";
-            }
 
+            print $FHD "    $static_vec_type $name"."_$static_vec_name;\n";
 
         }
 
