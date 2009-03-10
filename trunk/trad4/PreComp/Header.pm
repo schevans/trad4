@@ -16,6 +16,7 @@ sub Generate($) {
     my @header = PreComp::Constants::CommomHeader();
 
     my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::GenObjRoot().$name.".".h );
+    if( ! $FHD ) { return; }
 
     print $FHD "\n";
     print $FHD "#ifndef __$name"."__\n";

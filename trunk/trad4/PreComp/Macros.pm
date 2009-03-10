@@ -15,6 +15,7 @@ sub Generate($$) {
     foreach $name ( keys %{$obj_hash} ) {
 
         my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::GenObjRoot().$name."_macros.h" );
+        if( ! $FHD ) { return; }
 
         print $FHD "\n";
         print $FHD "/*======================================================================\n";

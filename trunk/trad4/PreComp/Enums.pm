@@ -12,6 +12,7 @@ sub Generate($) {
     my $enum_hash = shift;
 
     my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::GenObjRoot()."enums.h" );
+    if( ! $FHD ) { return; }
 
     print $FHD "\n";
     print $FHD "#ifndef __enums_h__\n";

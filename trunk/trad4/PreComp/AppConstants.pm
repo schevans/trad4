@@ -12,6 +12,7 @@ sub Generate($) {
     my $constants_hash = shift;
 
     my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::GenObjRoot()."constants.h" );
+    if( ! $FHD ) { return; }
 
     print $FHD "\n";
     print $FHD "#ifndef __constants_h__\n";

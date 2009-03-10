@@ -26,6 +26,7 @@ sub generate_indices($) {
     my $master_hash = shift;
 
     my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::SqlRoot()."indices.sql" );
+    if( ! $FHD ) { return; }
 
     my $object_type;
 
@@ -43,6 +44,7 @@ sub generate_object_types($) {
     my $master_hash = shift;
     
     my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::SqlRoot()."object_types.sql" );
+    if( ! $FHD ) { return; }
 
     my $object_type;
 
