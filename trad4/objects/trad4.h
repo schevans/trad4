@@ -34,6 +34,7 @@ typedef struct {
     validate_fpointer validate;
 } object_type_struct_t;
 
+#define DEBUG_ON
 
 #ifdef DEBUG_ON
 #define DEBUG( debug ) if ( ((object_header*)obj_loc[id])->log_level > 0 ) std::cout << debug << std::endl;
