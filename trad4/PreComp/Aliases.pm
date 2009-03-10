@@ -12,6 +12,7 @@ sub Generate($) {
     my $alias_hash = shift;
 
     my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::GenObjRoot()."aliases.h" );
+    if( ! $FHD ) { return; }
 
     print $FHD "\n";
     print $FHD "#ifndef __aliases_h__\n";

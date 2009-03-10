@@ -13,6 +13,7 @@ sub Generate($) {
     my $app_name = $ENV{APP};
 
     my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::DoccoRoot()."$app_name.html");
+    if( ! $FHD ) { return; }
 
     print $FHD "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
     print $FHD "  <!DOCTYPE html\n";

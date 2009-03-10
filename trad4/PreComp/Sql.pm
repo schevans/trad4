@@ -45,6 +45,7 @@ sub generate_dummy_data($$) {
     my $type_num = $obj_hash->{type_num};
 
     my $FHD = PreComp::Utilities::OpenFile( $ENV{APP_ROOT}."/data/default_set/$name.sql" );
+    if( ! $FHD ) { return; }
 
     print $FHD "delete from $name;\n";
     print $FHD "insert into object values ( $type_num, $type_num, $tier, \"$name"."_$type_num\", 1, 1 );\n";
@@ -81,6 +82,7 @@ sub generate_vec_tables($$) {
         my $static_vec_type = $obj_hash->{data}->{static_vec}->{$key};
 
         my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::SqlRoot()."$name.table" );
+        if( ! $FHD ) { return; }
 
         print $FHD "create table $name (\n";
         print $FHD "    id int";
@@ -113,6 +115,7 @@ sub generate_vec_tables($$) {
         my $static_vec_type = $obj_hash->{data}->{sub_vec}->{$key};
 
         my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::SqlRoot()."$name.table" );
+        if( ! $FHD ) { return; }
 
         print $FHD "create table $name (\n";
         print $FHD "    id int";
@@ -132,6 +135,7 @@ sub generate_table($) {
     my $name = $obj_hash->{name};
 
     my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::SqlRoot()."$name.table" );
+    if( ! $FHD ) { return; }
 
     print $FHD "create table $name (\n";
     print $FHD "    id int";
@@ -175,6 +179,7 @@ sub generate_vec_dummy_data($$$) {
         my $static_vec_type = $obj_hash->{data}->{static_vec}->{$key};
 
         my $FHD = PreComp::Utilities::OpenFile( $ENV{APP_ROOT}."/data/default_set/"."$name.sql" );
+        if( ! $FHD ) { return; }
 
         print $FHD "delete from $name;\n";
         print $FHD "insert into $name values ( $type_num";

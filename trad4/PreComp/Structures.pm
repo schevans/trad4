@@ -12,6 +12,7 @@ sub Generate($) {
     my $struct_hash = shift;
 
     my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::GenObjRoot()."structures.h" );
+    if( ! $FHD ) { return; }
 
     print $FHD "\n";
     print $FHD "#ifndef __structures_h__\n";
