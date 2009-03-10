@@ -662,8 +662,9 @@ sub LoadDef($) {
 
         $line =~ s/^\s+//;
         $line =~ s/\s+$//;
+        $line =~ s/#.*//;
 
-        if ( !$line or $line =~ /#/ ) {
+        if ( !$line ) {
             next;
         }
 
