@@ -11,7 +11,7 @@ use Data::Dumper;
 sub generate_validator($$$);
 sub generate_loader($$);
 sub generate_constructor($$);
-sub generate_calculate($$$);
+sub generate_calculate($$$$);
 sub generate_need_refresh($$$);
 sub generate_loader_callback($$$$);
 sub generate_extra_loaders($$$$);
@@ -73,7 +73,7 @@ sub Generate($$$$) {
     print $FHD "\n";
 
 
-    generate_calculate( $master_hash, $name, $FHD );
+    generate_calculate( $master_hash, $struct_hash, $name, $FHD );
     print $FHD "\n";
 
     generate_need_refresh( $obj_hash, $constants_hash, $FHD );
@@ -110,9 +110,10 @@ sub generate_constructor($$)
     print $FHD "}\n";
 }
 
-sub generate_calculate($$$)
+sub generate_calculate($$$$)
 {
     my $master_hash = shift;
+    my $struct_hash = shift;
     my $name = shift;
     my $FHD = shift;
 
@@ -139,7 +140,28 @@ sub generate_calculate($$$)
 
         foreach $key2 ( @{$master_hash->{$obj_hash->{data}->{sub}->{$key}}->{data}->{pub_order}} ) {
 
-            print $FHD "    DEBUG_FINE( \"\\t\\t$key"."_$key2: \" << $key"."_$key2 );\n";
+            $key_type = $master_hash->{$obj_hash->{data}->{sub}->{$key}}->{data}->{pub}->{$key2};
+
+print "KK: $key2 X $key_type\n";
+
+            if ( $struct_hash->{$key_type} ) {
+
+                foreach $struct_type ( keys %{$struct_hash->{$key_type}->{data}} ) {
+
+                    $struct_type_short = $struct_type;
+                    $struct_type_short =~ s/\[.*\]//g;
+
+                    if ( $struct_type eq $struct_type_short ) {
+
+                        print $FHD "    DEBUG_FINE( \"\\t\\t$key"."_$key2.$struct_type_short: \" << $key"."_$key2.$struct_type_short );\n";
+
+                    }
+                }
+            }
+            else {
+
+                print $FHD "    DEBUG_FINE( \"\\t\\t$key"."_$key2: \" << $key"."_$key2 );\n";
+            }
         }
 
         foreach $key2 ( @{$master_hash->{$obj_hash->{data}->{sub}->{$key}}->{data}->{static_order}} ){ 
@@ -155,7 +177,26 @@ sub generate_calculate($$$)
 
     foreach $key ( @{$obj_hash->{data}->{pub_order}} ) {
 
-        print $FHD "    DEBUG( \"\\t$obj_hash->{name}_$key: \" << $obj_hash->{name}_$key );\n";
+        $key_type = $obj_hash->{data}->{pub}->{$key};
+
+        if ( $struct_hash->{$key_type} ) {
+
+            foreach $struct_type ( keys %{$struct_hash->{$key_type}->{data}} ) {
+
+                $struct_type_short = $struct_type;
+                $struct_type_short =~ s/\[.*\]//g;
+
+                if ( $struct_type eq $struct_type_short ) {
+
+                    print $FHD "    DEBUG( \"\\t$obj_hash->{name}_$key.$struct_type_short: \" << $obj_hash->{name}_$key.$struct_type_short );\n";
+
+                }
+            }
+        }
+        else {
+
+            print $FHD "    DEBUG( \"\\t$obj_hash->{name}_$key: \" << $obj_hash->{name}_$key );\n";
+        }
 
     }
     print $FHD "\n";
