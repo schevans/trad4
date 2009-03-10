@@ -325,7 +325,23 @@ sub generate_loader_callback($$$$)
 
     foreach $pub_var ( keys %{$obj_hash->{data}->{pub}} ) {
 
-        if ( not $struct_hash->{$obj_hash->{data}->{pub}->{$pub_var}} ) {
+        $pub_var_type = $obj_hash->{data}->{pub}->{$pub_var};
+
+        if ( $struct_hash->{$pub_var_type} ) {
+
+            foreach $struct_type ( keys %{$struct_hash->{$pub_var_type}->{data}} ) {
+
+                $struct_type_short = $struct_type;
+                $struct_type_short =~ s/\[.*\]//g;
+
+                if ( $struct_type eq $struct_type_short ) {
+
+                    print $FHD "    (($name*)obj_loc[id])->$pub_var.$struct_type_short = 0;\n";
+
+                }
+            }
+        } 
+        else {
 
             print $FHD "    (($name*)obj_loc[id])->$pub_var = 0;\n";
         }
