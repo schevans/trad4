@@ -51,11 +51,11 @@ typedef long int TBadDayAndStubPos;
 /*t
  * TStubMethod combines all the types of stub information for swaps.
  */
-typedef struct _TStubMethod
-{
-    TBoolean stubAtEnd;
-    TBoolean longStub;
-} TStubMethod;
+//typedef struct _TStubMethod
+//{
+//    TBoolean stubAtEnd;
+//    TBoolean longStub;
+//} TStubMethod;
 
 
 /*f
