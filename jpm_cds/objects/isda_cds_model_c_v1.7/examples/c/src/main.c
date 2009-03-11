@@ -35,7 +35,7 @@ TCurve* BuildExampleZeroCurve()
     char         *types = "MMMMMSSSSSSSSS";
     char         *expiries[14] = {"1M", "2M", "3M", "6M", "9M", "1Y", "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y", "9Y"};
     TDate        *dates = NULL;
-    double        rates[14] = {1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9};
+    double        rates[14] = {0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04};
     TDate         baseDate;
     long          mmDCC;
     TDateInterval ivl;
@@ -58,6 +58,11 @@ TCurve* BuildExampleZeroCurve()
 
     if (JpmcdsDateIntervalToFreq(&ivl, &freq) != SUCCESS)
         goto done;
+
+printf("mmDCC: %d\n", mmDCC );
+printf("dcc: %d\n", dcc );
+printf("ivl: %d\n", ivl );
+printf("freq: %f\n", freq );
 
     n = strlen(types);
 
@@ -175,6 +180,7 @@ done:
 */
 int main(int argc, char** argv)
 {
+
     int     status = 1;
     char    version[256];
     char  **lines = NULL;
@@ -202,7 +208,7 @@ int main(int argc, char** argv)
     /* get discount factor */
     printf("\n");
     printf("Discount factor on 3rd Jan 08 = %f\n", JpmcdsZeroPrice(zerocurve, JpmcdsDate(2008,1,3)));
-    printf("Discount factor on 3rd Jan 09 = %f\n", JpmcdsZeroPrice(zerocurve, JpmcdsDate(2009,1,3)));
+    printf("Discount factor on 3rd Jan 09 = %f\n", JpmcdsZeroPrice(zerocurve, JpmcdsDate(2009,1,3)*100000.0));
     printf("Discount factor on 3rd Jan 17 = %f\n", JpmcdsZeroPrice(zerocurve, JpmcdsDate(2017,1,3)));
 
     /* get upfront charge */
@@ -213,6 +219,123 @@ int main(int argc, char** argv)
     
     /* return 'no error' */
     status = 0;
+
+    printf("\nCDS Stuff starts\n");
+
+    TDate baseDate = JpmcdsDate(2008, 1, 3);
+    long nbDate = 14;
+    TDate *endDates;
+    double *couponRates;
+
+    endDates = NEW_ARRAY(TDate, nbDate);
+    couponRates = NEW_ARRAY( double, nbDate );
+
+    double recoveryRate = 0.4;
+    TBoolean payAccOnDefault = FALSE;
+
+    TDateInterval couponInterval;
+    couponInterval.prd = 1;
+    couponInterval.prd_typ = 'A';
+    couponInterval.flag = 0;
+
+    long paymentDCC = 4;
+
+    TStubMethod stubType;
+    stubType.stubAtEnd = FALSE;
+    stubType.longStub = FALSE;
+
+    long badDayConv = JPMCDS_BAD_DAY_NONE;
+    char *calendar = "NONE";
+
+    int i2;
+    for ( i2=0 ; i2 < nbDate ; i2++ )
+    {
+        endDates[i2] = baseDate + ( i2 * 365 );
+
+        couponRates[i2] = 0.05;
+    }
+
+    TBoolean includes = FALSE;
+
+printf("baseDate: %d\n", baseDate );
+
+    TCurve* creditcurve = JpmcdsCleanSpreadCurve(
+        baseDate, 
+        zerocurve,
+        baseDate,
+        baseDate,
+        baseDate,
+        nbDate,
+        endDates,
+        couponRates,
+        &includes,
+        recoveryRate,
+        payAccOnDefault,
+        &couponInterval,
+        paymentDCC,
+        &stubType,
+        badDayConv,
+        calendar );
+
+    printf("Discount factor on 3rd Jan 08 = %f\n", JpmcdsZeroPrice(creditcurve, JpmcdsDate(2009,1,3)));
+
+    TDate startDate = 148559;
+    TDate endDate = 153400;
+    double notional = 10000;
+    double couponRate = 0.16;
+    TBoolean protectStart = FALSE;
+
+    TBoolean isPriceClean = FALSE; 
+    double feeLegPV = 0;   
+
+    TDate stepinDate = 150000;
+
+    int result = JpmcdsCdsFeeLegPV(
+        baseDate,
+        baseDate,
+        baseDate,
+        startDate,
+        endDate,
+        payAccOnDefault,
+        NULL,
+        &stubType,
+        notional,
+        couponRate,
+        paymentDCC,
+        badDayConv,
+        calendar,
+        zerocurve,
+        creditcurve,
+        protectStart,
+        isPriceClean,
+        &feeLegPV
+    );
+         
+    printf("feeLegPV: %f\n", feeLegPV );
+
+    double contingentLegPV = 0;
+   
+    result = JpmcdsCdsContingentLegPV(
+        baseDate,
+        baseDate,
+        startDate,
+        endDate,
+        notional,
+        zerocurve,
+        creditcurve,
+        recoveryRate,
+        protectStart,
+        &contingentLegPV
+    );
+
+    printf("contingentLegPV: %f\n", contingentLegPV );
+
+    printf("PV: %f\n", contingentLegPV - feeLegPV );
+
+    FREE(endDates);
+    FREE(couponRates);
+
+    printf("CDS Stuff ends\n\n");
 
 done:
     if (status != 0)
