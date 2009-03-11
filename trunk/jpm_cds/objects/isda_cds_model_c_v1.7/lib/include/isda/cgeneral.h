@@ -11,6 +11,7 @@
 #ifndef CGENERAL_H
 #define CGENERAL_H
 
+#include "../../../../../gen/objects/aliases.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -38,7 +39,7 @@ extern "C"
 
 #endif                                  /* if (WIN32, etc) */
 
-typedef int TBoolean;
+//typedef int TBoolean;
 
 #ifndef TRUE
 #define TRUE 1

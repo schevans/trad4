@@ -1,12 +1,12 @@
 
 
 TRatePt
-    double fDate
+    TDate fDate
     double fRate
 
 TCurve
     int fNumItems
-    TRatePt fArray[MAX_RATEPT]
+    TRatePt* fArray
     TDate fBaseDate
     double fBasis
     long fDayCountConv

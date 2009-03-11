@@ -11,6 +11,7 @@
 #ifndef CDATE_H
 #define CDATE_H
 
+#include "../../../../../gen/objects/structures.h"
 #include "cgeneral.h"
 
 #ifdef __cplusplus
@@ -18,7 +19,7 @@ extern "C"
 {
 #endif
 
-typedef long int TDate;
+//typedef long int TDate;
 
 /*
  * (double) value of TDate with any fractional part
