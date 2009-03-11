@@ -6,19 +6,19 @@
 
 #include "fee_leg_wrapper.c"
 
-#include "include/version.h"
-#include "include/macros.h"
-#include "include/cerror.h"
-#include "include/tcurve.h"
-#include "include/cdsone.h"
-#include "include/convert.h"
-#include "include/zerocurve.h"
-#include "include/cds.h"
-#include "include/cxzerocurve.h"
-#include "include/dateconv.h"
-#include "include/date_sup.h"
-#include "include/busday.h"
-#include "include/ldate.h"
+#include "isda_cds_model_c_v1.7/lib/include/isda/version.h"
+#include "isda_cds_model_c_v1.7/lib/include/isda/macros.h"
+#include "isda_cds_model_c_v1.7/lib/include/isda/cerror.h"
+#include "isda_cds_model_c_v1.7/lib/include/isda/tcurve.h"
+#include "isda_cds_model_c_v1.7/lib/include/isda/cdsone.h"
+#include "isda_cds_model_c_v1.7/lib/include/isda/convert.h"
+#include "isda_cds_model_c_v1.7/lib/include/isda/zerocurve.h"
+#include "isda_cds_model_c_v1.7/lib/include/isda/cds.h"
+#include "isda_cds_model_c_v1.7/lib/include/isda/cxzerocurve.h"
+#include "isda_cds_model_c_v1.7/lib/include/isda/dateconv.h"
+#include "isda_cds_model_c_v1.7/lib/include/isda/date_sup.h"
+#include "isda_cds_model_c_v1.7/lib/include/isda/busday.h"
+#include "isda_cds_model_c_v1.7/lib/include/isda/ldate.h"
 
 
 using namespace std;
