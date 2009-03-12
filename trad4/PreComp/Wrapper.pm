@@ -55,7 +55,13 @@ sub Generate($$$$) {
     print $FHD "\n";
     print $FHD "#include <sqlite3.h>\n";
     print $FHD "\n";
-    print $FHD "\n";
+
+    if ( %{$obj_hash->{data}->{static_vec}} or %{$obj_hash->{data}->{sub_vec}} ) {
+
+        print $FHD "static int counter(0);\n";
+        print $FHD "\n";
+    }
+
     print $FHD "void calculate_$obj_hash->{name}( obj_loc_t obj_loc, int id );\n";
 
     foreach $vec_name ( ( keys %{$obj_hash->{data}->{static_vec}} , keys %{$obj_hash->{data}->{sub_vec}} )) {
@@ -469,6 +475,7 @@ sub generate_loader($$)
                 $vec_short =~ s/\[.*\]//g;
 
                 print $FHD "            load_$name"."_$vec_short( obj_loc, i, db, 0 );\n";
+                print $FHD "            if ( counter == 0 ) { std::cout << \"Warning: Table $name"."_$vec_short is empty for id \" << i << \".\" << std::endl; }\n";
         }
 
         print $FHD "        }\n";
@@ -491,9 +498,6 @@ sub generate_extra_loaders($$$$)
     my $FHD = shift;
 
     my $name = $obj_hash->{name};
-
-    print $FHD "static int counter(0);\n";
-    print $FHD "\n";
 
     my ( $vec_type, $vec_short ); 
 
