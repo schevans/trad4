@@ -35,7 +35,7 @@ TCurve* BuildExampleZeroCurve()
     char         *types = "MMMMMSSSSSSSSS";
     char         *expiries[14] = {"1M", "2M", "3M", "6M", "9M", "1Y", "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y", "9Y"};
     TDate        *dates = NULL;
-    double        rates[14] = {0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04};
+    double        rates[14] = {0.014, 0.014, 0.014, 0.014, 0.014, 0.014, 0.014, 0.014, 0.014, 0.014, 0.014, 0.014, 0.014, 0.014};
     TDate         baseDate;
     long          mmDCC;
     TDateInterval ivl;
@@ -208,7 +208,7 @@ int main(int argc, char** argv)
     /* get discount factor */
     printf("\n");
     printf("Discount factor on 3rd Jan 08 = %f\n", JpmcdsZeroPrice(zerocurve, JpmcdsDate(2008,1,3)));
-    printf("Discount factor on 3rd Jan 09 = %f\n", JpmcdsZeroPrice(zerocurve, JpmcdsDate(2009,1,3)*100000.0));
+    printf("Discount factor on 3rd Jan 09 = %f\n", JpmcdsZeroPrice(zerocurve, JpmcdsDate(2009,1,3)));
     printf("Discount factor on 3rd Jan 17 = %f\n", JpmcdsZeroPrice(zerocurve, JpmcdsDate(2017,1,3)));
 
     /* get upfront charge */
