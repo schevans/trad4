@@ -54,13 +54,13 @@ sub Generate($$) {
             print $FHD "\nstatic:\n";
         }
 
-        foreach $var ( keys %{$obj_hash->{$name}->{data}->{static}} ) {
+        foreach $var ( @{$obj_hash->{$name}->{data}->{static_order}} ) {
 
             print $FHD "    $obj_hash->{$name}->{data}->{static}->{$var} $name"."_$var\n";
 
         }
 
-        foreach $static_vec_name ( keys %{$obj_hash->{$name}->{data}->{static_vec}} ) {
+        foreach $static_vec_name ( @{$obj_hash->{$name}->{data}->{static_vec_order}} ) {
 
             $static_vec_type = $obj_hash->{$name}->{data}->{static_vec}->{$static_vec_name};
 
@@ -87,19 +87,21 @@ sub Generate($$) {
 
         foreach $var ( @{$obj_hash->{$name}->{data}->{sub_order}} ) {
 
+            print $FHD "    $var:\n";
+
             foreach $var2 ( keys %{$obj_hash->{$obj_hash->{$name}->{data}->{sub}->{$var}}->{data}->{pub}} ) {
 
-                print $FHD "    $obj_hash->{$obj_hash->{$name}->{data}->{sub}->{$var}}->{data}->{pub}->{$var2} $var"."_$var2\n";
+                print $FHD "        $obj_hash->{$obj_hash->{$name}->{data}->{sub}->{$var}}->{data}->{pub}->{$var2} $var"."_$var2\n";
             }
 
             foreach $var2 ( keys %{$obj_hash->{$obj_hash->{$name}->{data}->{sub}->{$var}}->{data}->{static}} ) {
 
-                print $FHD "    $obj_hash->{$obj_hash->{$name}->{data}->{sub}->{$var}}->{data}->{static}->{$var2} $var"."_$var2\n";
+                print $FHD "        $obj_hash->{$obj_hash->{$name}->{data}->{sub}->{$var}}->{data}->{static}->{$var2} $var"."_$var2\n";
             }
 
             foreach $var2 ( keys %{$obj_hash->{$obj_hash->{$name}->{data}->{sub}->{$var}}->{data}->{static_vec}} ) {
 
-                print $FHD "    $obj_hash->{$obj_hash->{$name}->{data}->{sub}->{$var}}->{data}->{static_vec}->{$var2} $var"."_$var2\n";
+                print $FHD "        $obj_hash->{$obj_hash->{$name}->{data}->{sub}->{$var}}->{data}->{static_vec}->{$var2} $var"."_$var2\n";
 
             }
 
@@ -118,12 +120,12 @@ sub Generate($$) {
 
             foreach $var2 ( keys %{$obj_hash->{$obj_hash->{$name}->{data}->{sub_vec}->{$var}}->{data}->{pub}} ) {
 
-                print $FHD "    $obj_hash->{$obj_hash->{$name}->{data}->{sub_vec}->{$var}}->{data}->{pub}->{$var2} $name"."_$var_short"."_$var2( index )\n";
+                print $FHD "        $obj_hash->{$obj_hash->{$name}->{data}->{sub_vec}->{$var}}->{data}->{pub}->{$var2} $name"."_$var_short"."_$var2( index )\n";
             }
 
             foreach $var2 ( keys %{$obj_hash->{$obj_hash->{$name}->{data}->{sub_vec}->{$var}}->{data}->{static}} ) {
 
-                print $FHD "    $obj_hash->{$obj_hash->{$name}->{data}->{sub_vec}->{$var}}->{data}->{static}->{$var2} $name"."_$var_short"."_$var2( index )\n";
+                print $FHD "        $obj_hash->{$obj_hash->{$name}->{data}->{sub_vec}->{$var}}->{data}->{static}->{$var2} $name"."_$var_short"."_$var2( index )\n";
             }
 
             print $FHD "\n";
