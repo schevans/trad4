@@ -1,0 +1,15 @@
+delete from ir_curve_rates;
+insert into ir_curve_rates values ( 1, 0.000000001 );
+insert into ir_curve_rates values ( 1, 0.000000001 );
+insert into ir_curve_rates values ( 1, 0.000000001 );
+insert into ir_curve_rates values ( 1, 0.000000001 );
+insert into ir_curve_rates values ( 1, 0.000000001 );
+insert into ir_curve_rates values ( 1, 0.000000001 );
+insert into ir_curve_rates values ( 1, 0.000000001 );
+insert into ir_curve_rates values ( 1, 0.000000001 );
+insert into ir_curve_rates values ( 1, 0.000000001 );
+insert into ir_curve_rates values ( 1, 0.000000001 );
+insert into ir_curve_rates values ( 1, 0.000000001 );
+insert into ir_curve_rates values ( 1, 0.000000001 );
+insert into ir_curve_rates values ( 1, 0.000000001 );
+insert into ir_curve_rates values ( 1, 0.000000001 );

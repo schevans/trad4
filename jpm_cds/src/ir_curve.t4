@@ -1,6 +1,6 @@
 
 static
-    double rate[NUM_RATES]
+    double rates[NUM_RATES]
     TDate baseDate
     int mmDCC 
     int dcc
