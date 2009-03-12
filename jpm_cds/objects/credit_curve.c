@@ -24,6 +24,7 @@ using namespace std;
 
 void calculate_credit_curve( obj_loc_t obj_loc, int id )
 {
+
     char* calendar = "NONE";
 
     credit_curve_pTCurve = *(JpmcdsCleanSpreadCurve(
@@ -35,7 +36,7 @@ void calculate_credit_curve( obj_loc_t obj_loc, int id )
         credit_curve_nbDate,
         credit_curve_endDates,
         credit_curve_couponRates,
-        credit_curve_includes,
+        NULL,
         credit_curve_recoveryRate,
         credit_curve_payAccOnDefault,
         credit_curve_couponInterval,

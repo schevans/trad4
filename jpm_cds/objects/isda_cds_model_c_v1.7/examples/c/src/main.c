@@ -255,7 +255,6 @@ int main(int argc, char** argv)
         couponRates[i2] = 0.05;
     }
 
-    TBoolean includes = FALSE;
 
 printf("baseDate: %d\n", baseDate );
 
@@ -268,7 +267,7 @@ printf("baseDate: %d\n", baseDate );
         nbDate,
         endDates,
         couponRates,
-        &includes,
+        NULL,
         recoveryRate,
         payAccOnDefault,
         &couponInterval,
