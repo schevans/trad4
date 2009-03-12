@@ -2,13 +2,15 @@
 static
     TDate baseDate
     int mmDCC 
-    int dcc
-    double freq
+    long fixedSwapFreq
+    long floatSwapFreq
+    long fixedSwapDCC
+    long floatSwapDCC
     char badDayConv
     int iholidays
     char types[NUM_RATES]   # These three really should be on the same struct,
-    double rates[NUM_RATES] #  but there's no support in trad4 for this yet.
-    TDate dates[NUM_RATES]  # 
+    double rates[NUM_RATES] #  but there's no support in trad4 for the layout
+    TDate dates[NUM_RATES]  #  JPMCDS requires.
 
 pub
     TCurve pTCurve

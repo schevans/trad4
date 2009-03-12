@@ -29,15 +29,15 @@ void calculate_ir_curve( obj_loc_t obj_loc, int id )
 
     ir_curve_pTCurve = *(JpmcdsBuildIRZeroCurve(
             ir_curve_baseDate,
-            (char*)&ir_curve_types,
+            ir_curve_types,
             ir_curve_dates,
             ir_curve_rates,
             NUM_RATES,
             ir_curve_mmDCC,
-            (long)ir_curve_freq,
-            (long)ir_curve_freq,
-            ir_curve_dcc,
-            ir_curve_dcc,
+            ir_curve_fixedSwapFreq,
+            ir_curve_floatSwapFreq,
+            ir_curve_fixedSwapDCC,
+            ir_curve_floatSwapDCC,
             ir_curve_badDayConv,
             local_holidays));
 
