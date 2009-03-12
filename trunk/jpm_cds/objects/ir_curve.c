@@ -62,7 +62,7 @@ void calculate_ir_curve( obj_loc_t obj_loc, int id )
             ir_curve_baseDate,
             (char*)&ir_curve_types,
             local_dates,
-            ir_curve_rate,
+            ir_curve_rates,
             n,
             ir_curve_mmDCC,
             (long)ir_curve_freq,
