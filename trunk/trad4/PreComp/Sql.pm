@@ -186,10 +186,13 @@ sub generate_vec_dummy_data($$$) {
 
         if ( $struct_hash->{$static_vec_type} ) {
 
-            foreach $struct ( keys %{$struct_hash->{$static_vec_type}} ) {
+            foreach $struct ( @{$struct_hash->{$static_vec_type}->{order}} ) {
 
-                if ( $struct_hash->{$static_vec_type}->{$struct} =~ /int/ ) {
+                if ( $struct_hash->{$static_vec_type}->{data}->{$struct} =~ /int/ ) {
                     print $FHD ", 1";
+                } 
+                if ( $struct_hash->{$static_vec_type}->{data}->{$struct} =~ /char/ ) {
+                    print $FHD ", 'X'";
                 } 
                 else {
                     print $FHD ", $PI";
