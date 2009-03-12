@@ -1,13 +1,14 @@
 
 static
-    double rates[NUM_RATES]
     TDate baseDate
     int mmDCC 
     int dcc
     double freq
     char badDayConv
     int iholidays
-    char types[NUM_RATES]
+    char types[NUM_RATES]   # These three really should be on the same struct,
+    double rates[NUM_RATES] #  but there's no support in trad4 for this yet.
+    TDate dates[NUM_RATES]  # 
 
 pub
     TCurve pTCurve
