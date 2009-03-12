@@ -59,7 +59,7 @@ static char pLogFilePath[MAX_LOG_PATH_LEN];
 /* pWriteMessage is toggled by JpmcdsErrMsgOn and JpmcdsErrMsgOff. It simply
  * determines whether a call to JpmcdsErrMsg has any effect or not.
  */
-static TBoolean pWriteMessage = FALSE;  /* Default is OFF */
+static TBoolean pWriteMessage = TRUE;  /* Default is OFF */
 
 static JpmcdsErrCallBackFunc *errorUserFunc = NULL;
 static TBoolean          errorSendTimeStamp = TRUE;
