@@ -15,7 +15,7 @@ sub Generate($) {
     my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::DoccoRoot()."$app_name.html");
     if( ! $FHD ) { return; }
 
-    print $FHD "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
+    print $FHD "\n";
     print $FHD "  <!DOCTYPE html\n";
     print $FHD "            PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\n";
     print $FHD "            \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n";
@@ -119,7 +119,6 @@ sub Generate($) {
 
         if ( $master_hash->{$type}->{data}->{implements} eq $type ) {
 
-            print $FHD "<p>\n";
             print $FHD "<ul>\n";
 
             foreach $section ( "sub", "static", "pub" ) {
@@ -129,7 +128,6 @@ sub Generate($) {
             }
 
             print $FHD "</ul>\n";
-            print $FHD "</p>\n";
 
         }
 
@@ -164,7 +162,7 @@ sub PrintT4Section($$$$) {
     {
         if ( $is_ul_list ) {
 
-            print $FHD "<li>$section:</li>\n";
+            print $FHD "<li>$section:\n";
         }
         else {
     
@@ -174,7 +172,7 @@ sub PrintT4Section($$$$) {
 
     if ( ( keys %{$master_hash->{$type}->{data}->{$section}} || keys %{$master_hash->{$type}->{data}->{$section_vec}} ) && $is_ul_list ) {
 
-        print $FHD "<ul>\n";
+        print $FHD "    <ul>\n";
     }
 
     if ( exists $master_hash->{$type}->{data}->{$section} ) {
@@ -183,7 +181,7 @@ sub PrintT4Section($$$$) {
 
             if ( $is_ul_list ) {
 
-                print $FHD "<li>$var</li>\n";
+                print $FHD "    <li>$var</li>\n";
             }
             else {
 
@@ -198,7 +196,7 @@ sub PrintT4Section($$$$) {
 
             if ( $is_ul_list ) {
 
-                print $FHD "<li>$var</li>\n";
+                print $FHD "    <li>$var</li>\n";
             }
             else {
 
@@ -209,7 +207,8 @@ sub PrintT4Section($$$$) {
 
     if ( ( keys %{$master_hash->{$type}->{data}->{$section}} or keys %{$master_hash->{$type}->{data}->{$section_vec}} ) and $is_ul_list ) {
 
-        print $FHD "</ul>\n";
+        print $FHD "    </ul>\n";
+        print $FHD "</li>\n";
     }
 
     if ( keys %{$master_hash->{$type}->{data}->{$section}} or keys %{$master_hash->{$type}->{data}->{$section_vec}} )
