@@ -223,16 +223,21 @@ sub OpenFile($) {
     my $file_type = $file;
     $file_type =~ s/^.*\.//g;
 
-    my $comment_string;
+    my $comment_start = "";
+    my $comment_end = "";
 
     if ( $file =~ /Makefile/ ) {
-        $comment_string = "#";
+        $comment_start = "#";
     }
-    elsif ( $file_type =~ /h|c/ ) {
-        $comment_string = "//";
+    elsif ( $file_type =~ /^h$/ or $file_type =~ /^c$/ ) {
+        $comment_start = "//";
     }
     elsif ( $file_type =~ /table|sql/ ) {
-        $comment_string = "--";
+        $comment_start = "--";
+    }
+    elsif ( $file_type =~ /^html$/ ) {
+        $comment_start = "<!--"; 
+        $comment_end = "-->";
     }
     else
     {
@@ -252,13 +257,21 @@ sub OpenFile($) {
  
     open $current_file, ">$file.t4t" or die "Can't open file $file";
 
+
+    if ( $file_type =~ /^html$/ ) {
+
+        print $current_file "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
+    }
+
     foreach $line ( @licence_header_array ) {
 
-        print $current_file "$comment_string $line";
+        chomp( $line );
+
+        print $current_file "$comment_start $line $comment_end\n";
     }
 
     print $current_file "\n";
-    print $current_file "$comment_string $gen_string";
+    print $current_file "$comment_start $gen_string $comment_end";
     print $current_file "\n";
 
     return $current_file;
