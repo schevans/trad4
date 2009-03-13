@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
+
   <!DOCTYPE html
             PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -22,23 +23,23 @@ jpm_cds
 <table border="1">
 <tr>
 <td>Download version</td>
-<td>0.1 (alpha)</td>
+<td></td>
 </tr>
 <tr>
 <td>Download licence</td>
-<td>Undecided</td>
+<td></td>
 </tr>
 <tr>
 <td>Trad4 version</td>
-<td>2.0.4 (alpha)</td>
+<td></td>
 </tr>
 <tr>
 <td>Author</td>
-<td>schevans</td>
+<td></td>
 </tr>
 <tr>
 <td>Date</td>
-<td>04-03-2009</td>
+<td></td>
 </tr>
 </table>
 
@@ -54,15 +55,16 @@ jpm_cds
 <p>
 This is a trad4 port of the ISDA CDS Standard Model from JP Morgan. The original code is available here: <a href="http://www.cdsmodel.com/">http://www.cdsmodel.com/</a>
 </p>
-<p>
-This is very much a work in progress.
-</p>
 <h2><a name="the_model">The Model</a></h2>
 <p>
 
 </p>
 <h2><a name="implementation">Implementation</a></h2>
 <h3>The abstract diagram</h3>
+<p>
+<img src="abstract.jpeg" alt="Abstract Diagram"/>
+</p>
+
 <p>
 
 </p>
@@ -76,38 +78,44 @@ This is very much a work in progress.
 static
     TDate baseDate
     int mmDCC
-    int dcc
-    double freq
+    long fixedSwapFreq
+    long floatSwapFreq
+    long fixedSwapDCC
+    long floatSwapDCC
     char badDayConv
     int iholidays
-    double rate[NUM_RATES]
     char types[NUM_RATES]
+    double rates[NUM_RATES]
+    TDate dates[NUM_RATES]
 
 pub
     TCurve pTCurve
 
 </pre></blockquote>
-<p>
 <ul>
-<li>static:</li>
-<ul>
-<li>baseDate</li>
-<li>mmDCC</li>
-<li>dcc</li>
-<li>freq</li>
-<li>badDayConv</li>
-<li>iholidays</li>
-<li>rate[NUM_RATES]</li>
-<li>types[NUM_RATES]</li>
-</ul>
+<li>static:
+    <ul>
+    <li>baseDate</li>
+    <li>mmDCC</li>
+    <li>fixedSwapFreq</li>
+    <li>floatSwapFreq</li>
+    <li>fixedSwapDCC</li>
+    <li>floatSwapDCC</li>
+    <li>badDayConv</li>
+    <li>iholidays</li>
+    <li>types[NUM_RATES]</li>
+    <li>rates[NUM_RATES]</li>
+    <li>dates[NUM_RATES]</li>
+    </ul>
+</li>
 
-<li>pub:</li>
-<ul>
-<li>pTCurve</li>
-</ul>
+<li>pub:
+    <ul>
+    <li>pTCurve</li>
+    </ul>
+</li>
 
 </ul>
-</p>
 <p>
 
 </p>
@@ -129,7 +137,6 @@ static
     int icalendar
     TDate endDates[NUM_RATES]
     double couponRates[NUM_RATES]
-    TBoolean includes[NUM_RATES]
     TDateInterval couponInterval[ONE]
     TStubMethod stubType[ONE]
 
@@ -137,39 +144,39 @@ pub
     TCurve pTCurve
 
 </pre></blockquote>
-<p>
 <ul>
-<li>sub:</li>
-<ul>
-<li>s_ir_curve</li>
-</ul>
+<li>sub:
+    <ul>
+    <li>s_ir_curve</li>
+    </ul>
+</li>
 
-<li>static:</li>
-<ul>
-<li>today</li>
-<li>startDate</li>
-<li>stepinDate</li>
-<li>cashSettleDate</li>
-<li>nbDate</li>
-<li>recoveryRate</li>
-<li>payAccOnDefault</li>
-<li>paymentDcc</li>
-<li>badDayConv</li>
-<li>icalendar</li>
-<li>endDates[NUM_RATES]</li>
-<li>couponRates[NUM_RATES]</li>
-<li>includes[NUM_RATES]</li>
-<li>couponInterval[ONE]</li>
-<li>stubType[ONE]</li>
-</ul>
+<li>static:
+    <ul>
+    <li>today</li>
+    <li>startDate</li>
+    <li>stepinDate</li>
+    <li>cashSettleDate</li>
+    <li>nbDate</li>
+    <li>recoveryRate</li>
+    <li>payAccOnDefault</li>
+    <li>paymentDcc</li>
+    <li>badDayConv</li>
+    <li>icalendar</li>
+    <li>endDates[NUM_RATES]</li>
+    <li>couponRates[NUM_RATES]</li>
+    <li>couponInterval[ONE]</li>
+    <li>stubType[ONE]</li>
+    </ul>
+</li>
 
-<li>pub:</li>
-<ul>
-<li>pTCurve</li>
-</ul>
+<li>pub:
+    <ul>
+    <li>pTCurve</li>
+    </ul>
+</li>
 
 </ul>
-</p>
 <p>
 
 </p>
@@ -185,21 +192,20 @@ static
     double recoveryRate
 
 </pre></blockquote>
-<p>
 <ul>
-<li>static:</li>
-<ul>
-<li>startDate</li>
-<li>endDate</li>
-<li>notional</li>
-<li>couponRate</li>
-<li>protectStart</li>
-<li>isPriceClean</li>
-<li>recoveryRate</li>
-</ul>
+<li>static:
+    <ul>
+    <li>startDate</li>
+    <li>endDate</li>
+    <li>notional</li>
+    <li>couponRate</li>
+    <li>protectStart</li>
+    <li>isPriceClean</li>
+    <li>recoveryRate</li>
+    </ul>
+</li>
 
 </ul>
-</p>
 <p>
 
 </p>
@@ -214,22 +220,22 @@ pub
     double pv
 
 </pre></blockquote>
-<p>
 <ul>
-<li>sub:</li>
-<ul>
-<li>s_ir_curve</li>
-<li>s_credit_curve</li>
-<li>s_trade</li>
-</ul>
+<li>sub:
+    <ul>
+    <li>s_ir_curve</li>
+    <li>s_credit_curve</li>
+    <li>s_trade</li>
+    </ul>
+</li>
 
-<li>pub:</li>
-<ul>
-<li>pv</li>
-</ul>
+<li>pub:
+    <ul>
+    <li>pv</li>
+    </ul>
+</li>
 
 </ul>
-</p>
 <p>
 
 </p>
@@ -257,21 +263,21 @@ pub
     double pv
 
 </pre></blockquote>
-<p>
 <ul>
-<li>sub:</li>
-<ul>
-<li>s_contingent_leg</li>
-<li>s_fee_leg</li>
-</ul>
+<li>sub:
+    <ul>
+    <li>s_contingent_leg</li>
+    <li>s_fee_leg</li>
+    </ul>
+</li>
 
-<li>pub:</li>
-<ul>
-<li>pv</li>
-</ul>
+<li>pub:
+    <ul>
+    <li>pv</li>
+    </ul>
+</li>
 
 </ul>
-</p>
 <p>
 
 </p>
