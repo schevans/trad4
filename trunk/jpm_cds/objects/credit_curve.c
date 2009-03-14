@@ -42,7 +42,7 @@ void calculate_credit_curve( obj_loc_t obj_loc, int id )
         credit_curve_couponInterval,
         credit_curve_paymentDcc,
         credit_curve_stubType,
-        credit_curve_badDayConv,
+        (long)credit_curve_badDayConv,
         calendar ));
 
 }
