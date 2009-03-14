@@ -15,7 +15,7 @@ void calculate_standard_risk( obj_loc_t obj_loc, int id )
 
     cout << "standard_risk_pv: " << standard_risk_pv << endl;
 
-    if ( fabs(standard_risk_pv - -8327.39 ) > 0.01 )
+    if ( fabs(standard_risk_pv - -8323.85 ) > 0.01 )
     {
         cout << "XXXXXXXXXXXXXXXXXXXXX" << endl;
         cout << "std pv's changed" << endl;
