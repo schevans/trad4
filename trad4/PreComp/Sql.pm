@@ -11,11 +11,12 @@ use Data::Dumper;
 sub generate_table($);
 sub generate_dummy_data($$);
 sub generate_vec_tables($$);
-sub generate_vec_dummy_data($$$);
+sub generate_vec_dummy_data($$$$);
 
-sub Generate($$$) {
+sub Generate($$$$) {
     my $master_hash = shift;
     my $struct_hash = shift;
+    my $alias_hash = shift;
     my $name = shift;
 
     my $obj_hash = $master_hash->{$name};
@@ -27,7 +28,7 @@ sub Generate($$$) {
     if ( defined $obj_hash->{data}->{static_vec} or defined $obj_hash->{data}->{sub_vec} ) {
 
         generate_vec_tables( $obj_hash, $struct_hash );
-        generate_vec_dummy_data( $master_hash, $name, $struct_hash );
+        generate_vec_dummy_data( $master_hash, $name, $struct_hash, $alias_hash );
     }
 
 }
@@ -158,10 +159,11 @@ sub generate_table($) {
     PreComp::Utilities::CloseFile();
 }
 
-sub generate_vec_dummy_data($$$) {
+sub generate_vec_dummy_data($$$$) {
     my $master_hash = shift;
     my $name = shift;
     my $struct_hash = shift;
+    my $alias_hash = shift;
 
     my $obj_hash = $master_hash->{$name};
 
@@ -188,10 +190,17 @@ sub generate_vec_dummy_data($$$) {
 
             foreach $struct ( @{$struct_hash->{$static_vec_type}->{order}} ) {
 
-                if ( $struct_hash->{$static_vec_type}->{data}->{$struct} =~ /int/ ) {
+                my $type = $struct_hash->{$static_vec_type}->{data}->{$struct};
+
+                if ( $alias_hash->{$type} ) {
+
+                    $type = $alias_hash->{$type};
+                }
+
+                if ( $type =~ /int/ ) {
                     print $FHD ", 1";
                 } 
-                if ( $struct_hash->{$static_vec_type}->{data}->{$struct} =~ /char/ ) {
+                elsif ( $type =~ /char/ ) {
                     print $FHD ", 'X'";
                 } 
                 else {
