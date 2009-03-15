@@ -8,3 +8,12 @@ static
     TBoolean protectStart
     TBoolean isPriceClean
     double recoveryRate
+    TDate today
+    TDate valueDate
+    TDate stepinDate
+    TBoolean payAccOnDefault
+    TDateInterval couponInterval[ONE]
+    #TStubMethod stubType[ONE]
+    long paymentDcc
+    char badDayConv
+
