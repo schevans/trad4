@@ -26,7 +26,7 @@ sub Generate($) {
     if( ! $FHD ) { return; }
 
     print $FHD "\n";
-    print $FHD "// Please see the comment at the top of $ENV{APP}/gen/objects/$name"."_macros.c\n";
+    print $FHD "// Please see the comment at the top of $ENV{APP}/gen/objects/$name"."_macros.h\n";
     print $FHD "//  to see what's in-scope.\n";
     print $FHD "\n";
     print $FHD "#include <iostream>\n";
