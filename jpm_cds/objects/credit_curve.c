@@ -5,7 +5,7 @@
 // This application is based on the ISDA CDS Standard Model (version 1.7),  
 // developed and supported in collaboration with Markit Group Ltd.
 
-// Please see the comment at the top of jpm_cds/gen/objects/credit_curve_macros.c
+// Please see the comment at the top of jpm_cds/gen/objects/credit_curve_macros.h
 //  to see what's in-scope.
 
 #include <iostream>
