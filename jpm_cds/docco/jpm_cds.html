@@ -110,7 +110,7 @@ The interesting this about this project is that this is the first time I've port
 While I've done quite a lot of work on the precompiler while working on this project (particularly relating to support for structs), it's becoming increasingly apparent that the existing architecture of the trad4 precompiler is becoming unmanageable. 
 </p>
 <p>
-I've started work on precompiler_v3, which should start to replace the code under PreComp from the inside-out. There should be <i>no functional changes<i/> except for some added features that are simply too fiddly to add to the current architecture.
+I've started work on precompiler_v3, which should start to replace the code under PreComp from the inside-out. There should be <i>no functional changes</i> except for some added features that are simply too fiddly to add to the current architecture.
 <p>
 For this reason in this release I've had to work around some of these restrictions in the precompiler rather than fix them. See types/rates/dates in ir_curve.t4, and the ONE constant - required because stand-alone structs aren't supported.
 </p>
