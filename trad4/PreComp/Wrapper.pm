@@ -577,16 +577,6 @@ sub generate_extra_loaders($$$$)
         print $FHD "        sqlite3_free(zErrMsg);\n";
         print $FHD "    }\n";
         print $FHD "\n";
-
-        if ( $struct_hash->{$vec_type} ) {
-
-            foreach $key ( @{$struct_hash->{$vec_type}{order}} ) {
-
-                print $FHD "    $name"."_$vec_short"."_$key(counter) = 0;\n";
-            }
-        }
-
-        print $FHD "\n";
         print $FHD "}\n";
         
     }
@@ -653,16 +643,6 @@ sub generate_extra_loaders($$$$)
         print $FHD "        fprintf(stderr, \"SQL error: %s. File %s, line %d.\\n\", zErrMsg, __FILE__, __LINE__);\n";
         print $FHD "        sqlite3_free(zErrMsg);\n";
         print $FHD "    }\n";
-        print $FHD "\n";
-
-        if ( $struct_hash->{$vec_type} ) {
-
-            foreach $key ( @{$struct_hash->{$vec_type}{order}} ) {
-
-                print $FHD "    $name"."_$vec_short"."_$key(counter) = 0;\n";
-            }
-        }
-
         print $FHD "\n";
         print $FHD "}\n";
         
