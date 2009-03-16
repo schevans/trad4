@@ -23,23 +23,23 @@ jpm_cds
 <table border="1">
 <tr>
 <td>Download version</td>
-<td></td>
+<td>1.0</td>
 </tr>
 <tr>
 <td>Download licence</td>
-<td></td>
+<td>BSD</td>
 </tr>
 <tr>
 <td>Trad4 version</td>
-<td></td>
+<td>2.0.4</td>
 </tr>
 <tr>
 <td>Author</td>
-<td></td>
+<td>schevans</td>
 </tr>
 <tr>
 <td>Date</td>
-<td></td>
+<td>17-03-2009</td>
 </tr>
 </table>
 
@@ -53,18 +53,26 @@ jpm_cds
 
 <h2><a name="introduction">Introduction</a></h2>
 <p>
-This is a trad4 port of the ISDA CDS Standard Model from JP Morgan. The original code is available here: <a href="http://www.cdsmodel.com/">http://www.cdsmodel.com/</a>
+This application is based on the ISDA CDS Standard Model (version 1.7), developed and supported in collaboration with Markit Group Ltd. The original code is available here: <a href="http://www.cdsmodel.com/">http://www.cdsmodel.com/</a>
+</p>
+<p>
+This application - jpm_cds - is a port of the above application to the trad4 architecture.
+</p>
+<p>
+This release (v.0) represents Phase1 of this project and simply hooks a trad4 wrapper up to the ISDA function calls. Phase2 will represent a full port, where all the underlying structures and functions become fully intergrated into jpm_cds.
+</p>
+<p>
+
 </p>
 <h2><a name="the_model">The Model</a></h2>
 <p>
-
+The model is very similar to that of bond_risk, discussed at length in the trad4 manual. The idea is to get the computationally expensive parts of pricing a trade (in this case the ir and credit curve bootstrapping) to persist so that any objects that depend on this result can re-use them.
 </p>
 <h2><a name="implementation">Implementation</a></h2>
 <h3>The abstract diagram</h3>
 <p>
 <img src="abstract.jpeg" alt="Abstract Diagram"/>
 </p>
-
 <p>
 
 </p>
@@ -73,213 +81,8 @@ This is a trad4 port of the ISDA CDS Standard Model from JP Morgan. The original
 
 </p>
 <h3>The t4 files</h3>
-<h4>ir_curve.t4:</h4>
-<blockquote><pre>
-static
-    TDate baseDate
-    int mmDCC
-    long fixedSwapFreq
-    long floatSwapFreq
-    long fixedSwapDCC
-    long floatSwapDCC
-    char badDayConv
-    int iholidays
-    char types[NUM_RATES]
-    double rates[NUM_RATES]
-    TDate dates[NUM_RATES]
-
-pub
-    TCurve pTCurve
-
-</pre></blockquote>
-<ul>
-<li>static:
-    <ul>
-    <li>baseDate</li>
-    <li>mmDCC</li>
-    <li>fixedSwapFreq</li>
-    <li>floatSwapFreq</li>
-    <li>fixedSwapDCC</li>
-    <li>floatSwapDCC</li>
-    <li>badDayConv</li>
-    <li>iholidays</li>
-    <li>types[NUM_RATES]</li>
-    <li>rates[NUM_RATES]</li>
-    <li>dates[NUM_RATES]</li>
-    </ul>
-</li>
-
-<li>pub:
-    <ul>
-    <li>pTCurve</li>
-    </ul>
-</li>
-
-</ul>
 <p>
-
-</p>
-<h4>credit_curve.t4:</h4>
-<blockquote><pre>
-sub
-    ir_curve s_ir_curve
-
-static
-    TDate today
-    TDate startDate
-    TDate stepinDate
-    TDate cashSettleDate
-    long nbDate
-    double recoveryRate
-    TBoolean payAccOnDefault
-    long paymentDcc
-    char badDayConv
-    int icalendar
-    TDate endDates[NUM_RATES]
-    double couponRates[NUM_RATES]
-    TDateInterval couponInterval[ONE]
-    TStubMethod stubType[ONE]
-
-pub
-    TCurve pTCurve
-
-</pre></blockquote>
-<ul>
-<li>sub:
-    <ul>
-    <li>s_ir_curve</li>
-    </ul>
-</li>
-
-<li>static:
-    <ul>
-    <li>today</li>
-    <li>startDate</li>
-    <li>stepinDate</li>
-    <li>cashSettleDate</li>
-    <li>nbDate</li>
-    <li>recoveryRate</li>
-    <li>payAccOnDefault</li>
-    <li>paymentDcc</li>
-    <li>badDayConv</li>
-    <li>icalendar</li>
-    <li>endDates[NUM_RATES]</li>
-    <li>couponRates[NUM_RATES]</li>
-    <li>couponInterval[ONE]</li>
-    <li>stubType[ONE]</li>
-    </ul>
-</li>
-
-<li>pub:
-    <ul>
-    <li>pTCurve</li>
-    </ul>
-</li>
-
-</ul>
-<p>
-
-</p>
-<h4>trade.t4:</h4>
-<blockquote><pre>
-static
-    TDate startDate
-    TDate endDate
-    double notional
-    double couponRate
-    TBoolean protectStart
-    TBoolean isPriceClean
-    double recoveryRate
-
-</pre></blockquote>
-<ul>
-<li>static:
-    <ul>
-    <li>startDate</li>
-    <li>endDate</li>
-    <li>notional</li>
-    <li>couponRate</li>
-    <li>protectStart</li>
-    <li>isPriceClean</li>
-    <li>recoveryRate</li>
-    </ul>
-</li>
-
-</ul>
-<p>
-
-</p>
-<h4>leg.t4:</h4>
-<blockquote><pre>
-sub
-    ir_curve s_ir_curve
-    credit_curve s_credit_curve
-    trade s_trade
-
-pub
-    double pv
-
-</pre></blockquote>
-<ul>
-<li>sub:
-    <ul>
-    <li>s_ir_curve</li>
-    <li>s_credit_curve</li>
-    <li>s_trade</li>
-    </ul>
-</li>
-
-<li>pub:
-    <ul>
-    <li>pv</li>
-    </ul>
-</li>
-
-</ul>
-<p>
-
-</p>
-<h4>fee_leg.t4:</h4>
-<blockquote><pre>
-implements leg
-</pre></blockquote>
-<p>
-
-</p>
-<h4>contingent_leg.t4:</h4>
-<blockquote><pre>
-implements leg
-</pre></blockquote>
-<p>
-
-</p>
-<h4>standard_risk.t4:</h4>
-<blockquote><pre>
-sub
-    contingent_leg s_contingent_leg
-    fee_leg s_fee_leg
-
-pub
-    double pv
-
-</pre></blockquote>
-<ul>
-<li>sub:
-    <ul>
-    <li>s_contingent_leg</li>
-    <li>s_fee_leg</li>
-    </ul>
-</li>
-
-<li>pub:
-    <ul>
-    <li>pv</li>
-    </ul>
-</li>
-
-</ul>
-<p>
-
+The annotated t4 files are available <a href="t4_files.html">here</a>
 </p>
 
 

@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- Copyright (c) Steve Evans 2009 -->
+<!-- steve@topaz.myzen.co.uk -->
+<!-- This code is released under the BSD licence. For details see $APP_ROOT/LICENCE -->
+<!--  -->
+<!-- This application is based on the ISDA CDS Standard Model (version 1.7),  -->
+<!-- developed and supported in collaboration with Markit Group Ltd. -->
+
+  <!DOCTYPE html
+            PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+            "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+     <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<link rel="stylesheet" type="text/css" href="http://trad4.sourceforge.net/gcc.css" />
+<title>
+jpm_cds t4 files
+</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000" link="#1F00FF" alink="#FF0000" vlink="#9900DD">
+
+<h3>The t4 files</h3>
+<h4>ir_curve.t4:</h4>
+<blockquote><pre>
+static
+    TDate baseDate
+    int mmDCC
+    long fixedSwapFreq
+    long floatSwapFreq
+    long fixedSwapDCC
+    long floatSwapDCC
+    char badDayConv
+    int iholidays
+    char types[NUM_RATES]
+    double rates[NUM_RATES]
+    TDate dates[NUM_RATES]
+
+pub
+    TCurve pTCurve
+
+</pre></blockquote>
+<ul>
+<li>static:
+    <ul>
+    <li>baseDate</li>
+    <li>mmDCC</li>
+    <li>fixedSwapFreq</li>
+    <li>floatSwapFreq</li>
+    <li>fixedSwapDCC</li>
+    <li>floatSwapDCC</li>
+    <li>badDayConv</li>
+    <li>iholidays</li>
+    <li>types[NUM_RATES]</li>
+    <li>rates[NUM_RATES]</li>
+    <li>dates[NUM_RATES]</li>
+    </ul>
+</li>
+
+<li>pub:
+    <ul>
+    <li>pTCurve</li>
+    </ul>
+</li>
+
+</ul>
+<p>
+
+</p>
+<h4>credit_curve.t4:</h4>
+<blockquote><pre>
+sub
+    ir_curve s_ir_curve
+
+static
+    TDate today
+    TDate startDate
+    TDate stepinDate
+    TDate cashSettleDate
+    long nbDate
+    double recoveryRate
+    TBoolean payAccOnDefault
+    long paymentDcc
+    char badDayConv
+    int icalendar
+    TDate endDates[NUM_RATES]
+    double couponRates[NUM_RATES]
+    TDateInterval couponInterval[ONE]
+    TStubMethod stubType[ONE]
+
+pub
+    TCurve pTCurve
+
+</pre></blockquote>
+<ul>
+<li>sub:
+    <ul>
+    <li>s_ir_curve</li>
+    </ul>
+</li>
+
+<li>static:
+    <ul>
+    <li>today</li>
+    <li>startDate</li>
+    <li>stepinDate</li>
+    <li>cashSettleDate</li>
+    <li>nbDate</li>
+    <li>recoveryRate</li>
+    <li>payAccOnDefault</li>
+    <li>paymentDcc</li>
+    <li>badDayConv</li>
+    <li>icalendar</li>
+    <li>endDates[NUM_RATES]</li>
+    <li>couponRates[NUM_RATES]</li>
+    <li>couponInterval[ONE]</li>
+    <li>stubType[ONE]</li>
+    </ul>
+</li>
+
+<li>pub:
+    <ul>
+    <li>pTCurve</li>
+    </ul>
+</li>
+
+</ul>
+<p>
+
+</p>
+<h4>trade.t4:</h4>
+<blockquote><pre>
+static
+    TDate startDate
+    TDate endDate
+    double notional
+    double couponRate
+    TBoolean protectStart
+    TBoolean isPriceClean
+    double recoveryRate
+    TDate today
+    TDate valueDate
+    TDate stepinDate
+    TBoolean payAccOnDefault
+    long paymentDcc
+    char badDayConv
+    TDateInterval couponInterval[ONE]
+    TStubMethod stubType[ONE]
+
+</pre></blockquote>
+<ul>
+<li>static:
+    <ul>
+    <li>startDate</li>
+    <li>endDate</li>
+    <li>notional</li>
+    <li>couponRate</li>
+    <li>protectStart</li>
+    <li>isPriceClean</li>
+    <li>recoveryRate</li>
+    <li>today</li>
+    <li>valueDate</li>
+    <li>stepinDate</li>
+    <li>payAccOnDefault</li>
+    <li>paymentDcc</li>
+    <li>badDayConv</li>
+    <li>couponInterval[ONE]</li>
+    <li>stubType[ONE]</li>
+    </ul>
+</li>
+
+</ul>
+<p>
+
+</p>
+<h4>leg.t4:</h4>
+<blockquote><pre>
+sub
+    ir_curve s_ir_curve
+    credit_curve s_credit_curve
+    trade s_trade
+
+pub
+    double pv
+
+</pre></blockquote>
+<ul>
+<li>sub:
+    <ul>
+    <li>s_ir_curve</li>
+    <li>s_credit_curve</li>
+    <li>s_trade</li>
+    </ul>
+</li>
+
+<li>pub:
+    <ul>
+    <li>pv</li>
+    </ul>
+</li>
+
+</ul>
+<p>
+
+</p>
+<h4>fee_leg.t4:</h4>
+<blockquote><pre>
+implements leg
+</pre></blockquote>
+<p>
+
+</p>
+<h4>contingent_leg.t4:</h4>
+<blockquote><pre>
+implements leg
+</pre></blockquote>
+<p>
+
+</p>
+<h4>standard_risk.t4:</h4>
+<blockquote><pre>
+sub
+    contingent_leg s_contingent_leg
+    fee_leg s_fee_leg
+
+pub
+    double pv
+
+</pre></blockquote>
+<ul>
+<li>sub:
+    <ul>
+    <li>s_contingent_leg</li>
+    <li>s_fee_leg</li>
+    </ul>
+</li>
+
+<li>pub:
+    <ul>
+    <li>pv</li>
+    </ul>
+</li>
+
+</ul>
+</body>
+</html>
