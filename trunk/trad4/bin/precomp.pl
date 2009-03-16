@@ -197,7 +197,7 @@ foreach $type ( keys %doing ) {
     print "Generating $type..\n";
     PreComp::Header::Generate( $master_hash->{$type} );
     PreComp::Wrapper::Generate( $master_hash, $type, $struct_hash, $constants_hash );
-    PreComp::Sql::Generate( $master_hash, $struct_hash, $type );
+    PreComp::Sql::Generate( $master_hash, $struct_hash, $alias_hash, $type );
     PreComp::Calculate::Generate( $master_hash->{$type} );
 }
 
