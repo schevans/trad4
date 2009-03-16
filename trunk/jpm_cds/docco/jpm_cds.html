@@ -56,7 +56,7 @@ jpm_cds
 This application is based on the ISDA CDS Standard Model (version 1.7), developed and supported in collaboration with Markit Group Ltd. The original code is available here: <a href="http://www.cdsmodel.com/">http://www.cdsmodel.com/</a>
 </p>
 <p>
-This application - jpm_cds - is a port of the above application to the trad4 architecture.
+The jpm_cds application is a port of the above application to the trad4 architecture.
 </p>
 <p>
 This release (v.0) represents Phase1 of this project and simply hooks a trad4 wrapper up to the ISDA function calls. Phase2 will represent a full port, where all the underlying structures and functions become fully intergrated into jpm_cds.
@@ -82,9 +82,38 @@ The model is very similar to that of bond_risk, discussed at length in the trad4
 </p>
 <h3>The t4 files</h3>
 <p>
-The annotated t4 files are available <a href="t4_files.html">here</a>
+The t4 files are available <a href="t4_files.html">here</a>
 </p>
-
+<h2><a name="phase2">Phase2</a></h2>
+<p>
+As mentioned above, this Phase1 release simply hooks into the ISDA functions. There are many problems with this approach. It might be worth you re-reading section 5.1 - "Porting your existing functions to trad4" of the manual to refresh your memory on the kinds of issues faced when porting a classically-architectured application to trad4. I'll step through some of these issues here in relation to this port.
+</p>
+<h4>Thread Safety</h4>
+<p>
+Firstly, the ISDA model is not thread-safe. In particular the JpmcdsErrMsgOff mechanism writes to a global buffer which is written to a file on exit. 
+</p>
+<h4>Persistence</h4>
+<p>
+Another issue with Phase1 is that the ISDA code news-off the required structures and returns a pointer to the calling function. For example, the TCurve structure which hold the bootstrapped curves and makes up the pub section of ir_ and credit_curve is newed-off in the ISDA internals. While this approach 'works' as far as we're concerned (we assign this pointer to the pub struct) it creates an obvious memory leak. Each call to JpmcdsBuildIRZeroCurve will new-off an new TCurve and pass the result back. We discard any reference to the old TCurve struct when we assign the new one.
+</p>
+<p>
+While we could just manage the memory better by deleting the old one, it would be better to have the one structure persist. The reason we would want to do that is, if only the last IR mark changed (e.g. that corresponding to date 151943), we wouldn't need to re-bootstrap the whole curve - only the last period.
+</p>
+<p>
+Likewise consider the two legs - fee_leg and contingent_leg - with their respective calls to JpmcdsCdsFeeLegPV and JpmcdsCdsContingentLegPV. Both of these ISDA calls construct the respective leg, price it, and delete it. This is not in keeping with the trad4 philosophy. While both legs do need to be constructed, they don't need to be reconstructed each time an IR rate moves - the IR rate move has no bearing on the leg itself, only on the value of that leg, so let the legs persist between the two valuations. The only time we need change the leg is when the trade to which it subscribes changes, for example in the case of a start date correction.
+</p>
+<h4>precomp_v3</h4>
+<p>
+The interesting this about this project is that this is the first time I've ported an existing application to trad4. This means the application hasn't been worked-up with trad4 in mind, and puts interesting stresses and strains onto the precompiler.
+</p>
+<p>
+While I've done quite a lot of work on the precompiler while working on this project (particularly relating to support for structs), it's becoming increasingly apparent that the existing architecture of the trad4 precompiler is becoming unmanageable. 
+</p>
+<p>
+I've started work on precompiler_v3, which should start to replace the code under PreComp from the inside-out. There should be <i>no functional changes<i/> except for some added features that are simply too fiddly to add to the current architecture.
+<p>
+For this reason in this release I've had to work around some of these restrictions in the precompiler rather than fix them. See types/rates/dates in ir_curve.t4, and the ONE constant - required because stand-alone structs aren't supported.
+</p>
 
 
 </body>

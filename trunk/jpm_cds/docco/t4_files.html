@@ -23,6 +23,9 @@ jpm_cds t4 files
 <body bgcolor="#FFFFFF" text="#000000" link="#1F00FF" alink="#FF0000" vlink="#9900DD">
 
 <h3>The t4 files</h3>
+<p>
+I'm afraid these aren't annotated. If you're wondering what they all mean please see the well-documented function calls in the ISDA headers under jpm_cds/objects/isda_cds_model_c_v1.7/lib/include/isda.
+</p>
 <h4>ir_curve.t4:</h4>
 <blockquote><pre>
 static
@@ -42,33 +45,7 @@ pub
     TCurve pTCurve
 
 </pre></blockquote>
-<ul>
-<li>static:
-    <ul>
-    <li>baseDate</li>
-    <li>mmDCC</li>
-    <li>fixedSwapFreq</li>
-    <li>floatSwapFreq</li>
-    <li>fixedSwapDCC</li>
-    <li>floatSwapDCC</li>
-    <li>badDayConv</li>
-    <li>iholidays</li>
-    <li>types[NUM_RATES]</li>
-    <li>rates[NUM_RATES]</li>
-    <li>dates[NUM_RATES]</li>
-    </ul>
-</li>
 
-<li>pub:
-    <ul>
-    <li>pTCurve</li>
-    </ul>
-</li>
-
-</ul>
-<p>
-
-</p>
 <h4>credit_curve.t4:</h4>
 <blockquote><pre>
 sub
@@ -94,42 +71,6 @@ pub
     TCurve pTCurve
 
 </pre></blockquote>
-<ul>
-<li>sub:
-    <ul>
-    <li>s_ir_curve</li>
-    </ul>
-</li>
-
-<li>static:
-    <ul>
-    <li>today</li>
-    <li>startDate</li>
-    <li>stepinDate</li>
-    <li>cashSettleDate</li>
-    <li>nbDate</li>
-    <li>recoveryRate</li>
-    <li>payAccOnDefault</li>
-    <li>paymentDcc</li>
-    <li>badDayConv</li>
-    <li>icalendar</li>
-    <li>endDates[NUM_RATES]</li>
-    <li>couponRates[NUM_RATES]</li>
-    <li>couponInterval[ONE]</li>
-    <li>stubType[ONE]</li>
-    </ul>
-</li>
-
-<li>pub:
-    <ul>
-    <li>pTCurve</li>
-    </ul>
-</li>
-
-</ul>
-<p>
-
-</p>
 <h4>trade.t4:</h4>
 <blockquote><pre>
 static
@@ -150,31 +91,7 @@ static
     TStubMethod stubType[ONE]
 
 </pre></blockquote>
-<ul>
-<li>static:
-    <ul>
-    <li>startDate</li>
-    <li>endDate</li>
-    <li>notional</li>
-    <li>couponRate</li>
-    <li>protectStart</li>
-    <li>isPriceClean</li>
-    <li>recoveryRate</li>
-    <li>today</li>
-    <li>valueDate</li>
-    <li>stepinDate</li>
-    <li>payAccOnDefault</li>
-    <li>paymentDcc</li>
-    <li>badDayConv</li>
-    <li>couponInterval[ONE]</li>
-    <li>stubType[ONE]</li>
-    </ul>
-</li>
 
-</ul>
-<p>
-
-</p>
 <h4>leg.t4:</h4>
 <blockquote><pre>
 sub
@@ -186,39 +103,17 @@ pub
     double pv
 
 </pre></blockquote>
-<ul>
-<li>sub:
-    <ul>
-    <li>s_ir_curve</li>
-    <li>s_credit_curve</li>
-    <li>s_trade</li>
-    </ul>
-</li>
 
-<li>pub:
-    <ul>
-    <li>pv</li>
-    </ul>
-</li>
-
-</ul>
-<p>
-
-</p>
 <h4>fee_leg.t4:</h4>
 <blockquote><pre>
 implements leg
 </pre></blockquote>
-<p>
 
-</p>
 <h4>contingent_leg.t4:</h4>
 <blockquote><pre>
 implements leg
 </pre></blockquote>
-<p>
 
-</p>
 <h4>standard_risk.t4:</h4>
 <blockquote><pre>
 sub
@@ -229,20 +124,6 @@ pub
     double pv
 
 </pre></blockquote>
-<ul>
-<li>sub:
-    <ul>
-    <li>s_contingent_leg</li>
-    <li>s_fee_leg</li>
-    </ul>
-</li>
 
-<li>pub:
-    <ul>
-    <li>pv</li>
-    </ul>
-</li>
-
-</ul>
 </body>
 </html>
