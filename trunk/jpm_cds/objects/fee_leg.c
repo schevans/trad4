@@ -35,7 +35,7 @@ void calculate_fee_leg( obj_loc_t obj_loc, int id )
             s_trade_endDate,
             s_trade_payAccOnDefault,
             NULL,
-            s_credit_curve_stubType,
+            s_trade_stubType,
             s_trade_notional,
             s_trade_couponRate,
             s_trade_paymentDcc,
