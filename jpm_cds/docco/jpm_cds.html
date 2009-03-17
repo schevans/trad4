@@ -23,7 +23,7 @@ jpm_cds
 <table border="1">
 <tr>
 <td>Download version</td>
-<td>1.0</td>
+<td><a href="https://sourceforge.net/project/showfiles.php?group_id=202177&package_id=314457&release_id=668696">1.0</a></td>
 </tr>
 <tr>
 <td>Download licence</td>
@@ -31,7 +31,7 @@ jpm_cds
 </tr>
 <tr>
 <td>Trad4 version</td>
-<td>2.0.4</td>
+<td><a href="https://sourceforge.net/project/showfiles.php?group_id=202177&package_id=314457&release_id=668696">2.0.4</a></td>
 </tr>
 <tr>
 <td>Author</td>
@@ -78,7 +78,7 @@ The model is very similar to that of bond_risk, discussed at length in the trad4
 </p>
 <h3>The concrete diagram</h3>
 <p>
-
+<img src="concrete.jpeg" alt="Concrete Diagram"/>
 </p>
 <h3>The t4 files</h3>
 <p>
@@ -86,7 +86,7 @@ The t4 files are available <a href="t4_files.html">here</a>
 </p>
 <h2><a name="phase2">Phase2</a></h2>
 <p>
-As mentioned above, this Phase1 release simply hooks into the ISDA functions. There are many problems with this approach. It might be worth you re-reading section 5.1 - "Porting your existing functions to trad4" of the manual to refresh your memory on the kinds of issues faced when porting a classically-architectured application to trad4. I'll step through some of these issues here in relation to this port.
+As mentioned above, this Phase1 release simply hooks into the ISDA functions. There are many problems with this approach. It might be worth you re-reading section 5.1 - "Porting your existing applications to trad4" of the manual to refresh your memory on the kinds of issues faced when porting a classically-architectured application to trad4. I'll step through some of these issues here in relation to this port.
 </p>
 <h4>Thread Safety</h4>
 <p>
@@ -114,6 +114,13 @@ I've started work on precompiler_v3, which should start to replace the code unde
 <p>
 For this reason in this release I've had to work around some of these restrictions in the precompiler rather than fix them. See types/rates/dates in ir_curve.t4, and the ONE constant - required because stand-alone structs aren't supported.
 </p>
+<!-- ==================================================================== -->
+
+<div align="center" class="copyright">
+Copyright (c) Steve Evans 2009
+</div>
+
+<!-- ==================================================================== -->
 
 
 </body>
