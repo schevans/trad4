@@ -56,10 +56,10 @@ jpm_cds
 This application is based on the ISDA CDS Standard Model (version 1.7), developed and supported in collaboration with Markit Group Ltd. The original code is available here: <a href="http://www.cdsmodel.com/">http://www.cdsmodel.com/</a>
 </p>
 <p>
-The jpm_cds application is a port of the above application to the trad4 architecture.
+The jpm_cds application is a port of the ISDA application to the trad4 architecture.
 </p>
 <p>
-This release (v.0) represents Phase1 of this project and simply hooks a trad4 wrapper up to the ISDA function calls. Phase2 will represent a full port, where all the underlying structures and functions become fully intergrated into jpm_cds.
+This release (v1.0) represents Phase1 of this project and is simply a trad4 wrapper around the ISDA function calls. Phase2 will represent a full port, where all the underlying structures and functions become fully intergrated into jpm_cds.
 </p>
 <p>
 
@@ -74,11 +74,20 @@ The model is very similar to that of bond_risk, discussed at length in the trad4
 <img src="abstract.jpeg" alt="Abstract Diagram"/>
 </p>
 <p>
-
+From the abstract diagram we can see that the two legs are valued concurrently, and their pvs aggregated in standard_risk.
 </p>
 <h3>The concrete diagram</h3>
 <p>
 <img src="concrete.jpeg" alt="Concrete Diagram"/>
+</p>
+<p>
+We can see the advantages of the trad4 layout more clearly in the concrete diagram. This shows one ir_curve (GBP), two credit_curves (Tesco and Diageo) and three trades against those curves, two against Tesco (T01 and T02 - trade or ticket numbers) and one against Diegeo (T03). T01f and T01c are the fee and contingent legs corresponding to T01, and T01sr is the standard_risk (aka pv) of T01. In practise you would have a handfull of ir_curves, hundreds of credit_curves and thousands of trades.
+</p>
+<p>
+From this we can see that should the Tesco credit_curve move (or 'be marked' in the parlance) then the Tesco curve would need to be re-calculated once, the C01f, C01c, C02f and C02c would all run concurrently. Lastly C01sr and C02sr would fire, producing the new pvs of these trades.
+</p>
+<p>
+
 </p>
 <h3>The t4 files</h3>
 <p>
@@ -101,6 +110,20 @@ While we could just manage the memory better by deleting the old one, it would b
 </p>
 <p>
 Likewise consider the two legs - fee_leg and contingent_leg - with their respective calls to JpmcdsCdsFeeLegPV and JpmcdsCdsContingentLegPV. Both of these ISDA calls construct the respective leg, price it, and delete it. This is not in keeping with the trad4 philosophy. While both legs do need to be constructed, they don't need to be reconstructed each time an IR rate moves - the IR rate move has no bearing on the leg itself, only on the value of that leg, so let the legs persist between the two valuations. The only time we need change the leg is when the trade to which it subscribes changes, for example in the case of a start date correction.
+</p>
+<h4>Adding other risk measures</h4>
+<p>
+The IDSA model only produced pv. As we're already bootstrapping the credit_curve, there's little overhead of also bootstrappin the credit_curve perturbed by +-1bp and using these curves to calculate the cr01 (cr01 being the shift in pv given a +-1bp shift in the credit_curve. This would involve extending the TCurve structure to add:
+</p>
+<blockquote><pre>
+TRatePt* fArray_p01
+TRatePt* fArray_m01
+</pre></blockquote>
+<p>
+These arrays would hold the credit_curve (for cr01) or ir_curve (for dv01) perturbed up and down by 1bp. Then the legs would also produce pvcrp01, pvcrm01, pvdvp01 and pvdvm01 which would be used in standard_risk to aggregate into trade-level cr01 and dv01.
+</p>
+<p>
+Likewise we could produce cr01 by gridpoint, by intoducing a range of fArrays corrosponding to a range of curves perurbed by gridpoint. This would produce a ladder of cr01s. This would come at the expense of a fair bit of RAM, but as the number of curves is relativly low compared to the number of trades this should not present a problem in practice. 
 </p>
 <h4>precomp_v3</h4>
 <p>
