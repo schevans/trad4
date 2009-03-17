@@ -11,6 +11,7 @@ sub Generate($) {
     my $master_hash = shift;
 
     my $app_name = $ENV{APP};
+    my $trad4_version = $ENV{TRAD4_VERSION};
 
     my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::DoccoRoot()."$app_name.html");
     if( ! $FHD ) { return; }
@@ -63,6 +64,7 @@ sub Generate($) {
     print $FHD "<li><a href=\"#introduction\">Introduction</a></li>\n";
     print $FHD "<li><a href=\"#the_model\">The Model</a></li>\n";
     print $FHD "<li><a href=\"#implementation\">Implementation</a></li>\n";
+    print $FHD "<li><a href=\"#usage\">Usage</a></li>\n";
     print $FHD "</ul>\n";
     print $FHD "\n";
     print $FHD "<hr />\n";
@@ -137,7 +139,34 @@ sub Generate($) {
     }
 
     print $FHD "\n";
-    print $FHD "\n";
+    print $FHD "<h2><a name=\"usage\">Usage</a></h2>\n";
+    print $FHD "<h3>Running</h3>\n";
+    print $FHD "<p>\n";
+    print $FHD "To run the application:\n";
+    print $FHD "</p>\n";
+
+    print $FHD "1) Download and unpack the distribution<br>\n";
+    print $FHD "2) cd into trad4_v$trad4_version/$app_name:<br>\n";
+    print $FHD "<blockquote><pre>\$ cd trad4_v$trad4_version/$app_name</pre></blockquote>\n";
+    print $FHD "3) Source $app_name.conf:<br>\n";
+    print $FHD "<blockquote><pre>$app_name\$ . ./$app_name.conf</pre></blockquote>\n";
+    print $FHD "4) Start $app_name:<br>\n";
+    print $FHD "<blockquote><pre>$app_name\$ $app_name</pre></blockquote>\n";
+    print $FHD "<p>\n";
+    print $FHD "To increase or decrease the number of threads used (the default is 4), set NUM_THREADS and re-start the application:\n";
+    print $FHD "</p>\n";
+    print $FHD "<blockquote><pre>\$ export NUM_THREADS=64\n"; 
+    print $FHD "\$ $app_name</pre></blockquote>\n";
+    print $FHD "<h3>Updating</h3>\n";
+    print $FHD "<p>\n";
+    print $FHD "To update a running system, log into the database:\n";
+    print $FHD "</p>\n";
+    print $FHD "<blockquote><pre>\$ t4db\n"; 
+    print $FHD "SQL></pre></blockquote>\n";
+    print $FHD "<p>\n";
+    print $FHD "And make any required updates. Then instruct the running application to collect these changes by using send_reload.sh:\n";
+    print $FHD "</p>\n";
+    print $FHD "<blockquote><pre>\$ send_reload.sh</pre></blockquote>\n";
     print $FHD "\n";
     print $FHD "</body>\n";
     print $FHD "</html>\n";
