@@ -39,7 +39,7 @@ jpm_cds
 </tr>
 <tr>
 <td>Date</td>
-<td>17-03-2009</td>
+<td>18-03-2009</td>
 </tr>
 </table>
 
@@ -47,6 +47,7 @@ jpm_cds
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#the_model">The Model</a></li>
 <li><a href="#implementation">Implementation</a></li>
+<li><a href="#usage">Usage</a></li>
 </ul>
 
 <hr />
@@ -74,17 +75,17 @@ The model is very similar to that of bond_risk, discussed at length in the trad4
 <img src="abstract.jpeg" alt="Abstract Diagram"/>
 </p>
 <p>
-From the abstract diagram we can see that the two legs are valued concurrently, and their pvs aggregated in standard_risk.
+From the abstract diagram we can see that the two legs are valued concurrently, and their pvs are aggregated in standard_risk.
 </p>
 <h3>The concrete diagram</h3>
 <p>
 <img src="concrete.jpeg" alt="Concrete Diagram"/>
 </p>
 <p>
-We can see the advantages of the trad4 layout more clearly in the concrete diagram. This shows one ir_curve (GBP), two credit_curves (Tesco and Diageo) and three trades against those curves, two against Tesco (T01 and T02 - trade or ticket numbers) and one against Diegeo (T03). T01f and T01c are the fee and contingent legs corresponding to T01, and T01sr is the standard_risk (aka pv) of T01. In practise you would have a handfull of ir_curves, hundreds of credit_curves and thousands of trades.
+We can see the advantages of the trad4 approach more clearly in the concrete diagram. This shows one ir_curve (GBP), two credit_curves (Tesco and Diageo) and three trades against those curves, two against Tesco (T01 and T02 - trade or ticket numbers) and one against Diegeo (T03). T01f and T01c are the fee and contingent legs corresponding to T01, and T01sr is the standard_risk (aka pv) of T01. In practise you would have a handfull of ir_curves, hundreds of credit_curves and thousands of trades.
 </p>
 <p>
-From this we can see that should the Tesco credit_curve move (or 'be marked' in the parlance) then the Tesco curve would need to be re-calculated once, the C01f, C01c, C02f and C02c would all run concurrently. Lastly C01sr and C02sr would fire, producing the new pvs of these trades.
+From this we can see that should the Tesco credit_curve move (or 'be marked' in the parlance) then the Tesco curve would need to be re-calculated once, the T01f, T01c, T02f and T02c would all run concurrently. Lastly T01sr and T02sr would fire, producing the new pvs of these trades.
 </p>
 <p>
 
@@ -99,7 +100,16 @@ As mentioned above, this Phase1 release simply hooks into the ISDA functions. Th
 </p>
 <h4>Thread Safety</h4>
 <p>
-Firstly, the ISDA model is not thread-safe. In particular the JpmcdsErrMsgOff mechanism writes to a global buffer which is written to a file on exit. 
+Firstly, we have no guarantee the ISDA model is thread-safe. Even if it were thread-safe in the classical sense (with mutex locks round shared resources) this still wouldn't fit with the trad4 model of thread-safety where we know no two objects will be writing to the same thing at the same time, and likewise we know no object will be being written to while it's being read from.
+</p>
+<p>
+In fact from what I've seen of the codebase I think the IDSA code is thread-safe and Phase1 would scale across thousands of trades and scores of threads. One exception is the error handling - the JpmcdsErrMsgOff mechanism - which writes to a global buffer which is written to a file on exit. This wouldn't cause any catastrophic problems but would result in a garbled log file.
+</p>
+<p>
+There also seem to be some caches used (for holiday calenders). These seem to be read-only, but we'd still need a mechanism for adding a new holiday intra-day.
+</p>
+<p>
+All the same, short of stepping through each function call we can't be 100% certain that the underlying functions are going to behave the way we expect.
 </p>
 <h4>Persistence</h4>
 <p>
@@ -113,7 +123,7 @@ Likewise consider the two legs - fee_leg and contingent_leg - with their respect
 </p>
 <h4>Adding other risk measures</h4>
 <p>
-The IDSA model only produced pv. As we're already bootstrapping the credit_curve, there's little overhead of also bootstrappin the credit_curve perturbed by +-1bp and using these curves to calculate the cr01 (cr01 being the shift in pv given a +-1bp shift in the credit_curve. This would involve extending the TCurve structure to add:
+The IDSA model only produced pv. As we're already bootstrapping the credit_curve, there's little overhead of also bootstrappin the credit_curve perturbed by +-1bp and using these curves to calculate the cr01 (cr01 being the shift in pv given a +-1bp shift in the credit_curve). This would involve extending the TCurve structure to add:
 </p>
 <blockquote><pre>
 TRatePt* fArray_p01
@@ -123,11 +133,11 @@ TRatePt* fArray_m01
 These arrays would hold the credit_curve (for cr01) or ir_curve (for dv01) perturbed up and down by 1bp. Then the legs would also produce pvcrp01, pvcrm01, pvdvp01 and pvdvm01 which would be used in standard_risk to aggregate into trade-level cr01 and dv01.
 </p>
 <p>
-Likewise we could produce cr01 by gridpoint, by intoducing a range of fArrays corrosponding to a range of curves perurbed by gridpoint. This would produce a ladder of cr01s. This would come at the expense of a fair bit of RAM, but as the number of curves is relativly low compared to the number of trades this should not present a problem in practice. 
+Likewise we could produce cr01 by gridpoint, by introducing a range of fArrays corresponding to a range of curves perturbed by gridpoint. This would produce a ladder of cr01s. This would come at the expense of a fair bit of RAM, but as the number of curves is relatively low compared to the number of trades this should not present a problem in practice. 
 </p>
 <h4>precomp_v3</h4>
 <p>
-The interesting this about this project is that this is the first time I've ported an existing application to trad4. This means the application hasn't been worked-up with trad4 in mind, and puts interesting stresses and strains onto the precompiler.
+The interesting thing about this project is that this is the first time I've ported an existing application to trad4. This means the application hasn't been worked-up with trad4 in mind, and puts interesting stresses and strains onto the precompiler.
 </p>
 <p>
 While I've done quite a lot of work on the precompiler while working on this project (particularly relating to support for structs), it's becoming increasingly apparent that the existing architecture of the trad4 precompiler is becoming unmanageable. 
@@ -137,6 +147,47 @@ I've started work on precompiler_v3, which should start to replace the code unde
 <p>
 For this reason in this release I've had to work around some of these restrictions in the precompiler rather than fix them. See types/rates/dates in ir_curve.t4, and the ONE constant - required because stand-alone structs aren't supported.
 </p>
+<h2><a name="usage">Usage</a></h2>
+<h3>Running</h3>
+<p>
+To run the application:
+</p>
+1) Download and unpack the distribution<br>
+2) cd into trad4_v2_0_4/jpm_cds:<br>
+<blockquote><pre>$ cd trad4_v2_0_4/jpm_cds</pre></blockquote>
+3) Source jpm_cds.conf:<br>
+<blockquote><pre>jpm_cds$ . ./jpm_cds.conf</pre></blockquote>
+4) Start jpm_cds:<br>
+<blockquote><pre>jpm_cds$ jpm_cds</pre></blockquote>
+<p>
+To increase or decrease the number of threads used (the default is 4), set NUM_THREADS and re-start the application:
+</p>
+<blockquote><pre>$ export NUM_THREADS=64
+$ jpm_cds</pre></blockquote>
+
+<h3>Updating</h3>
+<p>
+To update a running system, log into the database:
+</p>
+<blockquote><pre>$ t4db
+SQL></pre></blockquote>
+<p>
+And make any required updates. Then instruct the running application to collect these changes by using send_reload.sh:
+</p>
+<blockquote><pre>$ send_reload.sh</pre></blockquote>
+<h3>Building</h3>
+<p>
+Firstly, should you run the precompiler, expect to see a warning about the Makefile under jpm_cds/lib. This is due to the partial nature of the integration between the two systems in the Phase1 release. Please ignore this warning.
+</p>
+<p>
+Secondly, should you wish to rebuild the ISDA binaries, do so as follows:
+</p>
+<blockquote><pre>
+jpm_cds$ cd objects/isda_cds_model_c_v1.7/lib/build/lib/linux
+linux$ make clean
+linux$ make
+</pre></blockquote>
+
 <!-- ==================================================================== -->
 
 <div align="center" class="copyright">
