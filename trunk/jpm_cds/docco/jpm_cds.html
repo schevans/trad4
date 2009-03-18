@@ -67,7 +67,7 @@ This release (v1.0) represents Phase1 of this project and is simply a trad4 wrap
 </p>
 <h2><a name="the_model">The Model</a></h2>
 <p>
-The model is very similar to that of bond_risk, discussed at length in the trad4 manual. The idea is to get the computationally expensive parts of pricing a trade (in this case the ir and credit curve bootstrapping) to persist so that any objects that depend on this result can re-use them.
+The model is very similar to that of bond_risk, discussed at length in the trad4 manual. The idea is to get the computationally expensive parts of pricing a trade (in this case the ir and credit curve bootstrapping) to persist so that any objects that depend on this result can re-use them. Also, this being trad4, different parts of the problem can run concurrently.
 </p>
 <h2><a name="implementation">Implementation</a></h2>
 <h3>The abstract diagram</h3>
@@ -103,7 +103,7 @@ As mentioned above, this Phase1 release simply hooks into the ISDA functions. Th
 Firstly, we have no guarantee the ISDA model is thread-safe. Even if it were thread-safe in the classical sense (with mutex locks round shared resources) this still wouldn't fit with the trad4 model of thread-safety where we know no two objects will be writing to the same thing at the same time, and likewise we know no object will be being written to while it's being read from.
 </p>
 <p>
-In fact from what I've seen of the codebase I think the IDSA code is thread-safe and Phase1 would scale across thousands of trades and scores of threads. One exception is the error handling - the JpmcdsErrMsgOff mechanism - which writes to a global buffer which is written to a file on exit. This wouldn't cause any catastrophic problems but would result in a garbled log file.
+In fact from what I've seen of the codebase I think the IDSA code is thread-safe and Phase1 would scale across thousands of trades and scores of threads. One exception is the error handling - the JpmcdsErrMsg mechanism - which writes to a global buffer which is written to a file on exit. This might not cause any catastrophic problems but would result in a garbled log file.
 </p>
 <p>
 There also seem to be some caches used (for holiday calenders). These seem to be read-only, but we'd still need a mechanism for adding a new holiday intra-day.
@@ -123,7 +123,7 @@ Likewise consider the two legs - fee_leg and contingent_leg - with their respect
 </p>
 <h4>Adding other risk measures</h4>
 <p>
-The IDSA model only produced pv. As we're already bootstrapping the credit_curve, there's little overhead of also bootstrappin the credit_curve perturbed by +-1bp and using these curves to calculate the cr01 (cr01 being the shift in pv given a +-1bp shift in the credit_curve). This would involve extending the TCurve structure to add:
+The IDSA model only produced pv. As we're already bootstrapping the credit_curve, there's little overhead of also bootstrapping the credit_curve perturbed by +-1bp and using these curves to calculate the cr01 (cr01 being the shift in pv given a +-1bp shift in the credit_curve). This would involve extending the TCurve structure to add:
 </p>
 <blockquote><pre>
 TRatePt* fArray_p01
@@ -143,9 +143,9 @@ The interesting thing about this project is that this is the first time I've por
 While I've done quite a lot of work on the precompiler while working on this project (particularly relating to support for structs), it's becoming increasingly apparent that the existing architecture of the trad4 precompiler is becoming unmanageable. 
 </p>
 <p>
-I've started work on precompiler_v3, which should start to replace the code under PreComp from the inside-out. There should be <i>no functional changes</i> except for some added features that are simply too fiddly to add to the current architecture.
+I've started work on precompiler_v3 (Pv3), which should start to replace the code under PreComp from the inside-out. There should be <i>no functional changes</i> except for some added features that are simply too fiddly to add to the current architecture.
 <p>
-For this reason in this release I've had to work around some of these restrictions in the precompiler rather than fix them. See types/rates/dates in ir_curve.t4, and the ONE constant - required because stand-alone structs aren't supported.
+For this reason in this release I've had to work around some of these restrictions in the precompiler rather than fix them. See types/rates/dates in src/ir_curve.t4, and the ONE constant - required because stand-alone structs aren't supported.
 </p>
 <h2><a name="usage">Usage</a></h2>
 <h3>Running</h3>
@@ -195,6 +195,10 @@ Copyright (c) Steve Evans 2009
 </div>
 
 <!-- ==================================================================== -->
+<br />
+<center>
+<a href="http://sourceforge.net/projects/trad4"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=202177&type=16" width="150" height="40" border="0" alt="Get trad4 at SourceForge.net. Fast, secure and Free Open Source software downloads" /></a>
+</center>
 
 
 </body>
