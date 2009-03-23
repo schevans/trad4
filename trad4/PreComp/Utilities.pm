@@ -857,5 +857,114 @@ sub T4Warning($) {
  
     $warnings = $warnings + 1;   
 }
+
+########################################################
+# PV3 starts..
+
+use strict;
+
+sub UpgradeMasterHash($$$$$) {
+    my $old_master_hash = shift;
+    my $old_struct_hash = shift;
+    my $old_enum_hash = shift;
+    my $old_alias_hash = shift;
+    my $old_constant_hash = shift;
+
+    my %master_hash_obj;
+    my $new_master_hash = \%master_hash_obj;
+
+    $new_master_hash->{structures}->{data} = $old_struct_hash;
+    $new_master_hash->{enums}->{data} = $old_enum_hash;
+    $new_master_hash->{aliases}->{data} = $old_alias_hash;
+    $new_master_hash->{constants}->{data} = $old_constant_hash;
+
+    my ( $kind, $key );
+
+    foreach $kind ( "structures", "enums", "aliases", "constants" ) {
+
+        foreach $key ( keys %{$new_master_hash->{$kind}->{data}} ) {
+
+            push @{$new_master_hash->{$kind}->{order}}, $key;
+        }
+    }
+
+    my $type;
+    
+    foreach $type ( keys %{$old_master_hash} ) {
+
+        $new_master_hash->{$type}->{tier} = $old_master_hash->{$type}->{tier};
+        $new_master_hash->{$type}->{type_num} = $old_master_hash->{$type}->{type_num};
+        $new_master_hash->{$type}->{implements} = $old_master_hash->{$type}->{data}->{implements};
+
+        my $var_name;
+        my $var_type;
+        my $section;
+        my $new_section;
+        my $section_order;
+
+        foreach $section_order ( "sub_order", "sub_vec_order", "static_order", "static_vec_order", "pub_order", "pub_vec_order"  ) {
+
+            foreach $var_name ( @{$old_master_hash->{$type}->{data}->{$section_order}} )
+            {
+    
+                $section = $section_order;
+                $section =~ s/_order//;
+
+                $new_section = $section;
+                $new_section =~ s/_vec//;
+
+                $var_type = $old_master_hash->{$type}->{data}->{$section}->{$var_name};
+
+
+                push @{$new_master_hash->{$type}->{$new_section}->{order}}, $var_name;
+                $new_master_hash->{$type}->{$new_section}->{data}->{$var_name} = $var_type;
+
+            }
+        }
+
+    }
+
+    return $new_master_hash;
+}
+
+sub GetSections($) {
+    my $type_hash = shift;
+    
+    my $section;
+    my @result;
+
+    foreach $section ( keys %{$type_hash} ) {
+
+        if ( $section !~ /tier/ and $section !~ /type_num/ and $section !~ /implements/ ) {
+
+            if ( exists $type_hash->{$section} ) {
+
+                push @result, $section;
+            }
+        }
+
+    } 
+
+    return @result;  
+}
+
+sub GetTypes($) {
+    my $master_hash = shift;
+
+    my $key;
+    my @result;
+
+    foreach $key ( keys %${master_hash} ) {
+
+        if ( $key !~ /structures/ and $key !~ /constants/ and $key !~ /enums/ and $key !~ /aliases/ ) {
+    
+            push @result, $key;
+        }
+    }
+
+    return @result;
+}
+
+
 1;
 

@@ -275,5 +275,73 @@ sub print_macro_vec($) {
         print $FHD "#define $name"."_$vec_short (($name*)obj_loc[id])->$vec_short\n";
     }
 }
+
+#######################################################
+# pv3 stuff..
+
+use strict;
+
+sub GenerateNew($$) {
+    my $master_hash = shift;
+    my $type = shift;
+
+    my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::GenObjRoot().$type."_new_macros.h" );
+    if( ! $FHD ) { return; }
+
+    print $FHD "\n";
+    print $FHD "/*======================================================================\n";
+    print $FHD "\n";
+    print $FHD "The following variables are in-scope for calculate_$type():\n";
+    print $FHD "\n";
+
+    my $section;
+
+    foreach $section ( PreComp::Utilities::GetSections( $master_hash->{$type} )) {
+
+        print $FHD "$section:\n";
+
+        my ( $var_name, $var_type );
+
+        foreach $var_name ( @{$master_hash->{$type}->{$section}->{order}} ) {
+
+            $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
+
+            if ( exists $master_hash->{$var_type} and $section =~ /sub/ ) {
+
+                print $FHD "    $var_type:\n";
+
+                my $sub_section;
+
+                foreach $sub_section ( "static", "pub" ) {
+
+                    my ( $sub_var_name, $sub_var_type );
+
+                    foreach $sub_var_name ( @{$master_hash->{$var_type}->{$sub_section}->{order}} ) {
+
+                        $sub_var_type = $master_hash->{$var_type}->{$sub_section}->{data}->{$sub_var_name};
+
+                        print $FHD "        $sub_var_type $var_name"."_$sub_var_name\n";
+ 
+                    }
+                }
+            }
+            else {
+
+                print $FHD "    $var_type $var_name\n";
+            }
+        }
+
+        print $FHD "\n";
+    }
+
+    print $FHD "======================================================================*/\n";
+    print $FHD "\n";
+
+    
+    PreComp::Utilities::CloseFile();
+
+}
+
+
 1;
 
