@@ -23,11 +23,13 @@ sub usage();
 
 my %opts;
 
-if ( ! getopts( 'o:hvdscka', \%opts ) ) {
+if ( ! getopts( 'o:hvdsckan', \%opts ) ) {
     usage();
 }
 
 my $verbose = $opts{v};
+
+my $pv3 = $opts{n};
 
 if ( $opts{c} ) {
 
@@ -183,6 +185,23 @@ if ( $verbose ) {
         print Dumper( $master_hash );
         print "\n";
     }
+}
+
+if ( $pv3 ) {
+
+    print "Calling pv3 stuff...\n";
+
+    my $new_master_hash = PreComp::Utilities::UpgradeMasterHash( $master_hash, $struct_hash, $enum_hash, $alias_hash, $constants_hash );
+
+    #print Dumper( $new_master_hash );
+
+    foreach $type ( PreComp::Utilities::GetTypes( $new_master_hash )) {
+
+        PreComp::Macros::GenerateNew( $new_master_hash, $type );
+    }
+
+    print "Done pv3 stuff. Exiting.\n";
+    exit(0);
 }
 
 print "Validating..\n";
