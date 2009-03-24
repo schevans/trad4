@@ -288,94 +288,185 @@ sub GenerateNew($$) {
     my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::GenObjRoot().$type."_new_macros.h" );
     if( ! $FHD ) { return; }
 
-    print $FHD "\n";
-    print $FHD "/*======================================================================\n";
-    print $FHD "\n";
-    print $FHD "The following variables are in-scope for calculate_$type():\n";
-    print $FHD "\n";
+    my $file_section;
+    foreach $file_section ( "comment", "code" ) {
 
-    my $section;
+        my $code_comment;
 
-    foreach $section ( PreComp::Utilities::GetSections( $master_hash->{$type} )) {
+        if ( $file_section =~ /comment/ ) {
 
-        print $FHD "$section:\n";
+            print $FHD "\n";
+            print $FHD "/*======================================================================\n";
+            print $FHD "\n";
+            print $FHD "The following variables are in-scope for calculate_$type():\n";
+            print $FHD "\n";
 
-        my ( $var_name, $var_type );
+        }
+        else {
 
-        foreach $var_name ( @{$master_hash->{$type}->{$section}->{order}} ) {
+            $code_comment = "// ";
 
+            print $FHD "#ifndef __$type"."_macros_h__\n";
+            print $FHD "#define __$type"."_macros_h__\n";
+            print $FHD "\n";
 
-            $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
-
-            if ( exists $master_hash->{$var_type} and $section =~ /sub/ ) {
-
-                print $FHD "    $var_type:\n";
-
-                my $sub_section;
-
-                foreach $sub_section ( "static", "pub" ) {
-
-                    my ( $sub_var_name, $sub_var_type );
-
-                    foreach $sub_var_name ( @{$master_hash->{$var_type}->{$sub_section}->{order}} ) {
-
-                        $sub_var_type = $master_hash->{$var_type}->{$sub_section}->{data}->{$sub_var_name};
-
-                        print $FHD "        $sub_var_type $var_name"."_$sub_var_name\n";
-
-                        my ( $struct_var_name, $struct_var_type );
-                        foreach $struct_var_name ( PreComp::Utilities::GetStructVarNames( $master_hash, $sub_var_type ) ) {
-
-                            $struct_var_type = $master_hash->{structures}->{$sub_var_type}->{data}->{$struct_var_name};
-                            if ( $sub_var_name =~ /\[.*\]/ ) {
-
-                                my $sub_var_name_stripped = $sub_var_name;
-                                $sub_var_name_stripped =~ s/\[.*\]//;
-
-                                 print $FHD "        $struct_var_type $var_name"."_$sub_var_name_stripped"."_$struct_var_name( index )\n";
-                            }
-                            else {
-                                 print $FHD "        $struct_var_type $var_name"."_$sub_var_name"."_$struct_var_name\n";
-                            }
-
-                        }
- 
-                    }
-                }
-            }
-            else {
-
-                print $FHD "    $var_type $type"."_$var_name\n";
-
-                my ( $struct_var_name, $struct_var_type );
-                foreach $struct_var_name ( PreComp::Utilities::GetStructVarNames( $master_hash, $var_type ) ) {
-                    $struct_var_type = $master_hash->{structures}->{$var_type}->{data}->{$struct_var_name};
-                    if ( $var_name =~ /\[.*\]/ ) {
-
-                        my $var_name_stripped = $var_name;
-                        $var_name_stripped =~ s/\[.*\]//;
-
-                         print $FHD "    $struct_var_type $type"."_$var_name_stripped"."_$struct_var_name( index )\n";
-                    }
-                    else {
-                         print $FHD "    $struct_var_type $type"."_$var_name"."_$struct_var_name\n";
-                    }
-
-                }
-            }
         }
 
-        print $FHD "\n";
+        my $section;
+        foreach $section ( PreComp::Utilities::GetSections( $master_hash->{$type} )) {
+
+            print $FHD "$code_comment$section:\n";
+
+            my ( $var_name, $var_type );
+
+            foreach $var_name ( @{$master_hash->{$type}->{$section}->{order}} ) {
+
+                $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
+
+                if ( $section =~ /sub/ ) {
+
+                    print $FHD "$code_comment    $var_type:\n";
+
+                    my $sub_section;
+
+                    foreach $sub_section ( "static", "pub" ) {
+
+                        my ( $sub_var_name, $sub_var_type );
+
+                        foreach $sub_var_name ( @{$master_hash->{$var_type}->{$sub_section}->{order}} ) {
+
+                            $sub_var_type = $master_hash->{$var_type}->{$sub_section}->{data}->{$sub_var_name};
+        
+                            my $code_root = "(($var_type*)obj_loc[(($type*)obj_loc[id])->$var_name])->";
+
+                            if ( $file_section =~ /comment/ ) {
+                                print $FHD "        $sub_var_type $var_name"."_$sub_var_name\n";
+                            }
+                            else {
+            
+                                my $sub_var_name_stripped = StripBrackets( $sub_var_name );
+
+                                print $FHD "#define $var_name"."_$sub_var_name_stripped $code_root$sub_var_name_stripped\n";
+
+                            }
+
+                            my ( $struct_var_name, $struct_var_type );
+                            foreach $struct_var_name ( PreComp::Utilities::GetStructVarNames( $master_hash, $sub_var_type ) ) {
+
+                                $struct_var_type = $master_hash->{structures}->{$sub_var_type}->{data}->{$struct_var_name};
+                                my $sub_var_name_stripped = StripBrackets( $sub_var_name );
+
+                                if ( $sub_var_name =~ /\[.*\]/ ) {
+
+
+                                    if ( $file_section =~ /comment/ ) {
+                                         print $FHD "        $struct_var_type $var_name"."_$sub_var_name_stripped"."_$struct_var_name( index )\n";
+                                    }
+                                    else {
+                                my $sub_var_name_stripped = StripBrackets( $sub_var_name );
+                                         print $FHD "#define $var_name"."_$sub_var_name_stripped"."_$struct_var_name( index ) $var_name"."_$sub_var_name_stripped"."[index].$struct_var_name\n";
+                                    }
+
+    
+                                }
+                                else {
+                                    if ( $file_section =~ /comment/ ) {
+                                        print $FHD "        $struct_var_type $var_name"."_$sub_var_name"."_$struct_var_name\n";
+                                    }
+                                    else {
+
+                                        my $struct_var_name_stripped = StripBrackets( $struct_var_name );
+
+                                        print $FHD "#define $var_name"."_$sub_var_name"."_$struct_var_name_stripped $var_name"."_$sub_var_name_stripped.$struct_var_name_stripped\n";
+
+
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+                else {
+
+                    my $code_root = "(($type*)obj_loc[id])->";
+
+                    if ( $file_section =~ /comment/ ) {
+                        print $FHD "    $var_type $type"."_$var_name\n";
+                    }
+                    else {
+                        
+                        my $var_name_stripped = StripBrackets( $var_name );
+
+                        print $FHD "#define $type"."_$var_name_stripped $code_root$var_name_stripped\n";
+                    }
+
+                    my ( $struct_var_name, $struct_var_type );
+                    foreach $struct_var_name ( PreComp::Utilities::GetStructVarNames( $master_hash, $var_type ) ) {
+                        $struct_var_type = $master_hash->{structures}->{$var_type}->{data}->{$struct_var_name};
+                        if ( $var_name =~ /\[.*\]/ ) {
+
+                            my $var_name_stripped = StripBrackets( $var_name );
+
+                            if ( $file_section =~ /comment/ ) {
+                                print $FHD "    $struct_var_type $type"."_$var_name_stripped"."_$struct_var_name( index )\n";
+                            }
+                            else {
+
+                                print $FHD "#define $type"."_$var_name_stripped"."_$struct_var_name( index ) $code_root$var_name_stripped"."[index].$struct_var_name\n";
+
+                            }
+                        }
+                        else {
+                            if ( $file_section =~ /comment/ ) {
+                                print $FHD "    $struct_var_type $type"."_$var_name"."_$struct_var_name\n";
+                            }
+                            else {
+
+                                my $struct_var_name_stripped = StripBrackets( $struct_var_name );
+
+                                print $FHD "#define $type"."_$var_name"."_$struct_var_name_stripped $code_root$var_name.$struct_var_name_stripped\n";
+                            }
+                        }
+
+                    }
+                }
+            }
+
+            print $FHD "\n";
+        }
+
+        if ( $file_section =~ /comment/ ) {
+
+            print $FHD "======================================================================*/\n";
+            print $FHD "\n";
+
+        }
+        else {
+
+            print $FHD "#endif\n";
+            print $FHD "\n";
+        }
+
     }
-
-    print $FHD "======================================================================*/\n";
-    print $FHD "\n";
-
     
     PreComp::Utilities::CloseFile();
 
 }
 
+sub IsVec($) {
+    my $string = shift;
+
+    return ( $string =~ /\[.*\]/ );
+}
+
+sub StripBrackets($) {
+    my $string = shift;
+
+    $string =~ s/\[.*\]//;
+
+    return $string;
+}
 
 1;
 
