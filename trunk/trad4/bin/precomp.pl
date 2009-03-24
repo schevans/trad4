@@ -195,7 +195,7 @@ if ( $pv3 ) {
 
     #print Dumper( $new_master_hash );
 
-    foreach $type ( PreComp::Utilities::GetTypes( $new_master_hash )) {
+    foreach $type ( keys %doing ) {
 
         PreComp::Macros::GenerateNew( $new_master_hash, $type );
     }
