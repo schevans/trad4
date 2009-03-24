@@ -304,6 +304,7 @@ sub GenerateNew($$) {
 
         foreach $var_name ( @{$master_hash->{$type}->{$section}->{order}} ) {
 
+
             $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
 
             if ( exists $master_hash->{$var_type} and $section =~ /sub/ ) {
@@ -321,13 +322,46 @@ sub GenerateNew($$) {
                         $sub_var_type = $master_hash->{$var_type}->{$sub_section}->{data}->{$sub_var_name};
 
                         print $FHD "        $sub_var_type $var_name"."_$sub_var_name\n";
+
+                        my ( $struct_var_name, $struct_var_type );
+                        foreach $struct_var_name ( PreComp::Utilities::GetStructVarNames( $master_hash, $sub_var_type ) ) {
+
+                            $struct_var_type = $master_hash->{structures}->{$sub_var_type}->{data}->{$struct_var_name};
+                            if ( $sub_var_name =~ /\[.*\]/ ) {
+
+                                my $sub_var_name_stripped = $sub_var_name;
+                                $sub_var_name_stripped =~ s/\[.*\]//;
+
+                                 print $FHD "        $struct_var_type $var_name"."_$sub_var_name_stripped"."_$struct_var_name( index )\n";
+                            }
+                            else {
+                                 print $FHD "        $struct_var_type $var_name"."_$sub_var_name"."_$struct_var_name\n";
+                            }
+
+                        }
  
                     }
                 }
             }
             else {
 
-                print $FHD "    $var_type $var_name\n";
+                print $FHD "    $var_type $type"."_$var_name\n";
+
+                my ( $struct_var_name, $struct_var_type );
+                foreach $struct_var_name ( PreComp::Utilities::GetStructVarNames( $master_hash, $var_type ) ) {
+                    $struct_var_type = $master_hash->{structures}->{$var_type}->{data}->{$struct_var_name};
+                    if ( $var_name =~ /\[.*\]/ ) {
+
+                        my $var_name_stripped = $var_name;
+                        $var_name_stripped =~ s/\[.*\]//;
+
+                         print $FHD "    $struct_var_type $type"."_$var_name_stripped"."_$struct_var_name( index )\n";
+                    }
+                    else {
+                         print $FHD "    $struct_var_type $type"."_$var_name"."_$struct_var_name\n";
+                    }
+
+                }
             }
         }
 

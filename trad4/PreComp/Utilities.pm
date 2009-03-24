@@ -873,14 +873,14 @@ sub UpgradeMasterHash($$$$$) {
     my %master_hash_obj;
     my $new_master_hash = \%master_hash_obj;
 
-    $new_master_hash->{structures}->{data} = $old_struct_hash;
-    $new_master_hash->{enums}->{data} = $old_enum_hash;
+    $new_master_hash->{structures} = $old_struct_hash;
+    $new_master_hash->{enums} = $old_enum_hash;
     $new_master_hash->{aliases}->{data} = $old_alias_hash;
     $new_master_hash->{constants}->{data} = $old_constant_hash;
 
     my ( $kind, $key );
 
-    foreach $kind ( "structures", "enums", "aliases", "constants" ) {
+    foreach $kind ( "aliases", "constants" ) {
 
         foreach $key ( keys %{$new_master_hash->{$kind}->{data}} ) {
 
@@ -915,7 +915,6 @@ sub UpgradeMasterHash($$$$$) {
 
                 $var_type = $old_master_hash->{$type}->{data}->{$section}->{$var_name};
 
-
                 push @{$new_master_hash->{$type}->{$new_section}->{order}}, $var_name;
                 $new_master_hash->{$type}->{$new_section}->{data}->{$var_name} = $var_type;
 
@@ -948,23 +947,23 @@ sub GetSections($) {
     return @result;  
 }
 
-sub GetTypes($) {
+sub GetStructVarNames($$) {
     my $master_hash = shift;
+    my $var_type = shift;
 
-    my $key;
     my @result;
 
-    foreach $key ( keys %${master_hash} ) {
+    if ( $master_hash->{structures}->{$var_type} ) {
 
-        if ( $key !~ /structures/ and $key !~ /constants/ and $key !~ /enums/ and $key !~ /aliases/ ) {
-    
-            push @result, $key;
+        my $struct_var_name;
+        foreach $struct_var_name ( @{$master_hash->{structures}->{$var_type}->{order}} ) {
+
+            push @result, $struct_var_name;
         }
     }
 
     return @result;
 }
-
 
 1;
 
