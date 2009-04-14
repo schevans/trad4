@@ -281,7 +281,7 @@ sub print_macro_vec($) {
 
 use strict;
 
-sub GenerateNew($$) {
+sub OldGenerateNew($$) {
     my $master_hash = shift;
     my $type = shift;
 
@@ -363,8 +363,9 @@ sub GenerateNew($$) {
                                          print $FHD "        $struct_var_type $var_name"."_$sub_var_name_stripped"."_$struct_var_name( index )\n";
                                     }
                                     else {
-                                my $sub_var_name_stripped = StripBrackets( $sub_var_name );
-                                         print $FHD "#define $var_name"."_$sub_var_name_stripped"."_$struct_var_name( index ) $var_name"."_$sub_var_name_stripped"."[index].$struct_var_name\n";
+
+                                        my $sub_var_name_stripped = StripBrackets( $sub_var_name );
+                                        print $FHD "#define $var_name"."_$sub_var_name_stripped"."_$struct_var_name( index ) $var_name"."_$sub_var_name_stripped"."[index].$struct_var_name\n";
                                     }
 
     
@@ -387,7 +388,7 @@ sub GenerateNew($$) {
                         }
                     }
                 }
-                else {
+                else {  # section /static|pub/
 
                     my $code_root = "(($type*)obj_loc[id])->";
 
@@ -466,6 +467,121 @@ sub StripBrackets($) {
     $string =~ s/\[.*\]//;
 
     return $string;
+}
+
+my $separator = "XXX";
+
+sub GenerateNew($$) {
+    my $master_hash = shift;
+    my $type = shift;
+
+    print "Type: $type\n";
+
+    my $section; 
+    foreach $section ( PreComp::Utilities::GetSections( $master_hash->{$type} )) {
+
+        print "\tSection: $section\n";
+
+        my $tmp;
+
+        foreach $tmp ( GetTypesNamesFromSection( $master_hash, $master_hash->{$type}->{$section}, "\t" )) {
+
+            my ( $var_name2, $var_type2 );
+
+            ( $var_name2, $var_type2 ) = split /$separator/, $tmp;
+
+            print "\nPre: $var_type2 $var_name2\n";    
+
+            while ( $var_name2 =~ /\[/g ) {
+
+                my @tmp_tuple;
+
+                @tmp_tuple = split /\[/, $var_name2;
+                @tmp_tuple = split /\]/, $tmp_tuple[1];
+
+
+                my $array_lenght = $tmp_tuple[0];
+
+                $var_name2 =~ s/\[$array_lenght\]/I/;
+
+                $var_name2 =~ s/$/(index_$array_lenght,/;
+
+            }
+
+            $var_name2 =~ s/\(/( /g;
+            $var_name2 =~ s/,\(/,/g;
+            $var_name2 =~ s/,$/ )/g;
+
+            print "Final: $var_type2 $var_name2\n";    
+        }
+
+    }
+}
+
+
+sub GetTypesNamesFromSection($$$) {
+    my $master_hash = shift;
+    my $section_hash = shift;
+    my $indent = shift;
+
+    my @ret_array;
+
+    $indent = $indent."\t";
+
+    my ( $var_name, $var_type );
+
+    foreach $var_name ( @{$section_hash->{order}} ) {
+
+        $var_type = $section_hash->{data}->{$var_name};
+
+        if ( exists $master_hash->{$var_type} ) {
+
+            print $indent."Var $var_name/$var_type is t4 type. Recursing..\n";
+
+            push @ret_array, $var_name.$separator.$var_type; 
+
+            my $section;
+            foreach $section ( "static", "pub" ) {
+
+                print $indent."Section: $section\n";
+
+#                print Dumper( $master_hash->{$var_type}->{$section} );
+
+my $tmp;
+ 
+                foreach $tmp ( GetTypesNamesFromSection( $master_hash, $master_hash->{$var_type}->{$section}, $indent ) ) {
+                    push @ret_array, $var_name."_".$tmp;
+                }
+            }
+
+        }
+        elsif ( exists $master_hash->{structures}->{$var_type} ) {
+
+            print $indent."Var $var_name/$var_type is struct. Recursing..\n";
+           
+            push @ret_array, $var_name.$separator.$var_type; 
+my $tmp;
+ 
+            foreach $tmp ( GetTypesNamesFromSection( $master_hash, $master_hash->{structures}->{$var_type}, $indent ) ) {
+
+                push @ret_array, $var_name."_$tmp";
+
+            }
+
+        }
+        else {
+       
+            print $indent."Var $var_name/$var_type is simple. Returning\n";
+
+            my $tmp_str = $var_name.$separator.$var_type;
+
+            push @ret_array, $tmp_str;
+
+            #GetTypesNames($$)
+        }
+    } 
+
+    return @ret_array;
 }
 
 1;
