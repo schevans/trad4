@@ -281,11 +281,11 @@ sub print_macro_vec($) {
 
 use strict;
 
-sub OldGenerateNew($$) {
+sub GenerateNew($$) {
     my $master_hash = shift;
     my $type = shift;
 
-    my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::GenObjRoot().$type."_new_macros.h" );
+    my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::GenObjRoot().$type."_new2_macros.h" );
     if( ! $FHD ) { return; }
 
     my $file_section;
@@ -315,126 +315,27 @@ sub OldGenerateNew($$) {
         my $section;
         foreach $section ( PreComp::Utilities::GetSections( $master_hash->{$type} )) {
 
-            print $FHD "$code_comment$section:\n";
+            my $printable;
 
-            my ( $var_name, $var_type );
+            foreach $printable ( GetTypesNamesFromSection( $master_hash, $master_hash->{$type}->{$section}, "\t" )) {
 
-            foreach $var_name ( @{$master_hash->{$type}->{$section}->{order}} ) {
+NameToFunction( $printable->{name} );
 
-                $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
-
-                if ( $section =~ /sub/ ) {
-
-                    print $FHD "$code_comment    $var_type:\n";
-
-                    my $sub_section;
-
-                    foreach $sub_section ( "static", "pub" ) {
-
-                        my ( $sub_var_name, $sub_var_type );
-
-                        foreach $sub_var_name ( @{$master_hash->{$var_type}->{$sub_section}->{order}} ) {
-
-                            $sub_var_type = $master_hash->{$var_type}->{$sub_section}->{data}->{$sub_var_name};
-        
-                            my $code_root = "(($var_type*)obj_loc[(($type*)obj_loc[id])->$var_name])->";
-
-                            if ( $file_section =~ /comment/ ) {
-                                print $FHD "        $sub_var_type $var_name"."_$sub_var_name\n";
-                            }
-                            else {
-            
-                                my $sub_var_name_stripped = StripBrackets( $sub_var_name );
-
-                                print $FHD "#define $var_name"."_$sub_var_name_stripped $code_root$sub_var_name_stripped\n";
-
-                            }
-
-                            my ( $struct_var_name, $struct_var_type );
-                            foreach $struct_var_name ( PreComp::Utilities::GetStructVarNames( $master_hash, $sub_var_type ) ) {
-
-                                $struct_var_type = $master_hash->{structures}->{$sub_var_type}->{data}->{$struct_var_name};
-                                my $sub_var_name_stripped = StripBrackets( $sub_var_name );
-
-                                if ( $sub_var_name =~ /\[.*\]/ ) {
-
-
-                                    if ( $file_section =~ /comment/ ) {
-                                         print $FHD "        $struct_var_type $var_name"."_$sub_var_name_stripped"."_$struct_var_name( index )\n";
-                                    }
-                                    else {
-
-                                        my $sub_var_name_stripped = StripBrackets( $sub_var_name );
-                                        print $FHD "#define $var_name"."_$sub_var_name_stripped"."_$struct_var_name( index ) $var_name"."_$sub_var_name_stripped"."[index].$struct_var_name\n";
-                                    }
-
-    
-                                }
-                                else {
-                                    if ( $file_section =~ /comment/ ) {
-                                        print $FHD "        $struct_var_type $var_name"."_$sub_var_name"."_$struct_var_name\n";
-                                    }
-                                    else {
-
-                                        my $struct_var_name_stripped = StripBrackets( $struct_var_name );
-
-                                        print $FHD "#define $var_name"."_$sub_var_name"."_$struct_var_name_stripped $var_name"."_$sub_var_name_stripped.$struct_var_name_stripped\n";
-
-
-                                    }
-                                }
-
-                            }
-                        }
-                    }
+                if ( $file_section =~ /comment/ ) {
+                    print $FHD "$printable->{type} ".NameToFunction( $printable->{name} )."\n";
                 }
-                else {  # section /static|pub/
+                else {
 
-                    my $code_root = "(($type*)obj_loc[id])->";
+                    my $tmp33 = $printable->{code};
+                    
+                    $tmp33 =~ s/\[/\[index_/g;
+                    $tmp33 =~ s/\[index_id\]/\[id\]/;
 
-                    if ( $file_section =~ /comment/ ) {
-                        print $FHD "    $var_type $type"."_$var_name\n";
-                    }
-                    else {
-                        
-                        my $var_name_stripped = StripBrackets( $var_name );
-
-                        print $FHD "#define $type"."_$var_name_stripped $code_root$var_name_stripped\n";
-                    }
-
-                    my ( $struct_var_name, $struct_var_type );
-                    foreach $struct_var_name ( PreComp::Utilities::GetStructVarNames( $master_hash, $var_type ) ) {
-                        $struct_var_type = $master_hash->{structures}->{$var_type}->{data}->{$struct_var_name};
-                        if ( $var_name =~ /\[.*\]/ ) {
-
-                            my $var_name_stripped = StripBrackets( $var_name );
-
-                            if ( $file_section =~ /comment/ ) {
-                                print $FHD "    $struct_var_type $type"."_$var_name_stripped"."_$struct_var_name( index )\n";
-                            }
-                            else {
-
-                                print $FHD "#define $type"."_$var_name_stripped"."_$struct_var_name( index ) $code_root$var_name_stripped"."[index].$struct_var_name\n";
-
-                            }
-                        }
-                        else {
-                            if ( $file_section =~ /comment/ ) {
-                                print $FHD "    $struct_var_type $type"."_$var_name"."_$struct_var_name\n";
-                            }
-                            else {
-
-                                my $struct_var_name_stripped = StripBrackets( $struct_var_name );
-
-                                print $FHD "#define $type"."_$var_name"."_$struct_var_name_stripped $code_root$var_name.$struct_var_name_stripped\n";
-                            }
-                        }
-
-                    }
+                    print $FHD "#define ".NameToFunction( $printable->{name} )." $tmp33\n";
                 }
+
             }
 
-            print $FHD "\n";
         }
 
         if ( $file_section =~ /comment/ ) {
@@ -471,11 +372,20 @@ sub StripBrackets($) {
 
 my $separator = "XXX";
 
-sub GenerateNew($$) {
+sub OldGenerateNew($$) {
     my $master_hash = shift;
     my $type = shift;
 
     print "Type: $type\n";
+
+    my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::GenObjRoot().$type."_new_macros.h" );
+    if( ! $FHD ) { return; }
+
+    print $FHD "\n";
+    print $FHD "/*======================================================================\n";
+    print $FHD "\n";
+    print $FHD "The following variables are in-scope for calculate_$type():\n";
+    print $FHD "\n";
 
     my $section; 
     foreach $section ( PreComp::Utilities::GetSections( $master_hash->{$type} )) {
@@ -485,6 +395,29 @@ sub GenerateNew($$) {
         my $tmp;
 
         foreach $tmp ( GetTypesNamesFromSection( $master_hash, $master_hash->{$type}->{$section}, "\t" )) {
+
+            
+
+            if ( $section =~ /sub/ ) {
+
+                my $tmp2 = "(($type*)obj_loc[id"; 
+
+print "tmp2: $tmp2\n";
+#print Dumper( $tmp );
+
+                $tmp->{code} =~ s/\[id\]/[$tmp2]/;
+
+            }
+            else {
+    
+                $tmp->{code} = "(($type*)obj_loc[id])->".$tmp->{code};
+
+            }
+            print "FF: $tmp->{name} $tmp->{code}\n";
+        }
+
+
+        if ( 0 ) {
 
             my ( $var_name2, $var_type2 );
 
@@ -518,6 +451,30 @@ sub GenerateNew($$) {
     }
 }
 
+sub NameToFunction($) {
+    my $name = shift;
+
+    while ( $name =~ /\[/g ) {
+
+        my @tmp_tuple;
+
+        @tmp_tuple = split /\[/, $name;
+        @tmp_tuple = split /\]/, $tmp_tuple[1];
+
+        my $array_length = $tmp_tuple[0];
+
+        $name =~ s/\[$array_length\]/I/;
+
+        $name =~ s/$/(index_$array_length,/;
+
+    }
+
+    $name =~ s/\(/( /g;
+    $name =~ s/,\(/,/g;
+    $name =~ s/,$/ )/g;
+
+    return $name;
+}
 
 sub GetTypesNamesFromSection($$$) {
     my $master_hash = shift;
@@ -538,7 +495,7 @@ sub GetTypesNamesFromSection($$$) {
 
             print $indent."Var $var_name/$var_type is t4 type. Recursing..\n";
 
-            push @ret_array, $var_name.$separator.$var_type; 
+#            push @ret_array, $var_name.$separator.$var_type; 
 
             my $section;
             foreach $section ( "static", "pub" ) {
@@ -550,7 +507,19 @@ sub GetTypesNamesFromSection($$$) {
 my $tmp;
  
                 foreach $tmp ( GetTypesNamesFromSection( $master_hash, $master_hash->{$var_type}->{$section}, $indent ) ) {
-                    push @ret_array, $var_name."_".$tmp;
+#                    push @ret_array, $var_name."_".$tmp;
+
+                    $tmp->{name} = $var_name."_".$tmp->{name};
+
+#Substitute id for next lvl here...
+
+#                    $tmp->{code} = "(($var_type*)obj_loc[id])->".$tmp->{code};
+
+                print "TT: ".$tmp->{code}."\n";
+                    $tmp->{code} =~ s/^/(($var_type*)obj_loc[id])->$var_name])->/g;
+                print "TT2: ".$tmp->{code}."\n";
+
+                    push @ret_array, $tmp;
                 }
             }
 
@@ -559,12 +528,21 @@ my $tmp;
 
             print $indent."Var $var_name/$var_type is struct. Recursing..\n";
            
-            push @ret_array, $var_name.$separator.$var_type; 
+my %printable;
+%printable->{name} = $var_name;
+%printable->{type} = $var_type;
+%printable->{code} = $var_name;
+
+            push @ret_array, \%printable;
 my $tmp;
  
             foreach $tmp ( GetTypesNamesFromSection( $master_hash, $master_hash->{structures}->{$var_type}, $indent ) ) {
 
-                push @ret_array, $var_name."_$tmp";
+
+                $tmp->{name} = $var_name."_$tmp->{name}";
+                $tmp->{code} = "$var_name.".$tmp->{code};
+
+                push @ret_array, $tmp;
 
             }
 
@@ -575,7 +553,13 @@ my $tmp;
 
             my $tmp_str = $var_name.$separator.$var_type;
 
-            push @ret_array, $tmp_str;
+my %printable;
+%printable->{name} = $var_name;
+%printable->{type} = $var_type;
+%printable->{code} = $var_name;
+
+
+            push @ret_array, \%printable;
 
             #GetTypesNames($$)
         }
