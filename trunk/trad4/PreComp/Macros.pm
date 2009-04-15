@@ -285,11 +285,12 @@ sub GenerateNew($$) {
     my $master_hash = shift;
     my $type = shift;
 
-    my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::GenObjRoot().$type."_new2_macros.h" );
+    my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::GenObjRoot().$type."_new_macros.h" );
     if( ! $FHD ) { return; }
 
     my $file_section;
-    foreach $file_section ( "comment", "code" ) {
+    #foreach $file_section ( "comment", "code" ) {
+    foreach $file_section ( "code" ) {
 
         my $code_comment;
 
@@ -317,22 +318,32 @@ sub GenerateNew($$) {
 
             my $printable;
 
-            foreach $printable ( GetTypesNamesFromSection( $master_hash, $master_hash->{$type}->{$section}, "\t" )) {
+            foreach $printable ( GetPrintablesFromSection( $master_hash, $master_hash->{$type}->{$section}, "\t" )) {
 
-NameToFunction( $printable->{name} );
+                if ( $section =~ /sub/ ) {
 
-                if ( $file_section =~ /comment/ ) {
-                    print $FHD "$printable->{type} ".NameToFunction( $printable->{name} )."\n";
+                    if ( $printable->{code} =~ /obj_loc/ ) {
+                       
+                        $printable->{code} =~ s/\[id/[(($type*)obj_loc\[id/;
+
+                        $printable->{code} =~ s/\[/\[index_/g;
+                        $printable->{code} =~ s/\[index_id\]/\[id\]/;
+                        $printable->{code} =~ s/obj_loc\[index_/obj_loc\[/;
+
+                    }
+                    else {
+                        $printable->{code} = "(($type*)obj_loc[id])->".$printable->{code};
+                        $printable->{name} = $type."_$printable->{name}";
+                    }
                 }
                 else {
 
-                    my $tmp33 = $printable->{code};
-                    
-                    $tmp33 =~ s/\[/\[index_/g;
-                    $tmp33 =~ s/\[index_id\]/\[id\]/;
+                    $printable->{name} = $type."_$printable->{name}";
+                    $printable->{code} = "(($type*)obj_loc[id])->".$printable->{code};
 
-                    print $FHD "#define ".NameToFunction( $printable->{name} )." $tmp33\n";
                 }
+
+                print $FHD "#define ".NameToFunction( $printable->{name} )." $printable->{code}\n";
 
             }
 
@@ -356,101 +367,6 @@ NameToFunction( $printable->{name} );
 
 }
 
-sub IsVec($) {
-    my $string = shift;
-
-    return ( $string =~ /\[.*\]/ );
-}
-
-sub StripBrackets($) {
-    my $string = shift;
-
-    $string =~ s/\[.*\]//;
-
-    return $string;
-}
-
-my $separator = "XXX";
-
-sub OldGenerateNew($$) {
-    my $master_hash = shift;
-    my $type = shift;
-
-    print "Type: $type\n";
-
-    my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::GenObjRoot().$type."_new_macros.h" );
-    if( ! $FHD ) { return; }
-
-    print $FHD "\n";
-    print $FHD "/*======================================================================\n";
-    print $FHD "\n";
-    print $FHD "The following variables are in-scope for calculate_$type():\n";
-    print $FHD "\n";
-
-    my $section; 
-    foreach $section ( PreComp::Utilities::GetSections( $master_hash->{$type} )) {
-
-        print "\tSection: $section\n";
-
-        my $tmp;
-
-        foreach $tmp ( GetTypesNamesFromSection( $master_hash, $master_hash->{$type}->{$section}, "\t" )) {
-
-            
-
-            if ( $section =~ /sub/ ) {
-
-                my $tmp2 = "(($type*)obj_loc[id"; 
-
-print "tmp2: $tmp2\n";
-#print Dumper( $tmp );
-
-                $tmp->{code} =~ s/\[id\]/[$tmp2]/;
-
-            }
-            else {
-    
-                $tmp->{code} = "(($type*)obj_loc[id])->".$tmp->{code};
-
-            }
-            print "FF: $tmp->{name} $tmp->{code}\n";
-        }
-
-
-        if ( 0 ) {
-
-            my ( $var_name2, $var_type2 );
-
-            ( $var_name2, $var_type2 ) = split /$separator/, $tmp;
-
-            print "\nPre: $var_type2 $var_name2\n";    
-
-            while ( $var_name2 =~ /\[/g ) {
-
-                my @tmp_tuple;
-
-                @tmp_tuple = split /\[/, $var_name2;
-                @tmp_tuple = split /\]/, $tmp_tuple[1];
-
-
-                my $array_lenght = $tmp_tuple[0];
-
-                $var_name2 =~ s/\[$array_lenght\]/I/;
-
-                $var_name2 =~ s/$/(index_$array_lenght,/;
-
-            }
-
-            $var_name2 =~ s/\(/( /g;
-            $var_name2 =~ s/,\(/,/g;
-            $var_name2 =~ s/,$/ )/g;
-
-            print "Final: $var_type2 $var_name2\n";    
-        }
-
-    }
-}
-
 sub NameToFunction($) {
     my $name = shift;
 
@@ -463,7 +379,7 @@ sub NameToFunction($) {
 
         my $array_length = $tmp_tuple[0];
 
-        $name =~ s/\[$array_length\]/I/;
+        $name =~ s/\[$array_length\]//;
 
         $name =~ s/$/(index_$array_length,/;
 
@@ -476,7 +392,7 @@ sub NameToFunction($) {
     return $name;
 }
 
-sub GetTypesNamesFromSection($$$) {
+sub GetPrintablesFromSection($$$) {
     my $master_hash = shift;
     my $section_hash = shift;
     my $indent = shift;
@@ -493,31 +409,26 @@ sub GetTypesNamesFromSection($$$) {
 
         if ( exists $master_hash->{$var_type} ) {
 
-            print $indent."Var $var_name/$var_type is t4 type. Recursing..\n";
+            #print $indent."Var $var_name/$var_type is t4 type. Recursing..\n";
 
-#            push @ret_array, $var_name.$separator.$var_type; 
+my %printable;
+$printable{name} = $var_name;
+$printable{type} = $var_type;
+$printable{code} = $var_name;
+
+            push @ret_array, \%printable;
 
             my $section;
             foreach $section ( "static", "pub" ) {
 
-                print $indent."Section: $section\n";
-
-#                print Dumper( $master_hash->{$var_type}->{$section} );
+                #print $indent."Section: $section\n";
 
 my $tmp;
  
-                foreach $tmp ( GetTypesNamesFromSection( $master_hash, $master_hash->{$var_type}->{$section}, $indent ) ) {
-#                    push @ret_array, $var_name."_".$tmp;
+                foreach $tmp ( GetPrintablesFromSection( $master_hash, $master_hash->{$var_type}->{$section}, $indent ) ) {
 
                     $tmp->{name} = $var_name."_".$tmp->{name};
-
-#Substitute id for next lvl here...
-
-#                    $tmp->{code} = "(($var_type*)obj_loc[id])->".$tmp->{code};
-
-                print "TT: ".$tmp->{code}."\n";
                     $tmp->{code} =~ s/^/(($var_type*)obj_loc[id])->$var_name])->/g;
-                print "TT2: ".$tmp->{code}."\n";
 
                     push @ret_array, $tmp;
                 }
@@ -526,18 +437,20 @@ my $tmp;
         }
         elsif ( exists $master_hash->{structures}->{$var_type} ) {
 
-            print $indent."Var $var_name/$var_type is struct. Recursing..\n";
+            #print $indent."Var $var_name/$var_type is struct. Recursing..\n";
            
 my %printable;
-%printable->{name} = $var_name;
-%printable->{type} = $var_type;
-%printable->{code} = $var_name;
+$printable{name} = $var_name;
+$printable{type} = $var_type;
+$printable{code} = $var_name;
+
+#print Dumper( \%printable );
+#print "\n";
 
             push @ret_array, \%printable;
 my $tmp;
  
-            foreach $tmp ( GetTypesNamesFromSection( $master_hash, $master_hash->{structures}->{$var_type}, $indent ) ) {
-
+            foreach $tmp ( GetPrintablesFromSection( $master_hash, $master_hash->{structures}->{$var_type}, $indent ) ) {
 
                 $tmp->{name} = $var_name."_$tmp->{name}";
                 $tmp->{code} = "$var_name.".$tmp->{code};
@@ -549,14 +462,13 @@ my $tmp;
         }
         else {
        
-            print $indent."Var $var_name/$var_type is simple. Returning\n";
-
-            my $tmp_str = $var_name.$separator.$var_type;
+#            print $indent."Var $var_name/$var_type is simple. Returning\n";
 
 my %printable;
-%printable->{name} = $var_name;
-%printable->{type} = $var_type;
-%printable->{code} = $var_name;
+#print Dumper( %printable );
+$printable{name} = $var_name;
+$printable{type} = $var_type;
+$printable{code} = $var_name;
 
 
             push @ret_array, \%printable;
