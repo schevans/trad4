@@ -1,0 +1,14 @@
+
+
+sub
+    tier1 my_tier1
+    multi_struct my_multi_struct
+
+
+static
+    double double1
+
+pub
+    int p_int
+
+

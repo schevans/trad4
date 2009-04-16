@@ -1,0 +1,9 @@
+#type_id, tier, name
+#1,1,tier1
+#2,2,tier2
+#3,3,tier3
+#4,3,monitor
+#5,1,multi_struct
+6,1,simple1
+7,2,simple2
+

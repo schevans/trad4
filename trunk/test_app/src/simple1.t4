@@ -1,0 +1,8 @@
+
+
+static
+    struct1 my_struct1[ONE]
+    int ix
+
+pub
+    float s1_float

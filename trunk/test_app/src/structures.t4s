@@ -1,0 +1,18 @@
+
+struct1
+    int x
+    float y
+
+struct2
+    double rates[NUM_RATES]
+    date dates[NUM_RATES]
+
+ms_inner
+    int d
+    float ha[NUM_RATES]
+
+
+ms_outer
+    ms_inner my_inner_ms[3]
+    int g
+
