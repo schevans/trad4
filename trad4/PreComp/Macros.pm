@@ -285,17 +285,17 @@ sub GenerateNew($$) {
     my $master_hash = shift;
     my $type = shift;
 
-    my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::GenObjRoot().$type."_new_macros.h" );
+    my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::GenObjRoot().$type."_macros.h" );
     if( ! $FHD ) { return; }
 
     my $file_section;
-    #foreach $file_section ( "comment", "code" ) {
-    foreach $file_section ( "code" ) {
+    foreach $file_section ( "comment", "code" ) {
 
         my $code_comment;
 
         if ( $file_section =~ /comment/ ) {
 
+#print "cout << \"$type:\" << endl;\n";
             print $FHD "\n";
             print $FHD "/*======================================================================\n";
             print $FHD "\n";
@@ -343,7 +343,16 @@ sub GenerateNew($$) {
 
                 }
 
-                print $FHD "#define ".NameToFunction( $printable->{name} )." $printable->{code}\n";
+
+                if ( $file_section =~ /comment/ ) {
+
+#print "cout << \"".NameToFunction( $printable->{name} ).":\" << ".NameToFunction( $printable->{name} )." << endl;\n";
+
+                    print $FHD "$printable->{type} ".NameToFunction( $printable->{name} )."\n";
+                }
+                else {
+                    print $FHD "#define ".NameToFunction( $printable->{name} )." $printable->{code}\n";
+                }
 
             }
 
