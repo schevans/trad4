@@ -4,6 +4,8 @@
 
 package PreComp::SqlCommon;
 
+use PreComp::Utilities;
+
 use warnings;
 use strict;
 
@@ -57,4 +59,72 @@ sub generate_object_types($) {
 
     PreComp::Utilities::CloseFile();
 }
+
+#######################################################
+# pv3 stuff..
+
+use strict;
+
+sub GenerateNew($) {
+    my $master_hash = shift;
+
+    GenerateStructureTables( $master_hash );
+
+}
+
+sub GenerateStructureTables($) {
+    my $master_hash = shift;
+
+    my $structure;
+
+    foreach $structure ( keys %{$master_hash->{structures}} ) {
+
+        my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::SqlRoot()."$structure.table" );
+        if( ! $FHD ) { return; }
+
+        print $FHD "create table $structure (\n";
+        print $FHD "    id int,\n";
+        print $FHD "    name char";
+
+        my ( $var_name, $var_type );
+
+        foreach $var_name ( @{$master_hash->{structures}->{$structure}->{order}} ) {
+
+            $var_type = $master_hash->{structures}->{$structure}->{data}->{$var_name};
+
+#print "VN: $structure: $var_name/$var_type\n";
+
+            if ( exists $master_hash->{structures}->{$var_type} ) {
+
+
+                print $FHD ",\n    ".PreComp::Utilities::StripBrackets( $var_name)." ".PreComp::Utilities::Type2Sql( $var_type );
+
+            }
+            else {
+
+                print $FHD ",\n    ".PreComp::Utilities::StripBrackets( $var_name)." ".PreComp::Utilities::Type2Sql( $var_type );
+
+            }
+
+
+
+        }
+
+        print $FHD "\n);\n";
+        PreComp::Utilities::CloseFile();
+        
+
+    }
+}
+
+
 1;
+
+
+
+
+
+
+
+
+
