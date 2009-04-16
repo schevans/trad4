@@ -243,15 +243,21 @@ sub GenerateObjectTable($$) {
     print $FHD "create table $type (\n";
     print $FHD "    id int";
 
-    my ( $var_name, $var_type );
+    my ( $var_name, $var_type, $var_name_stripped );
 
     foreach $section ( "static", "sub" ) {
 
         foreach $var_name ( @{$master_hash->{$type}->{$section}->{order}} ) {
 
+            $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name ); 
             $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
 
-            if ( ( not exists $master_hash->{structures}->{$var_type} ) and ( not IsArray( $var_name )) ) {
+            if ( exists $master_hash->{structures}->{$var_type} ) {
+
+                print $FHD ",\n    $var_name_stripped char";
+
+            }
+            elsif ( not IsArray( $var_name ) ) {
 
                 print $FHD ",\n    $var_name ".PreComp::Utilities::Type2Sql( $var_type );
             }
@@ -279,7 +285,7 @@ sub GenerateObjectVarArrayTables($$) {
 
             if ( ( not exists $master_hash->{structures}->{$var_type} ) and ( IsArray( $var_name )) ) {
 
-                my $var_name_stripped = StripBrackets( $var_name );;
+                my $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );;
 
                 my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::SqlRoot()."$type"."_$var_name_stripped.table" );
                 if( ! $FHD ) { return; }
@@ -300,14 +306,6 @@ sub IsArray($) {
     my $var_name = shift;
 
     return ( $var_name =~ /\[[0-9A-Z_]+\]/ ); 
-}
-
-sub StripBrackets($) {
-    my $var_name = shift;
-
-    $var_name =~ s/\[[0-9A-Z_]+\]//;
-
-    return $var_name;
 }
 
 1;
