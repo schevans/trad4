@@ -1,0 +1,10 @@
+
+
+sub
+    simple1 my_simple1
+
+static
+    int s2_int
+
+pub
+    float s2_float

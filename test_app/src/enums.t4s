@@ -1,0 +1,9 @@
+
+bool_enum
+    TRUE
+    FALSE
+
+buy_sell_enum
+    BUY
+    SELL
+
