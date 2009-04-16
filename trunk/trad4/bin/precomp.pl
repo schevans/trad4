@@ -193,15 +193,16 @@ if ( $pv3 ) {
 
     my $new_master_hash = PreComp::Utilities::UpgradeMasterHash( $master_hash, $struct_hash, $enum_hash, $alias_hash, $constants_hash );
 
-    #print Dumper( $new_master_hash );
-
     foreach $type ( keys %doing ) {
+
+        if ( $verbose ) {
+            print Dumper( $new_master_hash->{$type} );
+        }
 
         PreComp::Macros::GenerateNew( $new_master_hash, $type );
     }
 
-    print "Done pv3 stuff. Exiting.\n";
-    exit(0);
+    print "Done pv3 stuff.\n";
 }
 
 print "Validating..\n";
@@ -223,9 +224,11 @@ foreach $type ( keys %doing ) {
 print "Generating makefiles..\n";
 PreComp::Makefiles::Generate( $master_hash );
 
-print "Generating macros..\n";
-PreComp::Macros::Generate( $master_hash, $struct_hash );
-#PreComp::NewMacros::Generate( $master_hash );
+if ( ! $pv3 ) {
+
+    print "Generating macros..\n";
+    PreComp::Macros::Generate( $master_hash, $struct_hash );
+}
 
 print "Generating sql..\n";
 PreComp::SqlCommon::Generate( $master_hash );
