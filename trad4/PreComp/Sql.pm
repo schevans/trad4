@@ -33,6 +33,8 @@ sub Generate($$$$) {
 
 }
 
+
+
 sub generate_dummy_data($$) {
     my $master_hash = shift;
     my $name = shift;
@@ -217,6 +219,95 @@ sub generate_vec_dummy_data($$$$) {
         PreComp::Utilities::CloseFile();
 
     }
+}
+
+#######################################################
+# pv3 stuff..
+
+sub GenerateNew($$) {
+    my $master_hash = shift;
+    my $type = shift;
+
+    GenerateObjectTable( $master_hash, $type );
+
+    GenerateObjectVarArrayTables( $master_hash, $type );
+}
+
+sub GenerateObjectTable($$) {
+    my $master_hash = shift;
+    my $type = shift;
+
+    my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::SqlRoot()."$type.table" );
+    if( ! $FHD ) { return; }
+
+    print $FHD "create table $type (\n";
+    print $FHD "    id int";
+
+    my ( $var_name, $var_type );
+
+    foreach $section ( "static", "sub" ) {
+
+        foreach $var_name ( @{$master_hash->{$type}->{$section}->{order}} ) {
+
+            $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
+
+            if ( ( not exists $master_hash->{structures}->{$var_type} ) and ( not IsArray( $var_name )) ) {
+
+                print $FHD ",\n    $var_name ".PreComp::Utilities::Type2Sql( $var_type );
+            }
+        }
+    }
+
+    print $FHD "\n";
+    print $FHD ");\n";
+    print $FHD "\n";
+
+
+    PreComp::Utilities::CloseFile();
+
+}
+
+sub GenerateObjectVarArrayTables($$) {
+    my $master_hash = shift;
+    my $type = shift;
+
+    foreach $section ( "static", "sub" ) {
+
+        foreach $var_name ( @{$master_hash->{$type}->{$section}->{order}} ) {
+
+            $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
+
+            if ( ( not exists $master_hash->{structures}->{$var_type} ) and ( IsArray( $var_name )) ) {
+
+                my $var_name_stripped = StripBrackets( $var_name );;
+
+                my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::SqlRoot()."$type"."_$var_name_stripped.table" );
+                if( ! $FHD ) { return; }
+
+                print $FHD "create table $type"."_$var_name_stripped (\n";
+                print $FHD "    id int";
+
+                print $FHD ",\n    $var_name_stripped ".PreComp::Utilities::Type2Sql( $var_type )."\n";
+                
+                print $FHD ");\n";
+                PreComp::Utilities::CloseFile();
+            }
+        }
+    }
+}
+
+sub IsArray($) {
+    my $var_name = shift;
+
+    return ( $var_name =~ /\[[0-9A-Z_]+\]/ ); 
+}
+
+sub StripBrackets($) {
+    my $var_name = shift;
+
+    $var_name =~ s/\[[0-9A-Z_]+\]//;
+
+    return $var_name;
 }
 
 1;
