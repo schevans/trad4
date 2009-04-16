@@ -12,15 +12,17 @@ sub generate_validator($$$);
 sub generate_loader($$);
 sub generate_constructor($$);
 sub generate_calculate($$$$);
-sub generate_need_refresh($$$);
+sub generate_need_refresh($$$$);
 sub generate_loader_callback($$$$);
 sub generate_extra_loaders($$$$);
 
-sub Generate($$$$) {
+sub Generate($$$$$$) {
     my $master_hash = shift;
     my $name = shift;
     my $struct_hash = shift;
     my $constants_hash = shift;
+    my $new_master_hash = shift;
+    my $pv3 = shift;
 
     my $obj_hash = $master_hash->{$name};
 
@@ -83,7 +85,7 @@ sub Generate($$$$) {
     generate_calculate( $master_hash, $struct_hash, $name, $FHD );
     print $FHD "\n";
 
-    generate_need_refresh( $obj_hash, $constants_hash, $FHD );
+    generate_need_refresh( $obj_hash, $constants_hash, $FHD, $pv3 );
     print $FHD "\n";
 
 
@@ -102,6 +104,10 @@ sub Generate($$$$) {
     }
 
     print $FHD "\n";
+
+    if ( $pv3 ) {
+        GenerateNewLoader( $new_master_hash, $name, $FHD );
+    }
 
     PreComp::Utilities::CloseFile();
 }
@@ -246,11 +252,12 @@ sub generate_validator($$$)
     print $FHD "}\n";
 }
 
-sub generate_need_refresh($$$)
+sub generate_need_refresh($$$$)
 {
     my $obj_hash = shift;
     my $constants_hash = shift;
     my $FHD = shift;
+    my $pv3 = shift;
 
     my $name = $obj_hash->{name};
 
@@ -296,7 +303,13 @@ sub generate_need_refresh($$$)
 
         while ( $counter < $constants_hash->{$vec_size}) { 
 
-            print $FHD "(object_timestamp(id) < object_timestamp( $name"."_$vec_short\[$counter\] )) || ";
+            if ( $pv3 ) {
+                print $FHD "(object_timestamp(id) < object_timestamp( $name"."_$vec_short\($counter\) )) || ";
+            }
+            else {
+                print $FHD "(object_timestamp(id) < object_timestamp( $name"."_$vec_short\[$counter\] )) || ";
+            }
+
             $counter = $counter+1;
         }
     }
@@ -649,6 +662,54 @@ sub generate_extra_loaders($$$$)
     }
 
 }
+
+sub GenerateNewLoader($$$) {
+    my $master_hash = shift;
+    my $type = shift;
+    my $FHD = shift;
+
+    print $FHD "extern \"C\" void new_load_objects( obj_loc_t obj_loc, int initial_load )\n";
+    print $FHD "{\n";
+    print $FHD "    std::cout << \"load_all_$type"."()\" << std::endl;\n";
+    print $FHD "\n";
+    print $FHD "    char *zErrMsg = 0;\n";
+    print $FHD "    sqlite3* db;\n";
+    print $FHD "    sqlite3_open(getenv(\"APP_DB\"), &db);\n";
+    print $FHD "\n";
+    print $FHD "    std::ostringstream dbstream;\n";
+    print $FHD "    dbstream << \"select object.id, object.name, object.tier, object.log_level";
+
+    my $section;
+
+    foreach $section ( "static", "sub" ) {
+
+        my ( $var_name, $var_type );
+
+        foreach $var_name ( @{$master_hash->{$type}->{$section}->{order}} ) {
+
+            $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
+            $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
+
+            print $FHD ", $type.$var_name_stripped";
+        }
+
+    }
+
+    print $FHD " from object, object_types, $type where object.id = $type.id and object_types.type_id = object.type_id and object.type_id = $master_hash->{$type}->{type_id}\";\n";
+
+    print $FHD "\n";
+    print $FHD "    if ( initial_load != 1 )\n";
+    print $FHD "        dbstream << \" and o.need_reload=1\";\n";
+    print $FHD "\n";
+    print $FHD "    if( sqlite3_exec(db, dbstream.str().c_str(), load_objects_callback, obj_loc, &zErrMsg) != SQLITE_OK ){\n";
+    print $FHD "        fprintf(stderr, \"SQL error: %s. File %s, line %d.\\n\", zErrMsg, __FILE__, __LINE__);\n";
+    print $FHD "        sqlite3_free(zErrMsg);\n";
+    print $FHD "    }\n";
+    print $FHD "\n";
+    print $FHD "}\n";
+
+}
+
 
 1;
 
