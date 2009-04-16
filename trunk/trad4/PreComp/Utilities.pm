@@ -789,6 +789,9 @@ sub Type2atoX($) {
     elsif ( $type =~ /double/ ) {
         return "std::atof";
     }
+    elsif ( $type =~ /float/ ) {
+        return "std::atof";
+    }
     elsif ( $type =~ /long/ ) {
         return "std::atoi";
     }
@@ -893,7 +896,7 @@ sub UpgradeMasterHash($$$$$) {
     foreach $type ( keys %{$old_master_hash} ) {
 
         $new_master_hash->{$type}->{tier} = $old_master_hash->{$type}->{tier};
-        $new_master_hash->{$type}->{type_num} = $old_master_hash->{$type}->{type_num};
+        $new_master_hash->{$type}->{type_id} = $old_master_hash->{$type}->{type_num};
         $new_master_hash->{$type}->{implements} = $old_master_hash->{$type}->{data}->{implements};
 
         my $var_name;
@@ -934,7 +937,7 @@ sub GetSections($) {
 
     foreach $section ( keys %{$type_hash} ) {
 
-        if ( $section !~ /tier/ and $section !~ /type_num/ and $section !~ /implements/ ) {
+        if ( $section !~ /tier/ and $section !~ /type_id/ and $section !~ /implements/ ) {
 
             if ( exists $type_hash->{$section} ) {
 
@@ -964,6 +967,15 @@ sub GetStructVarNames($$) {
 
     return @result;
 }
+
+sub StripBrackets($) {
+    my $var_name = shift;
+
+    $var_name =~ s/\[[0-9A-Z_]+\]//;
+
+    return $var_name;
+}
+
 
 1;
 
