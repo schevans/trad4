@@ -195,6 +195,8 @@ if ( $pv3 ) {
 
     $new_master_hash = PreComp::Utilities::UpgradeMasterHash( $master_hash, $struct_hash, $enum_hash, $alias_hash, $constants_hash );
 
+#    print Dumper( $new_master_hash );
+
     foreach $type ( keys %doing ) {
 
         if ( $verbose ) {
@@ -204,8 +206,6 @@ if ( $pv3 ) {
         PreComp::Macros::GenerateNew( $new_master_hash, $type );
         PreComp::Sql::GenerateNew( $new_master_hash, $type );
     }
-
-    print "Done pv3 stuff.\n";
 }
 
 print "Validating..\n";
@@ -219,7 +219,7 @@ foreach $type ( keys %doing ) {
 
     print "Generating $type..\n";
     PreComp::Header::Generate( $master_hash->{$type} );
-    PreComp::Wrapper::Generate( $master_hash, $type, $struct_hash, $constants_hash );
+    PreComp::Wrapper::Generate( $master_hash, $type, $struct_hash, $constants_hash, $new_master_hash, $pv3 );
     PreComp::Calculate::Generate( $master_hash->{$type} );
 
     if ( ! $pv3 ) {

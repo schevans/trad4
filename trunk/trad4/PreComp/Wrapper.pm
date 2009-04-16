@@ -95,7 +95,13 @@ sub Generate($$$$$$) {
     generate_loader_callback( $master_hash, $obj_hash, $struct_hash, $FHD );
     print $FHD "\n";
 
-    generate_loader( $obj_hash, $FHD );
+    if ( $pv3 ) {
+        GenerateNewLoader( $new_master_hash, $name, $FHD );
+    }
+    else {
+        generate_loader( $obj_hash, $FHD );
+    }
+
     print $FHD "\n";
 
     if ( %{$obj_hash->{data}->{static_vec}} or %{$obj_hash->{data}->{sub_vec}} ) {
@@ -104,10 +110,6 @@ sub Generate($$$$$$) {
     }
 
     print $FHD "\n";
-
-    if ( $pv3 ) {
-        GenerateNewLoader( $new_master_hash, $name, $FHD );
-    }
 
     PreComp::Utilities::CloseFile();
 }
@@ -668,7 +670,7 @@ sub GenerateNewLoader($$$) {
     my $type = shift;
     my $FHD = shift;
 
-    print $FHD "extern \"C\" void new_load_objects( obj_loc_t obj_loc, int initial_load )\n";
+    print $FHD "extern \"C\" void load_objects( obj_loc_t obj_loc, int initial_load )\n";
     print $FHD "{\n";
     print $FHD "    std::cout << \"load_all_$type"."()\" << std::endl;\n";
     print $FHD "\n";
