@@ -252,12 +252,12 @@ sub GenerateObjectTable($$) {
             $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name ); 
             $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
 
-            if ( exists $master_hash->{structures}->{$var_type} ) {
+            if ( exists $master_hash->{structures}->{$var_type} or IsArray( $var_name ) ) {
 
                 print $FHD ",\n    $var_name_stripped char";
 
             }
-            elsif ( not IsArray( $var_name ) ) {
+            else {
 
                 print $FHD ",\n    $var_name ".PreComp::Utilities::Type2Sql( $var_type );
             }
