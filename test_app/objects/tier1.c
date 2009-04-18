@@ -13,16 +13,13 @@ using namespace std;
 void calculate_tier1( obj_loc_t obj_loc, int id )
 {
 
-cout << "DD: " << index_NUM_RATES << endl;
-
-tier1_struct_scalar_dates( index_NUM_RATES ) = 4;
 
 cout << "tier1:" << endl;
 cout << "tier1_int1:" << tier1_int1 << endl;
 cout << "tier1_int2:" << tier1_int2 << endl;
 //cout << "tier1_struct_scalar:" << tier1_struct_scalar << endl;
-cout << "tier1_struct_scalar_rates( index_NUM_RATES ):" << tier1_struct_scalar_rates( index_NUM_RATES ) << endl;
-cout << "tier1_struct_scalar_dates( index_NUM_RATES ):" << tier1_struct_scalar_dates( index_NUM_RATES ) << endl;
+cout << "tier1_struct_scalar_rates( 3 ):" << tier1_struct_scalar_rates( 3 ) << endl;
+cout << "tier1_struct_scalar_dates( 3 ):" << tier1_struct_scalar_dates( 3 ) << endl;
 cout << "tier1_double_array( index_10 ):" << tier1_double_array( index_10 ) << endl;
 cout << "tier1_int_out:" << tier1_int_out << endl;
 cout << "tier1_bool_array( index_20 ):" << tier1_bool_array( index_20 ) << endl;
