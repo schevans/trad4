@@ -71,7 +71,7 @@ sub Generate($$$$$$) {
             $vec_short = $vec_name;
             $vec_short =~ s/\[.*\]//g;
 
-            print $FHD "void load_$name"."_$vec_short( obj_loc_t obj_loc, int i, sqlite3* db, int initial_load );\n";
+            print $FHD "void load_$name"."_$vec_short( obj_loc_t obj_loc, sqlite3* db, int initial_load );\n";
     }
 
     print $FHD "\n";
@@ -96,17 +96,20 @@ sub Generate($$$$$$) {
     print $FHD "\n";
 
     if ( $pv3 ) {
+        GenerateExtraLoaders( $new_master_hash, $name, $FHD );
         GenerateNewLoader( $new_master_hash, $name, $FHD );
     }
     else {
+
         generate_loader( $obj_hash, $FHD );
-    }
 
-    print $FHD "\n";
+        print $FHD "\n";
 
-    if ( %{$obj_hash->{data}->{static_vec}} or %{$obj_hash->{data}->{sub_vec}} ) {
+        if ( %{$obj_hash->{data}->{static_vec}} or %{$obj_hash->{data}->{sub_vec}} ) {
 
-        generate_extra_loaders( $obj_hash, $struct_hash, $constants_hash, $FHD );
+            generate_extra_loaders( $obj_hash, $struct_hash, $constants_hash, $FHD );
+        }
+
     }
 
     print $FHD "\n";
@@ -665,6 +668,12 @@ sub generate_extra_loaders($$$$)
 
 }
 
+#######################################################
+# pv3 stuff..
+
+use strict;
+use warnings;
+
 sub GenerateNewLoader($$$) {
     my $master_hash = shift;
     my $type = shift;
@@ -685,7 +694,7 @@ sub GenerateNewLoader($$$) {
 
     foreach $section ( "static", "sub" ) {
 
-        my ( $var_name, $var_type );
+        my ( $var_name, $var_name_stripped, $var_type );
 
         foreach $var_name ( @{$master_hash->{$type}->{$section}->{order}} ) {
 
@@ -701,17 +710,180 @@ sub GenerateNewLoader($$$) {
 
     print $FHD "\n";
     print $FHD "    if ( initial_load != 1 )\n";
-    print $FHD "        dbstream << \" and o.need_reload=1\";\n";
+    print $FHD "        dbstream << \" and object.need_reload=1\";\n";
     print $FHD "\n";
     print $FHD "    if( sqlite3_exec(db, dbstream.str().c_str(), load_objects_callback, obj_loc, &zErrMsg) != SQLITE_OK ){\n";
     print $FHD "        fprintf(stderr, \"SQL error: %s. File %s, line %d.\\n\", zErrMsg, __FILE__, __LINE__);\n";
     print $FHD "        sqlite3_free(zErrMsg);\n";
+    print $FHD "        exit(0);\n";
     print $FHD "    }\n";
     print $FHD "\n";
+
+    foreach $section ( "static", "sub" ) {
+
+        my ( $var_name, $var_name_stripped, $var_type );
+
+        foreach $var_name ( @{$master_hash->{$type}->{$section}->{order}} ) {
+
+            $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
+
+            if ( exists $master_hash->{structures}->{$var_type} or PreComp::Utilities::IsArray( $var_name ) ) {
+
+                $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
+                my $function_name = "load_$type"."_$var_name_stripped";
+
+                print $FHD "    $function_name( obj_loc, db, 0 );\n";
+            }
+        }
+    }
+
     print $FHD "}\n";
 
 }
 
+sub GenerateExtraLoaders($$$) {
+    my $master_hash = shift;
+    my $type = shift;
+    my $FHD = shift;
+
+    my $section;
+
+    foreach $section ( "static", "sub" ) {
+
+        my ( $var_name, $var_name_stripped, $var_type );
+
+        foreach $var_name ( @{$master_hash->{$type}->{$section}->{order}} ) {
+
+            $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
+
+            if ( exists $master_hash->{structures}->{$var_type} or PreComp::Utilities::IsArray( $var_name ) ) {
+            
+                $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
+
+                my $function_name = "load_$type"."_$var_name_stripped";
+
+                my $vec_size;
+
+                if ( PreComp::Utilities::IsArray( $var_name )) {
+
+                    $vec_size = $var_name;
+                    $vec_size =~ s/.*\[//;
+                    $vec_size =~ s/\]//;
+                }
+                else {
+                    $vec_size = 1;
+                }
+
+                print $FHD "static int $function_name"."_callback(void *obj_loc_v, int argc, char **row, char **azColName)\n";
+                print $FHD "{\n";
+                print $FHD "    unsigned char** obj_loc = (unsigned char**)obj_loc_v;\n";
+                print $FHD "    int id = atoi(row[0]);\n";
+                print $FHD "\n";
+                print $FHD "    if ( counter > $vec_size )\n";
+                print $FHD "    {\n";
+
+                print $FHD "        cerr << \"Error in load_$var_type"."_$var_name_stripped: The number of rows in $var_type.table is greater than $vec_size. Truncating data in $var_type"."_$var_name_stripped structure to $vec_size elements. Suggest you fix the data or create a new type with larger arrays and migrate your objects across.\" << endl;\n";
+                print $FHD "    }\n";
+                print $FHD "    else\n";
+                print $FHD "    {\n";
+
+                if ( exists $master_hash->{structures}->{$var_type} ) {
+
+                    my ( $struct_var_name, $struct_var_type, $struct_var_name_stripped );
+
+                    my $counter = 0;
+
+                    foreach $struct_var_name ( @{$master_hash->{structures}->{$var_type}->{order}} ) {
+
+                        $struct_var_type = $master_hash->{structures}->{$var_type}->{data}->{$struct_var_name};
+                        $struct_var_name_stripped = PreComp::Utilities::StripBrackets( $struct_var_name );
+
+                        print $FHD "        $type"."_$var_name_stripped"."_$struct_var_name_stripped(counter) = ".PreComp::Utilities::Type2atoX( $struct_var_type )."(row[$counter]);\n";
+
+#PreComp::Utilities::Type2atoX($obj_hash->{data}->{static}->{$key})."(row[$counter])
+
+                        $counter = $counter+1;
+                    }
+
+                }
+                else {
+
+                    print $FHD "        $type"."_$var_name_stripped(counter) = ".PreComp::Utilities::Type2atoX( $var_type )."(row[0]);\n";
+
+                }
+
+                print $FHD "        counter++;\n";
+
+
+
+                print $FHD "    }\n";
+                print $FHD "\n";
+                print $FHD "    return 0;\n";
+                print $FHD "}\n";
+                print $FHD "\n";
+
+                print $FHD "void $function_name( obj_loc_t obj_loc, sqlite3* db, int initial_load )\n";
+                print $FHD "{\n";
+                print $FHD "    cout << \"\t$function_name()\" << endl;\n";
+                print $FHD "\n";
+                print $FHD "    counter = 0;\n";
+                print $FHD "    char *zErrMsg = 0;\n";
+                print $FHD "\n";
+                print $FHD "    std::ostringstream dbstream;\n";
+                print $FHD "    dbstream << \"select object.id";
+
+                my $table_name;
+
+                if ( exists $master_hash->{structures}->{$var_type} ) {
+
+                    $table_name = $var_type;
+
+                    my ( $struct_var_name, $struct_var_type, $struct_var_name_stripped );
+    
+                    foreach $struct_var_name ( @{$master_hash->{structures}->{$var_type}->{order}} ) {
+
+                        $struct_var_type = $master_hash->{structures}->{$var_type}->{data}->{$struct_var_name};
+                        $struct_var_name_stripped = PreComp::Utilities::StripBrackets( $struct_var_name );
+
+                        print $FHD ", $table_name.$struct_var_name_stripped";
+                    }
+
+                }
+                else {
+
+                    $table_name = "$type"."_$var_name_stripped";
+
+                    print $FHD ", $table_name.$var_name_stripped ";
+                    
+                }
+
+                print $FHD " from $type, $table_name, object where object.id = $table_name.id and $type.id = $table_name.id ";
+
+                if ( exists $master_hash->{structures}->{$var_type} ) {
+
+                    print $FHD " and $type.$var_name_stripped = $var_type.name ";
+
+                }
+
+                print $FHD " and object.type_id = $master_hash->{$type}->{type_id}\";\n";
+                print $FHD "\n";
+                print $FHD "    if ( initial_load != 1 )\n";
+                print $FHD "        dbstream << \" and object.need_reload=1\";\n";
+                print $FHD "\n";
+
+                print $FHD "\n";
+                print $FHD "    if( sqlite3_exec(db, dbstream.str().c_str(), $function_name"."_callback, obj_loc, &zErrMsg) != SQLITE_OK ){\n";
+                print $FHD "        fprintf(stderr, \"SQL error: %s. File %s, line %d.\\n\", zErrMsg, __FILE__, __LINE__);\n";
+                print $FHD "        sqlite3_free(zErrMsg);\n";
+                print $FHD "        exit(0);\n";
+                print $FHD "    }\n";
+                print $FHD "\n";
+                print $FHD "}\n";
+
+            }
+        }
+    }
+}
 
 1;
 
