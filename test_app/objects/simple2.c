@@ -12,19 +12,28 @@ using namespace std;
 
 void calculate_simple2( obj_loc_t obj_loc, int id )
 {
-    // Write me.
+
+    simple2_s2_float = simple2_s2_int / my_simple1_s1_float;
+
+    T4_TEST( simple2_s2_float, 13.6232 );
+
+cout << "simple2_s2_float:" << simple2_s2_float << endl;
+
+/*
     cout << "my_simple1_s1_float: " << my_simple1_s1_float << endl;
     cout << "my_simple1_my_struct1_y: " << my_simple1_my_struct1_y(0) << endl;
 
-int index_ONE = 0;
+
+cout << "my_simple1_ix:" << my_simple1_ix << endl;
+
 cout << "simple2:" << endl;
 cout << "simple2_my_simple1:" << simple2_my_simple1 << endl;
+//cout << "simple2_my_simple1:" << simple2_my_simple1 << endl;
 cout << "simple2_s2_int:" << simple2_s2_int << endl;
-cout << "simple2_s2_float:" << simple2_s2_float << endl;
-cout << "my_simple1_my_struct1_x( index_ONE ):" << my_simple1_my_struct1_x( index_ONE ) << endl;
-cout << "my_simple1_my_struct1_y( index_ONE ):" << my_simple1_my_struct1_y( index_ONE ) << endl;;
+cout << "my_simple1_my_struct1_x( 0 ):" << my_simple1_my_struct1_x( 0 ) << endl;
+cout << "my_simple1_my_struct1_y( 0 ):" << my_simple1_my_struct1_y( 0 ) << endl;;
 cout << "my_simple1_s1_float:" << my_simple1_s1_float << endl;;
-
+*/
 
 
 
