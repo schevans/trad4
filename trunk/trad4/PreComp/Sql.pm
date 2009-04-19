@@ -230,7 +230,7 @@ sub GenerateNew($$) {
 
     GenerateObjectTable( $master_hash, $type );
 
-    GenerateObjectVarArrayTables( $master_hash, $type );
+    GenerateExtraTables( $master_hash, $type );
 }
 
 sub GenerateObjectTable($$) {
@@ -252,7 +252,7 @@ sub GenerateObjectTable($$) {
             $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name ); 
             $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
 
-            if ( exists $master_hash->{structures}->{$var_type} or IsArray( $var_name ) ) {
+            if ( exists $master_hash->{structures}->{$var_type} or PreComp::Utilities::IsArray( $var_name ) ) {
 
                 print $FHD ",\n    $var_name_stripped char";
 
@@ -273,7 +273,7 @@ sub GenerateObjectTable($$) {
 
 }
 
-sub GenerateObjectVarArrayTables($$) {
+sub GenerateExtraTables($$) {
     my $master_hash = shift;
     my $type = shift;
 
@@ -283,7 +283,7 @@ sub GenerateObjectVarArrayTables($$) {
 
             $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
 
-            if ( ( not exists $master_hash->{structures}->{$var_type} ) and ( IsArray( $var_name )) ) {
+            if ( ( exists $master_hash->{structures}->{$var_type} ) or ( PreComp::Utilities::IsArray( $var_name )) ) {
 
                 my $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );;
 
@@ -302,10 +302,5 @@ sub GenerateObjectVarArrayTables($$) {
     }
 }
 
-sub IsArray($) {
-    my $var_name = shift;
-
-    return ( $var_name =~ /\[[0-9A-Z_]+\]/ ); 
-}
 
 1;
