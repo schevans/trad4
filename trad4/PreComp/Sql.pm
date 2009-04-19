@@ -283,7 +283,7 @@ sub GenerateExtraTables($$) {
 
             $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
 
-            if ( ( exists $master_hash->{structures}->{$var_type} ) or ( PreComp::Utilities::IsArray( $var_name )) ) {
+            if ( ( not exists $master_hash->{structures}->{$var_type} ) and ( PreComp::Utilities::IsArray( $var_name )) ) {
 
                 my $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );;
 
