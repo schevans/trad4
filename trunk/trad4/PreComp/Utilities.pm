@@ -976,6 +976,12 @@ sub StripBrackets($) {
     return $var_name;
 }
 
+sub IsArray($) {
+    my $var_name = shift;
+
+    return ( $var_name =~ /\[[0-9A-Z_]+\]/ );
+}
+
 
 1;
 
