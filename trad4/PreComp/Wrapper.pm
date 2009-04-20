@@ -816,7 +816,7 @@ sub GenerateExtraLoaders($$$) {
                 }
                 else {
 
-                    print $FHD "        $type"."_$var_name_stripped(counter) = ".PreComp::Utilities::Type2atoX( $var_type )."(row[0]);\n";
+                    print $FHD "        $type"."_$var_name_stripped(counter) = ".PreComp::Utilities::Type2atoX( $var_type )."(row[1]);\n";
 
                 }
 
