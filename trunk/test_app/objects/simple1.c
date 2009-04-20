@@ -18,16 +18,20 @@ void calculate_simple1( obj_loc_t obj_loc, int id )
     simple1_s1_float = 3.45;
 
     T4_TEST( simple1_ix, 2 );
+    T4_TEST( simple1_my_struct1( 0 ).x, 4 );
+    T4_TEST( simple1_my_struct1_y(0), 5 );
 
 /*
+    cout << "TT2: " << simple1_my_struct1( 0 ).x << endl;
+    cout << "TT2: " << simple1_my_struct1_y(0) << endl;
     // static:
     simple1_my_struct1_x(0) = 4;
     simple1_my_struct1_y(0) = 3.76;
 
     cout << "simple1_ix: " << simple1_ix << endl;
     cout << "TT: " << simple1_my_struct1( 0 ).y << endl;
-*/
 
+*/
 
 }
 
