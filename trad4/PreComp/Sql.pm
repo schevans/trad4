@@ -224,13 +224,90 @@ sub generate_vec_dummy_data($$$$) {
 #######################################################
 # pv3 stuff..
 
+use strict;
+use warnings;
+
 sub GenerateNew($$) {
     my $master_hash = shift;
     my $type = shift;
 
     GenerateObjectTable( $master_hash, $type );
 
-    GenerateExtraTables( $master_hash, $type );
+    my $section;
+
+    foreach $section ( "static", "sub" ) {
+
+        my ( $var_name, $var_type, $var_name_stripped );
+
+        foreach $var_name ( @{$master_hash->{$type}->{$section}->{order}} ) {
+
+            $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
+            $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
+
+            if ( exists $master_hash->{structures}->{$var_type} or PreComp::Utilities::IsArray( $var_name ) ) {
+
+                GenerateExtraTables( $master_hash, $var_name, $var_type, $type );
+
+            }
+        }
+    }
+}
+
+sub GenerateExtraTables($$) {
+    my $master_hash = shift;
+    my $var_name = shift;
+    my $var_type = shift;
+    my $table_name = shift;
+
+    my $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name ); 
+
+    $table_name = $table_name."_".$var_name_stripped;
+
+    if ( exists $master_hash->{structures}->{$var_type} ) {
+
+        my ( $struct_var_name, $struct_var_type, $struct_var_name_stripped );
+
+
+        foreach $struct_var_name ( @{$master_hash->{structures}->{$var_type}->{order}} ) {
+
+            $struct_var_type = $master_hash->{structures}->{$var_type}->{data}->{$struct_var_name};
+
+            if ( exists $master_hash->{structures}->{$struct_var_type} or PreComp::Utilities::IsArray( $struct_var_name ) ) {
+                GenerateExtraTables( $master_hash, $struct_var_name, $struct_var_type, $table_name );
+            }
+
+        }
+
+
+        my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::SqlRoot()."$table_name.table" );
+        if( ! $FHD ) { return; }
+
+        print $FHD "create table $table_name (\n";
+        print $FHD "    id int";
+
+        foreach $struct_var_name ( @{$master_hash->{structures}->{$var_type}->{order}} ) {
+
+            if ( not ( exists $master_hash->{structures}->{$struct_var_type} or PreComp::Utilities::IsArray( $struct_var_name )) ) {
+                $struct_var_type = $master_hash->{structures}->{$var_type}->{data}->{$struct_var_name};
+
+                print $FHD ",\n    ".PreComp::Utilities::StripBrackets( $struct_var_name)." ".PreComp::Utilities::Type2Sql( $struct_var_type );
+            }
+        }
+
+        print $FHD "\n);\n";
+        PreComp::Utilities::CloseFile();
+    }
+    elsif ( PreComp::Utilities::IsArray( $var_name ) ) {
+
+        my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::SqlRoot()."$table_name.table" );
+        if( ! $FHD ) { return; }
+
+        print $FHD "create table $table_name (\n";
+        print $FHD "    id int";
+        print $FHD ",\n    $var_name_stripped ".PreComp::Utilities::Type2Sql( $var_type )."\n";
+        print $FHD ");\n";
+        PreComp::Utilities::CloseFile();
+    }
 }
 
 sub GenerateObjectTable($$) {
@@ -243,9 +320,11 @@ sub GenerateObjectTable($$) {
     print $FHD "create table $type (\n";
     print $FHD "    id int";
 
-    my ( $var_name, $var_type, $var_name_stripped );
+    my $section;
 
     foreach $section ( "static", "sub" ) {
+
+        my ( $var_name, $var_type, $var_name_stripped );
 
         foreach $var_name ( @{$master_hash->{$type}->{$section}->{order}} ) {
 
@@ -254,7 +333,7 @@ sub GenerateObjectTable($$) {
 
             if ( exists $master_hash->{structures}->{$var_type} or PreComp::Utilities::IsArray( $var_name ) ) {
 
-                print $FHD ",\n    $var_name_stripped char";
+print "Doing nothing\n";
 
             }
             else {
@@ -271,35 +350,6 @@ sub GenerateObjectTable($$) {
 
     PreComp::Utilities::CloseFile();
 
-}
-
-sub GenerateExtraTables($$) {
-    my $master_hash = shift;
-    my $type = shift;
-
-    foreach $section ( "static", "sub" ) {
-
-        foreach $var_name ( @{$master_hash->{$type}->{$section}->{order}} ) {
-
-            $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
-
-            if ( ( not exists $master_hash->{structures}->{$var_type} ) and ( PreComp::Utilities::IsArray( $var_name )) ) {
-
-                my $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );;
-
-                my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::SqlRoot()."$type"."_$var_name_stripped.table" );
-                if( ! $FHD ) { return; }
-
-                print $FHD "create table $type"."_$var_name_stripped (\n";
-                print $FHD "    id int";
-
-                print $FHD ",\n    $var_name_stripped ".PreComp::Utilities::Type2Sql( $var_type )."\n";
-                
-                print $FHD ");\n";
-                PreComp::Utilities::CloseFile();
-            }
-        }
-    }
 }
 
 
