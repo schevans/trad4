@@ -207,7 +207,7 @@ if ( $pv3 ) {
         PreComp::Sql::GenerateNew( $new_master_hash, $type );
     }
 
-    PreComp::SqlCommon::GenerateNew( $new_master_hash );
+#    PreComp::SqlCommon::GenerateNew( $new_master_hash );
 }
 
 print "Validating..\n";
