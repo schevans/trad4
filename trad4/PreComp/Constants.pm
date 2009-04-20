@@ -16,7 +16,7 @@ sub CommomHeader {
     my @header = ( 
         "long_long last_published",
         "int id",
-        "object_status status",
+        "e_status status",
         "int type" ,
         "int tier" ,
         "char name[OBJECT_NAME_LEN]",
