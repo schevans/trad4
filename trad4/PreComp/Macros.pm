@@ -339,6 +339,8 @@ sub GenerateNew($$) {
                 else {
 
                     $printable->{name} = $type."_$printable->{name}";
+
+                    $printable->{code} =~ s/\[/\[index_/g;
                     $printable->{code} = "(($type*)obj_loc[id])->".$printable->{code};
 
                 }
