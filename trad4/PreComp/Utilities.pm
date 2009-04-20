@@ -837,6 +837,9 @@ sub Type2Sql($) {
     elsif ( $type =~ 'char' ) {
         $sql_type = "char";
     }
+    elsif ( $type =~ 'float' ) {
+        $sql_type = "float";
+    }
     else {
         $sql_type = "int";
     }
