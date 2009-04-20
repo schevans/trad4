@@ -34,7 +34,7 @@ typedef struct {
     validate_fpointer validate;
 } object_type_struct_t;
 
-#define DEBUG_ON
+//#define DEBUG_ON
 
 #ifdef DEBUG_ON
 #define DEBUG( debug ) if ( ((object_header*)obj_loc[id])->log_level > 0 ) std::cout << debug << std::endl;
@@ -52,7 +52,7 @@ enum logging_level {
     LOADS
 };
 
-enum object_status {
+enum e_status {
     STOPPED,
     RUNNING,
     FAILED,
@@ -67,7 +67,7 @@ typedef struct {
     // Header
     long long last_published;
     int id;
-    object_status status;
+    e_status status;
     int type;
     int tier;
     char name[OBJECT_NAME_LEN];
@@ -75,7 +75,13 @@ typedef struct {
     int implements;
 } object_header;
 
-#define object_timestamp(index) ((object_header*)obj_loc[index])->last_published
+#define object_last_published(index) ((object_header*)obj_loc[index])->last_published
+#define object_status(index) ((object_header*)obj_loc[index])->status
+#define object_type(index) ((object_header*)obj_loc[index])->type
+#define object_tier(index) ((object_header*)obj_loc[index])->tier
+#define object_name(index) ((object_header*)obj_loc[index])->name
+#define object_log_level(index) ((object_header*)obj_loc[index])->log_level
+#define object_implements(index) ((object_header*)obj_loc[index])->implements
 
 #define DBG cout << __FILE__ << ": " << __LINE__ << endl;
 
