@@ -2,6 +2,7 @@
 struct1
     int x
     float y
+    int iz
 
 struct2
     double rates[NUM_RATES]
@@ -14,5 +15,6 @@ ms_inner
 
 ms_outer
     ms_inner my_inner_ms[3]
-    int g
+    int ig
+    float fr
 

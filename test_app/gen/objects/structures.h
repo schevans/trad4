@@ -13,7 +13,8 @@ typedef struct {
 
 typedef struct {
     ms_inner my_inner_ms[3];
-    int g;
+    int ig;
+    float fr;
 } ms_outer;
 
 typedef struct {
@@ -24,6 +25,7 @@ typedef struct {
 typedef struct {
     int x;
     float y;
+    int iz;
 } struct1;
 
 
