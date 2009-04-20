@@ -92,14 +92,17 @@ sub Generate($$$$$$) {
     generate_validator( $master_hash, $name, $FHD );
     print $FHD "\n";
 
-    generate_loader_callback( $master_hash, $obj_hash, $struct_hash, $FHD );
     print $FHD "\n";
 
     if ( $pv3 ) {
+
         GenerateExtraLoaders( $new_master_hash, $name, $FHD );
+        GenerateLoaderCallback( $new_master_hash, $name, $FHD );
         GenerateNewLoader( $new_master_hash, $name, $FHD );
     }
     else {
+
+        generate_loader_callback( $master_hash, $obj_hash, $struct_hash, $FHD );
 
         generate_loader( $obj_hash, $FHD );
 
@@ -701,7 +704,12 @@ sub GenerateNewLoader($$$) {
             $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
             $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
 
-            print $FHD ", $type.$var_name_stripped";
+            if ( exists $master_hash->{structures}->{$var_type} or PreComp::Utilities::IsArray( $var_name ) ) {
+                print "Struct or array II - doing nothing, $type.$var_name\n";
+            }
+            else {
+                print $FHD ", $type.$var_name_stripped";
+            }
         }
 
     }
@@ -791,7 +799,7 @@ sub GenerateExtraLoaders($$$) {
 
                     my ( $struct_var_name, $struct_var_type, $struct_var_name_stripped );
 
-                    my $counter = 0;
+                    my $counter = 1;
 
                     foreach $struct_var_name ( @{$master_hash->{structures}->{$var_type}->{order}} ) {
 
@@ -883,6 +891,91 @@ sub GenerateExtraLoaders($$$) {
             }
         }
     }
+}
+
+sub GenerateLoaderCallback($$$$)
+{
+    my $master_hash = shift;
+    my $type = shift;
+    my $FHD = shift;
+
+
+    print $FHD "\n";
+    print $FHD "static int load_objects_callback(void *obj_loc_v, int argc, char **row, char **azColName)\n";
+    print $FHD "{\n";
+    print $FHD "    // Have to cast to unsigned char** here as C++ doesn't like\n";
+    print $FHD "    //  void* arithmetic for some strange reason... \n";
+    print $FHD "    unsigned char** obj_loc = (unsigned char**)obj_loc_v;\n";
+    print $FHD "\n";
+    print $FHD "    int id = atoi(row[0]);\n";
+    print $FHD "\n";
+    print $FHD "    bool is_new(false);\n";
+    print $FHD "\n";
+    print $FHD "    if ( !obj_loc[id] ) \n";
+    print $FHD "    {\n";
+    print $FHD "        obj_loc[id] = (unsigned char*)(new $type);\n";
+    print $FHD "        is_new = true;\n";
+    print $FHD "    }\n";
+    print $FHD "\n";
+    print $FHD "    (($type*)obj_loc[id])->id = id;\n";
+    print $FHD "    memcpy( (($type*)obj_loc[id])->name, row[1], 32 );\n";
+    print $FHD "    object_tier(id) = atoi(row[2]);\n";
+    print $FHD "    object_log_level(id) =  atoi(row[3]);\n";
+    print $FHD "\n";
+    print $FHD "    object_last_published(id) = 0;\n";
+    print $FHD "    object_status(id) = RELOADED;\n";
+    print $FHD "    object_type(id) = $master_hash->{$type}->{type_id};\n";
+    print $FHD "    object_implements(id) = $master_hash->{$master_hash->{$type}->{implements}}->{type_id};\n";
+            
+    print $FHD "\n";
+
+    print $FHD "    \n";
+
+    my $counter=4;
+
+    my $section;
+
+    foreach $section ( "static", "sub" ) {
+
+        my ( $var_name, $var_name_stripped, $var_type );
+
+        foreach $var_name ( @{$master_hash->{$type}->{$section}->{order}} ) {
+
+            $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
+            $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
+
+            if ( exists $master_hash->{structures}->{$var_type} or PreComp::Utilities::IsArray( $var_name ) ) {
+
+                print "Struct or array - doing nothing, $type.$var_name\n";
+            }
+            elsif ( exists $master_hash->{$var_type} ) {
+
+
+                print $FHD "    $type"."_$var_name_stripped = atoi(row[$counter]);\n";
+            }
+            else {
+
+                print $FHD "    $type"."_$var_name_stripped = ".PreComp::Utilities::Type2atoX( $var_type )."(row[$counter]);\n";
+                
+            }
+            
+            $counter = $counter+1;
+        }
+
+    }
+    
+
+    print $FHD "\n";
+
+    print $FHD "    if ( is_new )\n";
+    print $FHD "    {\n";
+    print $FHD "        std::cout << \"New $type created.\" << std::endl;\n";
+    print $FHD "    }\n";
+
+    print $FHD "\n";
+    print $FHD "    return 0;\n";
+    print $FHD "} \n";
+
 }
 
 1;
