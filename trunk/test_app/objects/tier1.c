@@ -12,15 +12,16 @@ using namespace std;
 
 void calculate_tier1( obj_loc_t obj_loc, int id )
 {
-    T4_TEST( tier1_struct_scalar_rates( 0 ), 4.5 );
+    T4_TEST( tier1_struct_scalar_rates( 0 ), 4.0 );
+    T4_TEST( tier1_struct_scalar_rates( 2 ), 4.2 );
     T4_TEST( tier1_struct_scalar_dates( 0 ), 5000 );
+    T4_TEST( tier1_struct_scalar_dates( 2 ), 5002 );
     T4_TEST( tier1_double_array( 0 ), 1.14 );
     T4_TEST( tier1_double_array( 1 ), 2.14 );
     T4_TEST( tier1_double_array( 2 ), 3.14 );
     T4_TEST( tier1_double_array( 3 ), 4.14 );
     T4_TEST( tier1_double_array( 4 ), 5.14 );
     
-
 /*
 cout << "tier1_double_array( 3 ):" << tier1_double_array( 3 ) << endl;
 cout << "tier1_struct_scalar_rates( 0 ):" << tier1_struct_scalar_rates( 0 ) << endl;
