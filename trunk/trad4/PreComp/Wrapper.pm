@@ -58,7 +58,7 @@ sub Generate($$$$$$) {
     print $FHD "#include <sqlite3.h>\n";
     print $FHD "\n";
 
-    if ( %{$obj_hash->{data}->{static_vec}} or %{$obj_hash->{data}->{sub_vec}} ) {
+    if ( not $pv3 and ( %{$obj_hash->{data}->{static_vec}} or %{$obj_hash->{data}->{sub_vec}} )) {
 
         print $FHD "static int counter(0);\n";
         print $FHD "\n";
@@ -775,29 +775,27 @@ sub PrintExtraLoaderCallback($$) {
     my $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
     my $function_name = "load_$table_name"."_callback";
 
-my $vec_size = 33;
+    my $vec_size = $var_name;
+    $vec_size =~ s/.*\[//g;
+    $vec_size =~ s/\]//g;
+
 
     print $FHD "static int $function_name(void *obj_loc_v, int argc, char **row, char **azColName)\n";
     print $FHD "{\n";
     print $FHD "    unsigned char** obj_loc = (unsigned char**)obj_loc_v;\n";
     print $FHD "    int id = atoi(row[0]);\n";
-    print $FHD "\n";
-    print $FHD "    if ( counter > $vec_size )\n";
-    print $FHD "    {\n";
-
-    print $FHD "        cerr << \"Error in load_$var_type"."_$var_name_stripped: The number of rows in $var_type.table is greater than $vec_size. Truncating data in $var_type"."_$var_name_stripped structure to $vec_size elements. Suggest you fix the data or create a new type with larger arrays and migrate your objects across.\" << endl;\n";
-    print $FHD "    }\n";
-    print $FHD "    else\n";
-    print $FHD "    {\n";
 
     my $counter = 1;
 
     my $arg_string="(";
+    my $last_ord = "";
 
     my $i;
     for ( $i = 1 ; $i <= $depth ; $i++ ) {
 
-        print $FHD "        int ord$i = atoi(row[$counter]);\n";
+        print $FHD "    int ord$i = atoi(row[$counter]);\n";
+
+        $last_ord = "ord$i";
 
         if ( $counter > 1 ) {
             $arg_string = $arg_string.", ";
@@ -810,10 +808,26 @@ my $vec_size = 33;
 
     $arg_string = $arg_string." )";
 
+    my $if_string;
+
     if ( $counter == 1 ) {
 
         $arg_string="";
+        $if_string = "0";
     }
+    else {
+    
+        $if_string = "$last_ord > $vec_size";
+    }
+
+    print $FHD "\n";
+    print $FHD "    if ( $if_string )\n";
+    print $FHD "    {\n";
+
+    print $FHD "        cerr << \"Error in load_$var_type"."_$var_name_stripped: The number of rows in $var_type.table is greater than $vec_size. Truncating data in $var_type"."_$var_name_stripped structure to $vec_size elements. Suggest you fix the data or create a new type with larger arrays and migrate your objects across.\" << endl;\n";
+    print $FHD "    }\n";
+    print $FHD "    else\n";
+    print $FHD "    {\n";
 
     if ( exists $master_hash->{structures}->{$var_type} ) {
 
@@ -842,7 +856,6 @@ my $vec_size = 33;
 
     }
 
-    print $FHD "        counter++;\n";
 
 
 
@@ -871,7 +884,6 @@ sub PrintExtraLoader($$) {
     print $FHD "{\n";
     print $FHD "    cout << \"\t$function_name()\" << endl;\n";
     print $FHD "\n";
-    print $FHD "    counter = 0;\n";
     print $FHD "    char *zErrMsg = 0;\n";
     print $FHD "\n";
     print $FHD "    std::ostringstream dbstream;\n";
