@@ -312,7 +312,7 @@ sub generate_need_refresh($$$$)
         while ( $counter < $constants_hash->{$vec_size}) { 
 
             if ( $pv3 ) {
-                print $FHD "(object_timestamp(id) < object_timestamp( $name"."_$vec_short\($counter\) )) || ";
+                print $FHD "(object_last_published(id) < object_last_published( $name"."_$vec_short\($counter\) )) || ";
             }
             else {
                 print $FHD "(object_timestamp(id) < object_timestamp( $name"."_$vec_short\[$counter\] )) || ";
@@ -840,7 +840,7 @@ sub PrintExtraLoaderCallback($$) {
 
             if ( not exists $master_hash->{structures}->{$struct_var_type} and not PreComp::Utilities::IsArray( $struct_var_name )) {
 
-                print $FHD "        $table_name"."_$struct_var_name_stripped$arg_string  = ".PreComp::Utilities::Type2atoX( $struct_var_type )."(row[$counter]);\n";
+                print $FHD "        $table_name"."_$struct_var_name_stripped$arg_string  = ".PreComp::Utilities::NewType2atoX( $master_hash, $struct_var_type )."(row[$counter]);\n";
                 $counter = $counter+1;
             }
 
@@ -852,7 +852,7 @@ sub PrintExtraLoaderCallback($$) {
     }
     else {
 
-        print $FHD "        $table_name$arg_string = ".PreComp::Utilities::Type2atoX( $var_type )."(row[$counter]);\n";
+        print $FHD "        $table_name$arg_string = ".PreComp::Utilities::NewType2atoX( $master_hash, $var_type )."(row[$counter]);\n";
 
     }
 
@@ -1089,7 +1089,7 @@ sub GenerateLoaderCallback($$$$) {
             }
             else {
 
-                print $FHD "    $type"."_$var_name_stripped = ".PreComp::Utilities::Type2atoX( $var_type )."(row[$counter]);\n";
+                print $FHD "    $type"."_$var_name_stripped = ".PreComp::Utilities::NewType2atoX( $master_hash, $var_type )."(row[$counter]);\n";
                 $counter = $counter+1;
                 
             }
