@@ -1,0 +1,10 @@
+
+
+static
+    struct1 my_struct1
+    double d9
+
+pub
+    double x_d9
+    double y_d9
+    double iz_d9
