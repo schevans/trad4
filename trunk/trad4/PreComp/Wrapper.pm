@@ -792,19 +792,28 @@ my $vec_size = 33;
 
     my $counter = 1;
 
-    my $arg_string="ord1";
-    print $FHD "        int ord1 = atoi(row[$counter]);\n";
-    $counter = $counter+1;
+    my $arg_string="(";
 
     my $i;
-    for ( $i = 2 ; $i <= $depth ; $i++ ) {
+    for ( $i = 1 ; $i <= $depth ; $i++ ) {
 
         print $FHD "        int ord$i = atoi(row[$counter]);\n";
 
-        $arg_string = $arg_string.", ord$i";
+        if ( $counter > 1 ) {
+            $arg_string = $arg_string.", ";
+        }
+
+        $arg_string = $arg_string." ord$i";
+
         $counter = $counter+1;
     }
 
+    $arg_string = $arg_string." )";
+
+    if ( $counter == 1 ) {
+
+        $arg_string="";
+    }
 
     if ( exists $master_hash->{structures}->{$var_type} ) {
 
@@ -817,7 +826,7 @@ my $vec_size = 33;
 
             if ( not exists $master_hash->{structures}->{$struct_var_type} and not PreComp::Utilities::IsArray( $struct_var_name )) {
 
-                print $FHD "        $table_name"."_$struct_var_name_stripped( $arg_string ) = ".PreComp::Utilities::Type2atoX( $struct_var_type )."(row[$counter]);\n";
+                print $FHD "        $table_name"."_$struct_var_name_stripped$arg_string  = ".PreComp::Utilities::Type2atoX( $struct_var_type )."(row[$counter]);\n";
                 $counter = $counter+1;
             }
 
@@ -829,7 +838,7 @@ my $vec_size = 33;
     }
     else {
 
-        print $FHD "        $table_name( $arg_string ) = ".PreComp::Utilities::Type2atoX( $var_type )."(row[$counter]);\n";
+        print $FHD "        $table_name$arg_string = ".PreComp::Utilities::Type2atoX( $var_type )."(row[$counter]);\n";
 
     }
 
@@ -964,10 +973,7 @@ sub GenerateNewLoader($$$) {
             $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
             $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
 
-            if ( exists $master_hash->{structures}->{$var_type} or PreComp::Utilities::IsArray( $var_name ) ) {
-                print "Struct or array II - doing nothing, $type.$var_name\n";
-            }
-            else {
+            if ( not ( exists $master_hash->{structures}->{$var_type} or PreComp::Utilities::IsArray( $var_name ))) {
                 print $FHD ", $type.$var_name_stripped";
             }
         }
@@ -1061,20 +1067,21 @@ sub GenerateLoaderCallback($$$$) {
 
             if ( exists $master_hash->{structures}->{$var_type} or PreComp::Utilities::IsArray( $var_name ) ) {
 
-                print "Struct or array - doing nothing, $type.$var_name\n";
+                # Do nothing
             }
             elsif ( exists $master_hash->{$var_type} ) {
 
 
                 print $FHD "    $type"."_$var_name_stripped = atoi(row[$counter]);\n";
+                $counter = $counter+1;
             }
             else {
 
                 print $FHD "    $type"."_$var_name_stripped = ".PreComp::Utilities::Type2atoX( $var_type )."(row[$counter]);\n";
+                $counter = $counter+1;
                 
             }
             
-            $counter = $counter+1;
         }
 
     }
