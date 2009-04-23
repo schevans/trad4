@@ -262,8 +262,11 @@ sub GenerateExtraTables($$) {
 
     my $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name ); 
 
-    $depth = $depth + 1;
     $table_name = $table_name."_".$var_name_stripped;
+    
+    if ( $var_name ne $var_name_stripped ) {
+        $depth = $depth + 1;
+    }
 
     if ( exists $master_hash->{structures}->{$var_type} ) {
 
@@ -279,7 +282,6 @@ sub GenerateExtraTables($$) {
             }
 
         }
-
 
         my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::SqlRoot()."$table_name.table" );
         if( ! $FHD ) { return; }

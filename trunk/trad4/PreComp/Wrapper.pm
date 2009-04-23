@@ -715,13 +715,15 @@ sub GenerateExtraSection($$$$$) {
 
     my $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
 
-    $depth = $depth + 1;
     $table_name = $table_name."_".$var_name_stripped;
+
+    if ( $var_name ne $var_name_stripped ) {
+        $depth = $depth + 1;
+    }
 
     if ( exists $master_hash->{structures}->{$var_type} ) {
 
         my ( $struct_var_name, $struct_var_type, $struct_var_name_stripped );
-
 
         foreach $struct_var_name ( @{$master_hash->{structures}->{$var_type}->{order}} ) {
 
