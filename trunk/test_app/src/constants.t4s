@@ -6,3 +6,5 @@ NUM_RATES = 12
 
 
 NUM_TIER1 = 10
+
+NUM_MANY1 = 10
