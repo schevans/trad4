@@ -777,6 +777,60 @@ sub PrintHeader($$$) {
 
 }
 
+sub NewType2atoX($$) {
+    my $master_hash = shift;
+    my $type = shift;
+
+    if ( $type =~ /int/ ) {
+        return "atoi";
+    }
+    elsif ( $type =~ /_enum/ ) {
+        return "($type)atoi";
+    }
+    elsif ( $type =~ /double/ ) {
+        return "std::atof";
+    }
+    elsif ( $type =~ /float/ ) {
+        return "std::atof";
+    }
+    elsif ( $type =~ /long/ ) {
+        return "std::atoi";
+    }
+    elsif ( $type =~ /char/ ) {
+        return "*";
+    }
+    elsif ( exists $master_hash->{$type} ) {
+        return "std::atoi";
+    }
+    else {
+
+        if ( defined $alias_hash->{$type} ) {
+
+            if ( $alias_hash->{$type} =~ /long int/ ) {
+
+                return "std::atoi";
+            }
+            elsif ( $alias_hash->{$type} =~ /int/ ) {
+
+                return "std::atoi";
+            }
+            else {
+
+                print "Error: Unknown type \'$type\' in call to Type2atoX in trad4 internals.\n";
+                ExitOnError();
+            }
+        }
+        else {
+
+            print "Error: Unknown type \'$type\' in call to Type2atoX in trad4 internals.\n";
+            ExitOnError();
+        }
+
+    }
+
+
+}
+
 sub Type2atoX($) {
     my $type = shift;
 

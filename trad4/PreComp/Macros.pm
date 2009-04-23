@@ -325,16 +325,15 @@ sub GenerateNew($$) {
                     if ( $printable->{code} =~ /obj_loc/ ) {
                        
                         $printable->{code} =~ s/\[id/[(($type*)obj_loc\[id/;
-
-                        $printable->{code} =~ s/\[/\[index_/g;
-                        $printable->{code} =~ s/\[index_id\]/\[id\]/;
-                        $printable->{code} =~ s/obj_loc\[index_/obj_loc\[/;
-
                     }
                     else {
                         $printable->{code} = "(($type*)obj_loc[id])->".$printable->{code};
                         $printable->{name} = $type."_$printable->{name}";
                     }
+
+                    $printable->{code} =~ s/\[/\[index_/g;
+                    $printable->{code} =~ s/\[index_id\]/\[id\]/;
+                    $printable->{code} =~ s/obj_loc\[index_/obj_loc\[/;
                 }
                 else {
 
