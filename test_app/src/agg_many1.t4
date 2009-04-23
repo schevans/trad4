@@ -1,0 +1,8 @@
+
+
+
+sub
+    many1 many1_array[NUM_MANY1]
+
+pub
+    struct1 agg_struct1
