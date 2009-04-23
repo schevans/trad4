@@ -697,7 +697,7 @@ sub GenerateExtraLoaders($$$) {
 
             if ( exists $master_hash->{structures}->{$var_type} or PreComp::Utilities::IsArray( $var_name ) ) {
 
-                GenerateExtraSection( $master_hash, $type_id, $var_name, $var_type, $type, $FHD );
+                GenerateExtraSection( $master_hash, $type_id, $var_name, $var_type, $type, 0, $FHD );
 
             }
         }
@@ -710,10 +710,12 @@ sub GenerateExtraSection($$$$$) {
     my $var_name = shift;
     my $var_type = shift;
     my $table_name = shift;
+    my $depth = shift;
     my $FHD = shift;
 
     my $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
 
+    $depth = $depth + 1;
     $table_name = $table_name."_".$var_name_stripped;
 
     if ( exists $master_hash->{structures}->{$var_type} ) {
@@ -726,13 +728,13 @@ sub GenerateExtraSection($$$$$) {
             $struct_var_type = $master_hash->{structures}->{$var_type}->{data}->{$struct_var_name};
 
             if ( exists $master_hash->{structures}->{$struct_var_type} or PreComp::Utilities::IsArray( $struct_var_name ) ) {
-                GenerateExtraSection( $master_hash, $type_id, $struct_var_name, $struct_var_type, $table_name, $FHD );
+                GenerateExtraSection( $master_hash, $type_id, $struct_var_name, $struct_var_type, $table_name, $depth, $FHD );
             }
 
         }
 
-        PrintExtraLoaderCallback( $master_hash, $type_id, $table_name, $var_name, $var_type, $FHD );
-        PrintExtraLoader( $master_hash, $type_id, $table_name, $var_name, $var_type, $FHD );
+        PrintExtraLoaderCallback( $master_hash, $type_id, $table_name, $var_name, $var_type, $depth, $FHD );
+        PrintExtraLoader( $master_hash, $type_id, $table_name, $var_name, $var_type, $depth, $FHD );
 
         foreach $struct_var_name ( @{$master_hash->{structures}->{$var_type}->{order}} ) {
 
@@ -746,8 +748,8 @@ sub GenerateExtraSection($$$$$) {
     }
     elsif ( PreComp::Utilities::IsArray( $var_name ) ) {
 
-        PrintExtraLoaderCallback( $master_hash, $type_id, $table_name, $var_name, $var_type, $FHD );
-        PrintExtraLoader( $master_hash, $type_id, $table_name, $var_name, $var_type, $FHD );
+        PrintExtraLoaderCallback( $master_hash, $type_id, $table_name, $var_name, $var_type, $depth, $FHD );
+        PrintExtraLoader( $master_hash, $type_id, $table_name, $var_name, $var_type, $depth, $FHD );
 
     }
     else {
@@ -765,6 +767,7 @@ sub PrintExtraLoaderCallback($$) {
     my $table_name = shift;
     my $var_name = shift;
     my $var_type = shift;
+    my $depth = shift;
     my $FHD = shift;
 
     my $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
@@ -785,28 +788,46 @@ my $vec_size = 33;
     print $FHD "    else\n";
     print $FHD "    {\n";
 
+    my $counter = 1;
+
+    my $arg_string="ord1";
+    print $FHD "        int ord1 = atoi(row[$counter]);\n";
+    $counter = $counter+1;
+
+    my $i;
+    for ( $i = 2 ; $i <= $depth ; $i++ ) {
+
+        print $FHD "        int ord$i = atoi(row[$counter]);\n";
+
+        $arg_string = $arg_string.", ord$i";
+        $counter = $counter+1;
+    }
+
+
     if ( exists $master_hash->{structures}->{$var_type} ) {
 
         my ( $struct_var_name, $struct_var_type, $struct_var_name_stripped );
-
-        my $counter = 1;
 
         foreach $struct_var_name ( @{$master_hash->{structures}->{$var_type}->{order}} ) {
 
             $struct_var_type = $master_hash->{structures}->{$var_type}->{data}->{$struct_var_name};
             $struct_var_name_stripped = PreComp::Utilities::StripBrackets( $struct_var_name );
 
-            print $FHD "        $table_name"."_$struct_var_name_stripped(counter) = ".PreComp::Utilities::Type2atoX( $struct_var_type )."(row[$counter]);\n";
+            if ( not exists $master_hash->{structures}->{$struct_var_type} and not PreComp::Utilities::IsArray( $struct_var_name )) {
+
+                print $FHD "        $table_name"."_$struct_var_name_stripped( $arg_string ) = ".PreComp::Utilities::Type2atoX( $struct_var_type )."(row[$counter]);\n";
+                $counter = $counter+1;
+            }
+
 
 #PreComp::Utilities::Type2atoX($obj_hash->{data}->{static}->{$key})."(row[$counter])
 
-            $counter = $counter+1;
         }
 
     }
     else {
 
-        print $FHD "        $table_name(counter) = ".PreComp::Utilities::Type2atoX( $var_type )."(row[1]);\n";
+        print $FHD "        $table_name( $arg_string ) = ".PreComp::Utilities::Type2atoX( $var_type )."(row[$counter]);\n";
 
     }
 
@@ -829,6 +850,7 @@ sub PrintExtraLoader($$) {
     my $table_name = shift;
     my $var_name = shift;
     my $var_type = shift;
+    my $depth = shift;
     my $FHD = shift; 
 
     my $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
@@ -843,6 +865,13 @@ sub PrintExtraLoader($$) {
     print $FHD "\n";
     print $FHD "    std::ostringstream dbstream;\n";
     print $FHD "    dbstream << \"select object.id";
+
+    my $i;
+    for ( $i = 1 ; $i <= $depth ; $i++ ) {
+
+        print $FHD ", $table_name.ord$i";
+    }
+
 
     if ( exists $master_hash->{structures}->{$var_type} ) {
 
