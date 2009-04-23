@@ -246,7 +246,7 @@ sub GenerateNew($$) {
 
             if ( exists $master_hash->{structures}->{$var_type} or PreComp::Utilities::IsArray( $var_name ) ) {
 
-                GenerateExtraTables( $master_hash, $var_name, $var_type, $type );
+                GenerateExtraTables( $master_hash, $var_name, $var_type, $type, 0 );
 
             }
         }
@@ -258,9 +258,11 @@ sub GenerateExtraTables($$) {
     my $var_name = shift;
     my $var_type = shift;
     my $table_name = shift;
+    my $depth = shift;
 
     my $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name ); 
 
+    $depth = $depth + 1;
     $table_name = $table_name."_".$var_name_stripped;
 
     if ( exists $master_hash->{structures}->{$var_type} ) {
@@ -273,7 +275,7 @@ sub GenerateExtraTables($$) {
             $struct_var_type = $master_hash->{structures}->{$var_type}->{data}->{$struct_var_name};
 
             if ( exists $master_hash->{structures}->{$struct_var_type} or PreComp::Utilities::IsArray( $struct_var_name ) ) {
-                GenerateExtraTables( $master_hash, $struct_var_name, $struct_var_type, $table_name );
+                GenerateExtraTables( $master_hash, $struct_var_name, $struct_var_type, $table_name, $depth );
             }
 
         }
@@ -284,6 +286,12 @@ sub GenerateExtraTables($$) {
 
         print $FHD "create table $table_name (\n";
         print $FHD "    id int";
+
+        my $i;
+        for ( $i = 1 ; $i <= $depth ; $i++ ) {
+
+            print $FHD ",\n    ord$i int";
+        }
 
         foreach $struct_var_name ( @{$master_hash->{structures}->{$var_type}->{order}} ) {
 
@@ -304,6 +312,13 @@ sub GenerateExtraTables($$) {
 
         print $FHD "create table $table_name (\n";
         print $FHD "    id int";
+
+        my $i;
+        for ( $i = 1 ; $i <= $depth ; $i++ ) {
+
+            print $FHD ",\n    ord$i int";
+        }
+
         print $FHD ",\n    $var_name_stripped ".PreComp::Utilities::Type2Sql( $var_type )."\n";
         print $FHD ");\n";
         PreComp::Utilities::CloseFile();
