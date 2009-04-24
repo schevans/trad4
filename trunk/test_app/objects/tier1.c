@@ -21,6 +21,8 @@ void calculate_tier1( obj_loc_t obj_loc, int id )
     T4_TEST( tier1_double_array( 2 ), 3.14 );
     T4_TEST( tier1_double_array( 3 ), 4.14 );
     T4_TEST( tier1_double_array( 4 ), 5.14 );
+
+    tier1_int_out = tier1_struct_scalar_dates( 0 ) + tier1_struct_scalar_dates( 1 ) + tier1_struct_scalar_dates( 2 );
     
 /*
 cout << "tier1_double_array( 3 ):" << tier1_double_array( 3 ) << endl;
