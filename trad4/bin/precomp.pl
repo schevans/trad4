@@ -203,7 +203,6 @@ if ( $pv3 ) {
             print Dumper( $new_master_hash->{$type} );
         }
 
-        PreComp::Macros::GenerateNew( $new_master_hash, $type );
         PreComp::Sql::GenerateNew( $new_master_hash, $type );
     }
 
@@ -223,6 +222,7 @@ foreach $type ( keys %doing ) {
     PreComp::Header::Generate( $master_hash->{$type} );
     PreComp::Wrapper::Generate( $master_hash, $type, $struct_hash, $constants_hash, $new_master_hash, $pv3 );
     PreComp::Calculate::Generate( $master_hash->{$type} );
+    PreComp::Macros::Generate( $new_master_hash, $type );
 
     if ( ! $pv3 ) {
         PreComp::Sql::Generate( $master_hash, $struct_hash, $alias_hash, $type );
@@ -231,12 +231,6 @@ foreach $type ( keys %doing ) {
 
 print "Generating makefiles..\n";
 PreComp::Makefiles::Generate( $master_hash );
-
-if ( ! $pv3 ) {
-
-    print "Generating macros..\n";
-    PreComp::Macros::Generate( $master_hash, $struct_hash );
-}
 
 print "Generating sql..\n";
 PreComp::SqlCommon::Generate( $master_hash );
