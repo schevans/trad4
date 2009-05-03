@@ -11,6 +11,7 @@ use PreComp::Utilities;
 use PreComp::Constants;
 use Data::Dumper;
 
+sub GetPrintablesFromSection($$$);
 
 sub Generate($$) {
     my $master_hash = shift;
