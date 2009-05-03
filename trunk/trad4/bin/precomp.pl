@@ -29,8 +29,6 @@ if ( ! getopts( 'o:hvdsckan', \%opts ) ) {
 
 my $verbose = $opts{v};
 
-my $pv3 = $opts{n};
-
 if ( $opts{c} ) {
 
     PreComp::Utilities::Clean();
@@ -200,7 +198,7 @@ foreach $type ( keys %doing ) {
 
     print "Generating $type..\n";
     PreComp::Header::Generate( $master_hash->{$type} );
-    PreComp::Wrapper::Generate( $master_hash, $type, $struct_hash, $constants_hash, $new_master_hash, $pv3 );
+    PreComp::Wrapper::Generate( $master_hash, $type, $struct_hash, $constants_hash, $new_master_hash );
     PreComp::Calculate::Generate( $master_hash->{$type} );
     PreComp::Macros::Generate( $new_master_hash, $type );
     PreComp::Sql::Generate( $new_master_hash, $type );
