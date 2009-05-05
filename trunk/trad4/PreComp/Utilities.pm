@@ -155,7 +155,7 @@ sub Validate($$$$$) {
 
                 if ( not $obj_hash->{data}->{$key}->{$key2} =~ /int|double|float|long|char/ ) {
 
-                    if ( exists $struct_hash->{$obj_hash->{data}->{$key}->{$key2}} ) {
+                    if ( exists $struct_hash->{data}->{$obj_hash->{data}->{$key}->{$key2}} ) {
         
                         next;
                     }
@@ -494,7 +494,6 @@ sub LoadStructures() {
 
     my $line;
     my $struct;
-    my $struct_order;
     my $counter = 0;
 
     my ( $type, $var );
@@ -512,8 +511,8 @@ sub LoadStructures() {
         if ( $line =~ /^[a-z]/i ) {
 
             $struct = $line;
-            $struct_order = $line."_order";
 
+            push @{$struct_hash{order}}, $struct;
             next;
         }
 
@@ -528,8 +527,8 @@ sub LoadStructures() {
             ExitOnError();
         }
 
-        $struct_hash{$struct}{data}{$var} = $type;
-        push @{$struct_hash{$struct}{order}}, $var;
+        $struct_hash{data}{$struct}{data}{$var} = $type;
+        push @{$struct_hash{data}{$struct}{order}}, $var;
     }
 
     close STRUCTURES_FILE;
