@@ -35,7 +35,7 @@ sub Generate($$) {
             $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
             $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
 
-            if ( exists $master_hash->{structures}->{$var_type} or PreComp::Utilities::IsArray( $var_name ) ) {
+            if ( exists $master_hash->{structures}->{data}->{$var_type} or PreComp::Utilities::IsArray( $var_name ) ) {
 
                 GenerateExtraTables( $master_hash, $var_name, $var_type, $type, 0 );
                 GenerateExtraDummyData( $master_hash, $var_name, $var_type, $type, 0, $type_num );
@@ -61,16 +61,16 @@ sub GenerateExtraTables($$$$$) {
         $depth = $depth + 1;
     }
 
-    if ( exists $master_hash->{structures}->{$var_type} ) {
+    if ( exists $master_hash->{structures}->{data}->{$var_type} ) {
 
         my ( $struct_var_name, $struct_var_type, $struct_var_name_stripped );
 
 
-        foreach $struct_var_name ( @{$master_hash->{structures}->{$var_type}->{order}} ) {
+        foreach $struct_var_name ( @{$master_hash->{structures}->{data}->{$var_type}->{order}} ) {
 
-            $struct_var_type = $master_hash->{structures}->{$var_type}->{data}->{$struct_var_name};
+            $struct_var_type = $master_hash->{structures}->{data}->{$var_type}->{data}->{$struct_var_name};
 
-            if ( exists $master_hash->{structures}->{$struct_var_type} or PreComp::Utilities::IsArray( $struct_var_name ) ) {
+            if ( exists $master_hash->{structures}->{data}->{$struct_var_type} or PreComp::Utilities::IsArray( $struct_var_name ) ) {
                 GenerateExtraTables( $master_hash, $struct_var_name, $struct_var_type, $table_name, $depth );
             }
 
@@ -88,10 +88,10 @@ sub GenerateExtraTables($$$$$) {
             print $FHD ",\n    ord$i int";
         }
 
-        foreach $struct_var_name ( @{$master_hash->{structures}->{$var_type}->{order}} ) {
+        foreach $struct_var_name ( @{$master_hash->{structures}->{data}->{$var_type}->{order}} ) {
 
-            if ( not ( exists $master_hash->{structures}->{$struct_var_type} or PreComp::Utilities::IsArray( $struct_var_name )) ) {
-                $struct_var_type = $master_hash->{structures}->{$var_type}->{data}->{$struct_var_name};
+            if ( not ( exists $master_hash->{structures}->{data}->{$struct_var_type} or PreComp::Utilities::IsArray( $struct_var_name )) ) {
+                $struct_var_type = $master_hash->{structures}->{data}->{$var_type}->{data}->{$struct_var_name};
 
                 print $FHD ",\n    ".PreComp::Utilities::StripBrackets( $struct_var_name)." ".PreComp::Utilities::Type2Sql( $struct_var_type );
             }
@@ -141,7 +141,7 @@ sub GenerateObjectTable($$) {
             $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name ); 
             $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
 
-            if ( not ( exists $master_hash->{structures}->{$var_type} or PreComp::Utilities::IsArray( $var_name ))) {
+            if ( not ( exists $master_hash->{structures}->{data}->{$var_type} or PreComp::Utilities::IsArray( $var_name ))) {
 
                 print $FHD ",\n    $var_name ".PreComp::Utilities::Type2Sql( $var_type );
             }
@@ -181,7 +181,7 @@ sub GenerateDummyData($$) {
 
     $var_type = $master_hash->{$type}->{static}->{data}->{$var_name};
     
-    if ( not ( exists $master_hash->{structures}->{$var_type} or PreComp::Utilities::IsArray( $var_name )) ) {
+    if ( not ( exists $master_hash->{structures}->{data}->{$var_type} or PreComp::Utilities::IsArray( $var_name )) ) {
             print $FHD ", $PI";
     } 
     }
@@ -219,16 +219,16 @@ sub GenerateExtraDummyData($$$$$$) {
         $depth = $depth + 1;
     }
 
-    if ( exists $master_hash->{structures}->{$var_type} ) {
+    if ( exists $master_hash->{structures}->{data}->{$var_type} ) {
 
         my ( $struct_var_name, $struct_var_type, $struct_var_name_stripped );
 
 
-        foreach $struct_var_name ( @{$master_hash->{structures}->{$var_type}->{order}} ) {
+        foreach $struct_var_name ( @{$master_hash->{structures}->{data}->{$var_type}->{order}} ) {
 
-            $struct_var_type = $master_hash->{structures}->{$var_type}->{data}->{$struct_var_name};
+            $struct_var_type = $master_hash->{structures}->{data}->{$var_type}->{data}->{$struct_var_name};
 
-            if ( exists $master_hash->{structures}->{$struct_var_type} or PreComp::Utilities::IsArray( $struct_var_name ) ) {
+            if ( exists $master_hash->{structures}->{data}->{$struct_var_type} or PreComp::Utilities::IsArray( $struct_var_name ) ) {
                 GenerateExtraDummyData( $master_hash, $struct_var_name, $struct_var_type, $table_name, $depth, $type_num );
             }
 
@@ -246,9 +246,9 @@ sub GenerateExtraDummyData($$$$$$) {
             print $FHD ", 0";
         }
 
-        foreach $struct_var_name ( @{$master_hash->{structures}->{$var_type}->{order}} ) {
+        foreach $struct_var_name ( @{$master_hash->{structures}->{data}->{$var_type}->{order}} ) {
 
-            if ( not ( exists $master_hash->{structures}->{$struct_var_type} or PreComp::Utilities::IsArray( $struct_var_name )) ) {
+            if ( not ( exists $master_hash->{structures}->{data}->{$struct_var_type} or PreComp::Utilities::IsArray( $struct_var_name )) ) {
 
                 print $FHD ", $PI";
             }

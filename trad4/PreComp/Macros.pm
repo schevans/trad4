@@ -174,7 +174,7 @@ my $tmp;
             }
 
         }
-        elsif ( exists $master_hash->{structures}->{$var_type} ) {
+        elsif ( exists $master_hash->{structures}->{data}->{$var_type} ) {
 
             #print $indent."Var $var_name/$var_type is struct. Recursing..\n";
            
@@ -189,7 +189,7 @@ $printable{code} = $var_name;
             push @ret_array, \%printable;
 my $tmp;
  
-            foreach $tmp ( GetPrintablesFromSection( $master_hash, $master_hash->{structures}->{$var_type}, $indent ) ) {
+            foreach $tmp ( GetPrintablesFromSection( $master_hash, $master_hash->{structures}->{data}->{$var_type}, $indent ) ) {
 
                 $tmp->{name} = $var_name."_$tmp->{name}";
                 $tmp->{code} = "$var_name.".$tmp->{code};

@@ -22,16 +22,16 @@ sub Generate($) {
     print $FHD "#include \"aliases.h\"\n";
     print $FHD "\n";
 
-    foreach $key ( keys %{$struct_hash} ) {
+    foreach $structure ( @{$struct_hash->{order}} ) {
 
         print $FHD "typedef struct {\n";
 
-        foreach $var ( @{$struct_hash->{$key}{order}} ) {
+        foreach $var ( @{$struct_hash->{data}{$structure}{order}} ) {
 
-            print $FHD "    $struct_hash->{$key}{data}{$var} $var;\n";
+            print $FHD "    $struct_hash->{data}{$structure}{data}{$var} $var;\n";
 
         }
-        print $FHD "} $key;\n";
+        print $FHD "} $structure;\n";
         print $FHD "\n";
     }
     print $FHD "\n";

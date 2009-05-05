@@ -326,7 +326,7 @@ sub GenerateExtraLoaders($$$) {
             $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
             $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
 
-            if ( exists $master_hash->{structures}->{$var_type} or PreComp::Utilities::IsArray( $var_name ) ) {
+            if ( exists $master_hash->{structures}->{data}->{$var_type} or PreComp::Utilities::IsArray( $var_name ) ) {
 
                 GenerateExtraSection( $master_hash, $type_id, $var_name, $var_type, $type, 0, $FHD );
 
@@ -352,15 +352,15 @@ sub GenerateExtraSection($$$$$$$) {
         $depth = $depth + 1;
     }
 
-    if ( exists $master_hash->{structures}->{$var_type} ) {
+    if ( exists $master_hash->{structures}->{data}->{$var_type} ) {
 
         my ( $struct_var_name, $struct_var_type, $struct_var_name_stripped );
 
-        foreach $struct_var_name ( @{$master_hash->{structures}->{$var_type}->{order}} ) {
+        foreach $struct_var_name ( @{$master_hash->{structures}->{data}->{$var_type}->{order}} ) {
 
-            $struct_var_type = $master_hash->{structures}->{$var_type}->{data}->{$struct_var_name};
+            $struct_var_type = $master_hash->{structures}->{data}->{$var_type}->{data}->{$struct_var_name};
 
-            if ( exists $master_hash->{structures}->{$struct_var_type} or PreComp::Utilities::IsArray( $struct_var_name ) ) {
+            if ( exists $master_hash->{structures}->{data}->{$struct_var_type} or PreComp::Utilities::IsArray( $struct_var_name ) ) {
                 GenerateExtraSection( $master_hash, $type_id, $struct_var_name, $struct_var_type, $table_name, $depth, $FHD );
             }
 
@@ -369,10 +369,10 @@ sub GenerateExtraSection($$$$$$$) {
         PrintExtraLoaderCallback( $master_hash, $type_id, $table_name, $var_name, $var_type, $depth, $FHD );
         PrintExtraLoader( $master_hash, $type_id, $table_name, $var_name, $var_type, $depth, $FHD );
 
-        foreach $struct_var_name ( @{$master_hash->{structures}->{$var_type}->{order}} ) {
+        foreach $struct_var_name ( @{$master_hash->{structures}->{data}->{$var_type}->{order}} ) {
 
-            if ( not ( exists $master_hash->{structures}->{$struct_var_type} or PreComp::Utilities::IsArray( $struct_var_name )) ) {
-                $struct_var_type = $master_hash->{structures}->{$var_type}->{data}->{$struct_var_name};
+            if ( not ( exists $master_hash->{structures}->{data}->{$struct_var_type} or PreComp::Utilities::IsArray( $struct_var_name )) ) {
+                $struct_var_type = $master_hash->{structures}->{data}->{$var_type}->{data}->{$struct_var_name};
 
 #                print $FHD ",\n    ".PreComp::Utilities::StripBrackets( $struct_var_name)." ".PreComp::Utilities::Type2Sql( $struct_var_type );
             }
@@ -460,16 +460,16 @@ sub PrintExtraLoaderCallback($$) {
     print $FHD "    else\n";
     print $FHD "    {\n";
 
-    if ( exists $master_hash->{structures}->{$var_type} ) {
+    if ( exists $master_hash->{structures}->{data}->{$var_type} ) {
 
         my ( $struct_var_name, $struct_var_type, $struct_var_name_stripped );
 
-        foreach $struct_var_name ( @{$master_hash->{structures}->{$var_type}->{order}} ) {
+        foreach $struct_var_name ( @{$master_hash->{structures}->{data}->{$var_type}->{order}} ) {
 
-            $struct_var_type = $master_hash->{structures}->{$var_type}->{data}->{$struct_var_name};
+            $struct_var_type = $master_hash->{structures}->{data}->{$var_type}->{data}->{$struct_var_name};
             $struct_var_name_stripped = PreComp::Utilities::StripBrackets( $struct_var_name );
 
-            if ( not exists $master_hash->{structures}->{$struct_var_type} and not PreComp::Utilities::IsArray( $struct_var_name )) {
+            if ( not exists $master_hash->{structures}->{data}->{$struct_var_type} and not PreComp::Utilities::IsArray( $struct_var_name )) {
 
                 print $FHD "        $table_name"."_$struct_var_name_stripped$arg_string  = ".PreComp::Utilities::NewType2atoX( $master_hash, $struct_var_type )."(row[$counter]);\n";
                 $counter = $counter+1;
@@ -527,13 +527,13 @@ sub PrintExtraLoader($$) {
     }
 
 
-    if ( exists $master_hash->{structures}->{$var_type} ) {
+    if ( exists $master_hash->{structures}->{data}->{$var_type} ) {
 
         my ( $struct_var_name, $struct_var_type, $struct_var_name_stripped );
 
-        foreach $struct_var_name ( @{$master_hash->{structures}->{$var_type}->{order}} ) {
+        foreach $struct_var_name ( @{$master_hash->{structures}->{data}->{$var_type}->{order}} ) {
 
-            $struct_var_type = $master_hash->{structures}->{$var_type}->{data}->{$struct_var_name};
+            $struct_var_type = $master_hash->{structures}->{data}->{$var_type}->{data}->{$struct_var_name};
             $struct_var_name_stripped = PreComp::Utilities::StripBrackets( $struct_var_name );
 
             if ( not PreComp::Utilities::IsArray( $struct_var_name )) {
@@ -562,13 +562,13 @@ sub PrintExtraLoader($$) {
     print $FHD "    }\n";
     print $FHD "\n";
 
-    if ( exists $master_hash->{structures}->{$var_type} ) {
+    if ( exists $master_hash->{structures}->{data}->{$var_type} ) {
 
         my ( $struct_var_name, $struct_var_type, $struct_var_name_stripped );
 
-        foreach $struct_var_name ( @{$master_hash->{structures}->{$var_type}->{order}} ) {
+        foreach $struct_var_name ( @{$master_hash->{structures}->{data}->{$var_type}->{order}} ) {
 
-            $struct_var_type = $master_hash->{structures}->{$var_type}->{data}->{$struct_var_name};
+            $struct_var_type = $master_hash->{structures}->{data}->{$var_type}->{data}->{$struct_var_name};
             $struct_var_name_stripped = PreComp::Utilities::StripBrackets( $struct_var_name );
 
             if ( PreComp::Utilities::IsArray( $struct_var_name )) {
@@ -616,7 +616,7 @@ sub GenerateNewLoader($$$) {
             $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
             $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
 
-            if ( not ( exists $master_hash->{structures}->{$var_type} or PreComp::Utilities::IsArray( $var_name ))) {
+            if ( not ( exists $master_hash->{structures}->{data}->{$var_type} or PreComp::Utilities::IsArray( $var_name ))) {
                 print $FHD ", $type.$var_name_stripped";
             }
         }
@@ -644,7 +644,7 @@ sub GenerateNewLoader($$$) {
 
             $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
 
-            if ( exists $master_hash->{structures}->{$var_type} or PreComp::Utilities::IsArray( $var_name ) ) {
+            if ( exists $master_hash->{structures}->{data}->{$var_type} or PreComp::Utilities::IsArray( $var_name ) ) {
 
                 $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
                 my $function_name = "load_$type"."_$var_name_stripped";
@@ -708,7 +708,7 @@ sub GenerateLoaderCallback($$$$) {
             $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
             $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
 
-            if ( exists $master_hash->{structures}->{$var_type} or PreComp::Utilities::IsArray( $var_name ) ) {
+            if ( exists $master_hash->{structures}->{data}->{$var_type} or PreComp::Utilities::IsArray( $var_name ) ) {
 
                 # Do nothing
             }
