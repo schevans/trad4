@@ -31,7 +31,6 @@ sub Generate($$) {
             print $FHD "/*======================================================================\n";
             print $FHD "\n";
             print $FHD "The following variables are in-scope for calculate_$type():\n";
-            print $FHD "\n";
 
         }
         else {
@@ -46,6 +45,11 @@ sub Generate($$) {
 
         my $section;
         foreach $section ( PreComp::Utilities::GetSections( $master_hash->{$type} )) {
+
+            if ( $file_section =~ /comment/ ) {
+
+                print $FHD "\n$section:\n";
+            }
 
             my $printable;
 
@@ -78,7 +82,7 @@ sub Generate($$) {
 
                 if ( $file_section =~ /comment/ ) {
 
-                    print $FHD "$printable->{type} ".NameToFunction( $printable->{name} )."\n";
+                    print $FHD "\t$printable->{type} ".NameToFunction( $printable->{name} )."\n";
                 }
                 else {
                     print $FHD "#define ".NameToFunction( $printable->{name} )." $printable->{code}\n";
@@ -90,7 +94,7 @@ sub Generate($$) {
 
         if ( $file_section =~ /comment/ ) {
 
-            print $FHD "======================================================================*/\n";
+            print $FHD "\n======================================================================*/\n";
             print $FHD "\n";
 
         }
@@ -145,70 +149,53 @@ sub GetPrintablesFromSection($$$) {
     foreach $var_name ( @{$section_hash->{order}} ) {
 
         $var_type = $section_hash->{data}->{$var_name};
+        my %printable;
+        my $sub_printable;
 
         if ( exists $master_hash->{$var_type} ) {
 
-            #print $indent."Var $var_name/$var_type is t4 type. Recursing..\n";
-
-my %printable;
-$printable{name} = $var_name;
-$printable{type} = $var_type;
-$printable{code} = $var_name;
+            $printable{name} = $var_name;
+            $printable{type} = $var_type;
+            $printable{code} = $var_name;
 
             push @ret_array, \%printable;
 
             my $section;
             foreach $section ( "static", "pub" ) {
 
-                #print $indent."Section: $section\n";
+                foreach $sub_printable ( GetPrintablesFromSection( $master_hash, $master_hash->{$var_type}->{$section}, $indent ) ) {
 
-my $tmp;
- 
-                foreach $tmp ( GetPrintablesFromSection( $master_hash, $master_hash->{$var_type}->{$section}, $indent ) ) {
+                    $sub_printable->{name} = $var_name."_".$sub_printable->{name};
+                    $sub_printable->{code} =~ s/^/(($var_type*)obj_loc[id])->$var_name])->/g;
 
-                    $tmp->{name} = $var_name."_".$tmp->{name};
-                    $tmp->{code} =~ s/^/(($var_type*)obj_loc[id])->$var_name])->/g;
-
-                    push @ret_array, $tmp;
+                    push @ret_array, $sub_printable;
                 }
             }
 
         }
         elsif ( exists $master_hash->{structures}->{data}->{$var_type} ) {
 
-            #print $indent."Var $var_name/$var_type is struct. Recursing..\n";
-           
-my %printable;
-$printable{name} = $var_name;
-$printable{type} = $var_type;
-$printable{code} = $var_name;
-
-#print Dumper( \%printable );
-#print "\n";
+            $printable{name} = $var_name;
+            $printable{type} = $var_type;
+            $printable{code} = $var_name;
 
             push @ret_array, \%printable;
-my $tmp;
  
-            foreach $tmp ( GetPrintablesFromSection( $master_hash, $master_hash->{structures}->{data}->{$var_type}, $indent ) ) {
+            foreach $sub_printable ( GetPrintablesFromSection( $master_hash, $master_hash->{structures}->{data}->{$var_type}, $indent ) ) {
 
-                $tmp->{name} = $var_name."_$tmp->{name}";
-                $tmp->{code} = "$var_name.".$tmp->{code};
+                $sub_printable->{name} = $var_name."_$sub_printable->{name}";
+                $sub_printable->{code} = "$var_name.".$sub_printable->{code};
 
-                push @ret_array, $tmp;
+                push @ret_array, $sub_printable;
 
             }
 
         }
         else {
        
-#            print $indent."Var $var_name/$var_type is simple. Returning\n";
-
-my %printable;
-#print Dumper( %printable );
-$printable{name} = $var_name;
-$printable{type} = $var_type;
-$printable{code} = $var_name;
-
+            $printable{name} = $var_name;
+            $printable{type} = $var_type;
+            $printable{code} = $var_name;
 
             push @ret_array, \%printable;
 
