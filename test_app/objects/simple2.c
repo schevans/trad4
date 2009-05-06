@@ -14,11 +14,11 @@ void calculate_simple2( obj_loc_t obj_loc, int id )
 {
 
     simple2_s2_float = simple2_s2_int / my_simple1_s1_float;
-
+/*
     T4_TEST( simple2_s2_float, 13.6232 );
-    T4_TEST( my_simple1_my_struct1_x( 0 ), 4 );
-    T4_TEST( my_simple1_my_struct1_y( 0 ), 5 );
-
+    T4_TEST( my_simple1_my_struct1_x, 4 );
+    T4_TEST( my_simple1_my_struct1_y, 5 );
+*/
 
 /*
     cout << "my_simple1_s1_float: " << my_simple1_s1_float << endl;

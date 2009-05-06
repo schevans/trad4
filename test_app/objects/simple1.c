@@ -18,7 +18,7 @@ void calculate_simple1( obj_loc_t obj_loc, int id )
     simple1_s1_float = 3.45;
 
     T4_TEST( simple1_ix, 2 );
-    T4_TEST( simple1_my_struct1( 0 ).x, 4 );
+    T4_TEST( simple1_my_struct1[ 0 ].x, 4 );
     T4_TEST( simple1_my_struct1_y(0), 5 );
 
 /*

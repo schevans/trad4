@@ -18,10 +18,9 @@ void calculate_agg_many1( obj_loc_t obj_loc, int id )
         agg_many1_agg_struct1_y = agg_many1_agg_struct1_y + many1_array_y_d9( i );
         agg_many1_agg_struct1_iz = agg_many1_agg_struct1_iz + many1_array_iz_d9( i );
 
-        T4_TEST( agg_many1_many1_array(i), many1_array_my_struct1_x(i) );
+        T4_TEST( agg_many1_many1_array[i], many1_array_my_struct1_x(i) );
         T4_TEST( many1_array_my_struct1_y(i), many1_array_my_struct1_x(i) );
         T4_TEST( many1_array_iz_d9( i ), 315 );
-
 /*
         cout << "agg_many1_many1_array( " << i << " ): " << agg_many1_many1_array(i) << endl;
         cout << "many1_array_d9( i ): " << many1_array_d9(i) << endl;
@@ -37,6 +36,5 @@ void calculate_agg_many1( obj_loc_t obj_loc, int id )
 //    cout << "agg_many1_agg_struct1_x: " << agg_many1_agg_struct1_x << endl << endl;
 //    cout << "agg_many1_agg_struct1_y: " << agg_many1_agg_struct1_y << endl << endl;
 //    cout << "agg_many1_agg_struct1_iz: " << agg_many1_agg_struct1_iz << endl << endl;
-
 }
 
