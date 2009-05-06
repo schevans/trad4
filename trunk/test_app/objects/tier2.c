@@ -28,13 +28,12 @@ void calculate_tier2( obj_loc_t obj_loc, int id )
     T4_TEST( my_multi_struct_my_outers_my_inner_ms_ha(0,0,1), 0.1 );
     T4_TEST( my_multi_struct_my_outers_my_inner_ms_ha(3,2,7), 32.7 );
 
-    T4_TEST( my_tier1_double_array( 2 ), 3.14 );
-    T4_TEST( my_tier1_struct_scalar_dates( 2 ), 5002 );
+    T4_TEST( my_tier1_double_array[ 2 ], 3.14 );
+    T4_TEST( my_tier1_struct_scalar_dates[ 2 ], 5002 );
     T4_TEST( my_tier1_int_out, 15003 );
 
     tier2_p_int = my_tier1_int_out - 38;
  
-
 
 /*
 cout << "tier2:" << endl;
