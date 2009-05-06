@@ -285,7 +285,7 @@ sub generate_need_refresh($$$)
 
         while ( $counter < $constants_hash->{$vec_size}) { 
 
-            print $FHD "(object_last_published(id) < object_last_published( $name"."_$vec_short\($counter\) )) || ";
+            print $FHD "(object_last_published(id) < object_last_published( $name"."_$vec_short\[$counter\] )) || ";
 
             $counter = $counter+1;
         }
@@ -451,6 +451,7 @@ sub PrintExtraLoaderCallback($$) {
         $if_string = "$last_ord > $vec_size";
     }
 
+
     print $FHD "\n";
     print $FHD "    if ( $if_string )\n";
     print $FHD "    {\n";
@@ -482,6 +483,11 @@ sub PrintExtraLoaderCallback($$) {
 
     }
     else {
+
+        if ( $depth == 1 and $arg_string =~ /( ord1 )/ ) {
+
+            $arg_string = "[ord1]";
+        }
 
         print $FHD "        $table_name$arg_string = ".PreComp::Utilities::NewType2atoX( $master_hash, $var_type )."(row[$counter]);\n";
 

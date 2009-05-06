@@ -53,7 +53,7 @@ sub Generate($$) {
 
             my $printable;
 
-            foreach $printable ( GetPrintablesFromSection( $master_hash, $master_hash->{$type}->{$section}, "\t" )) {
+            foreach $printable ( GetPrintablesFromSection( $master_hash, $master_hash->{$type}->{$section}, "0" )) {
 
                 if ( $section =~ /sub/ ) {
 
@@ -79,13 +79,20 @@ sub Generate($$) {
 
                 }
 
+                my $function = NameToFunction( $printable->{name} );
+
+                if ( $function =~ /\( \w+ \)/ and $printable->{code} =~ /\[\w+\]$/ ) {
+
+                    $function =~ s/\(.*\)//;
+                    $printable->{code} =~ s/\[\w+\]$//;
+                }
 
                 if ( $file_section =~ /comment/ ) {
 
-                    print $FHD "\t$printable->{type} ".NameToFunction( $printable->{name} )."\n";
+                    print $FHD "\t$printable->{type} $function\n";
                 }
                 else {
-                    print $FHD "#define ".NameToFunction( $printable->{name} )." $printable->{code}\n";
+                    print $FHD "#define $function $printable->{code}\n";
                 }
 
             }
@@ -138,11 +145,11 @@ sub NameToFunction($) {
 sub GetPrintablesFromSection($$$) {
     my $master_hash = shift;
     my $section_hash = shift;
-    my $indent = shift;
+    my $depth = shift;
 
     my @ret_array;
 
-    $indent = $indent."\t";
+    $depth = $depth+1;
 
     my ( $var_name, $var_type );
 
@@ -152,18 +159,19 @@ sub GetPrintablesFromSection($$$) {
         my %printable;
         my $sub_printable;
 
+        $printable{name} = $var_name;
+        $printable{type} = $var_type;
+        $printable{code} = $var_name;
+        $printable{depth} = $depth;
+
+        push @ret_array, \%printable;
+
         if ( exists $master_hash->{$var_type} ) {
-
-            $printable{name} = $var_name;
-            $printable{type} = $var_type;
-            $printable{code} = $var_name;
-
-            push @ret_array, \%printable;
 
             my $section;
             foreach $section ( "static", "pub" ) {
 
-                foreach $sub_printable ( GetPrintablesFromSection( $master_hash, $master_hash->{$var_type}->{$section}, $indent ) ) {
+                foreach $sub_printable ( GetPrintablesFromSection( $master_hash, $master_hash->{$var_type}->{$section}, $depth ) ) {
 
                     $sub_printable->{name} = $var_name."_".$sub_printable->{name};
                     $sub_printable->{code} =~ s/^/(($var_type*)obj_loc[id])->$var_name])->/g;
@@ -175,13 +183,7 @@ sub GetPrintablesFromSection($$$) {
         }
         elsif ( exists $master_hash->{structures}->{data}->{$var_type} ) {
 
-            $printable{name} = $var_name;
-            $printable{type} = $var_type;
-            $printable{code} = $var_name;
-
-            push @ret_array, \%printable;
- 
-            foreach $sub_printable ( GetPrintablesFromSection( $master_hash, $master_hash->{structures}->{data}->{$var_type}, $indent ) ) {
+            foreach $sub_printable ( GetPrintablesFromSection( $master_hash, $master_hash->{structures}->{data}->{$var_type}, $depth ) ) {
 
                 $sub_printable->{name} = $var_name."_$sub_printable->{name}";
                 $sub_printable->{code} = "$var_name.".$sub_printable->{code};
@@ -190,16 +192,6 @@ sub GetPrintablesFromSection($$$) {
 
             }
 
-        }
-        else {
-       
-            $printable{name} = $var_name;
-            $printable{type} = $var_type;
-            $printable{code} = $var_name;
-
-            push @ret_array, \%printable;
-
-            #GetTypesNames($$)
         }
     } 
 
