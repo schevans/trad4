@@ -1035,7 +1035,18 @@ sub StripBrackets($) {
 sub IsArray($) {
     my $var_name = shift;
 
-    return ( $var_name =~ /\[[0-9A-Z_]+\]/ );
+    return ( $var_name =~ /\[\w+\]/ );
+}
+
+sub GetArraySize($) {
+    my $var_name = shift;
+
+    my $size = $var_name;
+    $size =~ s/.*\[//g;
+    $size =~ s/\]//g;
+
+    return $size;
+
 }
 
 
