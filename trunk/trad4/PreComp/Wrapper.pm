@@ -9,7 +9,6 @@ use PreComp::Constants;
 use Data::Dumper;
 
 sub generate_validator($$$);
-sub generate_constructor($$);
 sub generate_calculate($$$$);
 
 sub GenerateExtraSection($$$$$$$);
@@ -69,10 +68,6 @@ sub Generate($$$$$) {
     print $FHD "using namespace std;\n";
     print $FHD "\n";
 
-    generate_constructor( $obj_hash, $FHD );
-    print $FHD "\n";
-
-
     generate_calculate( $master_hash, $struct_hash, $name, $FHD );
     print $FHD "\n";
 
@@ -92,17 +87,6 @@ sub Generate($$$$$) {
     print $FHD "\n";
 
     PreComp::Utilities::CloseFile();
-}
-
-sub generate_constructor($$)
-{
-    my $obj_hash = shift;
-    my $FHD = shift;
-
-    print $FHD "extern \"C\" void* constructor()\n";
-    print $FHD "{\n";
-    print $FHD "    return new $obj_hash->{name};\n";
-    print $FHD "}\n";
 }
 
 sub generate_calculate($$$$)
