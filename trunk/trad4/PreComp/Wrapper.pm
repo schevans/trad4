@@ -68,7 +68,8 @@ sub Generate($$$$$) {
     print $FHD "using namespace std;\n";
     print $FHD "\n";
 
-    generate_calculate( $master_hash, $struct_hash, $name, $FHD );
+#    generate_calculate( $master_hash, $struct_hash, $name, $FHD );
+    GenerateCalculate( $new_master_hash, $name, $FHD );
     print $FHD "\n";
 
     GenerateNeedRefresh( $new_master_hash, $name, $FHD );
@@ -680,13 +681,29 @@ sub GenerateNeedRefresh($$$) {
     print $FHD "    DEBUG_LOADS( \"\t$type last_published: \" <<  object_last_published(id) );\n";
     print $FHD "    DEBUG_LOADS( \"\t$type state: \" << object_status(id) );\n";
 
-#print Dumper( $master_hash->{$type} );
-
     my $var_name;
 
     foreach $var_name ( @{$master_hash->{$type}->{sub}->{order}} ) {
 
-        print $FHD "    DEBUG_LOADS( \"\t\t$var_name last_published: \" << object_last_published((($type*)obj_loc[id])->$var_name) );\n";
+        if ( PreComp::Utilities::IsArray( $var_name ) ) {
+
+            my $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
+
+            my $size = $master_hash->{constants}->{data}->{PreComp::Utilities::GetArraySize( $var_name )};
+
+            my $counter=0;
+
+            while ( $counter < $size ) {
+
+                print $FHD "    DEBUG_LOADS( \"\t\t$var_name_stripped"."[$counter] last_published: \" << object_last_published((($type*)obj_loc[id])->$var_name_stripped"."[$counter]) );\n";
+
+                $counter = $counter+1;
+            }
+        }
+        else {
+
+            print $FHD "    DEBUG_LOADS( \"\t\t$var_name last_published: \" << object_last_published((($type*)obj_loc[id])->$var_name) );\n";
+        }
     }
 
     print $FHD "\n";
@@ -708,8 +725,6 @@ sub GenerateNeedRefresh($$$) {
                 print $FHD "        || (((($type*)obj_loc[id])->$var_name_stripped"."[$counter]) and ( object_last_published(id) < object_last_published((($type*)obj_loc[id])->$var_name_stripped"."[$counter]) ))\n";
                 $counter = $counter+1;
             }
-
-
         }
         else {
             print $FHD "        || ( object_last_published(id) < object_last_published((($type*)obj_loc[id])->$var_name) )\n";
@@ -727,5 +742,22 @@ sub GenerateNeedRefresh($$$) {
     print $FHD "}\n";
 
 }
+
+sub GenerateCalculate($$$) {
+    my $master_hash = shift;
+    my $type = shift;
+    my $FHD = shift;
+    
+    print $FHD "extern \"C\" void calculate( obj_loc_t obj_loc, int id )\n";
+    print $FHD "{\n";
+    print $FHD "    DEBUG( \"calculate_$type( \" << (($type*)obj_loc[id])->name << \" )\" );\n";
+    print $FHD "\n";
+
+    print $FHD "    calculate_$type( obj_loc, id );\n";
+
+    print $FHD "\n";
+    print $FHD "}\n";
+}
+
 1;
 
