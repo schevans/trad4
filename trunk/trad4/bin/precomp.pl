@@ -143,7 +143,7 @@ if ( $verbose ) {
 
         print "Master hash:\n";
         print "------------\n";
-        print Dumper( $master_hash );
+        print Dumper( $new_master_hash );
         print "\n";
     }
 }
