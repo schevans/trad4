@@ -11,7 +11,6 @@ use Data::Dumper;
 sub generate_validator($$$);
 sub generate_constructor($$);
 sub generate_calculate($$$$);
-sub generate_need_refresh($$$);
 
 sub GenerateExtraSection($$$$$$$);
 
@@ -77,7 +76,7 @@ sub Generate($$$$$) {
     generate_calculate( $master_hash, $struct_hash, $name, $FHD );
     print $FHD "\n";
 
-    generate_need_refresh( $obj_hash, $constants_hash, $FHD );
+    GenerateNeedRefresh( $new_master_hash, $name, $FHD );
     print $FHD "\n";
 
 
@@ -233,73 +232,6 @@ sub generate_validator($$$)
     print $FHD "    return retval;\n";
     print $FHD "\n";
     print $FHD "}\n";
-}
-
-sub generate_need_refresh($$$)
-{
-    my $obj_hash = shift;
-    my $constants_hash = shift;
-    my $FHD = shift;
-
-    my $name = $obj_hash->{name};
-
-    print $FHD "extern \"C\" int need_refresh( obj_loc_t obj_loc, int id )\n";
-    print $FHD "{\n";
-
-    print $FHD "    DEBUG_LOADS( \"$name"."_need_refresh( \" << id << \")\" );\n";
-
-    print $FHD "\n";
-    print $FHD "    DEBUG_LOADS( \"\t$name timestamp: \" <<  *(long long*)obj_loc[id] );\n";
-    print $FHD "    DEBUG_LOADS( \"\t$name state: \" << ((object_header*)obj_loc[id])->status );\n";
-
-    foreach $key ( keys %{$obj_hash->{data}->{sub}} ) {
-
-        print $FHD "    DEBUG_LOADS( \"\t\t$key timestamp: \" << *(long long*)obj_loc[(($name*)obj_loc[id])->$key] );\n";
-    }
-
-    print $FHD "\n";
-    print $FHD "    int retval = ( (((object_header*)obj_loc[id])->status == RELOADED ) || ";
-
-
-    print $FHD "(((object_header*)obj_loc[id])->status == STOPPED ) && ( ";
-
-    foreach $key ( keys %{$obj_hash->{data}->{sub}} ) {
-
-        print $FHD "( *(long long*)obj_loc[id] < *(long long*)obj_loc[(($name*)obj_loc[id])->$key] ) || ";
-
-
-    }
-
-    foreach $vec ( keys %{$obj_hash->{data}->{sub_vec}} ) {
-
-        $vec_type = $obj_hash->{data}->{sub_vec}->{$vec};
-
-        my $vec_short = $vec;
-        $vec_short =~ s/\[.*]$//;
-
-        $vec_size = $vec;
-        $vec_size =~ s/.*\[//g;
-        $vec_size =~ s/\]//g;
-
-        my $counter=0;
-
-        while ( $counter < $constants_hash->{$vec_size}) { 
-
-            print $FHD "(object_last_published(id) < object_last_published( $name"."_$vec_short\[$counter\] )) || ";
-
-            $counter = $counter+1;
-        }
-    }
-
-    print $FHD " 0 ));\n";
-
-    print $FHD "\n";
-    print $FHD "    DEBUG_LOADS( \"\treturning: \" << retval )\n";
-    print $FHD "\n";
-    print $FHD "    return retval;\n";
-    print $FHD "\n";
-    print $FHD "}\n";
-
 }
 
 #######################################################
@@ -749,5 +681,67 @@ sub GenerateLoaderCallback($$$$) {
 
 }
 
+
+sub GenerateNeedRefresh($$$) {
+    my $master_hash = shift;
+    my $type = shift;
+    my $FHD = shift;
+
+    print $FHD "extern \"C\" int need_refresh( obj_loc_t obj_loc, int id )\n";
+    print $FHD "{\n";
+
+    print $FHD "    DEBUG_LOADS( \"$type"."_need_refresh( \" << id << \")\" );\n";
+
+    print $FHD "\n";
+    print $FHD "    DEBUG_LOADS( \"\t$type last_published: \" <<  object_last_published(id) );\n";
+    print $FHD "    DEBUG_LOADS( \"\t$type state: \" << object_status(id) );\n";
+
+#print Dumper( $master_hash->{$type} );
+
+    my $var_name;
+
+    foreach $var_name ( @{$master_hash->{$type}->{sub}->{order}} ) {
+
+        print $FHD "    DEBUG_LOADS( \"\t\t$var_name last_published: \" << object_last_published((($type*)obj_loc[id])->$var_name) );\n";
+    }
+
+    print $FHD "\n";
+    print $FHD "    int retval = ( (object_status(id) == RELOADED )\n";
+
+    foreach $var_name ( @{$master_hash->{$type}->{sub}->{order}} ) {
+
+        if ( PreComp::Utilities::IsArray( $var_name ) ) {
+
+            my $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
+
+            my $size = $master_hash->{constants}->{data}->{PreComp::Utilities::GetArraySize( $var_name )};
+            
+            my $counter=0;
+
+            while ( $counter < $size ) {
+
+
+                print $FHD "        || (((($type*)obj_loc[id])->$var_name_stripped"."[$counter]) and ( object_last_published(id) < object_last_published((($type*)obj_loc[id])->$var_name_stripped"."[$counter]) ))\n";
+                $counter = $counter+1;
+            }
+
+
+        }
+        else {
+            print $FHD "        || ( object_last_published(id) < object_last_published((($type*)obj_loc[id])->$var_name) )\n";
+        }
+
+    }
+
+    print $FHD "        );\n";
+
+    print $FHD "\n";
+    print $FHD "    DEBUG_LOADS( \"\treturning: \" << retval )\n";
+    print $FHD "\n";
+    print $FHD "    return retval;\n";
+
+    print $FHD "}\n";
+
+}
 1;
 
