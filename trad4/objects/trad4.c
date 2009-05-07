@@ -381,7 +381,6 @@ static int load_types_callback(void *NotUsed, int argc, char **row, char **azCol
         cout << "Reloading type " << name << ", type_id: " << obj_num << endl;
 
         dlclose(object_type_struct[obj_num]->lib_handle);
-        object_type_struct[obj_num]->constructor_fpointer = 0;
         object_type_struct[obj_num]->need_refresh = 0;
         object_type_struct[obj_num]->calculate = 0;
         object_type_struct[obj_num]->load_objects = 0;
@@ -394,12 +393,6 @@ static int load_types_callback(void *NotUsed, int argc, char **row, char **azCol
     (object_type_struct[obj_num])->lib_handle = dlopen (lib_name.str().c_str(), RTLD_LAZY);
     if (!object_type_struct[obj_num]->lib_handle) {
         fputs (dlerror(), stderr);
-        exit(1);
-    }
-
-    object_type_struct[obj_num]->constructor_fpointer = dlsym(object_type_struct[obj_num]->lib_handle, "constructor");
-    if ((error = dlerror()) != NULL)  {
-        fputs(error, stderr);
         exit(1);
     }
 
