@@ -113,46 +113,9 @@ else {
 
 my $type;
 
+my $new_master_hash = PreComp::Utilities::UpgradeMasterHash( $master_hash, $struct_hash, $enum_hash, $alias_hash, $constants_hash );
+
 if ( $verbose ) {
-
-    print "Dumping internal structures..\n\n";
-
-    if ( $constants_hash ) {
-
-        print "Constants:\n";
-        print "----------\n";
-        print Dumper( $constants_hash );
-        print "\n";
-
-    }
-
-    if ( $enum_hash ) {
-
-        print "Enums:\n";
-        print "------\n";
-        print Dumper( $enum_hash );
-        print "\n";
-
-    }
-    
-    if ( $struct_hash ) {
-
-        print "Structures:\n";
-        print "----------\n";
-        print Dumper( $struct_hash );
-        print "\n";
-
-    }
-
-    if ( $alias_hash ) {
-
-        print "Aliases:\n";
-        print "--------\n";
-        print Dumper( $alias_hash );
-        print "\n";
-
-    }
-
 
     if ( $opts{o} ) {
 
@@ -171,7 +134,7 @@ if ( $verbose ) {
             }
             print "\n"; 
 
-            print Dumper( $master_hash->{$type} );
+            print Dumper( $new_master_hash->{$type} );
             print "\n";
 
         }
@@ -184,8 +147,6 @@ if ( $verbose ) {
         print "\n";
     }
 }
-
-my $new_master_hash = PreComp::Utilities::UpgradeMasterHash( $master_hash, $struct_hash, $enum_hash, $alias_hash, $constants_hash );
 
 print "Validating..\n";
 
