@@ -587,7 +587,7 @@ sub GenerateNewLoader($$$) {
                 $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
                 my $function_name = "load_$type"."_$var_name_stripped";
 
-                print $FHD "    $function_name( obj_loc, db, 0 );\n";
+                print $FHD "    $function_name( obj_loc, db, initial_load );\n";
             }
         }
     }
