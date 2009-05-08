@@ -1038,15 +1038,19 @@ sub IsArray($) {
     return ( $var_name =~ /\[\w+\]/ );
 }
 
-sub GetArraySize($) {
+sub GetArraySize($$) {
+    my $master_hash = shift;
     my $var_name = shift;
 
     my $size = $var_name;
     $size =~ s/.*\[//g;
     $size =~ s/\]//g;
 
-    return $size;
+    if ( $size !~ /^\d+$/ ) {
+        $size = $master_hash->{constants}->{data}->{$size};
+    }
 
+    return $size;
 }
 
 
