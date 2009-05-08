@@ -689,7 +689,7 @@ sub GenerateNeedRefresh($$$) {
 
             my $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
 
-            my $size = $master_hash->{constants}->{data}->{PreComp::Utilities::GetArraySize( $var_name )};
+            my $size = PreComp::Utilities::GetArraySize( $master_hash, $var_name );
 
             my $counter=0;
 
@@ -715,7 +715,7 @@ sub GenerateNeedRefresh($$$) {
 
             my $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
 
-            my $size = $master_hash->{constants}->{data}->{PreComp::Utilities::GetArraySize( $var_name )};
+            my $size = PreComp::Utilities::GetArraySize( $master_hash, $var_name );
             
             my $counter=0;
 
