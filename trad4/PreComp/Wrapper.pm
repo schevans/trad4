@@ -750,14 +750,60 @@ sub GenerateCalculate($$$) {
     
     print $FHD "extern \"C\" void calculate( obj_loc_t obj_loc, int id )\n";
     print $FHD "{\n";
+    print $FHD "\n";
     print $FHD "    DEBUG( \"calculate_$type( \" << (($type*)obj_loc[id])->name << \" )\" );\n";
     print $FHD "\n";
 
+    PrintSectionDebug( $master_hash, $type, "static", $FHD );
+
+    print $FHD "\n";
     print $FHD "    calculate_$type( obj_loc, id );\n";
+    print $FHD "\n";
+
+    PrintSectionDebug( $master_hash, $type, "pub", $FHD );
 
     print $FHD "\n";
     print $FHD "}\n";
 }
 
+sub PrintSectionDebug($$$$) {
+    my $master_hash = shift;
+    my $type = shift;
+    my $section = shift;
+    my $FHD = shift;
+
+    print $FHD "    DEBUG_FINE( \"$section:\" );\n";
+
+    my ( $var_name, $var_type, $var_name_stripped );
+
+    foreach $var_name ( @{$master_hash->{$type}->{$section}->{order}} ) {
+
+        $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
+        $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
+
+        if ( exists $master_hash->{structures}->{data}->{$var_type} ) {
+
+            #??
+        } 
+        elsif ( PreComp::Utilities::IsArray( $var_name )) {
+
+            my $size = PreComp::Utilities::GetArraySize( $master_hash, $var_name );
+
+            my $counter=0;
+
+            while ( $counter < $size ) {
+
+                print $FHD "    DEBUG_FINE( \"\\t$type"."_$var_name_stripped"."[$counter]: \" << $type"."_$var_name_stripped"."[$counter] );\n";
+
+                $counter = $counter+1;
+            }
+        }
+        else {
+
+            print $FHD "    DEBUG_FINE( \"\\t$type"."_$var_name: \" << $type"."_$var_name );\n";
+
+        }
+    }
+}
 1;
 
