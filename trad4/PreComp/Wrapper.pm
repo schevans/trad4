@@ -754,13 +754,15 @@ sub GenerateCalculate($$$) {
     print $FHD "    DEBUG( \"calculate_$type( \" << (($type*)obj_loc[id])->name << \" )\" );\n";
     print $FHD "\n";
 
-    PrintSectionDebug( $master_hash, $type, "static", $FHD );
+    print $FHD "    DEBUG_FINE( \"static:\" );\n";
+    PrintSectionDebug( $master_hash, $master_hash->{$type}->{static}, $type, $FHD );
 
     print $FHD "\n";
     print $FHD "    calculate_$type( obj_loc, id );\n";
     print $FHD "\n";
 
-    PrintSectionDebug( $master_hash, $type, "pub", $FHD );
+    print $FHD "    DEBUG_FINE( \"pub:\" );\n";
+    PrintSectionDebug( $master_hash, $master_hash->{$type}->{pub}, $type, $FHD );
 
     print $FHD "\n";
     print $FHD "}\n";
@@ -768,22 +770,21 @@ sub GenerateCalculate($$$) {
 
 sub PrintSectionDebug($$$$) {
     my $master_hash = shift;
-    my $type = shift;
-    my $section = shift;
+    my $section_hash = shift;
+    my $stem = shift;
     my $FHD = shift;
-
-    print $FHD "    DEBUG_FINE( \"$section:\" );\n";
 
     my ( $var_name, $var_type, $var_name_stripped );
 
-    foreach $var_name ( @{$master_hash->{$type}->{$section}->{order}} ) {
+    foreach $var_name ( @{$section_hash->{order}} ) {
 
-        $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
+        $var_type = $section_hash->{data}->{$var_name};
         $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
 
         if ( exists $master_hash->{structures}->{data}->{$var_type} ) {
 
-            #??
+            print $FHD "    DEBUG_FINE( \"\\t$stem"."_$var_name_stripped: \" << &$stem"."_$var_name_stripped );\n";
+
         } 
         elsif ( PreComp::Utilities::IsArray( $var_name )) {
 
@@ -793,14 +794,14 @@ sub PrintSectionDebug($$$$) {
 
             while ( $counter < $size ) {
 
-                print $FHD "    DEBUG_FINE( \"\\t$type"."_$var_name_stripped"."[$counter]: \" << $type"."_$var_name_stripped"."[$counter] );\n";
+                print $FHD "    DEBUG_FINE( \"\\t$stem"."_$var_name_stripped"."[$counter]: \" << $stem"."_$var_name_stripped"."[$counter] );\n";
 
                 $counter = $counter+1;
             }
         }
         else {
 
-            print $FHD "    DEBUG_FINE( \"\\t$type"."_$var_name: \" << $type"."_$var_name );\n";
+            print $FHD "    DEBUG_FINE( \"\\t$stem"."_$var_name: \" << $stem"."_$var_name );\n";
 
         }
     }
