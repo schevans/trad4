@@ -12,8 +12,8 @@ static
     TDate valueDate
     TDate stepinDate
     TBoolean payAccOnDefault
-    TDateInterval couponInterval[ONE]
-    TStubMethod stubType[ONE]
+    TDateInterval couponInterval
+    TStubMethod stubType
     long paymentDcc
     char badDayConv
 

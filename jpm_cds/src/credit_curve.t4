@@ -12,9 +12,9 @@ static
     double couponRates[NUM_RATES]
     double recoveryRate
     TBoolean payAccOnDefault
-    TDateInterval couponInterval[ONE] 
+    TDateInterval couponInterval
     long paymentDcc
-    TStubMethod stubType[ONE]  
+    TStubMethod stubType
     char badDayConv
     int icalendar
 
