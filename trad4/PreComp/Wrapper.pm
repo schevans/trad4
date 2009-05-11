@@ -8,7 +8,6 @@ use PreComp::Utilities;
 use PreComp::Constants;
 use Data::Dumper;
 
-sub generate_validator($$$);
 sub generate_calculate($$$$);
 
 sub GenerateExtraSection($$$$$$$);
@@ -75,8 +74,8 @@ sub Generate($$$$$) {
     GenerateNeedRefresh( $new_master_hash, $name, $FHD );
     print $FHD "\n";
 
+    GenerateValidator( $new_master_hash, $name, $FHD );
 
-    generate_validator( $master_hash, $name, $FHD );
     print $FHD "\n";
 
     print $FHD "\n";
@@ -180,43 +179,6 @@ sub generate_calculate($$$$)
     print $FHD "\n";
     print $FHD "}\n";
 
-}
-
-sub generate_validator($$$)
-{
-    my $master_hash = shift;
-    my $name = shift;
-    my $FHD = shift;
-
-    my $obj_hash = $master_hash->{$name};
-
-    print $FHD "extern \"C\" int validate( obj_loc_t obj_loc, int id )\n";
-    print $FHD "{\n";
-    print $FHD "    int retval=0;\n";
-    print $FHD "\n";
-
-    foreach $key ( keys %{$obj_hash->{data}->{sub}} ) {
-
-        print $FHD "    if ( ! obj_loc[(($name*)obj_loc[id])->$key] )\n";
-        print $FHD "    {\n";
-        print $FHD "        cout << \"Error: Type $name, id \" << id << \" failed validation because a sub object $key, id \" << (($name*)obj_loc[id])->$key << \" does not exist.\" << endl;\n";
-        print $FHD "        exit(0);\n";
-        print $FHD "    }\n";
-        print $FHD "\n";
-
-        print $FHD "    if ( ((object_header*)obj_loc[(($name*)obj_loc[id])->$key])->implements != $master_hash->{$master_hash->{$obj_hash->{data}->{sub}->{$key}}->{data}->{implements}}->{type_num} )\n";
-        print $FHD "    {\n";
-
-        print $FHD "        cout << \"Error: Type $name, id \" << id << \" failed validation because a sub object $key, id \" << (($name*)obj_loc[id])->$key << \" is not of type $master_hash->{$obj_hash->{data}->{sub}->{$key}}->{type_num}.\" << endl;\n";
-        print $FHD "        exit(0);\n";
-        print $FHD "    }\n";
-        print $FHD "\n";
-
-    }
-
-    print $FHD "    return retval;\n";
-    print $FHD "\n";
-    print $FHD "}\n";
 }
 
 #######################################################
@@ -806,5 +768,75 @@ sub PrintSectionDebug($$$$) {
         }
     }
 }
+
+sub GenerateValidator($$$) {
+    my $master_hash = shift;
+    my $type = shift;
+    my $FHD = shift;
+
+    print $FHD "extern \"C\" int validate( obj_loc_t obj_loc, int id )\n";
+    print $FHD "{\n";
+    print $FHD "    int retval = 1;\n";
+
+    my ( $var_name, $var_type );
+
+    foreach $var_name ( @{$master_hash->{$type}->{sub}->{order}} ) {
+
+        $var_type = $master_hash->{$type}->{sub}->{data}->{$var_name};
+
+        if ( PreComp::Utilities::IsArray( $var_name ) ) {
+
+            my $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
+
+            my $size = PreComp::Utilities::GetArraySize( $master_hash, $var_name );
+
+            my $counter=0;
+
+            while ( $counter < $size ) {
+
+                print $FHD "    if ( ! obj_loc[(($type*)obj_loc[id])->$var_name_stripped"."[$counter]] )\n";
+                print $FHD "    {\n";
+                print $FHD "        cout << \"Error: Type $type, id \" << id << \" failed validation because a sub object $var_name_stripped"."[$counter], id \" << (($type*)obj_loc[id])->$var_name_stripped"."[$counter] << \" does not exist.\" << endl;\n";
+                print $FHD "        exit(0);\n";
+                print $FHD "    }\n";
+                print $FHD "\n";
+
+                print $FHD "    if ( ((object_header*)obj_loc[(($type*)obj_loc[id])->$var_name_stripped"."[$counter]])->implements != $master_hash->{$master_hash->{$var_type}->{implements}}->{type_id}  )\n";
+                print $FHD "    {\n";
+
+                print $FHD "        cout << \"Error: Type $type, id \" << id << \" failed validation because a sub object $var_name_stripped"."[$counter], id \" << (($type*)obj_loc[id])->$var_name_stripped"."[$counter] << \" is not of type $master_hash->{$master_hash->{$var_type}->{implements}}->{type_id}.\" << endl;\n";
+                print $FHD "        exit(0);\n";
+                print $FHD "    }\n";
+                print $FHD "\n";
+
+                $counter = $counter+1;
+            }
+        }
+        else {
+
+            print $FHD "    if ( ! obj_loc[(($type*)obj_loc[id])->$var_name] )\n";
+            print $FHD "    {\n";
+            print $FHD "        cout << \"Error: Type $type, id \" << id << \" failed validation because a sub object $var_name, id \" << (($type*)obj_loc[id])->$var_name << \" does not exist.\" << endl;\n";
+            print $FHD "        exit(0);\n";
+            print $FHD "    }\n";
+            print $FHD "\n";
+
+            print $FHD "    if ( ((object_header*)obj_loc[(($type*)obj_loc[id])->$var_name])->implements != $master_hash->{$master_hash->{$var_type}->{implements}}->{type_id}  )\n";
+            print $FHD "    {\n";
+
+            print $FHD "        cout << \"Error: Type $type, id \" << id << \" failed validation because a sub object $var_name, id \" << (($type*)obj_loc[id])->$var_name << \" is not of type $master_hash->{$master_hash->{$var_type}->{implements}}->{type_id}.\" << endl;\n";
+            print $FHD "        exit(0);\n";
+            print $FHD "    }\n";
+            print $FHD "\n";
+
+        }
+
+    }
+
+    print $FHD "    return retval;\n";
+    print $FHD "}\n";
+
+}
+
 1;
 
