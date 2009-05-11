@@ -45,9 +45,9 @@ void calculate_credit_curve( obj_loc_t obj_loc, int id )
         NULL,
         credit_curve_recoveryRate,
         credit_curve_payAccOnDefault,
-        credit_curve_couponInterval,
+        &credit_curve_couponInterval,
         credit_curve_paymentDcc,
-        credit_curve_stubType,
+        &credit_curve_stubType,
         (long)credit_curve_badDayConv,
         calendar ));
 
