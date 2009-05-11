@@ -179,20 +179,20 @@ sub GenerateDummyData($$) {
 
     foreach $var_name ( @{$master_hash->{$type}->{static}->{order}} ) {
 
-    $var_type = $master_hash->{$type}->{static}->{data}->{$var_name};
-    
-    if ( not ( exists $master_hash->{structures}->{data}->{$var_type} or PreComp::Utilities::IsArray( $var_name )) ) {
-            print $FHD ", $PI";
-    } 
+        $var_type = $master_hash->{$type}->{static}->{data}->{$var_name};
+        
+        if ( not ( exists $master_hash->{structures}->{data}->{$var_type} or PreComp::Utilities::IsArray( $var_name )) ) {
+                print $FHD ", $PI";
+        } 
     }
 
     foreach $var_name ( @{$master_hash->{$type}->{sub}->{order}} ) {
 
-    $var_type = $master_hash->{$type}->{sub}->{data}->{$var_name};
+        $var_type = $master_hash->{$type}->{sub}->{data}->{$var_name};
 
-    if ( ! PreComp::Utilities::IsArray( $var_name ) ) {
-            print $FHD ", $master_hash->{$var_type}->{type_id}";
-    }
+        if ( ! PreComp::Utilities::IsArray( $var_name ) ) {
+                print $FHD ", $master_hash->{$var_type}->{type_id}";
+        }
 
     }
 
