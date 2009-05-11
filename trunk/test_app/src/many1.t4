@@ -3,8 +3,9 @@
 static
     struct1 my_struct1
     double d9
+    int i9
 
 pub
-    double x_d9
+    int x_d9
     double y_d9
-    double iz_d9
+    int iz_d9
