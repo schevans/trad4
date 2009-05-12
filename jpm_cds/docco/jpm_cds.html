@@ -135,18 +135,6 @@ These arrays would hold the credit_curve (for cr01) or ir_curve (for dv01) pertu
 <p>
 Likewise we could produce cr01 by gridpoint, by introducing a range of fArrays corresponding to a range of curves perturbed by gridpoint. This would produce a ladder of cr01s. This would come at the expense of a fair bit of RAM, but as the number of curves is relatively low compared to the number of trades this should not present a problem in practice. 
 </p>
-<h4>precomp_v3</h4>
-<p>
-The interesting thing about this project is that this is the first time I've ported an existing application to trad4. This means the application hasn't been worked-up with trad4 in mind, and puts interesting stresses and strains onto the precompiler.
-</p>
-<p>
-While I've done quite a lot of work on the precompiler while working on this project (particularly relating to support for structs), it's becoming increasingly apparent that the existing architecture of the trad4 precompiler is becoming unmanageable. 
-</p>
-<p>
-I've started work on precompiler_v3 (Pv3), which should start to replace the code under PreComp from the inside-out. There should be <i>no functional changes</i> except for some added features that are simply too fiddly to add to the current architecture.
-<p>
-For this reason in this release I've had to work around some of these restrictions in the precompiler rather than fix them. See types/rates/dates in src/ir_curve.t4, and the ONE constant - required because stand-alone structs aren't supported.
-</p>
 <h2><a name="usage">Usage</a></h2>
 <h3>Running</h3>
 <p>
