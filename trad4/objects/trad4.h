@@ -6,6 +6,7 @@
 #define __TRAD4_H__
 
 #include <sys/types.h>
+#include "math.h"
 
 #define MAX_OBJECTS 1400000
 #define MAX_THREADS 128
@@ -33,7 +34,7 @@ typedef struct {
     validate_fpointer validate;
 } object_type_struct_t;
 
-//#define DEBUG_ON
+#define DEBUG_ON
 
 #ifdef DEBUG_ON
 #define DEBUG( debug ) if ( ((object_header*)obj_loc[id])->log_level > 0 ) std::cout << debug << std::endl;
@@ -44,6 +45,8 @@ typedef struct {
 #define DEBUG_FINE( debug )
 #define DEBUG_LOADS( debug )
 #endif
+
+#define T4_TEST( val1, val2 ) if ( fabs(val1 - val2 ) > 0.01 ) std::cout << "T4_TEST failed for object id " << id  << ": " << val1 << " vs " << val2 << ", file " << __FILE__ << ", line " << __LINE__ << std::endl; else std::cout << "T4_TEST passed" << std::endl;
 
 enum logging_level {
     NONE,
