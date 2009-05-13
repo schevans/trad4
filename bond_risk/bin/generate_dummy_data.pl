@@ -11,7 +11,6 @@ sub get_next_id();
 sub generate_currency_curves_ir_rates();
 sub generate_currency_curves();
 sub generate_fx_rates();
-sub generate_books();
 sub generate_bonds($);
 sub generate_outright_trades($);
 sub generate_repo_trades($);
@@ -49,16 +48,17 @@ my %bond_to_ccy_curve;
 generate_currency_curves_ir_rates();
 generate_currency_curves();
 generate_fx_rates();
-#generate_books();
-generate_bonds( 20 );
-generate_outright_trades( 100 );
-generate_repo_trades( 100 );
+generate_bonds( 20000 );
+generate_outright_trades( 100000 );
+generate_repo_trades( 100000 );
 
 sub generate_currency_curves_ir_rates() {
 
     my $id = 1;
     my $file = "$dummy_data_root/currency_curves_ir_rates.sql";
     open FILE, ">$file" or die "Can't open $file";
+
+    print FILE "BEGIN;\n";
 
     print FILE "delete from currency_curves_ir_rates;\n";
 
@@ -99,6 +99,8 @@ sub generate_currency_curves_ir_rates() {
     print FILE "insert into currency_curves_ir_rates values ( $id, 8, 18000,3.8 );\n";
     print FILE "insert into currency_curves_ir_rates values ( $id, 9, 20000,3.8 );\n";
 
+    print FILE "COMMIT;\n";
+
     close FILE;
 }
 
@@ -108,6 +110,8 @@ sub generate_currency_curves()
 
     my $file = "$dummy_data_root/currency_curves.sql";
     open FILE, ">$file" or die "Can't open $file";
+
+    print FILE "BEGIN;\n";
 
     print FILE "delete from currency_curves;\n";
 
@@ -138,69 +142,18 @@ sub generate_currency_curves()
 
     push @currency_curve_ids, $id;
 
+    print FILE "COMMIT;\n";
+
     close FILE;
 }
-
-sub generate_books() {
-
-    my $FILE;
-    my $id;
-
-    $id = get_next_id();
-    $FILE = open_file( $id, 7 );
-    print $FILE "OUTBK_1,5,1,0,0,0\n";
-    close $FILE;
-    push @outright_agg, 1;
-
-    $id = get_next_id();
-    $FILE = open_file( $id, 7 );
-    print $FILE "OUTBK_2,5,2,0,0,0\n";
-    close $FILE;
-    push @outright_agg, 2;
-
-    $id = get_next_id();
-    $FILE = open_file( $id, 7 );
-    print $FILE "OUTBK_3,5,3,0,0,0\n";
-    close $FILE;
-    push @outright_agg, 3;
-
-    $id = get_next_id();
-    $FILE = open_file( $id, 7 );
-    print $FILE "OUTBK_4,5,4,0,0,0\n";
-    close $FILE;
-    push @outright_agg, 4;
-
-
-    $id = get_next_id();
-    $FILE = open_file( $id, 8 );
-    print $FILE "REOPBK_1,5,1,0,0,0\n";
-    close $FILE;
-    push @repo_agg, 1;
-
-    $id = get_next_id();
-    $FILE = open_file( $id, 8 );
-    print $FILE "REOPBK_2,5,2,0,0,0\n";
-    close $FILE;
-    push @repo_agg, 2;
-
-    $id = get_next_id();
-    $FILE = open_file( $id, 8 );
-    print $FILE "REOPBK_3,5,3,0,0,0\n";
-    close $FILE;
-    push @repo_agg, 3;
-
-    $id = get_next_id();
-    $FILE = open_file( $id, 8 );
-    print $FILE "REOPBK_4,5,4,0,0,0\n";
-    close $FILE;
-    push @repo_agg, 4;
-
-}  
 
 sub generate_fx_rates() {
 
     my $file = "$dummy_data_root/fx_rates.sql";
     open FILE, ">$file" or die "Can't open $file";
+
+    print FILE "BEGIN;\n";
+
     print FILE "delete from fx_rate;\n";
 
     my $id = 4;
@@ -257,6 +210,8 @@ sub generate_fx_rates() {
     print FILE "insert into fx_rate values ( $id, 1.0, 3, 3 );\n";
     $fx_rates{33} = $id;
     
+    print FILE "COMMIT;\n";
+
     close FILE;
 }
 
@@ -265,6 +220,9 @@ sub generate_bonds($) {
 
     my $file = "$dummy_data_root/bonds.sql";
     open FILE, ">$file" or die "Can't open $file";
+
+    print FILE "BEGIN;\n";
+
 
     print FILE "delete from bond;\n";
 
@@ -290,6 +248,8 @@ sub generate_bonds($) {
         $bond_to_ccy_curve{$id} = $currency_curve;
         $bond_ccys{$id} = $currency_curve;
     }
+    print FILE "COMMIT;\n";
+
     close FILE;
 
 }
@@ -299,6 +259,9 @@ sub generate_outright_trades($) {
 
     my $file = "$dummy_data_root/outright_trades.sql";
     open FILE, ">$file" or die "Can't open $file";
+
+    print FILE "BEGIN;\n";
+
 
     print FILE "delete from outright_trade;\n";
 
@@ -321,6 +284,8 @@ sub generate_outright_trades($) {
 
     }
 
+    print FILE "COMMIT;\n";
+
     close FILE;
 
 }
@@ -330,6 +295,9 @@ sub generate_repo_trades($) {
 
     my $file = "$dummy_data_root/repo_trades.sql";
     open FILE, ">$file" or die "Can't open $file";
+
+    print FILE "BEGIN;\n";
+
 
     print FILE "delete from repo_trade;\n";
 
@@ -368,6 +336,8 @@ sub generate_repo_trades($) {
 
     }
 
+    print FILE "COMMIT;\n";
+
     close FILE;
 }
 
@@ -377,19 +347,3 @@ sub get_next_id() {
 
 }
 
-sub open_file($$) {
-    my $id = shift;
-    my $type = shift;
-
-    my $file = "$dummy_data_root/$id.$type.t4o";
-
-    if ( ! -d $dummy_data_root ) {
-
-        `mkdir $dummy_data_root`;
-    }
-
-    open FILE, ">$file" or die "Can't open $file";
-    
-    return *FILE;
-
-}
