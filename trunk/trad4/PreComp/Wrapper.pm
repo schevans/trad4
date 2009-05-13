@@ -753,9 +753,23 @@ sub PrintSectionDebug($$$$) {
             my $size = PreComp::Utilities::GetArraySize( $master_hash, $var_name );
 
             my $counter=0;
+            my $skipped=0;
 
             while ( $counter < $size ) {
 
+                if ( $counter > 3 and $counter < $size - 4 ) {
+
+                    if ( $skipped == 0 ) {
+
+                        print $FHD "    DEBUG_FINE( \"\\t..skipping rows..\" );\n";
+
+                        $skipped = 1;
+                    }
+                    
+                    $counter = $counter+1;
+                    next; 
+                }
+ 
                 print $FHD "    DEBUG_FINE( \"\\t$stem"."_$var_name_stripped"."[$counter]: \" << $stem"."_$var_name_stripped"."[$counter] );\n";
 
                 $counter = $counter+1;
