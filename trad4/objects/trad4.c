@@ -29,6 +29,7 @@ int current_thread(1);
 int num_threads_fired(0);
 bool need_reload(false);
 char* timing_debug = 0;
+char* batch_mode = 0;
 void set_timestamp( obj_loc_t obj_loc, int id );
 
 bool fire_object( int id );
@@ -51,6 +52,8 @@ void run_trad4() {
     }
 
     timing_debug = getenv("TIMING_DEBUG");
+
+    batch_mode = getenv("BATCH_MODE");
 
     for ( int i = 0 ; i < MAX_OBJECTS+1 ; i++ )
     {
@@ -166,6 +169,13 @@ void run_trad4() {
 
             if ( timing_debug ) 
                 cout << endl << "All tiers ran " << num_objects_run << " objects in " << end_time-start_time << " seconds." << endl;
+
+            if ( batch_mode )
+            {
+                cout << endl << "Exiting after first run as BATCH_MODE is set." << endl;
+                exit(0);
+            }
+
 
         }
         else
