@@ -619,7 +619,7 @@ sub GenerateLoaderCallback($$$$) {
 
     print $FHD "    if ( is_new )\n";
     print $FHD "    {\n";
-    print $FHD "        std::cout << \"New $type created.\" << std::endl;\n";
+    print $FHD "        //std::cout << \"New $type created.\" << std::endl;\n";
     print $FHD "    }\n";
 
     print $FHD "\n";
