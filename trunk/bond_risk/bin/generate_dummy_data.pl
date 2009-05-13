@@ -62,42 +62,42 @@ sub generate_currency_curves_ir_rates() {
 
     print FILE "delete from currency_curves_ir_rates;\n";
 
-    print FILE "insert into currency_curves_ir_rates values ( $id, 10000,2.6 );\n";
-    print FILE "insert into currency_curves_ir_rates values ( $id, 10010,2.7 );\n";
-    print FILE "insert into currency_curves_ir_rates values ( $id, 10100,2.7 );\n";
-    print FILE "insert into currency_curves_ir_rates values ( $id, 10200,2.7 );\n";
-    print FILE "insert into currency_curves_ir_rates values ( $id, 10300,2.8 );\n";
-    print FILE "insert into currency_curves_ir_rates values ( $id, 12000,2.8 );\n";
-    print FILE "insert into currency_curves_ir_rates values ( $id, 13000,2.9 );\n";
-    print FILE "insert into currency_curves_ir_rates values ( $id, 15000,2.9 );\n";
-    print FILE "insert into currency_curves_ir_rates values ( $id, 18000,2.8 );\n";
-    print FILE "insert into currency_curves_ir_rates values ( $id, 20000,2.8 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 0, 10000,2.6 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 1, 10010,2.7 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 2, 10100,2.7 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 3, 10200,2.7 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 4, 10300,2.8 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 5, 12000,2.8 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 6, 13000,2.9 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 7, 15000,2.9 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 8, 18000,2.8 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 9, 20000,2.8 );\n";
 
     $id = 2;
 
-    print FILE "insert into currency_curves_ir_rates values ( $id, 10000,5.2 );\n";
-    print FILE "insert into currency_curves_ir_rates values ( $id, 10010,5.3 );\n";
-    print FILE "insert into currency_curves_ir_rates values ( $id, 10100,5.4 );\n";
-    print FILE "insert into currency_curves_ir_rates values ( $id, 10200,5.4 );\n";
-    print FILE "insert into currency_curves_ir_rates values ( $id, 10300,5.5 );\n";
-    print FILE "insert into currency_curves_ir_rates values ( $id, 12000,5.5 );\n";
-    print FILE "insert into currency_curves_ir_rates values ( $id, 13000,5.5 );\n";
-    print FILE "insert into currency_curves_ir_rates values ( $id, 15000,5.4 );\n";
-    print FILE "insert into currency_curves_ir_rates values ( $id, 18000,5.3 );\n";
-    print FILE "insert into currency_curves_ir_rates values ( $id, 20000,5.3 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 0, 10000,5.2 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 1, 10010,5.3 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 2, 10100,5.4 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 3, 10200,5.4 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 4, 10300,5.5 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 5, 12000,5.5 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 6, 13000,5.5 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 7, 15000,5.4 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 8, 18000,5.3 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 9, 20000,5.3 );\n";
 
     $id = 3;
 
-    print FILE "insert into currency_curves_ir_rates values ( $id, 10000,3.6 );\n";
-    print FILE "insert into currency_curves_ir_rates values ( $id, 10010,3.7 );\n";
-    print FILE "insert into currency_curves_ir_rates values ( $id, 10100,3.7 );\n";
-    print FILE "insert into currency_curves_ir_rates values ( $id, 10200,3.7 );\n";
-    print FILE "insert into currency_curves_ir_rates values ( $id, 10300,3.8 );\n";
-    print FILE "insert into currency_curves_ir_rates values ( $id, 12000,3.8 );\n";
-    print FILE "insert into currency_curves_ir_rates values ( $id, 13000,3.9 );\n";
-    print FILE "insert into currency_curves_ir_rates values ( $id, 15000,3.9 );\n";
-    print FILE "insert into currency_curves_ir_rates values ( $id, 18000,3.8 );\n";
-    print FILE "insert into currency_curves_ir_rates values ( $id, 20000,3.8 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 0, 10000,3.6 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 1, 10010,3.7 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 2, 10100,3.7 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 3, 10200,3.7 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 4, 10300,3.8 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 5, 12000,3.8 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 6, 13000,3.9 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 7, 15000,3.9 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 8, 18000,3.8 );\n";
+    print FILE "insert into currency_curves_ir_rates values ( $id, 9, 20000,3.8 );\n";
 
     close FILE;
 }
@@ -115,7 +115,7 @@ sub generate_currency_curves()
     my $name = "USD-CCY-CURVES";
     my $interest_rate = 1;
 
-    print FILE "insert into object values (  $id, 1, \"$name\", 0, 1 );\n";
+    print FILE "insert into object values (  $id, 1, 1, \"$name\", 0, 1 );\n";
     print FILE "insert into currency_curves values ( $id );\n";
 
     push @currency_curve_ids, $id;
@@ -124,7 +124,7 @@ sub generate_currency_curves()
     $name = "GBP-CCY-CURVES";
     $interest_rate = 2;
 
-    print FILE "insert into object values (  $id, 1, \"$name\", 0, 1 );\n";
+    print FILE "insert into object values (  $id, 1, 1, \"$name\", 0, 1 );\n";
     print FILE "insert into currency_curves values ( $id );\n";
 
     push @currency_curve_ids, $id;
@@ -133,7 +133,7 @@ sub generate_currency_curves()
     $name = "EUR-CCY-CURVES";
     $interest_rate = 3;
 
-    print FILE "insert into object values (  $id, 1, \"$name\", 0, 1 );\n";
+    print FILE "insert into object values (  $id, 1, 1, \"$name\", 0, 1 );\n";
     print FILE "insert into currency_curves values ( $id );\n";
 
     push @currency_curve_ids, $id;
@@ -205,55 +205,55 @@ sub generate_fx_rates() {
 
     my $id = 4;
     my $name = "USD-GBP";
-    print FILE "insert into object values (  $id, 2, \"$name\", 0, 1 );\n";
+    print FILE "insert into object values (  $id, 2, 1, \"$name\", 0, 1 );\n";
     print FILE "insert into fx_rate values ( $id, 0.509242756, 1, 2 );\n";
     $fx_rates{12} = $id;
 
     $id = 5;
     $name = "GBP-EUR";
-    print FILE "insert into object values (  $id, 2, \"$name\", 0, 1 );\n";
+    print FILE "insert into object values (  $id, 2, 1, \"$name\", 0, 1 );\n";
     print FILE "insert into fx_rate values ( $id, 1.4734749, 2, 3 );\n";
     $fx_rates{23} = $id;
 
     $id = 6;
     $name = "EUR-USD";
-    print FILE "insert into object values (  $id, 2, \"$name\", 0, 1 );\n";
+    print FILE "insert into object values (  $id, 2, 1, \"$name\", 0, 1 );\n";
     print FILE "insert into fx_rate values ( $id, 1.3327, 3, 1 );\n";
     $fx_rates{31} = $id;
 
     $id = 7;
     $name = "GBP-USD";
-    print FILE "insert into object values (  $id, 2, \"$name\", 0, 1 );\n";
+    print FILE "insert into object values (  $id, 2, 1, \"$name\", 0, 1 );\n";
     print FILE "insert into fx_rate values ( $id, ".(1.0/0.509242756).", 2, 1 );\n";
     $fx_rates{21} = $id;
 
     $id = 8;
     $name = "EUR-GBP";
-    print FILE "insert into object values (  $id, 2, \"$name\", 0, 1 );\n";
+    print FILE "insert into object values (  $id, 2, 1, \"$name\", 0, 1 );\n";
     print FILE "insert into fx_rate values ( $id, ".(1.0/1.4734749).", 3, 2 );\n";
     $fx_rates{32} = $id;
 
     $id = 10;
     $name = "USD-EUR";
-    print FILE "insert into object values (  $id, 2, \"$name\", 0, 1 );\n";
+    print FILE "insert into object values (  $id, 2, 1, \"$name\", 0, 1 );\n";
     print FILE "insert into fx_rate values ( $id, ".(1.0/1.3327).", 1, 3 );\n";
     $fx_rates{13} = $id;
 
     $id = 11;
     $name = "USD-USD";
-    print FILE "insert into object values (  $id, 2, \"$name\", 0, 1 );\n";
+    print FILE "insert into object values (  $id, 2, 1, \"$name\", 0, 1 );\n";
     print FILE "insert into fx_rate values ( $id, 1.0, 1, 1 );\n";
     $fx_rates{11} = $id;
 
     $id = 12;
     $name = "GBP-GBP";
-    print FILE "insert into object values (  $id, 2, \"$name\", 0, 1 );\n";
+    print FILE "insert into object values (  $id, 2, 1, \"$name\", 0, 1 );\n";
     print FILE "insert into fx_rate values ( $id, 1.0, 2, 2 );\n";
     $fx_rates{22} = $id;
 
     $id = 13;
     $name = "EUR-EUR";
-    print FILE "insert into object values (  $id, 2, \"$name\", 0, 1 );\n";
+    print FILE "insert into object values (  $id, 2, 1, \"$name\", 0, 1 );\n";
     print FILE "insert into fx_rate values ( $id, 1.0, 3, 3 );\n";
     $fx_rates{33} = $id;
     
@@ -277,7 +277,7 @@ sub generate_bonds($) {
 
         $currency_curve = $currency_curve_ids[ int( rand( @currency_curve_ids )) ];
 
-        print FILE "insert into object values (  $id, 3, \"$name\", 0, 1 );\n";
+        print FILE "insert into object values (  $id, 3, 2, \"$name\", 0, 1 );\n";
 
         print FILE "insert into bond values (  $id, ".
             int( 6000 + rand(  8000 - 6000 )).",".
@@ -310,7 +310,7 @@ sub generate_outright_trades($) {
 
         $name = "C".int( rand(999999));
 
-        print FILE "insert into object values (  $id, 4, \"$name\", 0, 1 );\n";
+        print FILE "insert into object values (  $id, 4, 3, \"$name\", 0, 1 );\n";
 
         print FILE "insert into outright_trade values ( $id, ".
             1000 * int( rand( 1000  )).",".
@@ -341,7 +341,7 @@ sub generate_repo_trades($) {
 
         my $name = "R".int( rand(999999));
 
-        print FILE "insert into object values (  $id, 5, \"$name\", 0, 1 );\n";
+        print FILE "insert into object values (  $id, 5, 3, \"$name\", 0, 1 );\n";
 
         my $cash_ccy = $currencies[ int( rand( @currencies )) ];
         my $notional = 10000 * int( rand( 100  ));
