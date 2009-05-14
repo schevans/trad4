@@ -11,19 +11,22 @@ export BATCH_MODE=1
 
 i=1
 
-while [ $i -ne 128 ]
+while [ $i -le 4096 ]
 do
-    echo $i
-
     export NUM_THREADS=$i
 
-    echo -n "$i: " >> load.$$
-    top -b -n1 | grep "load average" >> load.$$
+    RUN_TIME=`$APP | grep "All tiers ran" | awk -F' ' '{print $7}'`
 
-    echo -n "$i: " >> timer.$$
-    $APP | grep "All tiers ran" >> timer.$$
-    
-    i=`expr $i + 1`
+    LOAD_AVERAGE=`top -b -n1 | grep "load average" | sed 's/^.*load average://' | awk -F, '{print $1}'`
+
+    echo "$i,$LOAD_AVERAGE,$RUN_TIME" >> benchmark.log.$$
+
+    echo "$i,$RUN_TIME"
+
+    i=`expr $i \* 2`
+
+    echo "Sleeping.."
+    sleep 100
 
 done
 
