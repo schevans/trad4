@@ -31,12 +31,7 @@ sub generate_top_lvl_make($) {
     if( ! $FHD ) { return; }
 
     print $FHD "\n";
-    print $FHD "CXX = g++ -m32\n";
-    print $FHD "\n";
-    print $FHD "CXXFLAGS = $all_headers\n";
-    print $FHD "\n";
-    print $FHD "COMPILE = \$(CXX) \$(CXXFLAGS) -c\n";
-    print $FHD "\n";
+    print $FHD "COMPILE = \$(CXX) \$(CXXFLAGS) \n";
     print $FHD "\n";
     print $FHD "SUBDIRS = \$(TRAD4_ROOT)/objects \$(APP_ROOT)/objects \$(APP_ROOT)/lib\n";
     print $FHD "\n";
@@ -73,10 +68,6 @@ sub generate_object_make($) {
     if( ! $FHD ) { return; }
 
     print $FHD "\n";
-    print $FHD "CXX = g++ -m32\n";
-    print $FHD "\n";
-    print $FHD "CXXFLAGS =  -Wall -c\n";
-    print $FHD "\n";
     print $FHD "COMPILE = \$(CXX) \$(CXXFLAGS)\n";
     print $FHD "\n";
 
@@ -96,7 +87,7 @@ sub generate_object_make($) {
     foreach $type ( keys %{$obj_hash} ) {
 
         print $FHD "$type.o: $type.c ../gen/objects/$type"."_wrapper.c\n";
-        print $FHD "	\$(COMPILE) -I\$(APP_ROOT)/objects -I\$(APP_ROOT)/gen/objects -I\$(TRAD4_ROOT)/objects -c $type.c -o $type.o\n";
+        print $FHD "	\$(COMPILE) -I\$(APP_ROOT)/objects -I\$(APP_ROOT)/gen/objects -I\$(TRAD4_ROOT)/objects $type.c -o $type.o\n";
         print $FHD "\n";
     }
 
@@ -116,11 +107,7 @@ sub generate_lib_make($) {
     if( ! $FHD ) { return; }
 
     print $FHD "\n";
-    print $FHD "CXX = g++ -m32\n";
-    print $FHD "\n";
-    print $FHD "CXXFLAGS = $all_headers\n";
-    print $FHD "\n";
-    print $FHD "COMPILE = \$(CXX) \$(CXXFLAGS) -c \n";
+    print $FHD "COMPILE = \$(CXX) \$(CXXFLAGS) \n";
     print $FHD "\n";
 
     print $FHD "LIBS =";
