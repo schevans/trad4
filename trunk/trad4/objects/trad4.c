@@ -320,27 +320,27 @@ void set_timestamp( obj_loc_t obj_loc, int id )
 void* thread_loop( void* thread_id ) 
 {
 
-    cout << "Starting thread " << (int)thread_id << endl;
+    cout << "Starting thread " << (long long)thread_id << endl;
 
     bool thread_fired(false);
 
     while (1) {
 
-        //cout << "thread_contoller[(int)thread_id] = " << thread_contoller[(int)thread_id] << endl;
+        //cout << "thread_contoller[(long long)thread_id] = " << thread_contoller[(long long)thread_id] << endl;
 
-        if ( thread_contoller[(int)thread_id] != 0 )
+        if ( thread_contoller[(long long)thread_id] != 0 )
         {
 
-            //cout << "Thread #" << (int)thread_id << " working on obj id: " << thread_contoller[(int)thread_id] << endl;
+            //cout << "Thread #" << (long long)thread_id << " working on obj id: " << thread_contoller[(long long)thread_id] << endl;
 
-            (*object_type_struct[((object_header*)obj_loc[thread_contoller[(int)thread_id]])->type]->calculate)(obj_loc, thread_contoller[(int)thread_id] );
+            (*object_type_struct[((object_header*)obj_loc[thread_contoller[(long long)thread_id]])->type]->calculate)(obj_loc, thread_contoller[(long long)thread_id] );
 
-            set_timestamp( obj_loc, thread_contoller[(int)thread_id] );
+            set_timestamp( obj_loc, thread_contoller[(long long)thread_id] );
 
-            //cout << "Thread #" << (int)thread_id << " done." << endl;
+            //cout << "Thread #" << (long long)thread_id << " done." << endl;
             thread_fired=true;
 
-            thread_contoller[(int)thread_id] = 0;
+            thread_contoller[(long long)thread_id] = 0;
 
             usleep(50);
         }

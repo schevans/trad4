@@ -1,10 +1,6 @@
 # Copyright (c) Steve Evans 2008
 # steve@topaz.myzen.co.uk
 
-CXX = g++ -m32
-
-CXXFLAGS = -Wall -c 
-
 COMPILE = $(CXX) $(CXXFLAGS)
 
 all : trad4.o libtrad4.so sqlite3.o
@@ -17,7 +13,7 @@ libtrad4.so: trad4.o
 	mv libtrad4.so $(APP_ROOT)/lib/.
 
 sqlite3.o : sqlite3.c
-	gcc -m32 -fPIC -c sqlite3.c -o sqlite3.o
+	gcc -fPIC -c sqlite3.c -o sqlite3.o
 
 clean : 
 	rm -f libtrad4.so trad4.o $(APP_ROOT)/lib/libtrad4.so
