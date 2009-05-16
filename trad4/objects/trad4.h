@@ -9,7 +9,7 @@
 #include "math.h"
 
 #define MAX_OBJECTS 1400000
-#define MAX_THREADS 128
+#define MAX_THREADS 4096
 #define MAX_TIERS 10
 #define MAX_TYPES 15
 
