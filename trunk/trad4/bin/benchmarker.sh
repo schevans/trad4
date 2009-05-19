@@ -21,15 +21,13 @@ do
 
     RUN_TIME=`$APP | grep "All tiers ran" | awk -F' ' '{print $7}'`
 
-    LOAD_AVERAGE=`top -b -n1 | grep "load average" | sed 's/^.*load average://' | awk -F, '{print $1}'`
-
     CONTEXT_SWITCHES_END=`cat /proc/stat | grep ctxt | sed 's/ctxt //'`
     
     CONTEXT_SWITCHES=`expr $CONTEXT_SWITCHES_END - $CONTEXT_SWITCHES_START`
 
-    echo "$i,$LOAD_AVERAGE,$RUN_TIME,$CONTEXT_SWITCHES" >> benchmark.log.$$
+    echo "$i,$RUN_TIME,$CONTEXT_SWITCHES" >> benchmark.log.$$
 
-    echo "$i,$LOAD_AVERAGE,$RUN_TIME,$CONTEXT_SWITCHES"
+    echo "$i,$RUN_TIME,$CONTEXT_SWITCHES"
 
     i=`expr $i \* 2`
 
