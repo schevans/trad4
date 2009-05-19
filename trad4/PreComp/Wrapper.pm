@@ -537,12 +537,12 @@ sub GenerateLoaderCallback($$$$) {
     print $FHD "\n";
     print $FHD "    if ( !obj_loc[id] ) \n";
     print $FHD "    {\n";
-    print $FHD "        obj_loc[id] = (unsigned char*)(new $type);\n";
+    print $FHD "        obj_loc[id] = (unsigned char*)(new t4::$type);\n";
     print $FHD "        is_new = true;\n";
     print $FHD "    }\n";
     print $FHD "\n";
-    print $FHD "    (($type*)obj_loc[id])->id = id;\n";
-    print $FHD "    memcpy( (($type*)obj_loc[id])->name, row[1], 32 );\n";
+    print $FHD "    ((t4::$type*)obj_loc[id])->id = id;\n";
+    print $FHD "    memcpy( ((t4::$type*)obj_loc[id])->name, row[1], 32 );\n";
     print $FHD "    object_tier(id) = atoi(row[2]);\n";
     print $FHD "    object_log_level(id) =  atoi(row[3]);\n";
     print $FHD "\n";
@@ -632,14 +632,14 @@ sub GenerateNeedRefresh($$$) {
 
             while ( $counter < $size ) {
 
-                print $FHD "    DEBUG_LOADS( \"\t\t$var_name_stripped"."[$counter] last_published: \" << object_last_published((($type*)obj_loc[id])->$var_name_stripped"."[$counter]) );\n";
+                print $FHD "    DEBUG_LOADS( \"\t\t$var_name_stripped"."[$counter] last_published: \" << object_last_published(((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) );\n";
 
                 $counter = $counter+1;
             }
         }
         else {
 
-            print $FHD "    DEBUG_LOADS( \"\t\t$var_name last_published: \" << object_last_published((($type*)obj_loc[id])->$var_name) );\n";
+            print $FHD "    DEBUG_LOADS( \"\t\t$var_name last_published: \" << object_last_published(((t4::$type*)obj_loc[id])->$var_name) );\n";
         }
     }
 
@@ -659,12 +659,12 @@ sub GenerateNeedRefresh($$$) {
             while ( $counter < $size ) {
 
 
-                print $FHD "        || (((($type*)obj_loc[id])->$var_name_stripped"."[$counter]) and ( object_last_published(id) < object_last_published((($type*)obj_loc[id])->$var_name_stripped"."[$counter]) ))\n";
+                print $FHD "        || ((((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) and ( object_last_published(id) < object_last_published(((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) ))\n";
                 $counter = $counter+1;
             }
         }
         else {
-            print $FHD "        || ( object_last_published(id) < object_last_published((($type*)obj_loc[id])->$var_name) )\n";
+            print $FHD "        || ( object_last_published(id) < object_last_published(((t4::$type*)obj_loc[id])->$var_name) )\n";
         }
 
     }
@@ -688,7 +688,7 @@ sub GenerateCalculate($$$) {
     print $FHD "extern \"C\" void calculate( obj_loc_t obj_loc, int id )\n";
     print $FHD "{\n";
     print $FHD "\n";
-    print $FHD "    DEBUG( \"calculate_$type( \" << (($type*)obj_loc[id])->name << \" )\" );\n";
+    print $FHD "    DEBUG( \"calculate_$type( \" << ((t4::$type*)obj_loc[id])->name << \" )\" );\n";
     print $FHD "\n";
 
     print $FHD "    DEBUG_FINE( \"static:\" );\n";
@@ -783,17 +783,17 @@ sub GenerateValidator($$$) {
 
             while ( $counter < $size ) {
 
-                print $FHD "    if ( ! obj_loc[(($type*)obj_loc[id])->$var_name_stripped"."[$counter]] )\n";
+                print $FHD "    if ( ! obj_loc[((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]] )\n";
                 print $FHD "    {\n";
-                print $FHD "        cout << \"Error: Type $type, id \" << id << \" failed validation because a sub object $var_name_stripped"."[$counter], id \" << (($type*)obj_loc[id])->$var_name_stripped"."[$counter] << \" does not exist.\" << endl;\n";
+                print $FHD "        cout << \"Error: Type $type, id \" << id << \" failed validation because a sub object $var_name_stripped"."[$counter], id \" << ((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter] << \" does not exist.\" << endl;\n";
                 print $FHD "        exit(0);\n";
                 print $FHD "    }\n";
                 print $FHD "\n";
 
-                print $FHD "    if ( ((object_header*)obj_loc[(($type*)obj_loc[id])->$var_name_stripped"."[$counter]])->implements != $master_hash->{$master_hash->{$var_type}->{implements}}->{type_id}  )\n";
+                print $FHD "    if ( ((object_header*)obj_loc[((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]])->implements != $master_hash->{$master_hash->{$var_type}->{implements}}->{type_id}  )\n";
                 print $FHD "    {\n";
 
-                print $FHD "        cout << \"Error: Type $type, id \" << id << \" failed validation because a sub object $var_name_stripped"."[$counter], id \" << (($type*)obj_loc[id])->$var_name_stripped"."[$counter] << \" is not of type $master_hash->{$master_hash->{$var_type}->{implements}}->{type_id}.\" << endl;\n";
+                print $FHD "        cout << \"Error: Type $type, id \" << id << \" failed validation because a sub object $var_name_stripped"."[$counter], id \" << ((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter] << \" is not of type $master_hash->{$master_hash->{$var_type}->{implements}}->{type_id}.\" << endl;\n";
                 print $FHD "        exit(0);\n";
                 print $FHD "    }\n";
                 print $FHD "\n";
@@ -803,17 +803,17 @@ sub GenerateValidator($$$) {
         }
         else {
 
-            print $FHD "    if ( ! obj_loc[(($type*)obj_loc[id])->$var_name] )\n";
+            print $FHD "    if ( ! obj_loc[((t4::$type*)obj_loc[id])->$var_name] )\n";
             print $FHD "    {\n";
-            print $FHD "        cout << \"Error: Type $type, id \" << id << \" failed validation because a sub object $var_name, id \" << (($type*)obj_loc[id])->$var_name << \" does not exist.\" << endl;\n";
+            print $FHD "        cout << \"Error: Type $type, id \" << id << \" failed validation because a sub object $var_name, id \" << ((t4::$type*)obj_loc[id])->$var_name << \" does not exist.\" << endl;\n";
             print $FHD "        exit(0);\n";
             print $FHD "    }\n";
             print $FHD "\n";
 
-            print $FHD "    if ( ((object_header*)obj_loc[(($type*)obj_loc[id])->$var_name])->implements != $master_hash->{$master_hash->{$var_type}->{implements}}->{type_id}  )\n";
+            print $FHD "    if ( ((object_header*)obj_loc[((t4::$type*)obj_loc[id])->$var_name])->implements != $master_hash->{$master_hash->{$var_type}->{implements}}->{type_id}  )\n";
             print $FHD "    {\n";
 
-            print $FHD "        cout << \"Error: Type $type, id \" << id << \" failed validation because a sub object $var_name, id \" << (($type*)obj_loc[id])->$var_name << \" is not of type $master_hash->{$master_hash->{$var_type}->{implements}}->{type_id}.\" << endl;\n";
+            print $FHD "        cout << \"Error: Type $type, id \" << id << \" failed validation because a sub object $var_name, id \" << ((t4::$type*)obj_loc[id])->$var_name << \" is not of type $master_hash->{$master_hash->{$var_type}->{implements}}->{type_id}.\" << endl;\n";
             print $FHD "        exit(0);\n";
             print $FHD "    }\n";
             print $FHD "\n";
