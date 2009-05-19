@@ -106,7 +106,7 @@ void run_trad4() {
     {
         num_threads = atoi(num_threads_env);
 
-        if ( num_threads < 1 or num_threads > MAX_THREADS )
+        if ( num_threads < 0 or num_threads > MAX_THREADS )
         {
             cout << "Warning: NUM_THREADS set to " << num_threads << ". Assuming 1 thread." << endl;
             num_threads = 1;
@@ -278,23 +278,37 @@ bool fire_object( int id )
 
     int num_threads_checked=0;
 
-    while ( ! fired && num_threads_checked < num_threads )
+    if ( num_threads > 0 ) 
     {
-        //cout << "current_thread: " << current_thread << std::endl;
 
-        if ( thread_contoller[current_thread] == 0 )
+        while ( ! fired && num_threads_checked < num_threads )
         {
-            ((object_header*)obj_loc[id])->status = RUNNING;
-            thread_contoller[current_thread] = id;
-            fired = true;
+            //cout << "current_thread: " << current_thread << std::endl;
+
+            if ( thread_contoller[current_thread] == 0 )
+            {
+                ((object_header*)obj_loc[id])->status = RUNNING;
+                thread_contoller[current_thread] = id;
+                fired = true;
+            }
+
+            current_thread++;
+
+            if ( current_thread > num_threads )
+                current_thread=1;
+
+            num_threads_checked++;
         }
+    }
+    else {
 
-        current_thread++;
+        // Single-threaded mode.
 
-        if ( current_thread > num_threads )
-            current_thread=1;
+        (*object_type_struct[((object_header*)obj_loc[id])->type]->calculate)(obj_loc, id);
 
-        num_threads_checked++;
+        set_timestamp( obj_loc, id );
+
+        fired = 1;
     }
 
     return fired;
