@@ -59,10 +59,10 @@ sub Generate($$) {
 
                     if ( $printable->{code} =~ /obj_loc/ ) {
                        
-                        $printable->{code} =~ s/\[id/[(($type*)obj_loc\[id/;
+                        $printable->{code} =~ s/\[id/[((t4::$type*)obj_loc\[id/;
                     }
                     else {
-                        $printable->{code} = "(($type*)obj_loc[id])->".$printable->{code};
+                        $printable->{code} = "((t4::$type*)obj_loc[id])->".$printable->{code};
                         $printable->{name} = $type."_$printable->{name}";
                     }
 
@@ -75,7 +75,7 @@ sub Generate($$) {
                     $printable->{name} = $type."_$printable->{name}";
 
                     $printable->{code} =~ s/\[/\[index_/g;
-                    $printable->{code} = "(($type*)obj_loc[id])->".$printable->{code};
+                    $printable->{code} = "((t4::$type*)obj_loc[id])->".$printable->{code};
 
                 }
 
@@ -174,7 +174,7 @@ sub GetPrintablesFromSection($$$) {
                 foreach $sub_printable ( GetPrintablesFromSection( $master_hash, $master_hash->{$var_type}->{$section}, $depth ) ) {
 
                     $sub_printable->{name} = $var_name."_".$sub_printable->{name};
-                    $sub_printable->{code} =~ s/^/(($var_type*)obj_loc[id])->$var_name])->/g;
+                    $sub_printable->{code} =~ s/^/((t4::$var_type*)obj_loc[id])->$var_name])->/g;
 
                     push @ret_array, $sub_printable;
                 }

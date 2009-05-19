@@ -30,16 +30,18 @@ sub Generate($) {
     print $FHD "#include \"constants.h\"\n";
     print $FHD "#include \"aliases.h\"\n";
     print $FHD "\n";
+    print $FHD "namespace t4 {\n";
+    print $FHD "\n";
 
-    print $FHD "typedef struct {\n";
+    print $FHD "    typedef struct {\n";
 
-    print $FHD "    // header\n";
+    print $FHD "        // header\n";
 
     foreach $tuple ( @header ) {
 
         ( $type, $var ) = split / /, $tuple;
 
-        print $FHD "    $type $var;\n";
+        print $FHD "        $type $var;\n";
 
     }
 
@@ -47,13 +49,15 @@ sub Generate($) {
 
         if ( $section !~ /\_vec/ ) {
 
-            print $FHD "\n    // $section\n";
+            print $FHD "\n        // $section\n";
         }
 
         PreComp::Utilities::PrintHeader( $FHD, $obj_hash, $section );
     }
 
-    print $FHD "} $name;\n";
+    print $FHD "    } $name;\n";
+    print $FHD "\n";
+    print $FHD "}\n";
     print $FHD "\n";
     print $FHD "#endif\n";
 
