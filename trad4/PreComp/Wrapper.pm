@@ -55,14 +55,6 @@ sub Generate($$$$$) {
 
     print $FHD "void calculate_$obj_hash->{name}( obj_loc_t obj_loc, int id );\n";
 
-    foreach $vec_name ( ( keys %{$obj_hash->{data}->{static_vec}} , keys %{$obj_hash->{data}->{sub_vec}} )) {
-
-            $vec_short = $vec_name;
-            $vec_short =~ s/\[.*\]//g;
-
-            print $FHD "void load_$name"."_$vec_short( obj_loc_t obj_loc, sqlite3* db, int initial_load );\n";
-    }
-
     print $FHD "\n";
     print $FHD "using namespace std;\n";
     print $FHD "\n";
@@ -367,8 +359,6 @@ sub PrintExtraLoaderCallback($$) {
     print $FHD "    return 0;\n";
     print $FHD "}\n";
     print $FHD "\n";
-
-
 }
 
 sub PrintExtraLoader($$) {
@@ -466,7 +456,7 @@ sub GenerateNewLoader($$$) {
 
     print $FHD "extern \"C\" void load_objects( obj_loc_t obj_loc, int initial_load )\n";
     print $FHD "{\n";
-    print $FHD "    std::cout << \"load_all_$type"."()\" << std::endl;\n";
+    print $FHD "    std::cout << \"Loading $type..\" << std::endl;\n";
     print $FHD "\n";
     print $FHD "    char *zErrMsg = 0;\n";
     print $FHD "    sqlite3* db;\n";
