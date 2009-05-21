@@ -45,6 +45,7 @@ Analysis: bond_risk
 <ul>
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#hosts">The hosts</a></li>
+<li><a href="#st_mean">Single-threaded mean (ST Mean)</a></li>
 <li><a href="#br440k">Test 1: 440k objects, non-optimised</a></li>
 <li><a href="#br440k_opt">Test 2: 440k objects, optimised</a></li>
 <li><a href="#context">Test 3: 440k objects, time vs. context switches</a></li>
@@ -55,12 +56,24 @@ Analysis: bond_risk
 
 <h2><a name="introduction">Introduction</a></h2>
 <p>
-- Locally compiled<br>
-- Record calc-stage time only<br>
-- Single user<br>
-- flush<br>
-- CS<br>
-
+This is an analysis of the trad4 app bond_risk. This document is still in beta - if there is anything you'd like clarified or any test you'd like to see run, please let me know.
+</p>
+<p>
+What we'll be measuring is the duration of the initial flush on start-up under various conditions. A flush is when every node gets recalculated, as happens on start-up. As such we'll be ignoring the time it takes to load the objects from the DB (a subject for later discussion).
+</p>
+<p>
+For each test the binary is locally compiled, and the test is run with the host in single-user mode using a non-root user and the default nice.
+</p>
+<p>
+Unless otherwise stated, all these tests were run against the 440k data set (40k bonds, 200k each or repo and outright trades).
+</p>
+<p>
+The tests are summarised below:
+<ul>
+<li>Tests 1&2 are comparisons between the Athlon and Opteron measuring the duration of the 440k flush duration against log2 threads using both optimised and non-optimised binaries.</li>
+<li>Test 3 shows the 440k flush duration along with context switches</li>
+<li>Test 4 shows context switches per second as a 440k flush runs against log2 threads.</li>
+</ul>
 </p>
 <h2><a name="hosts"></a>The hosts</h2>
 <p>
@@ -77,6 +90,26 @@ The hosts are summarised below.
 </table>
 * As advertised
 </p>
+<p>
+I will also be running a couple of these tests on a 3 year-old Intel which lacks a HyperTransport bus (QuickPath in Intel-speak), which should prove interesting.
+</p>
+<h2><a name="st_mean">Single-threaded mean (ST Mean)</a></h2>
+<p>
+The ST Mean value of a particular test is the mean value of 10 runs in single-threaded mode (NUM_THREADS=0). This gives us a good benchmark for the single-threaded performace of a particular arch/comiler combination.
+</p>
+This also gives us some information on the variance and standard deviation of these runs. This is shown in the table below:
+</p>
+<p>
+<table border="1">
+<tr><td>Test</td><td>Mean</td><td>Variance</td><td>Standard Deviation</td></tr>
+<tr><td>Athlon</td><td>22.3148</td><td>0.2297</td><td>0.4792</td></tr>
+<tr><td>AthlonO3</td><td>8.2094</td><td>1.3066</td><td>1.1431</td></tr>
+<tr><td>Opteron</td><td>19.9114</td><td>0.2944</td><td>0.5426</td></tr>
+<tr><td>OpteronO3</td><td>13.2403</td><td>0.0020</td><td>0.0450</td></tr>
+</table>
+
+</p>
+
 <h2><a name="br440k"></a>Test 1: 440k objects, non-optimised</h2>
 <p>
 <table border="1">
