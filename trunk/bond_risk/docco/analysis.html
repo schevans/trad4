@@ -45,7 +45,7 @@ Analysis: bond_risk
 <ul>
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#hosts">The hosts</a></li>
-<li><a href="#st_mean">Single-threaded mean (ST Mean)</a></li>
+<li><a href="#concepts">Concepts</a></li>
 <li><a href="#br440k">Test 1: 440k objects, non-optimised</a></li>
 <li><a href="#br440k_opt">Test 2: 440k objects, optimised</a></li>
 <li><a href="#context">Test 3: 440k objects, time vs. context switches</a></li>
@@ -59,7 +59,7 @@ Analysis: bond_risk
 This is an analysis of the trad4 app bond_risk. This document is still in beta - if there is anything you'd like clarified or any test you'd like to see run, please let me know.
 </p>
 <p>
-What we'll be measuring is the duration of the initial flush on start-up under various conditions. A flush is when every node gets recalculated, as happens on start-up. As such we'll be ignoring the time it takes to load the objects from the DB (a subject for later discussion).
+What we'll be measuring is the duration of the initial flush on start-up under various conditions. A flush is when every node gets recalculated, as happens on start-up. As such we'll be ignoring the time it takes to load the objects from the DB (a subject for later discussion). It's important to understand that this initial flush is only the start-up time of a particular app and the performace profile during day-to-day activities will be different as the system will be responding to and fedding up discrete changes.
 </p>
 <p>
 For each test the binary is locally compiled, and the test is run with the host in single-user mode using a non-root user and the default nice.
@@ -93,9 +93,13 @@ The hosts are summarised below.
 <p>
 I will also be running a couple of these tests on a 3 year-old Intel which lacks a HyperTransport bus (QuickPath in Intel-speak), which should prove interesting.
 </p>
-<h2><a name="st_mean">Single-threaded mean (ST Mean)</a></h2>
+<h2><a name="concepts">Concepts</a></h2>
 <p>
-The ST Mean value of a particular test is the mean value of 10 runs in single-threaded mode (NUM_THREADS=0). This gives us a good benchmark for the single-threaded performace of a particular arch/comiler combination.
+
+</p>
+<h3>Single-Threaded Mean (ST Mean)</h3>
+<p>
+The ST Mean value of a particular test is the mean value of 10 runs in single-threaded mode (NUM_THREADS=0). This gives us a good benchmark for the single-threaded performace of a particular arch/compiler combination.
 </p>
 This also gives us some information on the variance and standard deviation of these runs. This is shown in the table below:
 </p>
@@ -107,9 +111,22 @@ This also gives us some information on the variance and standard deviation of th
 <tr><td>Opteron</td><td>19.9114</td><td>0.2944</td><td>0.5426</td></tr>
 <tr><td>OpteronO3</td><td>13.2403</td><td>0.0020</td><td>0.0450</td></tr>
 </table>
-
 </p>
-
+<h3>Single-Threaded Mode vs. NUM_THREADS=1</h3>
+<p>
+Single-threaded mode means the master thread does all the work. NUM_THREADS=1 means there is one master thread and one worker thread. Single-threaded mode is faster than NUM_THREADS=1 due to the lack of overhead of handing the work off to the worker thread.
+</p>
+<h3>The Context-Switch Cascade</h3>
+<p>
+The context-switch cascade occurs when there are too many threads on a host, and the kernel spends all it's time switching threads and the system becomes unresponsive and unusable. It is the hard limit on the number of threads we can run per host. This is given below:
+</p>
+<p>
+<table border="1">
+<tr><td>Host</td><td>Max Threads</td></tr>
+<tr><td>Athlon</td><td>128</td></tr>
+<tr><td>Opteron</td><td>512</td></tr>
+</table>
+</p>
 <h2><a name="br440k"></a>Test 1: 440k objects, non-optimised</h2>
 <p>
 <table border="1">
@@ -129,6 +146,16 @@ This also gives us some information on the variance and standard deviation of th
 <p>
 <img src="br440k.jpg" alt="br440k"/>
 </p>
+<p>
+From this test we can see several things. firstly, by comparing the ST Mean of both the Athlon and Opteron we can see the single-core CPU speed is roughly comparable with the Opteron coming in as slightly faster.
+</p>
+<p>
+Second, we can see that the multi-threaded Athlon is about twice as fast as the ST Mean. Likewise the multi-threaded Opteron is about eight times faster than the ST Mean. This we would expect as the Athlon is dual-cored and the Opteron is 8-cored. 
+</p>
+<p>
+Last, we can see that the multi-threaded Opteron is about four times as fast as the multi-threaded Athlon. Again we would expect this as the Opteron has four-times as many cores.
+</p>
+
 <h2><a name="br440k_opt"></a>Test 2: 440k objects, optimised</h2>
 <p>
 <table border="1">
@@ -147,6 +174,15 @@ This also gives us some information on the variance and standard deviation of th
 </p>
 <p>
 <img src="br440k_opt.jpg" alt="br440k_opt"/>
+</p>
+<p>
+The first thing we notice on this graph is that the Athlon binary has improved with optimisation (-O3) significantly more than the Opteron - the Athlon's ST Mean is not only faster than the Opteron now, there's also a bigger disparity between the two ST Means. This is a somewhat unexpected result and one I'll be looking into in the future.
+</p>
+<p>
+For this reason the multi-threaded Opteron is only about three times faster than the Athlon, when we expected a four-fold increase.
+</p>
+<p>
+This is a somewhat unexpected result and one I'll be looking into in the future. My hypothesis is that the gcc 4.3.2 optimiser on x86_64 isn't as effective as the gcc 4.1.3 optimiser on i686. The fact the ST Means show the same pattern suggests I'm not hitting some not-yet-understood limit of the trad4 architecture.
 </p>
 <h2><a name="context"></a>Test 3: 440k objects, time vs. context switches</h2>
 <p>
@@ -167,9 +203,27 @@ This also gives us some information on the variance and standard deviation of th
 <p>
 <img src="br440k_context.jpg" alt="br440k_context"/>
 </p>
+<p>
+This graph shows the duration and number of context switches against log2 num threads, using an optimised Opteron.
+</p>
+<p>
+The reason for the high number of context switches for a low number of threads is simply because the run has a longer duration and therefore a longer context-switch sample period. This is better illustrated in the graph below.
+</p>
+<p>
+Another observation we can make is that even after the number of context switches starts to climb, the duration continues to fall (albeit slightly). This suggests any optimisation strategy should not be an attempt to minimise the context-switches - it is only when the cascade starts will we see performance drop off.
+</p>
 <h2><a name="context_time"></a>Test 4: 440k objects, context switches over time</h2>
 <p>
 <img src="br440k_context_time.jpg" alt="br440k_context_time"/>
+</p>
+<p>
+This data was collected from a second process collecting CS/s stats while an optimised Operon run was taking place. As such the x-axis shows real-time and each peak corresponds to a bond_risk run where the number of threads are dobled each run. 
+</p>
+<p>
+You can now see why the NUM_THREADS=1 run in Test3 was inflated by the time it took to complete the run. The CS/run data in Test3 corresponds to the integration of each peak on this graph.
+</p>
+<p>
+You can see the beginnings of the context switch cascade on the NUM_THREADS=1024 spike. When this occurs the process monitoring CS/s can't get enough time on the CPU to record the CS/s, so the experiment is terminated.
 </p>
 <!-- ==================================================================== -->
 
