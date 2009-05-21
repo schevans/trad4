@@ -50,6 +50,8 @@ Analysis: bond_risk
 <li><a href="#br440k_opt">Test 2: 440k objects, optimised</a></li>
 <li><a href="#context">Test 3: 440k objects, time vs. context switches</a></li>
 <li><a href="#context_time">Test 4: 440k objects, context switches over time</a></li>
+<li><a href="#conclusion">Conclusion</a></li>
+<li><a href="#usage">How to run the tests</a></li>
 </ul>
 
 <hr />
@@ -69,15 +71,16 @@ Unless otherwise stated, all these tests were run against the 440k data set (40k
 </p>
 <p>
 The tests are summarised below:
+</p>
 <ul>
-<li>Tests 1&2 are comparisons between the Athlon and Opteron measuring the duration of the 440k flush duration against log2 threads using both optimised and non-optimised binaries.</li>
+<li>Tests 1&lt;2 are comparisons between the Athlon and Opteron measuring the duration of the 440k flush duration against log2 threads using both optimised and non-optimised binaries.</li>
 <li>Test 3 shows the 440k flush duration along with context switches</li>
 <li>Test 4 shows context switches per second as a 440k flush runs against log2 threads.</li>
 </ul>
-</p>
 <h2><a name="hosts"></a>The hosts</h2>
 <p>
 The hosts are summarised below.
+</p>
 <table border="1">
 <tr><td>Host</td><td>Athlon</td><td>Opteron</td></tr>
 <tr><td>Model</td><td>64 X2 Dual Core 4800+</td><td>Quad-Core Opteron 2354</td></tr>
@@ -89,7 +92,6 @@ The hosts are summarised below.
 <tr><td>Compiler</td><td>gcc 4.1.3</td><td>gcc 4.3.2</td></tr>
 </table>
 * As advertised
-</p>
 <p>
 I will also be running a couple of these tests on a 3 year-old Intel which lacks a HyperTransport bus (QuickPath in Intel-speak), which should prove interesting.
 </p>
@@ -101,9 +103,9 @@ I will also be running a couple of these tests on a 3 year-old Intel which lacks
 <p>
 The ST Mean value of a particular test is the mean value of 10 runs in single-threaded mode (NUM_THREADS=0). This gives us a good benchmark for the single-threaded performace of a particular arch/compiler combination.
 </p>
+<p>
 This also gives us some information on the variance and standard deviation of these runs. This is shown in the table below:
 </p>
-<p>
 <table border="1">
 <tr><td>Test</td><td>Mean</td><td>Variance</td><td>Standard Deviation</td></tr>
 <tr><td>Athlon</td><td>22.3148</td><td>0.2297</td><td>0.4792</td></tr>
@@ -111,24 +113,24 @@ This also gives us some information on the variance and standard deviation of th
 <tr><td>Opteron</td><td>19.9114</td><td>0.2944</td><td>0.5426</td></tr>
 <tr><td>OpteronO3</td><td>13.2403</td><td>0.0020</td><td>0.0450</td></tr>
 </table>
-</p>
+
 <h3>Single-Threaded Mode vs. NUM_THREADS=1</h3>
 <p>
 Single-threaded mode means the master thread does all the work. NUM_THREADS=1 means there is one master thread and one worker thread. Single-threaded mode is faster than NUM_THREADS=1 due to the lack of overhead of handing the work off to the worker thread.
 </p>
 <h3>The Context-Switch Cascade</h3>
 <p>
-The context-switch cascade occurs when there are too many threads on a host, and the kernel spends all it's time switching threads and the system becomes unresponsive and unusable. It is the hard limit on the number of threads we can run per host. This is given below:
+The context-switch cascade occurs when there are too many threads on a host, and the kernel spends all it's time switching between threads and not getting any work done, so the host becomes unresponsive and unusable. It is the hard limit on the number of threads we can run per host. This is given below:
 </p>
-<p>
 <table border="1">
 <tr><td>Host</td><td>Max Threads</td></tr>
 <tr><td>Athlon</td><td>128</td></tr>
 <tr><td>Opteron</td><td>512</td></tr>
 </table>
+<p>
+For this reason no data is given for the Athlon where NUM_THREADS>128.
 </p>
 <h2><a name="br440k"></a>Test 1: 440k objects, non-optimised</h2>
-<p>
 <table border="1">
 <tr><td>Num Threads</td><td>Athlon Time</td><td>Opteron Time</td></tr>
 <tr><td>1</td><td>70.05</td><td>54.82</td></tr>
@@ -142,7 +144,6 @@ The context-switch cascade occurs when there are too many threads on a host, and
 <tr><td>256</td><td></td><td>2.74</td></tr>
 <tr><td>512</td><td></td><td>2.87</td></tr>
 </table>
-</p>
 <p>
 <img src="br440k.jpg" alt="br440k"/>
 </p>
@@ -157,7 +158,6 @@ Last, we can see that the multi-threaded Opteron is about four times as fast as 
 </p>
 
 <h2><a name="br440k_opt"></a>Test 2: 440k objects, optimised</h2>
-<p>
 <table border="1">
 <tr><td>Num Cores</td><td>Athlon Time</td><td>Opteron Time</td></tr>
 <tr><td>1</td><td>49.98</td><td>46.79</td></tr>
@@ -171,7 +171,6 @@ Last, we can see that the multi-threaded Opteron is about four times as fast as 
 <tr><td>256</td><td></td><td>1.94</td></tr>
 <tr><td>512</td><td></td><td>2.08</td></tr>
 </table>
-</p>
 <p>
 <img src="br440k_opt.jpg" alt="br440k_opt"/>
 </p>
@@ -185,7 +184,6 @@ For this reason the multi-threaded Opteron is only about three times faster than
 This is a somewhat unexpected result and one I'll be looking into in the future. My hypothesis is that the gcc 4.3.2 optimiser on x86_64 isn't as effective as the gcc 4.1.3 optimiser on i686. The fact the ST Means show the same pattern suggests I'm not hitting some not-yet-understood limit of the trad4 architecture.
 </p>
 <h2><a name="context"></a>Test 3: 440k objects, time vs. context switches</h2>
-<p>
 <table border="1">
 <tr><td>Num Threads</td><td>Opteron Time</td><td>Opteron CS</td></tr>
 <tr><td>1</td><td>46.79</td><td>105.75</td></tr>
@@ -199,7 +197,6 @@ This is a somewhat unexpected result and one I'll be looking into in the future.
 <tr><td>256</td><td>1.94</td><td>13.63</td></tr>
 <tr><td>512</td><td>2.08</td><td>23.78</td></tr>
 </table>
-</p>
 <p>
 <img src="br440k_context.jpg" alt="br440k_context"/>
 </p>
@@ -224,6 +221,35 @@ You can now see why the NUM_THREADS=1 run in Test3 was inflated by the time it t
 </p>
 <p>
 You can see the beginnings of the context switch cascade on the NUM_THREADS=1024 spike. When this occurs the process monitoring CS/s can't get enough time on the CPU to record the CS/s, so the experiment is terminated.
+</p>
+<h2><a name="conclusion">Conclusion</a></h2>
+<h3>Intra-host</h3>
+<p>
+<img src="br440k_st_duration.jpg" alt="br440k_st_duration"/>
+</p>
+<p>
+
+</p>
+<h3>Inter-host</h3>
+<p>
+<img src="br440k_ath_opt.jpg" alt="br440k_ath_opt"/>
+</p>
+<p>
+
+
+</p>
+<h2><a name="usage">How to run the tests</a></h2>
+<p>
+To run the tests:
+</p>
+<ol>
+<li>Download(TBA), unpack and set-up as usual, sourcing bond_risk.conf</li>
+<li>Set APP_DB to point to bond_risk_440k.db</li>
+<li>Recompile with -O3 in CXXFLAGS if required</li>
+<li>Run benchmarker.sh, which produces a benchmark.log.$$ file in $APP_ROOT.</li>
+</ol>
+<p>
+<b>Pro Tip:</b> Run benchmarker.sh in the foreground so that it's easy to kill once you hit the context switch cascade. If in a multi-user/desktop environment and you don't run in the foreground you may have to hard-reboot your machine.
 </p>
 <!-- ==================================================================== -->
 
