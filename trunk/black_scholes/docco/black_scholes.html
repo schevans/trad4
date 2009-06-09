@@ -51,17 +51,50 @@ black_scholes
 
 <ul>
 <li><a href="#introduction">Introduction</a></li>
+<li><a href="#the_equation">The Equation</a></li>
 </ul>
 
 <hr />
 
 <h2><a name="introduction">Introduction</a></h2>
 <p>
-
+This document originally appeaared in the 2.0_beta_04 version of The Manual. It is a model for the open form Black Scholes and calculate the price and greeks of European options on non-dividend paying stocks. To start with we're just going to model the price and introduce the greeks later.
 
 </p>
+<h2><a name="the_equation">The Equation</a></h2>
+<p>
+The full equation for the price of a call (c) and put option (p) is given by:
+</p>
+<blockquote><pre>
+    c = S*N(d1) - Ke(-rT) * N(d2)
 
+    p = Ke(-rT) * N(-d2) - S*N(-d1)
 
+    where 
+        d1 = (ln(S/K) + rT + vvT/2) / (v * sqrt(T))
+
+    and
+        d2 = (ln(S/K) + rT - vvT/2) / (v * sqrt(T))
+
+    and 
+        N(x) is the cumulative normal distribution of x
+
+    and
+        S = stock price
+        K = strike price
+        r = risk free rate
+        v = volatility
+        vv = volatility squared
+        T = time to maturity
+</pre></blockquote>
+<p>
+Now we need to decompose this into a viable graph. There are various ways to do this, but we'll start by picking off the feeds.
+</p>
+<h3>The T1 objects - the feeds</h3>
+<p>
+Looking at the feeds, we can see that T, the time to maturity, and K, the strike price, are properties of the option contract. S, the stock price and v the volatility are both properties of the stock. The risk free rate r is not related to either of these two.
+So now we have our feed objects:
+</p>
 
 </body>
 </html>
