@@ -39,15 +39,15 @@ sub Generate($) {
     print $FHD "\n";
     print $FHD "<table border=\"1\">\n";
     print $FHD "<tr>\n";
-    print $FHD "<td>Download version</td>\n";
-    print $FHD "<td></td>\n";
-    print $FHD "</tr>\n";
-    print $FHD "<tr>\n";
-    print $FHD "<td>Download licence</td>\n";
+    print $FHD "<td>Application version</td>\n";
     print $FHD "<td></td>\n";
     print $FHD "</tr>\n";
     print $FHD "<tr>\n";
     print $FHD "<td>Trad4 version</td>\n";
+    print $FHD "<td></td>\n";
+    print $FHD "</tr>\n";
+    print $FHD "<tr>\n";
+    print $FHD "<td>Document version</td>\n";
     print $FHD "<td></td>\n";
     print $FHD "</tr>\n";
     print $FHD "<tr>\n";
@@ -143,7 +143,6 @@ sub Generate($) {
     print $FHD "<h3>Running</h3>\n";
     print $FHD "<p>\n";
     print $FHD "To run the application:\n";
-    print $FHD "</p>\n";
 
     print $FHD "1) Download and unpack the distribution<br>\n";
     print $FHD "2) cd into trad4_v$trad4_version/$app_name:<br>\n";
