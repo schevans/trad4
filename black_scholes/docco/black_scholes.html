@@ -52,13 +52,17 @@ black_scholes
 <ul>
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#the_equation">The Equation</a></li>
+<li><a href="#t1_objects">The T1 Objects - The Feeds</a></li>
+<li><a href="#t2_objects">The T2 Objects</a></li>
+<li><a href="#t3_objects">The T3 Objects</a></li>
+<li><a href="#the_greeks">Introducing the Greeks</a></li>
 </ul>
 
 <hr />
 
 <h2><a name="introduction">Introduction</a></h2>
 <p>
-This document originally appeaared in the 2.0_beta_04 version of The Manual. It is a model for the open form Black Scholes and calculate the price and greeks of European options on non-dividend paying stocks. To start with we're just going to model the price and introduce the greeks later.
+This document originally appeared in the 2.0_beta_04 version of The Manual. It is a model for the open form Black Scholes and calculate the price and greeks of European options on non-dividend paying stocks. To start with we're just going to model the price and introduce the greeks later.
 
 </p>
 <h2><a name="the_equation">The Equation</a></h2>
@@ -90,11 +94,93 @@ The full equation for the price of a call (c) and put option (p) is given by:
 <p>
 Now we need to decompose this into a viable graph. There are various ways to do this, but we'll start by picking off the feeds.
 </p>
-<h3>The T1 objects - the feeds</h3>
+<h2><a name="t1_objects"></a>The T1 Objects - The Feeds</h2>
 <p>
 Looking at the feeds, we can see that T, the time to maturity, and K, the strike price, are properties of the option contract. S, the stock price and v the volatility are both properties of the stock. The risk free rate r is not related to either of these two.
 So now we have our feed objects:
 </p>
+<p>
+<img src="abstract_t1.jpg" alt="abstract_t1"/>
+</p>
+<p>
+RtT (sqrt(T)) and vv (v*v) are included at this level as they are simple transformations of the object's own inputs. We know they will be needed by the tiers above so we may as well calculate them now. 
+</p>
+<h2><a name="t2_objects"></a>The T2 Objects</h2>
+<p>
+The next set of objects we need to model are the T2 objects. We'll do this by creating an object for any multiplicative or divisive operation that appears more than once, like so:
+</p>
+<blockquote><pre>
+    c  = SN_pd1 - KerT * N_pd2
 
+    p = KerT * N_pd2 - SN_md1
+
+    where 
+        d1 = (lnSK + rT + vvT_2) / vRtT
+
+    and
+        d2 = (lnSK + rT - vvT_2) / vRtT
+
+    and
+        SN_pd1 = S*N(d1)
+        SN_md1 = S*N(-d1)
+        KerT = K*e(-r*T)
+        N_pd2 = N(pd2)
+        lnSK = ln(S/K)
+        rt = r*T
+        vvT_2 = (v*v*T) / 2
+        vRrT = v*sqrt(T)
+</pre></blockquote>
+<p>
+The names I've chosen for the objects roughly represent what they are and what they do, but there's no formal convention - feel free to call them what you want.
+</p>
+<p>
+You'll notice that I don't lump KerT and N_pd2 together even though they are multiplicative. This is to simplify this model of price only. When we introduce the greeks we will add the object KerTN_pd2.
+</p>
+<p>
+Now we have the published values we'll want from the T2 objects, we will want to group these into objects. lnSK for example is a function of the stock_feed and the option_feed, so we create a new object stock_trade. Likewise vRtT also depends on the stock_feed and the option_feed, so we can lump that in with the stock_trade object. We do this for all the T2 objects, like so:
+</p>
+<p>
+<img src="abstract_t2.jpg" alt="abstract_t2"/>
+</p>
+<h2><a name="t3_objects"></a>The T3 Objects</h2>
+<p>
+For the next tier we'll need to decide how to arrange c, p, d1 and d2. Looking at these functions, d1 and d2 depend on all the feeds, and c and p depend on both d1 and d2. This means there is no further decomposition we can do and we'll need to lump all the values in the same object, bs_delta, like so:
+</p>
+<p>
+<img src="abstract_t3.jpg" alt="abstract_t3"/>
+</p>
+<h2><a name="the_greeks"></a>Introducing the Greeks</h2>
+<p>
+At this stage we need to introduce the greeks:
+</p>
+<table border="1">
+<tr><td></td><td>Call</td><td>Put</td></tr>
+<tr><td>Delta</td><td>N(d1)</td><td>N(d1)-1</td></tr>
+<tr><td>Gamma</td><td colspan="2">N(d1)/Sv*sqrt(T)</td></tr>
+<tr><td>Vega</td><td colspan="2">SN(d1)*sqrt(T)</td></tr>
+<tr><td>Theta</td><td colspan="2">Given below</td></tr>
+<tr><td>Rho</td><td>Kte(-rT)*N(d2)</td><td>-KTe(-rT)*N(-d2)</td></tr>
+</table>
+<p>
+Where Theta is given by:
+</p>
+<blockquote><pre>
+    Theta(call) = ( -SN(d1)v -rKe(-rt)N(d2) ) / 2*sqrt(T)
+
+    Theta(put) = ( -SN(d1)v + rKe(-rt)N(-d2) / 2*sqrt(T)
+</pre></blockquote>
+<p>
+Now we need to decompose these in terms of the T(1-3) objects we've already created. For example, we can see delta is a function only of N(d1) and for this reason it makes sense to include it in the bs_delta object.
+</p>
+<p>
+Gamma is a function of N(d1) which is a property of bs_delta, S which is a property of the stock and v*sqrt(T) which is a property of stock_trade - vRrT.
+</p>
+<p>
+We'll do this for the rest of the greeks, making some changes in the process.
+</p>
+<img src="abstract.jpg" alt="abstract"/>
+<p>
+Price has been broken out into it's own object and bs_delta now just provides Npd1 etc. In this way, once bs_delta is completed the T4 objects can all run concurrently. It tuns out one of the terms in price, KTe(-rT)*N(D2), is actually rho so it makes sense to re-use that value rather than computing two KTe(-rT)*N(D2)s in different objects. Again this is just the implementation I've chosen - feel free to arrange your graph as you please.
+</p>
 </body>
 </html>
