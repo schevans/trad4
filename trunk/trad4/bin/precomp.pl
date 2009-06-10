@@ -23,7 +23,7 @@ sub usage();
 
 my %opts;
 
-if ( ! getopts( 'o:hvdsckan', \%opts ) ) {
+if ( ! getopts( 'o:hvdckan', \%opts ) ) {
     usage();
 }
 
@@ -82,10 +82,6 @@ if ( -f  $ENV{SRC_DIR}."/aliases.t4s" ) {
 
 print "Loading t4 files..\n";
 my $master_hash = PreComp::Utilities::LoadDefs();
-
-if ( $opts{s} ) {
-    PreComp::Utilities::GenerateSpecs( $master_hash );
-}
 
 my %doing;
 
@@ -245,7 +241,6 @@ sub usage() {
     print "  -c             remove all generated files\n";
     print "  -a             remove all generated files and regenerate\n";
     print "  -v             verbose - dumps internal structures\n";
-    print "  -s             generate specs\n";
     print "  -d             generate documentation\n";
     print "  -h             display this help and exit\n";
     print"\n";
