@@ -17,9 +17,6 @@ int calculate_rate_trade( obj_loc_t obj_loc, int id )
 
     rate_trade_rKerT = srisk_free_rate_r * rate_trade_KerT;
 
-    if ( srisk_free_rate_r == 0.1 )
-        return 1;
-    else
-        return 0;
+    return 1;
 }
 
