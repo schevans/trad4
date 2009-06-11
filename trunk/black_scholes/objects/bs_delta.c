@@ -11,7 +11,7 @@ using namespace std;
 
 double CumeNormDist(const double x);
 
-void calculate_bs_delta( obj_loc_t obj_loc, int id )
+int calculate_bs_delta( obj_loc_t obj_loc, int id )
 {
     double d1 =  ( sstock_trade_ln_SK + srate_trade_rT  + sstock_trade_vvT_2 ) / sstock_trade_vRtT;
 
@@ -33,6 +33,8 @@ void calculate_bs_delta( obj_loc_t obj_loc, int id )
     {
         bs_delta_delta = bs_delta_N_pd1 - 1.0;
     }
+
+    return 1;
 }
 
 double CumeNormDist(const double x)

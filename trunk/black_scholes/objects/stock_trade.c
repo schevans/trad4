@@ -9,7 +9,7 @@
 
 using namespace std;
 
-void calculate_stock_trade( obj_loc_t obj_loc, int id )
+int calculate_stock_trade( obj_loc_t obj_loc, int id )
 {
     stock_trade_ln_SK = log( sstock_S / soption_K );
 
@@ -17,5 +17,6 @@ void calculate_stock_trade( obj_loc_t obj_loc, int id )
 
     stock_trade_vRtT = sstock_v * soption_RtT;
 
+    return 1;
 }
 

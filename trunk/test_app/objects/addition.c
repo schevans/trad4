@@ -10,10 +10,12 @@
 
 using namespace std;
 
-void calculate_addition( obj_loc_t obj_loc, int id )
+int calculate_addition( obj_loc_t obj_loc, int id )
 {
     addition_output = numeric1_output + numeric2_output;
 
     T4_TEST( addition_output, 10.055 );
+
+    return 1;
 }
 

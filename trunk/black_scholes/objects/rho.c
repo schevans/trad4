@@ -8,7 +8,7 @@
 
 using namespace std;
 
-void calculate_rho( obj_loc_t obj_loc, int id )
+int calculate_rho( obj_loc_t obj_loc, int id )
 {
     if ( soption_call_or_put == CALL )
     {
@@ -18,5 +18,7 @@ void calculate_rho( obj_loc_t obj_loc, int id )
     {
         rho_rho = - soption_T * srate_trade_KerT * sbs_delta_N_md2;
     }
+
+    return 1;
 }
 

@@ -8,7 +8,7 @@
 
 using namespace std;
 
-void calculate_price( obj_loc_t obj_loc, int id )
+int calculate_price( obj_loc_t obj_loc, int id )
 {
     if ( soption_call_or_put == CALL )
     {
@@ -18,5 +18,7 @@ void calculate_price( obj_loc_t obj_loc, int id )
     {
         price_price = ( srate_trade_KerT * sbs_delta_N_pd2  ) - ( sstock_S * sbs_delta_N_md1 );
     }
+
+    return 1;
 }
 
