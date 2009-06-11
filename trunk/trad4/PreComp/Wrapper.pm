@@ -53,7 +53,7 @@ sub Generate($$$$$) {
     print $FHD "#include <sqlite3.h>\n";
     print $FHD "\n";
 
-    print $FHD "void calculate_$obj_hash->{name}( obj_loc_t obj_loc, int id );\n";
+    print $FHD "int calculate_$obj_hash->{name}( obj_loc_t obj_loc, int id );\n";
 
     print $FHD "\n";
     print $FHD "using namespace std;\n";
@@ -547,7 +547,7 @@ sub GenerateLoaderCallback($$$$) {
     print $FHD "    object_log_level(id) =  atoi(row[3]);\n";
     print $FHD "\n";
     print $FHD "    object_last_published(id) = 0;\n";
-    print $FHD "    object_status(id) = RELOADED;\n";
+    print $FHD "    object_status(id) = OK;\n";
     print $FHD "    object_type(id) = $master_hash->{$type}->{type_id};\n";
     print $FHD "    object_implements(id) = $master_hash->{$master_hash->{$type}->{implements}}->{type_id};\n";
             
@@ -644,7 +644,8 @@ sub GenerateNeedRefresh($$$) {
     }
 
     print $FHD "\n";
-    print $FHD "    int retval = ( (object_status(id) == RELOADED )\n";
+
+    print $FHD "    int retval = ( (object_last_published(id) == 0 )\n";
 
     foreach $var_name ( @{$master_hash->{$type}->{sub}->{order}} ) {
 
@@ -657,7 +658,6 @@ sub GenerateNeedRefresh($$$) {
             my $counter=0;
 
             while ( $counter < $size ) {
-
 
                 print $FHD "        || ((((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) and ( object_last_published(id) < object_last_published(((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) ))\n";
                 $counter = $counter+1;
@@ -694,8 +694,93 @@ sub GenerateCalculate($$$) {
     print $FHD "    DEBUG_FINE( \"static:\" );\n";
     PrintSectionDebug( $master_hash, $master_hash->{$type}->{static}, $type, $FHD );
 
+    print $FHD "    if ( ";
+
+    my $var_name;
+
+    foreach $var_name ( @{$master_hash->{$type}->{sub}->{order}} ) {
+
+        if ( PreComp::Utilities::IsArray( $var_name ) ) {
+
+            my $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
+
+            my $size = PreComp::Utilities::GetArraySize( $master_hash, $var_name );
+
+            my $counter=0;
+
+            while ( $counter < $size ) {
+
+                print $FHD " ((((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) and object_status(((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) > OK) || \n";
+                $counter = $counter+1;
+            }
+        }
+        else {
+            print $FHD " object_status(((t4::$type*)obj_loc[id])->$var_name) > OK ||";
+        }
+
+    }
+
+    print $FHD " 0 )\n";
+    print $FHD "    { \n";
+
+    print $FHD "        if ( ";
+
+    foreach $var_name ( @{$master_hash->{$type}->{sub}->{order}} ) {
+
+        if ( PreComp::Utilities::IsArray( $var_name ) ) {
+
+            my $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
+
+            my $size = PreComp::Utilities::GetArraySize( $master_hash, $var_name );
+
+            my $counter=0;
+
+            while ( $counter < $size ) {
+
+                print $FHD " ((((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) and object_status(((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) == FAILED ) ||\n";
+                $counter = $counter+1;
+            }
+        }
+        else {
+            print $FHD " object_status(((t4::$type*)obj_loc[id])->$var_name) == FAILED ||";
+        }
+
+    }
+
+    print $FHD " 0 )\n";
+    print $FHD "        { \n";
+    print $FHD "            object_status(id) = STALE;\n";
+    print $FHD "            DEBUG( \"Warning: Object \" << id << \" STALE as one or more sub objects HAVE failed. Not firing.\" );\n";
+    print $FHD "        }\n";
+    print $FHD "        else\n";
+    print $FHD "        {\n";
+    print $FHD "            object_status(id) = STALE;\n";
+    print $FHD "            DEBUG( \"Warning: Object \" << id << \" STALE as one or more sub objects are STALE. Firing.\"  );\n";
+    print $FHD "            if ( ! calculate_$type( obj_loc, id ) )\n";
+    print $FHD "            {\n";
+    print $FHD "                object_status( id ) = FAILED;\n";
+    print $FHD "                cerr << \"Error: Object \" << id << \" FAILED.\" << endl;\n";
+    print $FHD "            }\n";
+    print $FHD "        }\n";
+
+
+
+
     print $FHD "\n";
-    print $FHD "    calculate_$type( obj_loc, id );\n";
+    print $FHD "    }\n";
+
+    print $FHD "    else\n";
+    print $FHD "    {\n";
+    print $FHD "        if ( ! calculate_$type( obj_loc, id ) )\n";
+    print $FHD "        {\n";
+    print $FHD "            object_status( id ) = FAILED;\n";
+    print $FHD "            cerr << \"Error: Object \" << id << \" FAILED.\" << endl;\n";
+    print $FHD "        }\n";
+    print $FHD "        else\n";
+    print $FHD "        {\n";
+    print $FHD "            object_status( id ) = OK;\n";
+    print $FHD "        }\n";
+    print $FHD "    }\n";
     print $FHD "\n";
 
     print $FHD "    DEBUG_FINE( \"pub:\" );\n";

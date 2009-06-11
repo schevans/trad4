@@ -35,9 +35,11 @@ sub Generate($) {
     print $FHD "\n";
     print $FHD "using namespace std;\n";
     print $FHD "\n";
-    print $FHD "void calculate_$name( obj_loc_t obj_loc, int id )\n";
+    print $FHD "int calculate_$name( obj_loc_t obj_loc, int id )\n";
     print $FHD "{\n";
     print $FHD "    // Write me.\n";
+    print $FHD "\n";
+    print $FHD "    return 1;\n";
     print $FHD "}\n";
     print $FHD "\n";
 
