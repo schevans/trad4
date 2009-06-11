@@ -10,7 +10,7 @@
 
 using namespace std;
 
-void calculate_tier1( obj_loc_t obj_loc, int id )
+int calculate_tier1( obj_loc_t obj_loc, int id )
 {
     T4_TEST( tier1_struct_scalar_rates[ 0 ], 4.0 );
     T4_TEST( tier1_struct_scalar_rates[ 2 ], 4.2 );
@@ -37,5 +37,7 @@ cout << "tier1_bool_array( index_20 ):" << tier1_bool_array( index_20 ) << endl;
 cout << "tier1_struct_vec_x( index_4 ):" << tier1_struct_vec_x( index_4 ) << endl;
 cout << "tier1_struct_vec_y( index_4 ):" << tier1_struct_vec_y( index_4 ) << endl;
 */
+
+    return 1;
 }
 

@@ -9,12 +9,17 @@
 
 using namespace std;
 
-void calculate_rate_trade( obj_loc_t obj_loc, int id )
+int calculate_rate_trade( obj_loc_t obj_loc, int id )
 {
     rate_trade_rT = srisk_free_rate_r * soption_T;
 
     rate_trade_KerT = soption_K * exp( - rate_trade_rT );
 
     rate_trade_rKerT = srisk_free_rate_r * rate_trade_KerT;
+
+    if ( srisk_free_rate_r == 0.1 )
+        return 1;
+    else
+        return 0;
 }
 

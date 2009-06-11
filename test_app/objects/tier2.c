@@ -10,8 +10,11 @@
 
 using namespace std;
 
-void calculate_tier2( obj_loc_t obj_loc, int id )
+int calculate_tier2( obj_loc_t obj_loc, int id )
 {
+
+//cout << "tier2_struct3_nested_scalar_my_struct1_x: " << tier2_struct3_nested_scalar_my_struct1_x << endl;
+
     T4_TEST( my_multi_struct_my_outers_ig( 0 ), 99 );
     T4_TEST( my_multi_struct_my_outers_ig( 1 ), 199 );
     T4_TEST( my_multi_struct_my_outers_ig( 2 ), 299 );
@@ -52,5 +55,7 @@ cout << "my_tier1_struct_vec_y( 2 ):" << my_tier1_struct_vec_y( 2 ) << endl;
 cout << "tier2_double1:" << tier2_double1 << endl;
 cout << "tier2_p_int:" << tier2_p_int << endl;
 */
+
+    return 1;
 }
 

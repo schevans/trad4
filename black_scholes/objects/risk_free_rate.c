@@ -8,8 +8,10 @@
 
 using namespace std;
 
-void calculate_risk_free_rate( obj_loc_t obj_loc, int id )
+int calculate_risk_free_rate( obj_loc_t obj_loc, int id )
 {
     // Does nothing.
+
+    return 1;
 }
 

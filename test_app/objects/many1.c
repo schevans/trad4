@@ -10,7 +10,7 @@
 
 using namespace std;
 
-void calculate_many1( obj_loc_t obj_loc, int id )
+int calculate_many1( obj_loc_t obj_loc, int id )
 {
     T4_TEST( many1_d9, 9.0 );
     T4_TEST( many1_my_struct1_x, id );
@@ -23,5 +23,7 @@ void calculate_many1( obj_loc_t obj_loc, int id )
 
 //cout << "many1_d9: " << many1_d9 << endl;
 //cout << "many1_my_struct1_y: " << many1_my_struct1_y << endl;
+
+    return 1;
 }
 

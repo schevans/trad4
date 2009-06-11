@@ -8,7 +8,7 @@
 
 using namespace std;
 
-void calculate_theta( obj_loc_t obj_loc, int id )
+int calculate_theta( obj_loc_t obj_loc, int id )
 {
     if ( soption_call_or_put == CALL )
     {
@@ -18,5 +18,7 @@ void calculate_theta( obj_loc_t obj_loc, int id )
     {
         theta_theta = (( - sstock_S * sbs_delta_N_pd1 * sstock_v ) / ( 2.0 * soption_RtT )) + ( srate_trade_rKerT * sbs_delta_N_md2 );
     }
+
+    return 1;
 }
 

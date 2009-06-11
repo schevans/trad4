@@ -8,8 +8,10 @@
 
 using namespace std;
 
-void calculate_stock( obj_loc_t obj_loc, int id )
+int calculate_stock( obj_loc_t obj_loc, int id )
 {
     stock_vv = stock_v * stock_v;
+
+    return 1;
 }
 

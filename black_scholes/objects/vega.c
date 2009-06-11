@@ -8,8 +8,10 @@
 
 using namespace std;
 
-void calculate_vega( obj_loc_t obj_loc, int id )
+int calculate_vega( obj_loc_t obj_loc, int id )
 {
     vega_vega = sstock_S * sbs_delta_N_pd1 * soption_RtT;
+
+    return 1;
 }
 
