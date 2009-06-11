@@ -287,7 +287,6 @@ bool fire_object( int id )
 
             if ( thread_contoller[current_thread] == 0 )
             {
-                ((object_header*)obj_loc[id])->status = RUNNING;
                 thread_contoller[current_thread] = id;
                 fired = true;
             }
@@ -327,8 +326,6 @@ void set_timestamp( obj_loc_t obj_loc, int id )
     //std::cout << "setting timestamp: " << timestamp << std::endl;
 
     *(long long*)obj_loc[id] = timestamp;
-
-    ((object_header*)obj_loc[id])->status = STOPPED;
 }
 
 void* thread_loop( void* thread_id ) 

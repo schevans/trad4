@@ -55,11 +55,10 @@ enum logging_level {
 };
 
 enum e_status {
-    STOPPED,
-    RUNNING,
-    FAILED,
     RELOADED,
-    NEW
+    OK,
+    STALE,
+    FAILED
 };
 
 // Hack to get the beta out (precomp expects only one string per type)...
