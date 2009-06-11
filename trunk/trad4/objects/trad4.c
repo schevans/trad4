@@ -90,16 +90,6 @@ void run_trad4() {
         std::cout << "Checking tier " << tier << ". Num objects this tier: " << tier_manager[tier][0] - 1 << std::endl; 
     }
 
-    cout << "Validating objects..." << endl;
-
-    for ( int i = 0 ; i < MAX_OBJECTS+1 ; i++ )
-    {
-        if ( obj_loc[i] )
-        {
-            ((object_type_struct[((object_header*)obj_loc[i])->type])->validate)( obj_loc, i );
-        }
-    }
-
     char* num_threads_env = getenv("NUM_THREADS");
 
     if ( num_threads_env ) 
@@ -398,7 +388,6 @@ static int load_types_callback(void *NotUsed, int argc, char **row, char **azCol
     }
     else 
     {
-// Validate
         cout << "Reloading type " << name << ", type_id: " << obj_num << endl;
 
         dlclose(object_type_struct[obj_num]->lib_handle);
@@ -471,6 +460,11 @@ static int load_objects_callback(void* initial_load_v, int argc, char **row, cha
 
 void load_objects( int initial_load )
 {
+    if ( initial_load ) 
+        cout << "Loading objects..." << endl;
+    else
+        cout << "Reloading objects..." << endl;
+
     std::ostringstream dbstream;
     dbstream << "select type_id from object_types";
 
@@ -481,5 +475,20 @@ void load_objects( int initial_load )
         fprintf(stderr, "SQL error: %s. File %s, line %d.\n", zErrMsg, __FILE__, __LINE__);
         sqlite3_free(zErrMsg);
     }
+
+    cout << "Validating objects..." << endl;
+
+    for ( int i = 0 ; i < MAX_OBJECTS+1 ; i++ )
+    {
+        if ( obj_loc[i] )
+        {
+            if ( ! ((object_type_struct[((object_header*)obj_loc[i])->type])->validate)( obj_loc, i ) )
+            {
+                object_status(i) = INVALID;
+                cerr << "Error: Object " << i << " INVALID." << endl;
+            }
+        }
+    }
+
 }
 
