@@ -55,12 +55,9 @@ enum logging_level {
 };
 
 enum e_status {
-    NEW,
     OK,
     STALE,
-    FAILED,
-    GIGO,
-    INVALID
+    CORRUPT
 };
 
 // Hack to get the beta out (precomp expects only one string per type)...
@@ -76,6 +73,7 @@ typedef struct {
     char name[OBJECT_NAME_LEN];
     int log_level; 
     int implements;
+    int init;
 } object_header;
 
 #define object_last_published(index) ((object_header*)obj_loc[index])->last_published
@@ -85,6 +83,7 @@ typedef struct {
 #define object_name(index) ((object_header*)obj_loc[index])->name
 #define object_log_level(index) ((object_header*)obj_loc[index])->log_level
 #define object_implements(index) ((object_header*)obj_loc[index])->implements
+#define object_init(index) ((object_header*)obj_loc[index])->init
 
 #define DBG cout << __FILE__ << ": " << __LINE__ << endl;
 

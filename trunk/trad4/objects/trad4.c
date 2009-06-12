@@ -480,12 +480,23 @@ void load_objects( int initial_load )
 
     for ( int i = 0 ; i < MAX_OBJECTS+1 ; i++ )
     {
-        if ( obj_loc[i] )
+        if ( obj_loc[i] && object_last_published(i) == 0 )
         {
             if ( ! ((object_type_struct[((object_header*)obj_loc[i])->type])->validate)( obj_loc, i ) )
             {
-                object_status(i) = INVALID;
-                cerr << "Error: Object " << i << " INVALID." << endl;
+                if ( object_init(i) )
+                {
+                    object_status( i ) = STALE;
+                    cerr << "Error: Object " << i << " STALE as it failed validation on reload." << endl;
+                }
+                else
+                {
+                    object_status( i ) = CORRUPT;
+                    cerr << "Error: Object " << i << " CORRUPT as it hasn't initilised and it failed validation ." << endl;
+                }
+
+                set_timestamp( obj_loc, i );
+
             }
         }
     }
