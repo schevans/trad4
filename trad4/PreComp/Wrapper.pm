@@ -531,12 +531,11 @@ sub GenerateLoaderCallback($$$$) {
     print $FHD "\n";
     print $FHD "    int id = atoi(row[0]);\n";
     print $FHD "\n";
-    print $FHD "    bool is_new(false);\n";
     print $FHD "\n";
     print $FHD "    if ( !obj_loc[id] ) \n";
     print $FHD "    {\n";
     print $FHD "        obj_loc[id] = (unsigned char*)(new t4::$type);\n";
-    print $FHD "        is_new = true;\n";
+    print $FHD "        object_init(id) = 0;\n";
     print $FHD "    }\n";
     print $FHD "\n";
     print $FHD "    ((t4::$type*)obj_loc[id])->id = id;\n";
@@ -589,17 +588,6 @@ sub GenerateLoaderCallback($$$$) {
 
     print $FHD "\n";
 
-    print $FHD "    if ( is_new )\n";
-    print $FHD "    {\n";
-    print $FHD "        //std::cout << \"New $type created.\" << std::endl;\n";
-    print $FHD "        object_status(id) = NEW;\n";
-    print $FHD "    }\n";
-    print $FHD "    else\n";
-    print $FHD "    {\n";
-    print $FHD "        object_status(id) = OK;\n";
-    print $FHD "    }\n";
-
-    print $FHD "\n";
     print $FHD "    return 0;\n";
     print $FHD "} \n";
 
@@ -617,16 +605,44 @@ sub GenerateNeedRefresh($$$) {
     print $FHD "    DEBUG_LOADS( \"$type"."_need_refresh( \" << id << \")\" );\n";
 
     print $FHD "\n";
-    print $FHD "    if ( object_status(id) == INVALID )\n";
+
+    print $FHD "    if ( \n";
+
+    my $var_name;
+
+    foreach $var_name ( @{$master_hash->{$type}->{sub}->{order}} ) {
+
+        if ( PreComp::Utilities::IsArray( $var_name ) ) {
+
+            my $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
+
+            my $size = PreComp::Utilities::GetArraySize( $master_hash, $var_name );
+
+            my $counter=0;
+
+            while ( $counter < $size ) {
+
+                print $FHD "        ((((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) and not ((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) ||\n";
+                $counter = $counter+1;
+            }
+        }
+        else {
+            print $FHD "         not ((t4::$type*)obj_loc[id])->$var_name ||\n";
+        }
+
+    }
+
+    print $FHD "        0 )\n";
     print $FHD "    {\n";
-    print $FHD "        DEBUG_LOADS( \"Error: Object \" << id << \" INVALID. Does not need_rfresh.\" );\n";
+    print $FHD "        DEBUG_LOADS( \"Error: Object \" << id << \" has invalid sub objects. Cannot check sub timestamp.\" );\n";
+
     print $FHD "        return 0;\n";
     print $FHD "    }\n";
+
+
     print $FHD "\n";
 
     print $FHD "    DEBUG_LOADS( \"\t$type last_published: \" <<  object_last_published(id) );\n";
-
-    my $var_name;
 
     foreach $var_name ( @{$master_hash->{$type}->{sub}->{order}} ) {
 
@@ -701,10 +717,12 @@ sub GenerateCalculate($$$) {
 
     print $FHD "    DEBUG_FINE( \"static:\" );\n";
     PrintSectionDebug( $master_hash, $master_hash->{$type}->{static}, $type, $FHD );
+    print $FHD "\n";
 
-    print $FHD "    if ( ";
 
     my $var_name;
+
+    print $FHD "    if ( ";
 
     foreach $var_name ( @{$master_hash->{$type}->{sub}->{order}} ) {
 
@@ -718,18 +736,46 @@ sub GenerateCalculate($$$) {
 
             while ( $counter < $size ) {
 
-                print $FHD " ((((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) and object_status(((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) > OK) || \n";
+                print $FHD "((((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) and object_status(((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) >= CORRUPT ) ||\n         ";
                 $counter = $counter+1;
             }
         }
         else {
-            print $FHD " object_status(((t4::$type*)obj_loc[id])->$var_name) > OK ||";
+            print $FHD "object_status(((t4::$type*)obj_loc[id])->$var_name) >= CORRUPT ||\n        ";
         }
 
     }
 
-    print $FHD " 0 )\n";
-    print $FHD "    { \n";
+    print $FHD "0 )\n";
+    print $FHD "    {\n";
+    print $FHD "        cerr << \"Warning: Object \" << id << \" not firing as one or more sub objects are CORRUPT.\" << endl;\n";
+    print $FHD "\n";
+    print $FHD "        if ( object_status(id) == OK )\n";
+    print $FHD "        {\n";
+    print $FHD "            cerr << \"Warning: Object \" << id << \" setting to STALE.\" << endl;\n";
+    print $FHD "            object_status(id) = STALE;\n";
+    print $FHD "        }\n";
+    print $FHD "        else if ( ! object_init(id) )\n";
+    print $FHD "        {\n";
+    print $FHD "            cerr << \"Error: Object \" << id << \" setting to CORRUPT as one or more sub objects are CORRUPT and the object hasn't initialised.\" << endl;\n";
+    print $FHD "            object_status(id) = CORRUPT;\n";
+    print $FHD "        }\n";
+    print $FHD "\n";
+    print $FHD "        return;\n";
+    print $FHD "    }\n";
+    print $FHD "\n";
+
+
+
+    print $FHD "\n";
+
+    print $FHD "    if ( ! calculate_$type( obj_loc, id ) )\n";
+    print $FHD "    {\n";
+    print $FHD "        object_status(id) = CORRUPT;\n";
+    print $FHD "        cerr << \"Error: Object \" << id << \"  CORRUPT as it failed calculation.\" << endl;\n";
+    print $FHD "    }\n";
+    print $FHD "    else\n";
+    print $FHD "    {\n";
 
     print $FHD "        if ( ";
 
@@ -745,104 +791,29 @@ sub GenerateCalculate($$$) {
 
             while ( $counter < $size ) {
 
-                print $FHD " ((((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) and object_status(((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) > STALE ) ||\n";
+                print $FHD "((((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) and object_status(((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) == STALE ) ||\n             ";
                 $counter = $counter+1;
             }
         }
         else {
-            print $FHD " object_status(((t4::$type*)obj_loc[id])->$var_name) > STALE ||";
+            print $FHD "object_status(((t4::$type*)obj_loc[id])->$var_name) == STALE ||\n            ";
         }
 
     }
 
-    print $FHD " 0 )\n";
-    print $FHD "        { \n";
-
-
-    print $FHD "            if ( ";
-
-    foreach $var_name ( @{$master_hash->{$type}->{sub}->{order}} ) {
-
-        if ( PreComp::Utilities::IsArray( $var_name ) ) {
-
-            my $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
-
-            my $size = PreComp::Utilities::GetArraySize( $master_hash, $var_name );
-
-            my $counter=0;
-
-            while ( $counter < $size ) {
-
-                print $FHD " ((((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) and object_status(((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) > FAILED ) ||\n";
-                $counter = $counter+1;
-            }
-        }
-        else {
-            print $FHD " object_status(((t4::$type*)obj_loc[id])->$var_name) > FAILED ||";
-        }
-
-    }
-
-    print $FHD " 0 )\n";
-    print $FHD "            { \n";
-    print $FHD "                object_status(id) = GIGO;\n";
-    print $FHD "                DEBUG( \"Error: Object \" << id << \" GIGO as one or more sub objects are INVALID or GIGO. Not firing.\" );\n";
-    print $FHD "            } \n";
-    print $FHD "            else\n";
-    print $FHD "            { \n";
-    print $FHD "                object_status(id) = STALE;\n";
-    print $FHD "                DEBUG( \"Warning: Object \" << id << \" STALE as one or more sub objects have FAILED. Not firing.\" );\n";
-    print $FHD "            } \n";
-    print $FHD "        }\n";
-    print $FHD "        else\n";
+    print $FHD "0 )\n";
     print $FHD "        {\n";
+    print $FHD "            cerr << \"Error: Object \" << id << \"  STALE.\" << endl;\n";
     print $FHD "            object_status(id) = STALE;\n";
-    print $FHD "            DEBUG( \"Warning: Object \" << id << \" STALE as one or more sub objects are STALE. Firing.\"  );\n";
-    print $FHD "\n";
-    print $FHD "            if ( ! calculate_$type( obj_loc, id ) )\n";
-    print $FHD "            {\n";
-    print $FHD "                if ( object_status(id) == NEW )\n";
-    print $FHD "                {\n";
-    print $FHD "                    object_status( id ) = INVALID;\n";
-    print $FHD "                    cerr << \"Error: Object \" << id << \" GIGO as it failed it's first calculate.\" << endl;\n";
-    print $FHD "                }\n";
-    print $FHD "                else\n";
-    print $FHD "                {\n";
-    print $FHD "                    object_status( id ) = FAILED;\n";
-    print $FHD "                    cerr << \"Error: Object \" << id << \" FAILED.\" << endl;\n";
-    print $FHD "                }\n";
-    print $FHD "            }\n";
     print $FHD "        }\n";
-
-
-
-
-    print $FHD "\n";
+    print $FHD "        else \n";
+    print $FHD "        {\n";
+    print $FHD "            object_status(id) = OK;\n";
+    print $FHD "            object_init(id) = 1;\n";
+    print $FHD "        }\n";
     print $FHD "    }\n";
 
-    print $FHD "    else\n";
-    print $FHD "    {\n";
-    print $FHD "        if ( ! calculate_$type( obj_loc, id ) )\n";
-    print $FHD "        {\n";
-    print $FHD "            if ( ! calculate_$type( obj_loc, id ) )\n";
-    print $FHD "            {\n";
-    print $FHD "                if ( object_status(id) == NEW )\n";
-    print $FHD "                {\n";
-    print $FHD "                    object_status( id ) = INVALID;\n";
-    print $FHD "                    cerr << \"Error: Object \" << id << \" GIGO as it failed it's first calculate.\" << endl;\n";
-    print $FHD "                }\n";
-    print $FHD "                else\n";
-    print $FHD "                {\n";
-    print $FHD "                    object_status( id ) = FAILED;\n";
-    print $FHD "                    cerr << \"Error: Object \" << id << \" FAILED.\" << endl;\n";
-    print $FHD "                }\n";
-    print $FHD "            }\n";
-    print $FHD "        }\n";
-    print $FHD "        else\n";
-    print $FHD "        {\n";
-    print $FHD "            object_status( id ) = OK;\n";
-    print $FHD "        }\n";
-    print $FHD "    }\n";
+
     print $FHD "\n";
 
     print $FHD "    DEBUG_FINE( \"pub:\" );\n";
@@ -933,6 +904,7 @@ sub GenerateValidator($$$) {
                 print $FHD "    if ( ! obj_loc[((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]] )\n";
                 print $FHD "    {\n";
                 print $FHD "        cout << \"Error: Type $type, id \" << id << \" failed validation because a sub object $var_name_stripped"."[$counter], id \" << ((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter] << \" does not exist.\" << endl;\n";
+                print $FHD "        ((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter] = 0;\n";
                 print $FHD "        retval = 0;\n";
                 print $FHD "    }\n";
                 print $FHD "\n";
@@ -941,6 +913,7 @@ sub GenerateValidator($$$) {
                 print $FHD "    {\n";
 
                 print $FHD "        cout << \"Error: Type $type, id \" << id << \" failed validation because a sub object $var_name_stripped"."[$counter], id \" << ((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter] << \" is not of type $master_hash->{$master_hash->{$var_type}->{implements}}->{type_id}.\" << endl;\n";
+                print $FHD "        ((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter] = 0;\n";
                 print $FHD "        retval = 0;\n";
                 print $FHD "    }\n";
                 print $FHD "\n";
@@ -953,6 +926,7 @@ sub GenerateValidator($$$) {
             print $FHD "    if ( ! obj_loc[((t4::$type*)obj_loc[id])->$var_name] )\n";
             print $FHD "    {\n";
             print $FHD "        cout << \"Error: Type $type, id \" << id << \" failed validation because a sub object $var_name, id \" << ((t4::$type*)obj_loc[id])->$var_name << \" does not exist.\" << endl;\n";
+            print $FHD "        ((t4::$type*)obj_loc[id])->$var_name = 0;\n";
             print $FHD "        retval = 0;\n";
             print $FHD "    }\n";
             print $FHD "\n";
@@ -961,6 +935,7 @@ sub GenerateValidator($$$) {
             print $FHD "    {\n";
 
             print $FHD "        cout << \"Error: Type $type, id \" << id << \" failed validation because a sub object $var_name, id \" << ((t4::$type*)obj_loc[id])->$var_name << \" is not of type $master_hash->{$master_hash->{$var_type}->{implements}}->{type_id}.\" << endl;\n";
+            print $FHD "        ((t4::$type*)obj_loc[id])->$var_name = 0;\n";
             print $FHD "        retval = 0;\n";
             print $FHD "    }\n";
             print $FHD "\n";
