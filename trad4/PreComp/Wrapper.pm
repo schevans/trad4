@@ -736,19 +736,19 @@ sub GenerateCalculate($$$) {
 
             while ( $counter < $size ) {
 
-                print $FHD "((((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) and object_status(((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) >= CORRUPT ) ||\n         ";
+                print $FHD "((((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) and object_status(((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) >= GIGO ) ||\n         ";
                 $counter = $counter+1;
             }
         }
         else {
-            print $FHD "object_status(((t4::$type*)obj_loc[id])->$var_name) >= CORRUPT ||\n        ";
+            print $FHD "object_status(((t4::$type*)obj_loc[id])->$var_name) >= GIGO ||\n        ";
         }
 
     }
 
     print $FHD "0 )\n";
     print $FHD "    {\n";
-    print $FHD "        cerr << \"Warning: Object \" << id << \" not firing as one or more sub objects are CORRUPT.\" << endl;\n";
+    print $FHD "        cerr << \"Warning: Object \" << id << \" not firing as one or more sub objects are GIGO.\" << endl;\n";
     print $FHD "\n";
     print $FHD "        if ( object_status(id) == OK )\n";
     print $FHD "        {\n";
@@ -757,8 +757,8 @@ sub GenerateCalculate($$$) {
     print $FHD "        }\n";
     print $FHD "        else if ( ! object_init(id) )\n";
     print $FHD "        {\n";
-    print $FHD "            cerr << \"Error: Object \" << id << \" setting to CORRUPT as one or more sub objects are CORRUPT and the object hasn't initialised.\" << endl;\n";
-    print $FHD "            object_status(id) = CORRUPT;\n";
+    print $FHD "            cerr << \"Error: Object \" << id << \" setting to GIGO as one or more sub objects are GIGO and the object hasn't initialised.\" << endl;\n";
+    print $FHD "            object_status(id) = GIGO;\n";
     print $FHD "        }\n";
     print $FHD "\n";
     print $FHD "        return;\n";
@@ -771,8 +771,8 @@ sub GenerateCalculate($$$) {
 
     print $FHD "    if ( ! calculate_$type( obj_loc, id ) )\n";
     print $FHD "    {\n";
-    print $FHD "        object_status(id) = CORRUPT;\n";
-    print $FHD "        cerr << \"Error: Object \" << id << \"  CORRUPT as it failed calculation.\" << endl;\n";
+    print $FHD "        object_status(id) = GIGO;\n";
+    print $FHD "        cerr << \"Error: Object \" << id << \" is GIGO as it failed calculation.\" << endl;\n";
     print $FHD "    }\n";
     print $FHD "    else\n";
     print $FHD "    {\n";
@@ -803,7 +803,7 @@ sub GenerateCalculate($$$) {
 
     print $FHD "0 )\n";
     print $FHD "        {\n";
-    print $FHD "            cerr << \"Error: Object \" << id << \"  STALE.\" << endl;\n";
+    print $FHD "            cerr << \"Error: Object \" << id << \" is STALE.\" << endl;\n";
     print $FHD "            object_status(id) = STALE;\n";
     print $FHD "        }\n";
     print $FHD "        else \n";
