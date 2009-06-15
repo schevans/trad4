@@ -57,7 +57,7 @@ enum logging_level {
 enum e_status {
     OK,
     STALE,
-    CORRUPT
+    GIGO
 };
 
 // Hack to get the beta out (precomp expects only one string per type)...

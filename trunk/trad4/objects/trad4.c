@@ -487,12 +487,12 @@ void load_objects( int initial_load )
                 if ( object_init(i) )
                 {
                     object_status( i ) = STALE;
-                    cerr << "Error: Object " << i << " STALE as it failed validation on reload." << endl;
+                    cerr << "Error: Object " << i << " is STALE as it failed validation on reload." << endl;
                 }
                 else
                 {
-                    object_status( i ) = CORRUPT;
-                    cerr << "Error: Object " << i << " CORRUPT as it hasn't initilised and it failed validation ." << endl;
+                    object_status( i ) = GIGO;
+                    cerr << "Error: Object " << i << " is GIGO as it hasn't initilised and it failed validation ." << endl;
                 }
 
                 set_timestamp( obj_loc, i );
