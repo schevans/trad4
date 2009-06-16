@@ -12,7 +12,7 @@
 
 using namespace std;
 
-void calculate_df( obj_loc_t obj_loc, int id )
+int calculate_df( obj_loc_t obj_loc, int id )
 {
     double local_dx = f_up_x - f_down_x;
 
@@ -22,5 +22,7 @@ void calculate_df( obj_loc_t obj_loc, int id )
         df_df = 0;
 
     df_dx = f_this_x;
+
+    return 1;
 }
 

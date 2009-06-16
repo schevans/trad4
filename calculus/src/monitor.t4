@@ -4,7 +4,7 @@
 
 
 sub
-    f my_f[NUM_NODES]
-    df my_df[NUM_NODES]
-    d2f my_d2f[NUM_NODES]
+    f f[NUM_NODES]
+    df df[NUM_NODES]
+    d2f d2f[NUM_NODES]
 

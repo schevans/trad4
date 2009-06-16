@@ -12,7 +12,7 @@
 
 using namespace std;
 
-void calculate_f( obj_loc_t obj_loc, int id )
+int calculate_f( obj_loc_t obj_loc, int id )
 {
     f_x = (id*1.0) / NUM_NODES;
 
@@ -24,5 +24,7 @@ void calculate_f( obj_loc_t obj_loc, int id )
     {
         f_y = f_x * f_x;
     }
+
+    return 1;
 }
 

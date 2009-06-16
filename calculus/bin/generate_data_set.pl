@@ -119,28 +119,28 @@ print FILE "insert into monitor values ( $monitor_id );\n";
 
 close FILE;
 
-my $monitor_my_f_file = "$dummy_data_root/monitor_my_f.sql";
-my $monitor_my_df_file = "$dummy_data_root/monitor_my_df.sql";
-my $monitor_my_d2f_file = "$dummy_data_root/monitor_my_d2f.sql";
+my $monitor_f_file = "$dummy_data_root/monitor_f.sql";
+my $monitor_df_file = "$dummy_data_root/monitor_df.sql";
+my $monitor_d2f_file = "$dummy_data_root/monitor_d2f.sql";
 
-open MON_F, ">$monitor_my_f_file" or die "Can't open $monitor_my_f_file";
-open MON_DF, ">$monitor_my_df_file" or die "Can't open $monitor_my_df_file";
-open MON_D2F, ">$monitor_my_d2f_file" or die "Can't open $monitor_my_d2f_file";
+open MON_F, ">$monitor_f_file" or die "Can't open $monitor_f_file";
+open MON_DF, ">$monitor_df_file" or die "Can't open $monitor_df_file";
+open MON_D2F, ">$monitor_d2f_file" or die "Can't open $monitor_d2f_file";
 
-print MON_F "delete from monitor_my_f;\n";
+print MON_F "delete from monitor_f;\n";
 print MON_F "BEGIN;\n";
-print MON_DF "delete from monitor_my_df;\n";
+print MON_DF "delete from monitor_df;\n";
 print MON_DF "BEGIN;\n";
-print MON_D2F "delete from monitor_my_d2f;\n";
+print MON_D2F "delete from monitor_d2f;\n";
 print MON_D2F "BEGIN;\n";
 
 $counter = 1;
 
 while ( $counter <= $length ) {
 
-    print MON_F "insert into monitor_my_f values ( $monitor_id, $counter );\n";
-    print MON_DF "insert into monitor_my_df values ( $monitor_id, ".($counter+$length)." );\n";
-    print MON_D2F "insert into monitor_my_d2f values ( $monitor_id, ".($counter+($length*2))." );\n";
+    print MON_F "insert into monitor_f values ( $monitor_id, ".($counter-1).", $counter );\n";
+    print MON_DF "insert into monitor_df values ( $monitor_id, ".($counter-1).", ".($counter+$length)." );\n";
+    print MON_D2F "insert into monitor_d2f values ( $monitor_id, ".($counter-1).", ".($counter+($length*2))." );\n";
 
     $counter = $counter+1;
 }
