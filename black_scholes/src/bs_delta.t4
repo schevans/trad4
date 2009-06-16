@@ -1,8 +1,8 @@
 
 sub
-    rate_trade srate_trade
-    stock_trade sstock_trade
-    option soption
+    rate_trade rate_trade
+    stock_trade stock_trade
+    option option
 
 pub
     double N_pd1

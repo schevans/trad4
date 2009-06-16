@@ -1,8 +1,8 @@
 
 sub
-    option soption
-    rate_trade srate_trade
-    bs_delta sbs_delta
+    option option
+    rate_trade rate_trade
+    bs_delta bs_delta
 
 pub
     double rho

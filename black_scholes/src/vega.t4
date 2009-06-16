@@ -1,8 +1,8 @@
 
 sub
-    bs_delta sbs_delta
-    stock sstock
-    option soption
+    bs_delta bs_delta
+    stock stock
+    option option
 
 pub
     double vega

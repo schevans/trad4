@@ -1,8 +1,8 @@
 
 
 sub
-    tier1 my_tier1
-    multi_struct my_multi_struct
+    tier1 tier1
+    multi_struct multi_struct
 
 
 static

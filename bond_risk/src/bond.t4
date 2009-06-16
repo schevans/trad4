@@ -3,7 +3,7 @@
 # This code is licenced under the BSD licence. For details see $INSTANCE_ROOT/LICENCE
 
 sub
-    currency_curves scurrency_curves
+    currency_curves currency_curves
 
 pub
     double price

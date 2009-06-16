@@ -1,9 +1,9 @@
 
 sub
-    bs_delta sbs_delta
-    stock sstock
-    option soption
-    rate_trade srate_trade
+    bs_delta bs_delta
+    stock stock
+    option option
+    rate_trade rate_trade
 
 pub
     double price

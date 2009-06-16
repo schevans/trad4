@@ -2,6 +2,6 @@
 
 sub
     tier1 tier1s[1]
-    tier2 my_tier2
+    tier2 tier2
 
 

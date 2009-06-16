@@ -1,7 +1,7 @@
 
 sub
-    option soption
-    risk_free_rate srisk_free_rate
+    option option
+    risk_free_rate risk_free_rate
 
 pub
     double rT

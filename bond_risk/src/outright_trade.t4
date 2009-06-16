@@ -4,7 +4,7 @@
 # This code is licenced under the BSD licence. For details see $INSTANCE_ROOT/LICENCE
 
 sub
-    bond sbond
+    bond bond
 
 pub
     double pv

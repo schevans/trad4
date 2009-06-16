@@ -1,7 +1,7 @@
 
 
 sub
-    simple1 my_simple1
+    simple1 simple1
 
 static
     int s2_int
