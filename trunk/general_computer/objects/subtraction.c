@@ -11,8 +11,10 @@
 
 using namespace std;
 
-void calculate_subtraction( obj_loc_t obj_loc, int id )
+int calculate_subtraction( obj_loc_t obj_loc, int id )
 {
     subtraction_output = numeric1_output - numeric2_output;
+
+    return 1;
 }
 

@@ -11,8 +11,10 @@
 
 using namespace std;
 
-void calculate_multiplication( obj_loc_t obj_loc, int id )
+int calculate_multiplication( obj_loc_t obj_loc, int id )
 {
     multiplication_output = numeric1_output * numeric2_output;
+
+    return 1;
 }
 

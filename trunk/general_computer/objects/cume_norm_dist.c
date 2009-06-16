@@ -13,7 +13,7 @@
 
 using namespace std;
 
-void calculate_cume_norm_dist( obj_loc_t obj_loc, int id )
+int calculate_cume_norm_dist( obj_loc_t obj_loc, int id )
 {
 
     double x = numeric1_output;
@@ -39,5 +39,7 @@ void calculate_cume_norm_dist( obj_loc_t obj_loc, int id )
         cume_norm_dist_output = ( c * exp( -x * x / 2.0 ) * t * ( t *( t * ( t * ( t * b5 + b4 ) + b3 ) + b2 ) + b1 ));
     }
 
+
+    return 1;
 }
 
