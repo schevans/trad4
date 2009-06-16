@@ -746,7 +746,7 @@ sub GenerateCalculate($$$) {
             }
         }
         else {
-            print $FHD "object_status(((t4::$type*)obj_loc[id])->$var_name) >= GIGO ||\n        ";
+            print $FHD "( ((t4::$type*)obj_loc[id])->$var_name != id and object_status(((t4::$type*)obj_loc[id])->$var_name) >= GIGO ) ||\n        ";
         }
 
     }
