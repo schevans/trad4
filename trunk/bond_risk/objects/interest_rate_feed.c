@@ -9,7 +9,9 @@
 
 using namespace std;
 
-void calculate_interest_rate_feed( obj_loc_t obj_loc, int id )
+int calculate_interest_rate_feed( obj_loc_t obj_loc, int id )
 {
     // Does nothing.
+
+    return 1;
 }
