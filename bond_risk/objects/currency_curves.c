@@ -9,7 +9,7 @@
 
 using namespace std;
 
-void calculate_currency_curves( obj_loc_t obj_loc, int id )
+int calculate_currency_curves( obj_loc_t obj_loc, int id )
 {
     int current_period_start;
     int current_period_end;
@@ -60,5 +60,7 @@ void calculate_currency_curves( obj_loc_t obj_loc, int id )
 */
     }
 
+
+    return 1;
 }
 
