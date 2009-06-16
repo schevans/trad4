@@ -148,7 +148,7 @@ print "Validating..\n";
 
 foreach $type ( keys %doing ) {
 
-    PreComp::Utilities::Validate( $master_hash, $type, $struct_hash, $enum_hash, $alias_hash );
+    PreComp::Utilities::Validate( $new_master_hash, $type );
 }
 
 foreach $type ( keys %doing ) {
