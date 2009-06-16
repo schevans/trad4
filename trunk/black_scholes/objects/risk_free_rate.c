@@ -12,6 +12,10 @@ int calculate_risk_free_rate( obj_loc_t obj_loc, int id )
 {
     // Does nothing.
 
-    return 1;
+    // Validate.
+    if ( risk_free_rate_r < 0 )
+        return 0;
+    else
+        return 1;
 }
 
