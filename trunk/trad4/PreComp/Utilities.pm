@@ -60,96 +60,6 @@ sub Clean() {
     `rm -f $ENV{APP_ROOT}/objects/Makefile`;
 }    
 
-sub Validate($$$$$) {
-    my $master_hash = shift;
-    my $name = shift;
-    my $struct_hash = shift;
-    my $enum_hash = shift;
-    my $alias_hash = shift;
-
-    my $obj_hash = $master_hash->{$name};
-
-    my $type_num =  $master_hash->{$name}->{type_num};
-
-    foreach $key ( @{$obj_hash->{data}->{sub_order}} ) {
-
-        if ( ! $master_hash->{$obj_hash->{data}->{sub}->{$key}} ) {
-
-            print "Error: Type \'$name\' has a type \'".$obj_hash->{data}->{sub}->{$key}."\', which is not found in $ENV{SRC_DIR}.\n";
-            ExitOnError();
-        }
-    }
-
-    foreach $key ( @{$obj_hash->{data}->{sub_vec_order}} ) { 
-
-        if ( ! $master_hash->{$obj_hash->{data}->{sub_vec}->{$key}} ) {
-
-            print "Error: Type \'$name\' has a type \'".$obj_hash->{data}->{sub_vec}->{$key}."\', which is not found in $ENV{SRC_DIR}.\n";
-            ExitOnError();
-        }
-    }
-
-    foreach $key ( keys %{$master_hash} ) {
-
-        if ( $key ne $name ) {
-
-            if ( $master_hash->{$key}->{type_num} == $type_num ) {
-
-                print "Error: Types \'$name\' and \'$key\' share the same type_num \'$type_num\' in object_types.t4s.\n";
-                ExitOnError();
-            }
-        }
-    }
-
-    foreach $key ( keys %{$obj_hash->{data}} ) {
-
-        if ( not $key =~ /_order/ ) {
-
-            foreach $key2 ( keys %{$obj_hash->{data}->{$key}} ) {
-
-                if ( not $obj_hash->{data}->{$key}->{$key2} =~ /int|double|float|long|char/ ) {
-
-                    if ( exists $struct_hash->{data}->{$obj_hash->{data}->{$key}->{$key2}} ) {
-        
-                        next;
-                    }
-
-                    if ( exists $master_hash->{$obj_hash->{data}->{$key}->{$key2}} ) {
-
-                        next;
-                    }
-
-                    if ( exists $enum_hash->{$obj_hash->{data}->{$key}->{$key2}} ) {
-
-                        next;
-                    }
-
-                    if ( exists $alias_hash->{$obj_hash->{data}->{$key}->{$key2}} ) {
-
-                        next;
-                    }
-
-                    if ( not $found_in_enums ) {
-
-                        print "Error: Type \'$obj_hash->{data}->{$key}->{$key2}\', referred to in the $key section of $name.t4 not found. It's not:\n";
-                        print "    a) an int, double or float\n";
-                        print "    b) a structure, as defined in structures.t4s\n";
-                        print "    c) an enum, as defined in enums.t4s\n";
-                        print "    d) an alias, as defined in aliases.t4s\n";
-
-                        ExitOnError();
-                    }
-                }
-
-            }
-    
-        }
-
-    }
-
-    return 1;
-}
-
 sub OpenFile($) {
     my $file = shift;
 
@@ -1007,6 +917,94 @@ sub GetArraySize($$) {
     return $size;
 }
 
+sub Validate($$) {
+    my $master_hash = shift;
+    my $type = shift;
+
+    my ( $var_name, $var_type );
+
+    foreach $var_name ( @{$master_hash->{$type}->{sub}->{order}} ) {
+
+        $var_type = $master_hash->{$type}->{sub}->{data}->{$var_name};
+
+        if ( ! $master_hash->{$var_type} ) {
+
+            print "Error: Type \'$type\' has a sub type \'$var_type\', which is not found in $ENV{SRC_DIR}.\n";
+            ExitOnError();
+        }
+    }
+
+    my $type_id =  $master_hash->{$type}->{type_id};
+
+    my $all_types;
+
+    foreach $all_types ( keys %{$master_hash} ) {
+
+        if ( $all_types ne $type and $all_types !~ /structures|enums|constants|aliases/) {
+
+            if ( $master_hash->{$all_types}->{type_id} == $type_id ) {
+
+                print "Error: Types \'$type\' and \'$all_types\' share the same type_id \'$type_id\' in object_types.t4s.\n";
+                ExitOnError();
+            }
+        }
+    }
+
+    if ( exists $master_hash->{structures}->{data}->{$type} )
+    {
+        print "Error: Name clash between t4 type \'$type\' and structure \'$type\'\n";
+        ExitOnError();
+    }
+
+    if ( exists $master_hash->{enums}->{$type} )
+    {
+        print "Error: Name clash between t4 type \'$type\' and enum \'$type\'\n";
+        ExitOnError();
+    }
+
+    if ( exists $master_hash->{aliases}->{data}->{$type} )
+    {
+        print "Error: Name clash between t4 type \'$type\' and alias \'$type\'\n";
+        ExitOnError();
+    }
+
+    my $section;
+
+    foreach $section ( 'static', 'pub' ) {
+
+        foreach $var_name ( @{$master_hash->{$type}->{$section}->{order}} ) {
+
+            $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
+
+            if ( $var_type !~ /int|double|float|long|char/ )
+            {
+                if ( exists $master_hash->{structures}->{data}->{$var_type} )
+                {
+                    next;
+                }
+
+                if ( exists $master_hash->{enums}->{$var_type} )
+                {
+                    next;
+                }
+
+                if ( exists $master_hash->{aliases}->{data}->{$var_type} )
+                {
+                    next;
+                }
+
+                print "Error: Type \'$var_type $var_name\', referred to in the $section section of $type.t4 not found. It's not:\n";
+                print "    a) an int, double, float, long or char.\n";
+                print "    b) a structure, as defined in structures.t4s\n";
+                print "    c) an enum, as defined in enums.t4s\n";
+                print "    d) an alias, as defined in aliases.t4s\n";
+
+                ExitOnError();
+
+            }
+        }
+    }
+}
 
 1;
 
