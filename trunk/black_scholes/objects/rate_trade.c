@@ -11,11 +11,11 @@ using namespace std;
 
 int calculate_rate_trade( obj_loc_t obj_loc, int id )
 {
-    rate_trade_rT = srisk_free_rate_r * soption_T;
+    rate_trade_rT = risk_free_rate_r * option_T;
 
-    rate_trade_KerT = soption_K * exp( - rate_trade_rT );
+    rate_trade_KerT = option_K * exp( - rate_trade_rT );
 
-    rate_trade_rKerT = srisk_free_rate_r * rate_trade_KerT;
+    rate_trade_rKerT = risk_free_rate_r * rate_trade_KerT;
 
     return 1;
 }

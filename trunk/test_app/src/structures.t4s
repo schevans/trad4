@@ -8,6 +8,9 @@ struct2
     double rates[NUM_RATES]
     date dates[NUM_RATES]
 
+struct3
+    struct1 my_struct1
+
 ms_inner
     int d
     float ha[NUM_RATES]

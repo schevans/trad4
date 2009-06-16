@@ -1,8 +1,8 @@
 
 sub
-    bs_delta sbs_delta
-    stock_trade sstock_trade
-    stock sstock
+    bs_delta bs_delta
+    stock_trade stock_trade
+    stock stock
 
 pub
     double gamma

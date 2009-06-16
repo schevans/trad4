@@ -1,7 +1,7 @@
 
 sub
-    option soption
-    stock sstock
+    option option
+    stock stock
 
 pub
     double ln_SK

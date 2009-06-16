@@ -10,13 +10,13 @@ using namespace std;
 
 int calculate_theta( obj_loc_t obj_loc, int id )
 {
-    if ( soption_call_or_put == CALL )
+    if ( option_call_or_put == CALL )
     {
-        theta_theta = (( - sstock_S * sbs_delta_N_pd1 * sstock_v ) / ( 2.0 * soption_RtT )) - ( srate_trade_rKerT * sbs_delta_N_pd2 );
+        theta_theta = (( - stock_S * bs_delta_N_pd1 * stock_v ) / ( 2.0 * option_RtT )) - ( rate_trade_rKerT * bs_delta_N_pd2 );
     }
     else
     {
-        theta_theta = (( - sstock_S * sbs_delta_N_pd1 * sstock_v ) / ( 2.0 * soption_RtT )) + ( srate_trade_rKerT * sbs_delta_N_md2 );
+        theta_theta = (( - stock_S * bs_delta_N_pd1 * stock_v ) / ( 2.0 * option_RtT )) + ( rate_trade_rKerT * bs_delta_N_md2 );
     }
 
     return 1;
