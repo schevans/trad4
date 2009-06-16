@@ -11,7 +11,7 @@
 
 using namespace std;
 
-void calculate_addition( obj_loc_t obj_loc, int id )
+int calculate_addition( obj_loc_t obj_loc, int id )
 {
     if ( numeric1_output == 0 ) {
         
@@ -22,5 +22,7 @@ void calculate_addition( obj_loc_t obj_loc, int id )
         addition_output = numeric1_output + numeric2_output;
 
     }
+
+    return 1;
 }
 

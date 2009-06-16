@@ -1,10 +1,10 @@
-#type_id, name
-1,numeric
-2,feed
-3,addition
-4,subtraction
-5,multiplication
-6,division
-7,natural_log
-8,cume_norm_dist
-9,square_root
+#type_id, tier, name
+1,0,numeric
+2,0,feed
+3,0,addition
+4,0,subtraction
+5,0,multiplication
+6,0,division
+7,0,natural_log
+8,0,cume_norm_dist
+9,0,square_root

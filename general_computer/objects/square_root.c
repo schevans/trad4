@@ -12,8 +12,10 @@
 
 using namespace std;
 
-void calculate_square_root( obj_loc_t obj_loc, int id )
+int calculate_square_root( obj_loc_t obj_loc, int id )
 {
     square_root_output = sqrt( numeric1_output );
+
+    return 1;
 }
 
