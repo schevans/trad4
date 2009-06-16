@@ -536,6 +536,11 @@ sub GenerateLoaderCallback($$$$) {
     print $FHD "    {\n";
     print $FHD "        obj_loc[id] = (unsigned char*)(new t4::$type);\n";
     print $FHD "        object_init(id) = 0;\n";
+    print $FHD "        object_status(id) = GIGO;\n";
+    print $FHD "    }\n";
+    print $FHD "    else\n";
+    print $FHD "    {\n";
+    print $FHD "        object_status(id) = OK;\n";
     print $FHD "    }\n";
     print $FHD "\n";
     print $FHD "    ((t4::$type*)obj_loc[id])->id = id;\n";
