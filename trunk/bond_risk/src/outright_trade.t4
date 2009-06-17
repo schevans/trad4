@@ -6,14 +6,14 @@
 sub
     bond bond
 
-pub
-    double pv
-    double pv_01
-    double pnl
-
 static
     double trade_price
     int book
     int quantity
     int trade_date
+
+pub
+    double pv
+    double pv_01
+    double pnl
 
