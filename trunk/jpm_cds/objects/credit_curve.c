@@ -28,7 +28,7 @@
 
 using namespace std;
 
-void calculate_credit_curve( obj_loc_t obj_loc, int id )
+int calculate_credit_curve( obj_loc_t obj_loc, int id )
 {
 
     char* calendar = "NONE";
@@ -51,5 +51,7 @@ void calculate_credit_curve( obj_loc_t obj_loc, int id )
         (long)credit_curve_badDayConv,
         calendar ));
 
+
+    return 1;
 }
 

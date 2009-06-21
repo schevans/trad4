@@ -20,3 +20,9 @@ TDateInterval
     char prd_typ
     int flag
 
+observables
+    char types[NUM_RATES]
+    double rates[NUM_RATES]
+    TDate dates[NUM_RATES]
+
+

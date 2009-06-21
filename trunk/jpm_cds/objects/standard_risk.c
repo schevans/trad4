@@ -15,12 +15,14 @@
 
 using namespace std;
 
-void calculate_standard_risk( obj_loc_t obj_loc, int id )
+int calculate_standard_risk( obj_loc_t obj_loc, int id )
 {
     standard_risk_pv = s_contingent_leg_pv - s_fee_leg_pv;
 
     cout << "standard_risk_pv: " << standard_risk_pv << endl;
 
     T4_TEST( standard_risk_pv, -8323.85 );
+
+    return 1;
 }
 

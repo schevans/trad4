@@ -8,9 +8,7 @@ static
     long floatSwapDCC
     char badDayConv
     int iholidays
-    char types[NUM_RATES]   # These three really should be on the same struct,
-    double rates[NUM_RATES] #  but there's no support in trad4 for the layout
-    TDate dates[NUM_RATES]  #  JPMCDS requires.
+    observables st_observables
 
 pub
     TCurve pTCurve

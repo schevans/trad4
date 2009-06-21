@@ -49,9 +49,9 @@ while ( $counter <= $length ) {
 
     $change_id = $counter+$length;
 
-    print FILE "insert into object values ( $counter, 2, \"element_$counter\", 0, 1 );\n";
+    print FILE "insert into object values ( $counter, 2, 1, \"element_$counter\", 0, 1 );\n";
 
-    print FILE "insert into element values ( $counter, 0, $element_type, $change_id );\n";
+    print FILE "insert into element values ( $counter, $element_type, $change_id );\n";
 
     $counter = $counter + 1;
 }
@@ -67,7 +67,7 @@ print FILE "delete from change;\n";
 
 while ( $counter <= $length * 2 ) {
 
-    print FILE "insert into object values ( $counter, 3, \"change_$counter\", 0, 1 );\n";
+    print FILE "insert into object values ( $counter, 3, 2, \"change_$counter\", 0, 1 );\n";
 
     my $sub_this = $counter - $length;
     my $sub_up = $counter - $length + 1;
@@ -94,7 +94,7 @@ open FILE, ">$file" or die "Can't open $file";
 
 print FILE "delete from data_server;\n";
 
-print FILE "insert into object values ( $data_server_id, 1, \"data_server\", 0, 1 );\n";
+print FILE "insert into object values ( $data_server_id, 1, 1, \"data_server\", 0, 1 );\n";
 
 print FILE "insert into data_server values ( $data_server_id, $k, $alpha, $beta );\n";
 
@@ -105,27 +105,27 @@ $file = "$dummy_data_root/monitor.sql";
 open FILE, ">$file" or die "Can't open $file";
 
 print FILE "delete from monitor;\n";
-print FILE "insert into object values ( $monitor_id, 4, \"monitor\", 0, 1 );\n";
+print FILE "insert into object values ( $monitor_id, 4, 3, \"monitor\", 0, 1 );\n";
 print FILE "insert into monitor values ( $monitor_id, 0, 0, $converged_limit, $diverged_limit, $data_server_id );\n";
 
 close FILE;
 
-my $changes_file = "$dummy_data_root/monitor_my_changes.sql";
-my $elements_file = "$dummy_data_root/monitor_my_elements.sql";
+my $changes_file = "$dummy_data_root/monitor_changes.sql";
+my $elements_file = "$dummy_data_root/monitor_elements.sql";
 
 open CHANGES_FILE, ">$changes_file" or die "Can't open $changes_file";
 open ELEMENTS_FILE, ">$elements_file" or die "Can't open $elements_file";
 
-print CHANGES_FILE "delete from monitor_my_changes;\n";
-print ELEMENTS_FILE "delete from monitor_my_elements;\n";
+print CHANGES_FILE "delete from monitor_changes;\n";
+print ELEMENTS_FILE "delete from monitor_elements;\n";
 
 $counter = 1;
 
 while ( $counter <= $length ) {
 
 
-    print CHANGES_FILE "insert into monitor_my_changes values ( $monitor_id, ".($length+$counter)." );\n";
-    print ELEMENTS_FILE "insert into monitor_my_elements values ( $monitor_id, ".$counter." );\n";
+    print CHANGES_FILE "insert into monitor_changes values ( $monitor_id, ".($counter-1).", ".($length+$counter)." );\n";
+    print ELEMENTS_FILE "insert into monitor_elements values ( $monitor_id, ".($counter-1).", ".$counter." );\n";
 
     $counter = $counter+1;
 }

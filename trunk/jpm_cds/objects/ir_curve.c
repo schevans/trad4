@@ -29,15 +29,15 @@
 
 using namespace std;
 
-void calculate_ir_curve( obj_loc_t obj_loc, int id )
+int calculate_ir_curve( obj_loc_t obj_loc, int id )
 {
     char *local_holidays = "None";
 
     ir_curve_pTCurve = *(JpmcdsBuildIRZeroCurve(
             ir_curve_baseDate,
-            ir_curve_types,
-            ir_curve_dates,
-            ir_curve_rates,
+            ir_curve_st_observables_types,
+            ir_curve_st_observables_dates,
+            ir_curve_st_observables_rates,
             NUM_RATES,
             ir_curve_mmDCC,
             ir_curve_fixedSwapFreq,
@@ -47,6 +47,8 @@ void calculate_ir_curve( obj_loc_t obj_loc, int id )
             ir_curve_badDayConv,
             local_holidays));
 
+
+    return 1;
 }
 
 

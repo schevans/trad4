@@ -16,7 +16,7 @@ using namespace std;
 void print_data( obj_loc_t obj_loc, int id );
 double get_timestamp();
 
-void calculate_monitor( obj_loc_t obj_loc, int id )
+int calculate_monitor( obj_loc_t obj_loc, int id )
 {
 
     if ( monitor_counter == 0 && ! monitor_print_each_cycle )
@@ -37,13 +37,13 @@ void calculate_monitor( obj_loc_t obj_loc, int id )
 
     for ( int i=0 ; i < NUM_NODES ; i++ )
     {
-        if ( fabs( monitor_my_changes_change(i) ) > monitor_diverged_limit )
+        if ( fabs( changes_change(i) ) > monitor_diverged_limit )
         {
             diverged = 1;
             break;
         }
 
-        if ( converged && fabs( monitor_my_changes_change(i) ) > monitor_converged_limit )
+        if ( converged && fabs( changes_change(i) ) > monitor_converged_limit )
         {
             converged = 0; 
         }
@@ -56,7 +56,7 @@ void calculate_monitor( obj_loc_t obj_loc, int id )
 
         double local_end_time = get_timestamp();
 
-        cout << "Converged in " << monitor_counter << " steps which took " << local_end_time - monitor_start_time << " seconds with k = " << my_data_server_k << endl;
+        cout << "Converged in " << monitor_counter << " steps which took " << local_end_time - monitor_start_time << " seconds with k = " << data_server_k << endl;
 
         exit(0);
     }
@@ -67,13 +67,14 @@ void calculate_monitor( obj_loc_t obj_loc, int id )
 
         double local_end_time = get_timestamp();
 
-        cout << "Diverged in " << monitor_counter << " steps which took " << local_end_time - monitor_start_time << " seconds with k = "<< my_data_server_k  << endl;
+        cout << "Diverged in " << monitor_counter << " steps which took " << local_end_time - monitor_start_time << " seconds with k = "<< data_server_k  << endl;
 
         exit(0);
     }
 
     monitor_counter = monitor_counter + 1;
 
+    return 1;
 }
 
 void print_data( obj_loc_t obj_loc, int id )
@@ -82,21 +83,21 @@ void print_data( obj_loc_t obj_loc, int id )
 
     for ( int i=0 ; i < NUM_NODES ; i++ )
     {
-        cout << "," << monitor_my_elements_x(i);
+        cout << "," << elements_x(i);
     }
 
     cout << endl << "y";
 
     for ( int i=0 ; i < NUM_NODES ; i++ )
     {
-        cout << "," << monitor_my_elements_y(i);
+        cout << "," << elements_y(i);
     }
 
     cout << endl << "change";
 
     for ( int i=0 ; i < NUM_NODES ; i++ )
     {
-        cout << "," << monitor_my_changes_change(i);
+        cout << "," << changes_change(i);
     }
 
     cout << endl;
