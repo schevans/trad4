@@ -536,12 +536,9 @@ sub GenerateLoaderCallback($$$$) {
     print $FHD "    {\n";
     print $FHD "        obj_loc[id] = (unsigned char*)(new t4::$type);\n";
     print $FHD "        object_init(id) = 0;\n";
-    print $FHD "        object_status(id) = GIGO;\n";
     print $FHD "    }\n";
-    print $FHD "    else\n";
-    print $FHD "    {\n";
-    print $FHD "        object_status(id) = OK;\n";
-    print $FHD "    }\n";
+    print $FHD "\n";
+    print $FHD "    object_status(id) = OK;\n";
     print $FHD "\n";
     print $FHD "    ((t4::$type*)obj_loc[id])->id = id;\n";
     print $FHD "    memcpy( ((t4::$type*)obj_loc[id])->name, row[1], 32 );\n";
@@ -611,9 +608,11 @@ sub GenerateNeedRefresh($$$) {
 
     print $FHD "\n";
 
+    my $var_name;
+if (0) {
+
     print $FHD "    if ( \n";
 
-    my $var_name;
 
     foreach $var_name ( @{$master_hash->{$type}->{sub}->{order}} ) {
 
@@ -644,6 +643,8 @@ sub GenerateNeedRefresh($$$) {
     print $FHD "        return 0;\n";
     print $FHD "    }\n";
 
+
+}
 
     print $FHD "\n";
 
@@ -755,15 +756,15 @@ sub GenerateCalculate($$$) {
     print $FHD "    {\n";
     print $FHD "        cerr << \"Warning: Object \" << id << \" not firing as one or more sub objects are GIGO.\" << endl;\n";
     print $FHD "\n";
-    print $FHD "        if ( object_status(id) == OK )\n";
-    print $FHD "        {\n";
-    print $FHD "            cerr << \"Warning: Object \" << id << \" setting to STALE.\" << endl;\n";
-    print $FHD "            object_status(id) = STALE;\n";
-    print $FHD "        }\n";
-    print $FHD "        else if ( ! object_init(id) )\n";
+    print $FHD "        if ( ! object_init(id) )\n";
     print $FHD "        {\n";
     print $FHD "            cerr << \"Error: Object \" << id << \" setting to GIGO as one or more sub objects are GIGO and the object hasn't initialised.\" << endl;\n";
     print $FHD "            object_status(id) = GIGO;\n";
+    print $FHD "        }\n";
+    print $FHD "        else if ( object_status(id) == OK )\n";
+    print $FHD "        {\n";
+    print $FHD "            cerr << \"Warning: Object \" << id << \" setting to STALE.\" << endl;\n";
+    print $FHD "            object_status(id) = STALE;\n";
     print $FHD "        }\n";
     print $FHD "\n";
     print $FHD "        return;\n";

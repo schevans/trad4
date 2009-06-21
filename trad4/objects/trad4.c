@@ -70,14 +70,27 @@ void run_trad4() {
         tier_manager[i][0]=1;
     }
 
+    // Null object
+    obj_loc[0] = (unsigned char*)(new object_header);
+
+    object_last_published(0) = 0;
+    object_status(0) = GIGO;
+    object_type(0) = 0;
+    object_tier(0) = 0;
+//    object_name(0) = "Null object";
+    object_log_level(0) = 0;
+    object_implements(0) = 0;
+    object_init(0) = 0;
+
     load_types( 1 );
 
     load_objects( 1 );
 
-    for ( int i = 0 ; i < MAX_OBJECTS+1 ; i++ )
+    for ( int i = 1 ; i < MAX_OBJECTS ; i++ )
     {
         if ( obj_loc[i] )
         {
+cout << "Setting for " << i << endl;
             tier_manager[((object_header*)obj_loc[i])->tier][tier_manager[((object_header*)obj_loc[i])->tier][0]] = i;
             tier_manager[((object_header*)obj_loc[i])->tier][0]++;
         }
@@ -198,7 +211,7 @@ int run_tier( int tier ) {
 
     int num_objects_fired = 0;
 
-    for ( int i=1 ; i <= tier_manager[tier][0] ; i++ )
+    for ( int i=1 ; i < tier_manager[tier][0] ; i++ )
     {
 
         //std::cout << "Checking tier " << tier << ". i=" << i << ", num objs this tier: " << tier_manager[tier][0] - 1 << std::endl; 
@@ -478,7 +491,7 @@ void load_objects( int initial_load )
 
     cout << "Validating objects..." << endl;
 
-    for ( int i = 0 ; i < MAX_OBJECTS+1 ; i++ )
+    for ( int i = 1 ; i < MAX_OBJECTS ; i++ )
     {
         if ( obj_loc[i] && object_last_published(i) == 0 )
         {
