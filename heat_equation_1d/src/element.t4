@@ -3,11 +3,10 @@
 # This code is released under the BSD licence. For details see $APP_ROOT/LICENCE
 
 static
-    int init
     element_type_enum element_type
     
 sub
-    change my_change
+    change change
 
 pub
     double y 

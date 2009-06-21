@@ -12,12 +12,10 @@
 
 using namespace std;
 
-void calculate_element( obj_loc_t obj_loc, int id )
+int calculate_element( obj_loc_t obj_loc, int id )
 {
-    if ( ! element_init ) 
+    if ( ! object_init(id) ) 
     {
-        element_init = 1;
-
 //      Use for id = 0.1 - 1.0
         element_x = (id*1.0)/NUM_NODES;
         element_y = cos( 2*(element_x) );
@@ -28,10 +26,12 @@ void calculate_element( obj_loc_t obj_loc, int id )
     }
     else
     {
-        element_y = element_y + my_change_change;
+        element_y = element_y + change_change;
     }
 
     if ( element_y < 0.0 ) 
         element_y = 0.0;
+
+    return 1;
 }
 

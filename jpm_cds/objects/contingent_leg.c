@@ -29,7 +29,7 @@
 
 using namespace std;
 
-void calculate_contingent_leg( obj_loc_t obj_loc, int id )
+int calculate_contingent_leg( obj_loc_t obj_loc, int id )
 {
     int result = JpmcdsCdsContingentLegPV(
         s_trade_today,
@@ -46,5 +46,6 @@ void calculate_contingent_leg( obj_loc_t obj_loc, int id )
 
 cout << "calculate_contingent_leg result: " << result << endl;
 
+    return 1;
 }
 

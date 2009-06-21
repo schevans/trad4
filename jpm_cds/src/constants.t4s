@@ -1,6 +1,4 @@
 
-ONE = 1
-
 MAX_RATEPT = 20
 
 NUM_RATES = 14

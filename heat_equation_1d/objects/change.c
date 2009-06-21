@@ -12,7 +12,7 @@
 
 using namespace std;
 
-void calculate_change( obj_loc_t obj_loc, int id )
+int calculate_change( obj_loc_t obj_loc, int id )
 {
     double local_2dx = up_element_x - down_element_x;
     double local_down_element_y = down_element_y;
@@ -21,14 +21,16 @@ void calculate_change( obj_loc_t obj_loc, int id )
     if ( this_element_element_type == START )
     {
         local_2dx = 2 * ( up_element_x - this_element_x );
-        local_down_element_y = my_data_server_alpha;
+        local_down_element_y = data_server_alpha;
     }
     else if ( this_element_element_type == END )
     {
         local_2dx = 2 * ( this_element_x - down_element_x );
-        local_up_element_y = my_data_server_beta;
+        local_up_element_y = data_server_beta;
     }
         
-    change_change = my_data_server_k * ( local_down_element_y - 2*this_element_y + local_up_element_y ) / local_2dx;;
+    change_change = data_server_k * ( local_down_element_y - 2*this_element_y + local_up_element_y ) / local_2dx;;
+
+    return 1;
 }
 

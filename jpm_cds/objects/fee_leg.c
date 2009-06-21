@@ -29,7 +29,7 @@
 
 using namespace std;
 
-void calculate_fee_leg( obj_loc_t obj_loc, int id )
+int calculate_fee_leg( obj_loc_t obj_loc, int id )
 {
     char* calendar = "NONE";
 
@@ -56,5 +56,7 @@ void calculate_fee_leg( obj_loc_t obj_loc, int id )
 
 cout << "calculate_fee_leg result: " << result << endl;
 
+
+    return 1;
 }
 

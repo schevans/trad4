@@ -3,9 +3,9 @@
 # This code is released under the BSD licence. For details see $APP_ROOT/LICENCE
 
 sub
-    change my_changes[NUM_NODES]
-    element my_elements[NUM_NODES]
-    data_server my_data_server
+    change changes[NUM_NODES]
+    element elements[NUM_NODES]
+    data_server data_server
 
 static
     int counter
