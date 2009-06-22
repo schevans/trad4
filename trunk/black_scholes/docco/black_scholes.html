@@ -29,23 +29,23 @@ black_scholes
 <table border="1">
 <tr>
 <td>Application version</td>
-<td></td>
+<td><a  href="https://sourceforge.net/project/downloading.php?group_id=202177&filename=trad4_v3_0.tar.gz&a=45202500">3.0</a></td>
 </tr>
 <tr>
 <td>Trad4 version</td>
-<td></td>
+<td><a  href="https://sourceforge.net/project/downloading.php?group_id=202177&filename=trad4_v3_0.tar.gz&a=45202500">3.0</a></td>
 </tr>
 <tr>
 <td>Document version</td>
-<td></td>
+<td>3.0</td>
 </tr>
 <tr>
 <td>Author</td>
-<td></td>
+<td>schevans</td>
 </tr>
 <tr>
 <td>Date</td>
-<td></td>
+<td>22-06-09</td>
 </tr>
 </table>
 
@@ -67,7 +67,7 @@ This document originally appeared in the 2.0_beta_04 version of The Manual. It i
 </p>
 <h2><a name="the_equation">The Equation</a></h2>
 <p>
-The full equation for the price of a call (c) and put option (p) is given by:
+The full equation for the price of a call (c) and put option (p) is given by<a href="#footnote1">[1]</a>:
 </p>
 <blockquote><pre>
     c = S*N(d1) - Ke(-rT) * N(d2)
@@ -151,7 +151,7 @@ For the next tier we'll need to decide how to arrange c, p, d1 and d2. Looking a
 </p>
 <h2><a name="the_greeks"></a>Introducing the Greeks</h2>
 <p>
-At this stage we need to introduce the greeks:
+At this stage we need to introduce the greeks<a href="#footnote2">[2]</a>:
 </p>
 <table border="1">
 <tr><td></td><td>Call</td><td>Put</td></tr>
@@ -180,7 +180,22 @@ We'll do this for the rest of the greeks, making some changes in the process.
 </p>
 <img src="abstract.jpg" alt="abstract"/>
 <p>
-Price has been broken out into it's own object and bs_delta now just provides Npd1 etc. In this way, once bs_delta is completed the T4 objects can all run concurrently. It tuns out one of the terms in price, KTe(-rT)*N(D2), is actually rho so it makes sense to re-use that value rather than computing two KTe(-rT)*N(D2)s in different objects. Again this is just the implementation I've chosen - feel free to arrange your graph as you please.
+Price has been broken out into it's own object and bs_delta now just provides Npd1 etc. In this way, once bs_delta is completed the T4 objects can all run concurrently.
 </p>
+<hr />
+<p><a name="footnote1">1 Hull:"Options, Futures and Other Derivatives", Fifth Edition, p246</a></p>
+<p><a name="footnote2">2 http://en.wikipedia.org/wiki/Black_scholes#Greeks</a></p>
+<!-- ==================================================================== -->
+
+<div align="center" class="copyright">
+Copyright (c) Steve Evans 2009
+</div>
+
+<!-- ==================================================================== -->
+<br />
+<center>
+<a href="http://sourceforge.net/projects/trad4"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=202177&type=16" width="150" height="40" border="0" alt="Get trad4 at SourceForge.net. Fast, secure and Free Open Source software downloads" /></a>
+</center>
+
 </body>
 </html>
