@@ -21,16 +21,20 @@ general_computer
 
 <table border="1">
 <tr>
-<td>Download version</td>
-<td><a  href="https://sourceforge.net/project/showfiles.php?group_id=202177&package_id=309900">1.0</a></td>
+<td>Application version</td>
+<td><a  href="https://sourceforge.net/project/downloading.php?group_id=202177&filename=trad4_v3_0.tar.gz&a=45202500">3.0</a></td>
 </tr>
 <tr>
-<td>Download licence</td>
+<td>Application licence</td>
 <td>BSD</td>
 </tr>
 <tr>
 <td>Trad4 version</td>
-<td><a  href="https://sourceforge.net/project/showfiles.php?group_id=202177&package_id=309900">2.0.2</a></td>
+<td><a  href="https://sourceforge.net/project/downloading.php?group_id=202177&filename=trad4_v3_0.tar.gz&a=45202500">3.0</a></td>
+</tr>
+<tr>
+<td>Document version</td>
+<td>3.0</td>
 </tr>
 <tr>
 <td>Author</td>
@@ -38,7 +42,7 @@ general_computer
 </tr>
 <tr>
 <td>Date</td>
-<td>13-01-09</td>
+<td>23-06-09</td>
 </tr>
 </table>
 
@@ -49,7 +53,6 @@ general_computer
 <li><a href="#the_model">The Model</a></li>
 <li><a href="#implementation">Implementation</a></li>
 <li><a href="#operation">Operation</a></li>
-<li><a href="#further_work">Further work</a></li>
 </ul>
 
 <hr />
@@ -62,10 +65,10 @@ This is a working model of what was a thought-experiment discussed in Appendix C
 The plan is to create a series of objects that perform primitive mathematical functions - plus, minus, natural_log, cume_norm_dist etc., and configure the relationship between these objects to solve a particular problem. The interesting thing about this approach is that once we've created the application, we can configure the relationship between the objects at run-time by manipulating data in the database.
 </p>
 <p>
-Inheritance of interface was introduced to allow for this model to be built. This allows for types with different functions to share the same interface to a base type (analogous to a pure virtual base class in C++). In this model our base type is called 'numeric', and this in turn allows for any type to connect to any other because any derived type 'is a' numeric. This will be covered further below and in much greater detail once I get round to updating The Manual.
+Inheritance of interface was introduced to allow for this model to be built. This allows for types with different functions to share the same interface to a base type (analogous to a pure virtual base class in C++). In this model our base type is called 'numeric', and this in turn allows for any type to connect to any other because any derived type 'is a' numeric.
 </p>
 <p>
-We'll start with a simple arithmetical example before moving onto the more complex problem of bs_delta as discussed in Appendix C. To switch between these data sets set the APP_DB env var to point to the database you want to run against and restart the application:
+We'll start with a simple arithmetical example before moving onto the more complex problem of computing delta for a European call option as addressed in the <a href="http://trad4.sourceforge.net/black_scholes/black_scholes.html">black_scholes</a> application. To switch between these data sets set the APP_DB env var to point to the database you want to run against and restart the application:
 </p>
 <blockquote><pre>
 general_computer$ export APP_DB=data/general_computer_bs_delta.db
@@ -309,13 +312,7 @@ All tiers ran 18 objects in 0.0105832 seconds.
 <p>
 For the record, the value of delta=0.779131 is correct, as described in black_scholes/spreadsheets/WorkedExample1.ods
 </p>
-<h2><a name="further_work">Further work</a></h2>
-<p>
-Firstly, I'll be the first to admit that setting up the data is very fiddly work, and I've been thinking about writing/adapting an equation parser to generate the data sets.
-</p>
-<p>
-Second, the model itself could be extended to include trigonometric operators etc.
-</p>
+
 <!-- ==================================================================== -->
 
 <div align="center" class="copyright">
@@ -328,7 +325,6 @@ Copyright (c) Steve Evans 2009
 <center>
 <a href="http://sourceforge.net/projects/trad4"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=202177&type=16" width="150" height="40" border="0" alt="Get trad4 at SourceForge.net. Fast, secure and Free Open Source software downloads" /></a>
 </center>
-
 
 </body>
 </html>
