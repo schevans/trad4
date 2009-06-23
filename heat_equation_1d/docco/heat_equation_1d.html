@@ -39,27 +39,31 @@ heat_equation_1d
 </h1>
 <table border="1">
 <tr>
-<td>Download version</td>
-<td><a  href="https://sourceforge.net/project/showfiles.php?group_id=202177&package_id=307767&release_id=656662">1.0</a></td>
+<td>Application version</td>
+<td><a  href="https://sourceforge.net/project/downloading.php?group_id=202177&filename=trad4_v3_0.tar.gz&a=45202500">3.0</a></td>
 </tr>
 <tr>
-<td>Download licence</td>
-<td><a  href="http://trad4.cvs.sourceforge.net/viewvc/trad4/heat_equation_1d/LICENCE?revision=1.2&view=markup">BSD</a></td>
+<td>Application licence</td>
+<td>BSD</td>
 </tr>
 <tr>
 <td>Trad4 version</td>
-<td><a  href="https://sourceforge.net/project/showfiles.php?group_id=202177&package_id=307767&release_id=656662">2.0.1</a></td>
+<td><a  href="https://sourceforge.net/project/downloading.php?group_id=202177&filename=trad4_v3_0.tar.gz&a=45202500">3.0</a></td>
 </tr>
-
+<tr>
+<td>Document version</td>
+<td>3.0</td>
+</tr>
 <tr>
 <td>Author</td>
 <td>schevans</td>
 </tr>
 <tr>
 <td>Date</td>
-<td>29-01-09</td>
+<td>23-06-09</td>
 </tr>
 </table>
+
 
 <ul>
 <li><a href="#introduction">Introduction</a></li>
@@ -721,7 +725,7 @@ Divergence is caused by the curve being steeper than the step_size can support, 
 Database values like k, alpha and beta are simple to change through a sql-prompt:
 </p>
 <blockquote><pre>
-$ $SQLITE -column -header $APP_DB
+$ t4db
 SQL> update data_server set k=0.3;
 </blockquote></pre>
 <p>
@@ -752,9 +756,7 @@ There is a 100-node grid checked in to worked_example2 but due to a limitation i
 heat_equation_1d$ t4p
 heat_equation_1d$ make all
 </blockquote></pre>
-<p>
-I realise this situation is far from ideal and I will be addressing this in the near future.
-</p>
+
 <!-- ==================================================================== -->
 
 <div align="center" class="copyright">
@@ -764,6 +766,7 @@ Copyright (c) Steve Evans 2009
 <!-- ==================================================================== -->
 
 <br />
+
 <center>
 <a href="http://sourceforge.net/projects/trad4"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=202177&type=16" width="150" height="40" border="0" alt="Get trad4 at SourceForge.net. Fast, secure and Free Open Source software downloads" /></a>
 </center>
