@@ -507,7 +507,7 @@ sub LoadDefs() {
         }
     }
 
-    if ( $counter == 0 ) {
+    if ( $counter == 1 ) {
         
         print "Error: object_types.t4s is empty.\n";
         ExitOnError();
