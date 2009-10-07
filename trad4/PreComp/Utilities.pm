@@ -932,6 +932,19 @@ sub Validate($$) {
             print "Error: Type \'$type\' has a sub type \'$var_type\', which is not found in $ENV{SRC_DIR}.\n";
             ExitOnError();
         }
+
+        if ( IsArray( $var_name ) ) {
+
+            if ( ! GetArraySize( $master_hash, $var_name ) ) {
+
+                my $size = $var_name;
+                $size =~ s/.*\[//g;
+                $size =~ s/\]//g;
+
+                print "Error: Type \'$type\' has an array variable \'$var_name\' but $size is not defined in constants.t4s.\n";
+                ExitOnError();
+            }
+        }
     }
 
     my $type_id =  $master_hash->{$type}->{type_id};
@@ -1001,6 +1014,19 @@ sub Validate($$) {
 
                 ExitOnError();
 
+            }
+
+            if ( IsArray( $var_name ) ) {
+
+                if ( ! GetArraySize( $master_hash, $var_name ) ) {
+        
+                    my $size = $var_name;
+                    $size =~ s/.*\[//g;
+                    $size =~ s/\]//g;
+
+                    print "Error: Type \'$type\' has an array variable \'$var_name\' but $size is not defined in constants.t4s.\n";
+                    ExitOnError();
+                }
             }
         }
     }
