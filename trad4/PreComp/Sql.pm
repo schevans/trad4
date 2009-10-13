@@ -268,7 +268,7 @@ sub GenerateExtraDummyData($$$$$$) {
         my $i;
         for ( $i = 1 ; $i <= $depth ; $i++ ) {
 
-            print $FHD ", 0";
+            print $FHD ", 1";
         }
 
         print $FHD ", $PI";

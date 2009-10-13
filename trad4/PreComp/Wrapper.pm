@@ -505,7 +505,6 @@ sub GenerateNewLoader($$$) {
             $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
 
             if ( exists $master_hash->{structures}->{data}->{$var_type} or PreComp::Utilities::IsArray( $var_name ) ) {
-
                 $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
                 my $function_name = "load_$type"."_$var_name_stripped";
 
@@ -566,9 +565,17 @@ sub GenerateLoaderCallback($$$$) {
             $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
             $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
 
-            if ( exists $master_hash->{structures}->{data}->{$var_type} or PreComp::Utilities::IsArray( $var_name ) ) {
+            if ( exists $master_hash->{structures}->{data}->{$var_type} ) {
 
                 # Do nothing
+            }
+            elsif ( PreComp::Utilities::IsArray( $var_name ) ) {
+
+                print $FHD "    for ( int i = 0 ; i < ".PreComp::Utilities::GetArraySize( $master_hash, $var_name )." ; i++ )\n";
+                print $FHD "    {\n";
+                print $FHD "        $type"."_$var_name_stripped"."[i] = 0;\n";
+                print $FHD "    }\n";
+
             }
             elsif ( exists $master_hash->{$var_type} ) {
 
