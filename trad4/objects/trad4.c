@@ -90,7 +90,6 @@ void run_trad4() {
     {
         if ( obj_loc[i] )
         {
-cout << "Setting for " << i << endl;
             tier_manager[((object_header*)obj_loc[i])->tier][tier_manager[((object_header*)obj_loc[i])->tier][0]] = i;
             tier_manager[((object_header*)obj_loc[i])->tier][0]++;
         }
