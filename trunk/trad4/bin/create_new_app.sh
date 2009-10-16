@@ -30,6 +30,8 @@ then
     echo >> ../../$NEW_APP/$NEW_APP.conf
     echo "NUM_THREADS=4; export NUM_THREADS" >> ../../$NEW_APP/$NEW_APP.conf
     echo >> ../../$NEW_APP/$NEW_APP.conf
+    echo "TIMING_DEBUG=1; export TIMING_DEBUG" >> ../../$NEW_APP/$NEW_APP.conf
+    echo >> ../../$NEW_APP/$NEW_APP.conf
     echo "APP_ROOT=\`pwd\` ; export APP_ROOT" >> ../../$NEW_APP/$NEW_APP.conf
     echo >> ../../$NEW_APP/$NEW_APP.conf
     echo "APP_DB=\$APP_ROOT/data/$NEW_APP.db; export APP_DB" >> ../../$NEW_APP/$NEW_APP.conf
