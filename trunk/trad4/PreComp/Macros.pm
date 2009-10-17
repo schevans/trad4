@@ -79,19 +79,21 @@ sub Generate($$) {
 
                 }
 
-                my $function = NameToFunction( $printable->{name} );
-
-                if ( $function =~ /\( \w+ \)/ and $printable->{code} =~ /\[\w+\]$/ ) {
-
-                    $function =~ s/\(.*\)//;
-                    $printable->{code} =~ s/\[\w+\]$//;
-                }
-
                 if ( $file_section =~ /comment/ ) {
 
-                    print $FHD "\t$printable->{type} $function\n";
+                    my $description = NameToFunctionDescription( $printable->{name} );
+                    print $FHD "\t$printable->{type} $description\n";
                 }
                 else {
+
+                    my $function = NameToFunction( $printable->{name} );
+
+                    if ( $function =~ /\( \w+ \)/ and $printable->{code} =~ /\[\w+\]$/ ) {
+
+                        $function =~ s/\(.*\)//;
+                        $printable->{code} =~ s/\[\w+\]$//;
+                    }
+
                     print $FHD "#define $function $printable->{code}\n";
                 }
 
@@ -141,6 +143,37 @@ sub NameToFunction($) {
 
     return $name;
 }
+
+sub NameToFunctionDescription($) {
+    my $name = shift;
+
+    if ( PreComp::Utilities::IsArray( $name )) {
+
+        return $name;
+    }
+
+    while ( $name =~ /\[/g ) {
+
+        my @tmp_tuple;
+
+        @tmp_tuple = split /\[/, $name;
+        @tmp_tuple = split /\]/, $tmp_tuple[1];
+
+        my $array_length = $tmp_tuple[0];
+
+        $name =~ s/\[$array_length\]//;
+
+        $name =~ s/$/($array_length,/;
+
+    }
+
+    $name =~ s/\(/( /g;
+    $name =~ s/,\(/,/g;
+    $name =~ s/,$/ )/g;
+
+    return $name;
+}
+
 
 sub GetPrintablesFromSection($$$) {
     my $master_hash = shift;
