@@ -227,20 +227,38 @@ sub LoadAppConstants() {
 
     close APP_CONSTANTS_FILE;
 
+    my ( $expression, $orig_expression );
+
     foreach $expression_name ( keys %{$expression_hash} ) {
 
         $expression = $expression_hash->{$expression_name};
+        $orig_expression = $expression;
 
         foreach $constant ( keys %{$constants_hash} ) {
 
             $expression =~ s/$constant/$constants_hash->{$constant}/g;
         }
 
+        # Disable any errors coming from eval - will be reported below.
+        open DEV_NULL, ">/dev/null";
+        my $ORIG_STDERR = *STDERR;
+        *STDERR = *DEV_NULL;
+
         $value = eval $expression;
+
+        # Restore stderr.
+        *STDERR = $ORIG_STDERR;
+        close DEV_NULL;
 
         if ( ! $@ ) {
 
             $constants_hash->{$expression_name} = $value;
+        }
+        else {
+
+            print "Error: Can't evaluate expression \'$expression_name = $orig_expression in constants.t4s.\n";
+            ExitOnError();
+
         }
     }
 
@@ -248,11 +266,13 @@ sub LoadAppConstants() {
 
         if ( $constants_hash->{$expression_name} =~ /[A-Za-z_]+/ ) {
 
+            if ( $constants_hash->{$constants_hash->{$expression_name}} ) {
 
-           if ( $constants_hash->{$constants_hash->{$expression_name}} =~ /^(\d+\.?\d*|\.\d+)$/ ) {
+               if ( $constants_hash->{$constants_hash->{$expression_name}} =~ /^(\d+\.?\d*|\.\d+)$/ ) {
 
-                $constants_hash->{$expression_name} = $constants_hash->{$constants_hash->{$expression_name}};
-            } 
+                    $constants_hash->{$expression_name} = $constants_hash->{$constants_hash->{$expression_name}};
+                } 
+            }
         }
     }
 
@@ -260,7 +280,7 @@ sub LoadAppConstants() {
  
         if ( $constants_hash->{$expression_name} =~ /[A-Za-z_]+/ ) {
 
-            print "NEW Error: Can't evaluate expression \'$expression_name = $constants_hash->{$expression_name}\' in constants.t4s.\n";
+            print "Error: Can't evaluate expression \'$expression_name = $constants_hash->{$expression_name}\' in constants.t4s.\n";
             ExitOnError();
         }
     }
