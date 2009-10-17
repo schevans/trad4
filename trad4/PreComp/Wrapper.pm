@@ -81,98 +81,6 @@ sub Generate($$$$$) {
     PreComp::Utilities::CloseFile();
 }
 
-sub generate_calculate($$$$)
-{
-    my $master_hash = shift;
-    my $struct_hash = shift;
-    my $name = shift;
-    my $FHD = shift;
-
-    my $obj_hash = $master_hash->{$name};
-
-    print $FHD "extern \"C\" void calculate( obj_loc_t obj_loc, int id )\n";
-    print $FHD "{\n";
-    print $FHD "    DEBUG( \"calculate_$obj_hash->{name}( \" << (($name*)obj_loc[id])->name << \" )\" );\n";
-    print $FHD "\n";
-    print $FHD "    DEBUG_FINE( \"static:\" );\n";
-
-    foreach $key ( @{$obj_hash->{data}->{static_order}} ) {
-
-        print $FHD "    DEBUG_FINE( \"\\t$obj_hash->{name}_$key: \" << $obj_hash->{name}_$key );\n";
-
-    }
-
-    print $FHD "\n";
-    print $FHD "    DEBUG_FINE( \"sub:\" );\n";
-
-    foreach $key ( @{$obj_hash->{data}->{sub_order}} ) {
-
-        print $FHD "    DEBUG_FINE( \"\t$key:\" );\n";
-
-        foreach $key2 ( @{$master_hash->{$obj_hash->{data}->{sub}->{$key}}->{data}->{pub_order}} ) {
-
-            $key_type = $master_hash->{$obj_hash->{data}->{sub}->{$key}}->{data}->{pub}->{$key2};
-
-            if ( $struct_hash->{$key_type} ) {
-
-                foreach $struct_type ( keys %{$struct_hash->{$key_type}->{data}} ) {
-
-                    $struct_type_short = $struct_type;
-                    $struct_type_short =~ s/\[.*\]//g;
-
-                    if ( $struct_type eq $struct_type_short ) {
-
-                        print $FHD "    DEBUG_FINE( \"\\t\\t$key"."_$key2.$struct_type_short: \" << $key"."_$key2.$struct_type_short );\n";
-
-                    }
-                }
-            }
-            else {
-
-                print $FHD "    DEBUG_FINE( \"\\t\\t$key"."_$key2: \" << $key"."_$key2 );\n";
-            }
-        }
-
-        foreach $key2 ( @{$master_hash->{$obj_hash->{data}->{sub}->{$key}}->{data}->{static_order}} ){ 
-
-            print $FHD "    DEBUG_FINE( \"\\t\\t$key"."_$key2: \" << $key"."_$key2 );\n";
-        }
-    }
-
-    print $FHD "\n";
-    print $FHD "    calculate_$obj_hash->{name}( obj_loc, id );\n";
-    print $FHD "\n";
-    print $FHD "    DEBUG_FINE( \"pub:\");\n";
-
-    foreach $key ( @{$obj_hash->{data}->{pub_order}} ) {
-
-        $key_type = $obj_hash->{data}->{pub}->{$key};
-
-        if ( $struct_hash->{$key_type} ) {
-
-            foreach $struct_type ( keys %{$struct_hash->{$key_type}->{data}} ) {
-
-                $struct_type_short = $struct_type;
-                $struct_type_short =~ s/\[.*\]//g;
-
-                if ( $struct_type eq $struct_type_short ) {
-
-                    print $FHD "    DEBUG( \"\\t$obj_hash->{name}_$key.$struct_type_short: \" << $obj_hash->{name}_$key.$struct_type_short );\n";
-
-                }
-            }
-        }
-        else {
-
-            print $FHD "    DEBUG( \"\\t$obj_hash->{name}_$key: \" << $obj_hash->{name}_$key );\n";
-        }
-
-    }
-    print $FHD "\n";
-    print $FHD "}\n";
-
-}
-
 #######################################################
 # pv3 stuff..
 
@@ -732,6 +640,12 @@ sub GenerateCalculate($$$) {
     PrintSectionDebug( $master_hash, $master_hash->{$type}->{static}, $type, $FHD );
     print $FHD "\n";
 
+    print $FHD "    if ( object_status(id) == GIGO && ! object_init(id) )\n";
+    print $FHD "    {\n";
+    print $FHD "        cerr << \"Warning: Object \" << id << \" type $type not firing as it hasn't initialised and it's GIGO.\" << endl;\n";
+    print $FHD "        return;\n";
+    print $FHD "    }\n";
+    print $FHD "\n";
 
     my $var_name;
 
