@@ -14,7 +14,10 @@ echo "delete from object;" | $SQLITE $APP_DB
 
 DATA_DIR=$1
 
-cd $APP_ROOT/data/$DATA_DIR
+if [ ! "$DATA_DIR" = "." ]
+then
+    cd $APP_ROOT/data/$DATA_DIR
+fi
 
 for i in `ls *.sql`
 do
