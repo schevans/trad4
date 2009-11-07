@@ -167,29 +167,17 @@ PreComp::Makefiles::Generate( $master_hash );
 print "Generating sql..\n";
 PreComp::SqlCommon::Generate( $master_hash );
 
-if ( $struct_hash ) {
+print "Generating structures..\n";
+PreComp::Structures::Generate( $struct_hash );
 
-    print "Generating structures..\n";
-    PreComp::Structures::Generate( $struct_hash );
-}
+print "Generating enums..\n";
+PreComp::Enums::Generate( $enum_hash );
 
-if ( $enum_hash ) {
+print "Generating constants..\n";
+PreComp::AppConstants::Generate( $constants_hash );
 
-    print "Generating enums..\n";
-    PreComp::Enums::Generate( $enum_hash );
-}
-
-if ( $constants_hash ) {
-
-    print "Generating constants..\n";
-    PreComp::AppConstants::Generate( $constants_hash );
-}
-
-if ( $alias_hash ) {
-
-    print "Generating aliases..\n";
-    PreComp::Aliases::Generate( $alias_hash );
-}
+print "Generating aliases..\n";
+PreComp::Aliases::Generate( $alias_hash );
 
 if( $opts{d} ) {
 
@@ -197,11 +185,7 @@ if( $opts{d} ) {
     PreComp::Docco::Generate( $master_hash );
 }
 
-
 # Hack alert
-`touch $ENV{APP_ROOT}/gen/objects/structures.h`;
-`touch $ENV{APP_ROOT}/gen/objects/enums.h`;
-`touch $ENV{APP_ROOT}/gen/objects/constants.h`;
 `touch $ENV{APP_ROOT}/objects/common.h`;
 
 my $main_file = "$ENV{APP_ROOT}/objects/main.c";
