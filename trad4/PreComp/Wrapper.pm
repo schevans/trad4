@@ -230,7 +230,7 @@ sub PrintExtraLoaderCallback($$) {
     print $FHD "    if ( $if_string )\n";
     print $FHD "    {\n";
 
-    print $FHD "        cerr << \"Error in load_$var_type"."_$var_name_stripped: The number of rows in $var_type.table is greater than $vec_size. Truncating data in $var_type"."_$var_name_stripped structure to $vec_size elements. Suggest you fix the data or create a new type with larger arrays and migrate your objects across.\" << endl;\n";
+    print $FHD "        cerr << \"Error in load_$var_type"."_$var_name_stripped: The number of rows in $table_name.table is greater than $vec_size. Truncating data in $var_type"."_$var_name_stripped structure to $vec_size elements. Suggest you fix the data or create a new type with larger arrays and migrate your objects across.\" << endl;\n";
     print $FHD "    }\n";
     print $FHD "    else\n";
     print $FHD "    {\n";
