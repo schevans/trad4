@@ -325,7 +325,7 @@ void set_timestamp( obj_loc_t obj_loc, int id )
     double timestamp_double = tim.tv_sec + (tim.tv_usec / 1000000.0);
     long long timestamp = (long long)(timestamp_double * 1000000 );
 
-    //std::cout << "setting timestamp: " << timestamp << std::endl;
+    //std::cout << "setting timestamp(" << id << "): " << timestamp << std::endl;
 
     *(long long*)obj_loc[id] = timestamp;
 }
@@ -504,7 +504,7 @@ void load_objects( int initial_load )
                 else
                 {
                     object_status( i ) = GIGO;
-                    cerr << "Error: Object " << i << " is GIGO as it hasn't initilised and it failed validation ." << endl;
+                    cerr << "Error: Object " << i << " is GIGO as it hasn't initilised and it failed validation." << endl;
                 }
 
                 set_timestamp( obj_loc, i );
