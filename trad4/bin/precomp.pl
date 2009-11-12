@@ -151,6 +151,8 @@ foreach $type ( keys %doing ) {
     PreComp::Utilities::Validate( $new_master_hash, $type );
 }
 
+PreComp::Structures::Validate( $new_master_hash );
+
 foreach $type ( keys %doing ) {
 
     print "Generating $type..\n";

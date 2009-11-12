@@ -4,9 +4,11 @@
 
 package PreComp::Structures;
 
-use Data::Dumper;
 use warnings;
+use strict;
 
+use Data::Dumper;
+use PreComp::Utilities;
 
 sub Generate($) {
     my $struct_hash = shift;
@@ -21,6 +23,8 @@ sub Generate($) {
     print $FHD "#include \"constants.h\"\n";
     print $FHD "#include \"aliases.h\"\n";
     print $FHD "\n";
+
+    my ( $structure, $var );
 
     foreach $structure ( @{$struct_hash->{order}} ) {
 
@@ -40,6 +44,31 @@ sub Generate($) {
     PreComp::Utilities::CloseFile();
 }
 
+sub Validate($) {
+    my $master_hash = shift;
+
+    my ( $structure, $var_name );
+
+    foreach $structure ( @{$master_hash->{structures}->{order}} ) {
+
+        foreach $var_name ( @{$master_hash->{structures}->{data}->{$structure}->{order}} ) {
+
+            if ( PreComp::Utilities::IsArray( $var_name ) ) {
+
+                if ( ! PreComp::Utilities::GetArraySize( $master_hash, $var_name ) ) {
+
+                    my $size = $var_name;
+                    $size =~ s/.*\[//g;
+                    $size =~ s/\]//g;
+
+                    print "Error: Structure \'$structure\' has an array variable \'$var_name\' but $size is not defined in constants.t4s.\n";
+                    PreComp::Utilities::ExitOnError();
+                }
+            }
+        }
+
+    }
+}
 
 1;
 
