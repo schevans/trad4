@@ -1026,6 +1026,12 @@ sub Validate($$) {
             {
                 if ( exists $master_hash->{structures}->{data}->{$var_type} )
                 {
+                    if ( $var_name eq $var_type ) {
+
+                        print "Error: Type \'$type\' has a structure \'$var_name\' called \'$var_type\'. Please rename the structure in $type.t4.\n";
+                        ExitOnError();
+                    } 
+
                     next;
                 }
 
