@@ -1009,6 +1009,19 @@ sub Validate($$) {
 
             $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
 
+            if ( IsArray( $var_name ) ) {
+
+                if ( ! GetArraySize( $master_hash, $var_name ) ) {
+        
+                    my $size = $var_name;
+                    $size =~ s/.*\[//g;
+                    $size =~ s/\]//g;
+
+                    print "Error: Type \'$type\' has an array variable \'$var_name\' but $size is not defined in constants.t4s.\n";
+                    ExitOnError();
+                }
+            }
+
             if ( $var_type !~ /int|double|float|long|char/ )
             {
                 if ( exists $master_hash->{structures}->{data}->{$var_type} )
@@ -1034,19 +1047,6 @@ sub Validate($$) {
 
                 ExitOnError();
 
-            }
-
-            if ( IsArray( $var_name ) ) {
-
-                if ( ! GetArraySize( $master_hash, $var_name ) ) {
-        
-                    my $size = $var_name;
-                    $size =~ s/.*\[//g;
-                    $size =~ s/\]//g;
-
-                    print "Error: Type \'$type\' has an array variable \'$var_name\' but $size is not defined in constants.t4s.\n";
-                    ExitOnError();
-                }
             }
         }
     }
