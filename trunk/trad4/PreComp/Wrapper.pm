@@ -159,14 +159,78 @@ sub GenerateExtraSection($$$$$$$) {
     }
     elsif ( PreComp::Utilities::IsArray( $var_name ) ) {
 
-        PrintExtraLoaderCallback( $master_hash, $type_id, $table_name, $var_name, $var_type, $depth, $FHD );
-        PrintExtraLoader( $master_hash, $type_id, $table_name, $var_name, $var_type, $depth, 1, $FHD );
-
+        PrintArrayLoaderCallback( $master_hash, $type_id, $table_name, $var_name, $var_type, $depth, $FHD );
+        PrintArrayLoader( $master_hash, $type_id, $table_name, $var_name, $var_type, $depth, 1, $FHD );
     }
     else {
 
 print "Error?\n";
     }
+}
+
+sub PrintArrayLoaderCallback($$) {
+    my $master_hash = shift;
+    my $type_id = shift;
+    my $table_name = shift;
+    my $var_name = shift;
+    my $var_type = shift;
+    my $depth = shift;
+    my $FHD = shift;
+
+    my $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
+    my $function_name = "load_$table_name"."_callback";
+
+    my $vec_size = PreComp::Utilities::GetArraySize( $master_hash, $var_name );
+
+    print $FHD "static int $function_name(void *obj_loc_v, int argc, char **row, char **azColName)\n";
+    print $FHD "{\n";
+    print $FHD "    unsigned char** obj_loc = (unsigned char**)obj_loc_v;\n";
+    print $FHD "    int id = atoi(row[0]);\n";
+
+    my $counter = 1;
+
+    my $arg_string="(";
+    my $last_ord = "";
+
+    my $i;
+    for ( $i = 1 ; $i < $depth ; $i++ ) {
+
+        print $FHD "    int ord$i = atoi(row[$counter]);\n";
+
+        $last_ord = "ord$i";
+
+        if ( $counter > 1 ) {
+            $arg_string = $arg_string.", ";
+        }
+
+        $arg_string = $arg_string." ord$i";
+
+        $counter = $counter+1;
+    }
+
+    print $FHD "\n";
+
+    my $col;
+
+    for ( $col = 0 ; $col < $vec_size ; $col++ ) {
+
+        if ( $depth == 1 and $arg_string =~ /^\(/ ) {
+            print $FHD "   $table_name\[$col\] = ".PreComp::Utilities::NewType2atoX( $master_hash, $var_type )."(row[$counter]);\n";
+
+        }
+        else {
+
+            print $FHD "    $table_name$arg_string, $col ) = ".PreComp::Utilities::NewType2atoX( $master_hash, $var_type )."(row[$counter]);\n";
+
+        }
+
+        $counter = $counter+1;
+    }
+
+    print $FHD "\n";
+    print $FHD "    return 0;\n";
+    print $FHD "}\n";
+    print $FHD "\n";
 }
 
 sub PrintExtraLoaderCallback($$) {
@@ -267,6 +331,65 @@ sub PrintExtraLoaderCallback($$) {
     print $FHD "    return 0;\n";
     print $FHD "}\n";
     print $FHD "\n";
+}
+
+sub PrintArrayLoader($$) {
+    my $master_hash = shift;
+    my $type_id = shift;
+    my $table_name = shift;
+    my $var_name = shift;
+    my $var_type = shift;
+    my $depth = shift;
+    my $has_primitives = shift;
+    my $FHD = shift; 
+
+    my $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
+    my $function_name = "load_$table_name";
+
+    print $FHD "void $function_name( obj_loc_t obj_loc, sqlite3* db, int initial_load )\n";
+    print $FHD "{\n";
+    print $FHD "    cout << \"\t$function_name()\" << endl;\n";
+    print $FHD "\n";
+
+    if ( $has_primitives ) {
+
+        print $FHD "    char *zErrMsg = 0;\n";
+        print $FHD "\n";
+        print $FHD "    std::ostringstream dbstream;\n";
+        print $FHD "    dbstream << \"select object.id";
+
+        my $i;
+        for ( $i = 1 ; $i < $depth ; $i++ ) {
+
+            print $FHD ", $table_name.ord$i";
+        }
+
+        my $vec_size = PreComp::Utilities::GetArraySize( $master_hash, $var_name );
+
+        my $col;
+
+        for ( $col = 0 ; $col < $vec_size ; $col++ ) {
+
+            print $FHD ", $table_name.col$col";
+        }
+
+        print $FHD " from object, $table_name where object.id = $table_name.id and object.type_id = $type_id\";\n";
+
+        print $FHD "    if ( initial_load != 1 )\n";
+        print $FHD "        dbstream << \" and object.need_reload=1\";\n";
+        print $FHD "\n";
+
+        print $FHD "\n";
+        print $FHD "    if( sqlite3_exec(db, dbstream.str().c_str(), $function_name"."_callback, obj_loc, &zErrMsg) != SQLITE_OK ){\n";
+        print $FHD "        fprintf(stderr, \"SQL error: %s. File %s, line %d.\\n\", zErrMsg, __FILE__, __LINE__);\n";
+        print $FHD "        sqlite3_free(zErrMsg);\n";
+        print $FHD "        exit(0);\n";
+        print $FHD "    }\n";
+        print $FHD "\n";
+
+    }
+
+    print $FHD "}\n";
 }
 
 sub PrintExtraLoader($$) {

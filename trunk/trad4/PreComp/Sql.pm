@@ -109,13 +109,19 @@ sub GenerateExtraTables($$$$$) {
         print $FHD "    id int";
 
         my $i;
-        for ( $i = 1 ; $i <= $depth ; $i++ ) {
+        for ( $i = 1 ; $i < $depth ; $i++ ) {
 
             print $FHD ",\n    ord$i int";
         }
 
-        print $FHD ",\n    $var_name_stripped ".PreComp::Utilities::Type2Sql( $var_type )."\n";
-        print $FHD ");\n";
+        my $array_size = PreComp::Utilities::GetArraySize( $master_hash, $var_name );
+
+        for ( $i = 0 ; $i < $array_size ; $i++ ) {
+
+            print $FHD ",\n    col$i int";
+        }
+
+        print $FHD "\n);\n";
         PreComp::Utilities::CloseFile();
     }
 }
