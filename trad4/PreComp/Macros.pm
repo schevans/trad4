@@ -79,20 +79,30 @@ sub Generate($$) {
 
                 }
 
+                my $function = NameToFunction( $printable->{name} );
+
+                if ( $function =~ /\( \w+ \)/ and $printable->{code} =~ /\[\w+\]$/ ) {
+
+                    $function =~ s/\(.*\)//;
+                    $printable->{code} =~ s/\[\w+\]$//;
+                }
+
                 if ( $file_section =~ /comment/ ) {
 
-                    my $description = NameToFunctionDescription( $printable->{name} );
-                    print $FHD "\t$printable->{type} $description\n";
+                    if ( PreComp::Utilities::IsArray( $printable->{name} ) ) {
+
+                        my $size = $printable->{name};
+                        $size =~ s/.*\[//g;
+                        $size =~ s/\]//g;
+
+                        $function = $function."[$size]";
+                    }
+
+                    $function =~ s/ index_/ /g;
+
+                    print $FHD "    $printable->{type} $function\n";
                 }
                 else {
-
-                    my $function = NameToFunction( $printable->{name} );
-
-                    if ( $function =~ /\( \w+ \)/ and $printable->{code} =~ /\[\w+\]$/ ) {
-
-                        $function =~ s/\(.*\)//;
-                        $printable->{code} =~ s/\[\w+\]$//;
-                    }
 
                     print $FHD "#define $function $printable->{code}\n";
                 }
@@ -143,37 +153,6 @@ sub NameToFunction($) {
 
     return $name;
 }
-
-sub NameToFunctionDescription($) {
-    my $name = shift;
-
-    if ( PreComp::Utilities::IsArray( $name )) {
-
-        return $name;
-    }
-
-    while ( $name =~ /\[/g ) {
-
-        my @tmp_tuple;
-
-        @tmp_tuple = split /\[/, $name;
-        @tmp_tuple = split /\]/, $tmp_tuple[1];
-
-        my $array_length = $tmp_tuple[0];
-
-        $name =~ s/\[$array_length\]//;
-
-        $name =~ s/$/($array_length,/;
-
-    }
-
-    $name =~ s/\(/( /g;
-    $name =~ s/,\(/,/g;
-    $name =~ s/,$/ )/g;
-
-    return $name;
-}
-
 
 sub GetPrintablesFromSection($$$) {
     my $master_hash = shift;
