@@ -919,7 +919,7 @@ sub StripBrackets($) {
 sub IsArray($) {
     my $var_name = shift;
 
-    return ( $var_name =~ /\[\w+\]$/ );
+    return ( $var_name =~ /^\w+\[\w+\]$/ );
 }
 
 sub GetArraySize($$) {
