@@ -388,7 +388,7 @@ sub LoadStructures() {
 
         chomp $line;
 
-        if ( !$line or $line =~ /#/ ) {
+        if ( !$line or $line =~ /#/ or $line =~ /^\s+$/ ) {
             next;
         }
 
