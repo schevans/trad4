@@ -11,6 +11,8 @@
 #include <sstream>
 #include <iomanip>
 #include <sqlite3.h>
+#include <cstdio>
+
 
 #include "trad4.h"
 
@@ -362,6 +364,8 @@ void* thread_loop( void* thread_id )
             usleep(500);
         }
     }
+
+    return obj_loc[0];
 }
 
 void start_threads()

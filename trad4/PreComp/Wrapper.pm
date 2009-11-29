@@ -32,8 +32,8 @@ sub Generate($$$$$) {
     print $FHD "#include <cstdlib>\n";
     print $FHD "#include <cstring>\n";
     print $FHD "#include <sstream>\n";
+    print $FHD "#include <cstdio>\n";
 
-    print $FHD "\n";
     print $FHD "\n";
     print $FHD "#include \"trad4.h\"\n";
     print $FHD "#include \"$name.h\"\n";
