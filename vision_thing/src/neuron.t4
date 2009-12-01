@@ -1,0 +1,15 @@
+
+
+sub
+    input input
+
+static
+    double threshold
+    int random_seed
+    int image
+    double bump
+
+pub
+    weight_matrix my_weight_matrix
+    int output
+
