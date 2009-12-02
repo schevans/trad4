@@ -19,8 +19,8 @@ print OUTFILE "delete from object;\n";
 print OUTFILE "delete from input;\n";
 print OUTFILE "delete from neuron;\n";
 print OUTFILE "delete from input_images;\n";
-print OUTFILE "delete from input_images_rows;\n";
-print OUTFILE "delete from input_images_rows_row;\n";
+print OUTFILE "delete from input_images_row;\n";
+print OUTFILE "delete from input_images_row_col;\n";
 
 print OUTFILE "insert into object values ( $input_id, 1, 1, \"input\", 1, 1 );\n";
 print OUTFILE "insert into input values ( $input_id );\n";
@@ -47,9 +47,9 @@ while ( $row = <INFILE> ) {
     my @row_arr = split //, $row;
     my $column_counter;
 
-    print OUTFILE "insert into input_images_rows values ( $input_id, $image_ord, $row_counter );\n";
+    print OUTFILE "insert into input_images_row values ( $input_id, $image_ord, $row_counter );\n";
 
-    print OUTFILE "insert into input_images_rows_row values ( $input_id, $image_ord, $row_counter";
+    print OUTFILE "insert into input_images_row_col values ( $input_id, $image_ord, $row_counter";
 
 
 
