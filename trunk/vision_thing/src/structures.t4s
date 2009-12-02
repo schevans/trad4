@@ -1,0 +1,16 @@
+
+
+image_row
+   int col[NUM_COLS]
+
+image
+    image_row row[NUM_ROWS]
+
+
+weight_row
+    double weight[NUM_COLS]
+
+weight_matrix
+    weight_row rows[NUM_ROWS]
+
+
