@@ -1,0 +1,10 @@
+
+
+static
+    image images[NUM_IMAGES]
+
+pub
+    int image_number
+
+
+
