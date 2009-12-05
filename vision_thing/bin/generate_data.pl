@@ -23,7 +23,7 @@ print OUTFILE "delete from input_images_row;\n";
 print OUTFILE "delete from input_images_row_col;\n";
 
 print OUTFILE "insert into object values ( $input_id, 1, 1, \"input\", 0, 1 );\n";
-print OUTFILE "insert into input values ( $input_id );\n";
+print OUTFILE "insert into input values ( $input_id, 1 );\n";
 
 my $image;
 my $neuron_id;

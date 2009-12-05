@@ -1,4 +1,6 @@
 
+sub
+    neuron neuron
 
 static
     image images[NUM_IMAGES]
