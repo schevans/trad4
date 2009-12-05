@@ -1,6 +1,6 @@
 
 sub
-    neuron neuron
+    monitor monitor
 
 static
     image images[NUM_IMAGES]

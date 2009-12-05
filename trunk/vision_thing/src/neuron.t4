@@ -12,4 +12,5 @@ static
 pub
     weight_matrix weights
     int output
+    int correct
 

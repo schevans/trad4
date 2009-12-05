@@ -1,4 +1,5 @@
 #type_id, tier, name
 1,1,input
 2,2,neuron
+3,3,monitor
 

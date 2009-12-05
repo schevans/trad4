@@ -28,8 +28,6 @@ int calculate_input( obj_loc_t obj_loc, int id )
         }
     }
 
-    cout << endl;
-
 /*
     for ( int row = 0 ; row < NUM_ROWS ; row++ )
     {
