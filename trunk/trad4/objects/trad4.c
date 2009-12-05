@@ -101,8 +101,13 @@ void run_trad4() {
 
     for ( int tier=1 ; tier <= num_tiers ; tier++ )
     {
-        std::cout << "Checking tier " << tier << ". Num objects this tier: " << tier_manager[tier][0] - 1 << std::endl; 
+        if ( tier_manager[tier][0] - 1 > 0 )
+        {
+            std::cout << "Num objects in tier" << tier << ": " << tier_manager[tier][0] - 1 << std::endl; 
+        }
     }
+
+    cout << endl;
 
     char* num_threads_env = getenv("NUM_THREADS");
 
