@@ -53,19 +53,17 @@ int calculate_neuron( obj_loc_t obj_loc, int id )
         neuron_output = 0;
     }
 
-    cout << "local_agg: " << local_agg << ", neuron_threshold: " << neuron_threshold << endl;
+    //cout << "local_agg: " << local_agg << ", neuron_threshold: " << neuron_threshold << endl;
 
     if ( ( neuron_output && ( neuron_image == input_image_number )) || ( ! neuron_output && ( neuron_image != input_image_number )))
     {
-        cout << "Correct: neuron says " << ( neuron_output ? "yes" : "no" ) << ", it's looking for " << neuron_image << " and being shown " << input_image_number << "." << endl;
+        cout << "Correct: " << object_name(id) << " says " << ( neuron_output ? "yes" : "no" ) << ", it's looking for " << neuron_image << " and being shown " << input_image_number << "." << endl;
     }
     else
     {
-        cout << "Incorrect" << endl;
-
         if ( neuron_output == 1 && neuron_image != input_image_number )
         {
-            cout << "Incorrect: neuron says yes but it's looking for " << neuron_image << " but being shown " << input_image_number << ". Reducing active inputs by " << ( neuron_bump / NUM_IMAGES ) << "." << endl;
+            cout << "Incorrect: " << object_name(id) << " says yes but it's looking for " << neuron_image << " but being shown " << input_image_number << ". Reducing active inputs by " << ( neuron_bump / NUM_IMAGES ) << "." << endl;
             for ( int row = 0 ; row < NUM_ROWS ; row++ )
             {
                 for ( int col = 0 ; col < NUM_ROWS ; col++ )
@@ -82,7 +80,7 @@ int calculate_neuron( obj_loc_t obj_loc, int id )
 
         if ( neuron_output == 0 && neuron_image == input_image_number )
         { 
-            cout << "Incorrect: neuron says no but it's looking for " << neuron_image << " and being shown " << input_image_number << ". Reducing active inputs by " << ( neuron_bump / NUM_IMAGES ) << "." << endl;
+            cout << "Incorrect: " << object_name(id) << " says no but it's looking for " << neuron_image << " and being shown " << input_image_number << ". Reducing active inputs by " << ( neuron_bump / NUM_IMAGES ) << "." << endl;
             for ( int row = 0 ; row < NUM_ROWS ; row++ )
             {
                 for ( int col = 0 ; col < NUM_ROWS ; col++ )
