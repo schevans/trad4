@@ -25,7 +25,7 @@ int calculate_neuron( obj_loc_t obj_loc, int id )
         {
             for ( int col = 0 ; col < NUM_ROWS ; col++ )
             {
-                neuron_my_weight_matrix_rows_weight( row, col ) = ( local_weight_coeff * rand() / (RAND_MAX + 1.0) );
+                neuron_weights_row_col( row, col ) = ( local_weight_coeff * rand() / (RAND_MAX + 1.0) );
             }
 
         }
@@ -40,7 +40,7 @@ int calculate_neuron( obj_loc_t obj_loc, int id )
     {
         for ( int col = 0 ; col < NUM_ROWS ; col++ )
         {
-            local_agg = local_agg + ( input_images_row_col( input_image_number, row, col ) * neuron_my_weight_matrix_rows_weight( row, col ));
+            local_agg = local_agg + ( input_images_row_col( input_image_number, row, col ) * neuron_weights_row_col( row, col ));
         }
     }
 
@@ -72,7 +72,7 @@ int calculate_neuron( obj_loc_t obj_loc, int id )
                 {
                     if ( input_images_row_col( input_image_number, row, col ) == 1 ) 
                     {
-                        neuron_my_weight_matrix_rows_weight( row, col ) = neuron_my_weight_matrix_rows_weight( row, col ) - ( neuron_bump / NUM_IMAGES );
+                        neuron_weights_row_col( row, col ) = neuron_weights_row_col( row, col ) - ( neuron_bump / NUM_IMAGES );
 
                     //cout << "Decreasing (" << row << ", " << col << ") by " << ( neuron_bump / NUM_IMAGES ) << endl; 
                     }
@@ -89,7 +89,7 @@ int calculate_neuron( obj_loc_t obj_loc, int id )
                 {
                     if ( input_images_row_col( input_image_number, row, col ) == 1 )
                     {
-                        neuron_my_weight_matrix_rows_weight( row, col ) = neuron_my_weight_matrix_rows_weight( row, col ) + neuron_bump;
+                        neuron_weights_row_col( row, col ) = neuron_weights_row_col( row, col ) + neuron_bump;
                         //cout << "Increasing (" << row << ", " << col << ") by " << neuron_bump << endl; 
                     }
                 }
@@ -108,7 +108,7 @@ void print_weights( obj_loc_t obj_loc, int id )
     {
         for ( int col = 0 ; col < NUM_ROWS ; col++ )
         {
-            cout << setprecision(4) << neuron_my_weight_matrix_rows_weight( row, col ) << ",";
+            cout << setprecision(4) << neuron_weights_row_col( row, col ) << ",";
         }
 
         cout << endl;

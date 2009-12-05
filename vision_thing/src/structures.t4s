@@ -8,9 +8,9 @@ image
 
 
 weight_row
-    double weight[NUM_COLS]
+    double col[NUM_COLS]
 
 weight_matrix
-    weight_row rows[NUM_ROWS]
+    weight_row row[NUM_ROWS]
 
 

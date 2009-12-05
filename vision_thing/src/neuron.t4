@@ -10,6 +10,6 @@ static
     double bump
 
 pub
-    weight_matrix my_weight_matrix
+    weight_matrix weights
     int output
 
