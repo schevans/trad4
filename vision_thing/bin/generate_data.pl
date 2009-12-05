@@ -12,6 +12,7 @@ my $NUM_ROWS = 8;
 my $NUM_COLUMNS = 8;
 
 my $input_id = 9999;
+my $monitor_id = 10000;
 
 my @image;
 
@@ -23,12 +24,14 @@ print OUTFILE "delete from input_images_row;\n";
 print OUTFILE "delete from input_images_row_col;\n";
 
 print OUTFILE "insert into object values ( $input_id, 1, 1, \"input\", 0, 1 );\n";
-print OUTFILE "insert into input values ( $input_id, 1 );\n";
+print OUTFILE "insert into input values ( $input_id, $monitor_id );\n";
 
 my $image;
 my $neuron_id;
 
-for $image ( 0, 1, 2, 3, 4 ) {
+my @images = ( 0, 1, 2, 3, 4 );
+
+for $image ( @images ) {
 
     my $row_counter=0;
 
@@ -66,5 +69,20 @@ for $image ( 0, 1, 2, 3, 4 ) {
     close INFILE;
 }
 
+print OUTFILE "insert into object values ( $monitor_id, 3, 3, \"monitor\", 0, 1 );\n";
+print OUTFILE "insert into monitor values ( $monitor_id, $input_id );\n";
+print OUTFILE "insert into monitor_neurons values ( $monitor_id";
+
+
+
+for $image ( @images ) {
+
+    $neuron_id = $image+1; 
+    print OUTFILE ", $neuron_id";
+}
+
+print OUTFILE " );\n";
+
 close OUTFILE;
+
 
