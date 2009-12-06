@@ -16,6 +16,7 @@ my $monitor_id = 10000;
 
 my @image;
 
+print OUTFILE "BEGIN;\n";
 print OUTFILE "delete from object;\n";
 print OUTFILE "delete from input;\n";
 print OUTFILE "delete from neuron;\n";
@@ -64,7 +65,7 @@ for $image ( @images ) {
     $neuron_id = $image+1; 
 
     print OUTFILE "insert into object values ( $neuron_id, 2, 2, \"neuron_$image\", 0, 1 );\n";
-    print OUTFILE "insert into neuron values ( $neuron_id, 0.5, 3, $image, 0.2, $input_id );\n";
+    print OUTFILE "insert into neuron values ( $neuron_id, $image, $input_id );\n";
 
     close INFILE;
 }
@@ -80,6 +81,7 @@ for $image ( @images ) {
 }
 
 print OUTFILE " );\n";
+print OUTFILE "COMMIT;\n";
 
 close OUTFILE;
 
