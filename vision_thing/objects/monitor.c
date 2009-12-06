@@ -27,6 +27,7 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
         if ( neurons_correct(i) == 0 )  
         {
             local_all_correct = 0;
+            monitor_num_cycles_correct = 0;
             break;
         }
     }
