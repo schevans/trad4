@@ -35,8 +35,9 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
     {
         if ( monitor_num_cycles_correct >= NUM_IMAGES ) 
         {
-            cout << endl;
             cout << "Converged in " << monitor_num_runs << " runs." << endl;
+            cout << endl;
+
             exit(0);
         }
 
