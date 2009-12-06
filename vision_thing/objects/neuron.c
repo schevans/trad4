@@ -70,8 +70,11 @@ int calculate_neuron( obj_loc_t obj_loc, int id )
                     if ( input_images_row_col( input_image_number, row, col ) == 1 ) 
                     {
                         neuron_weights_row_col( row, col ) = neuron_weights_row_col( row, col ) - ( 1.0 / NUM_IMAGES );
-
-                    //cout << "Decreasing (" << row << ", " << col << ") by " << ( 1.0 / NUM_IMAGES ) << endl; 
+                    
+                        if ( fabs( neuron_weights_row_col( row, col )) < 1.0e-10 )
+                        {
+                            neuron_weights_row_col( row, col ) = 0.0;
+                        }
                     }
                 }
             }
@@ -87,7 +90,11 @@ int calculate_neuron( obj_loc_t obj_loc, int id )
                     if ( input_images_row_col( input_image_number, row, col ) == 1 )
                     {
                         neuron_weights_row_col( row, col ) = neuron_weights_row_col( row, col ) + 1.0;
-                        //cout << "Increasing (" << row << ", " << col << ") by " << 1.0 << endl; 
+                        
+                        if ( fabs( neuron_weights_row_col( row, col ) ) < 1.0e-10 )
+                        {
+                            neuron_weights_row_col( row, col ) = 0.0;
+                        }
                     }
                 }
             }
@@ -105,7 +112,7 @@ void print_weights( obj_loc_t obj_loc, int id )
     {
         for ( int col = 0 ; col < NUM_ROWS ; col++ )
         {
-            cout << setprecision(2) << neuron_weights_row_col( row, col ) << ",";
+            printf("%5.1f", neuron_weights_row_col( row, col ));
         }
 
         cout << endl;
