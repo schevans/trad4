@@ -6,15 +6,35 @@
 
 #include <iostream>
 
+#include "gd.h"
+
 #include "input_wrapper.c"
+
+void load_image( image* image, string filename );
 
 using namespace std;
 
 int calculate_input( obj_loc_t obj_loc, int id )
 {
+    static char* vs_data_dir = getenv("VS_DATA_DIR");
+
+    if ( ! vs_data_dir )
+    {
+        cout << "VS_DATA_DIR unset" << endl;
+        exit(0);
+    }
+
     if ( ! object_init( id ) )
     {
         input_image_number = 0;
+
+        for ( int image = 0 ; image < NUM_IMAGES ; image++ )
+        {
+            std::ostringstream filename;
+            filename << vs_data_dir << "/" << image << ".png";
+
+            load_image( &input_images[image], filename.str() );
+        }
     }
     else
     {
@@ -39,7 +59,28 @@ int calculate_input( obj_loc_t obj_loc, int id )
         cout << endl;
     }
 */
-
     return 1;
+}
+
+void load_image( image* image, string filename )
+{
+    FILE *pngin = fopen( filename.c_str(), "r");
+
+    gdImagePtr im = gdImageCreateFromPng(pngin);
+
+    for ( int row = 0 ; row < NUM_ROWS ; row++ )
+    {
+        for ( int col = 0 ; col < NUM_ROWS ; col++ )
+        {
+            if ( gdImageGetPixel( im, col, row ) < 127 ) 
+               (*image).row[row].col[col] = 1;
+            else
+               (*image).row[row].col[col] = 0;
+        }
+    }
+
+    fclose(pngin);
+
+    gdImageDestroy(im);
 }
 

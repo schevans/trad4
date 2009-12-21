@@ -56,8 +56,6 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
         filename << object_name( ((t4::monitor*)obj_loc[id])->neurons[i]) << "_" << monitor_num_runs << ".png";
 
         save_weight_matrix( &neurons_weights( i ), filename.str() );
-
-        filename.clear();
     }
 
     return 1;
@@ -105,7 +103,6 @@ void save_weight_matrix( weight_matrix* weight_matrix, string filename )
             {
                 if ( ! colour_table[this_weight] )
                 {
-
                     int colour = 127 - ( this_weight * max_weight_coeff );
 
                     colour_table[this_weight] = gdImageColorAllocate(im, colour, colour, colour ); 
