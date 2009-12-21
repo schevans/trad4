@@ -2,11 +2,9 @@
 sub
     monitor monitor
 
-static
-    image images[NUM_IMAGES]
-
 pub
     int image_number
+    image images[NUM_IMAGES]
 
 
 
