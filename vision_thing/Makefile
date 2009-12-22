@@ -6,7 +6,7 @@ SUBDIRS = $(TRAD4_ROOT)/objects $(APP_ROOT)/objects $(APP_ROOT)/lib
 all: objs vision_thing
 
 vision_thing: objects/main.o
-	g++ objects/main.o $(TRAD4_ROOT)/objects/sqlite3.o -o bin/vision_thing -ltrad4 -L$(TRAD4_ROOT)/objects -lpthread -ldl -L$(APP_ROOT)/lib -lgd
+	g++ objects/main.o $(TRAD4_ROOT)/objects/sqlite3.o -o bin/vision_thing -ltrad4 -L$(TRAD4_ROOT)/objects -lpthread -ldl -L$(APP_ROOT)/lib -lgd -L$(APP_ROOT)/lib/3rd_party
 
 objs:
 	for dir in $(SUBDIRS); do cd $$dir; $(MAKE) all ; cd $(APP_ROOT); done
