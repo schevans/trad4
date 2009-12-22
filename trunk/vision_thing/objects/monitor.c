@@ -65,7 +65,9 @@ void save_weight_matrix( weight_matrix* weight_matrix, string filename )
 {
     FILE *pngout = fopen( filename.c_str(), "wb");
 
-    gdImagePtr im = gdImageCreate(NUM_COLS, NUM_ROWS);
+    int zoom(2);
+
+    gdImagePtr im = gdImageCreate(NUM_COLS*zoom, NUM_ROWS*zoom);
 
     double max_weight = 0;
     double min_weight = 0;
@@ -132,11 +134,11 @@ void save_weight_matrix( weight_matrix* weight_matrix, string filename )
 
     int this_colour(0);
 
-    for ( int row = 0 ; row < NUM_ROWS ; row++ )
+    for ( int row = 0 ; row < NUM_ROWS*zoom ; row++ )
     {
-        for ( int col = 0 ; col < NUM_COLS ; col++ )
+        for ( int col = 0 ; col < NUM_COLS*zoom ; col++ )
         {
-            this_weight = (*weight_matrix).row[row].col[col]; 
+            this_weight = (*weight_matrix).row[row/zoom].col[col/zoom]; 
             this_colour = colour_table[this_weight];
 
             gdImageSetPixel( im, col, row, this_colour );
