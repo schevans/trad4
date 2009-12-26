@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 
-my $outfile = "/home/steve/src/vision_thing/data/64bit_numbers/gen.sql";
+my $outfile = $ENV{APP_ROOT}."/data/64bit_numbers/gen.sql";
 open OUTFILE, ">$outfile" or die "Can't open $outfile.\n";
 
 my $row;
@@ -31,15 +31,11 @@ my @images = ( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 );
 
 for $image ( @images ) {
 
-    my $infile = "/home/steve/src/vision_thing/data/16bit_numbers/$image.txt";
-    open INFILE, $infile or die "Can't open $infile.\n";
-
     $neuron_id = $image+1; 
 
     print OUTFILE "insert into object values ( $neuron_id, 2, 2, \"neuron_$image\", 0, 1 );\n";
     print OUTFILE "insert into neuron values ( $neuron_id, $image, $input_id );\n";
 
-    close INFILE;
 }
 
 print OUTFILE "insert into object values ( $monitor_id, 3, 3, \"monitor\", 0, 1 );\n";
