@@ -47,7 +47,6 @@ int calculate_input( obj_loc_t obj_loc, int id )
             input_image_number = 0;
         }
     }
-
 /*
     for ( int row = 0 ; row < NUM_ROWS ; row++ )
     {
@@ -72,10 +71,14 @@ void load_image( image* image, string filename )
     {
         for ( int col = 0 ; col < NUM_ROWS ; col++ )
         {
-            if ( gdImageGetPixel( im, col, row ) < 127 ) 
+            if ( gdImageGetPixel( im, col, row ) > 0 ) 
+            {
                (*image).row[row].col[col] = 1;
+            }
             else
+            {
                (*image).row[row].col[col] = 0;
+            }
         }
     }
 
