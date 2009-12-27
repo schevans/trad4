@@ -6,6 +6,9 @@ image_row
 image
     image_row row[NUM_ROWS]
 
+font
+    image images[NUM_IMAGES]
+
 
 weight_row
     double col[NUM_COLS]
