@@ -5,6 +5,7 @@
 //  to see what's in-scope.
 
 #include <iostream>
+#include <map>
 
 #include "gd.h"
 
@@ -13,6 +14,8 @@
 void load_image( image* image, string filename );
 
 using namespace std;
+
+static map<int, string> font_map;
 
 int calculate_input( obj_loc_t obj_loc, int id )
 {
@@ -26,14 +29,22 @@ int calculate_input( obj_loc_t obj_loc, int id )
 
     if ( ! object_init( id ) )
     {
+        font_map[1] = "LiberationSerif";
+        font_map[0] = "Harabara";
+        
         input_image_number = 0;
+        input_font_number = 0;
 
-        for ( int image = 0 ; image < NUM_IMAGES ; image++ )
+        for ( int font=0 ; font < NUM_FONTS ; font++ )
         {
-            std::ostringstream filename;
-            filename << vs_data_dir << "/" << image << ".png";
 
-            load_image( &input_images[image], filename.str() );
+            for ( int image = 0 ; image < NUM_IMAGES ; image++ )
+            {
+                std::ostringstream filename;
+                filename << vs_data_dir << "/" << font_map[input_font_number] << "/" << image << ".png";
+
+                load_image( &input_fonts_images( font, image), filename.str() );
+            }
         }
     }
     else
@@ -47,12 +58,18 @@ int calculate_input( obj_loc_t obj_loc, int id )
             input_image_number = 0;
         }
     }
+
+    if ( monitor_converged )
+    {
+        input_font_number = 1;
+    }
+
 /*
     for ( int row = 0 ; row < NUM_ROWS ; row++ )
     {
         for ( int col = 0 ; col < NUM_ROWS ; col++ )
         {
-            cout << input_images_row_col( input_image_number, row, col );
+            cout << input_fonts_images_row_col( 0, input_image_number, row, col );
         }
 
         cout << endl;

@@ -26,7 +26,7 @@ int calculate_neuron( obj_loc_t obj_loc, int id )
         }
     }
 
-    if ( object_log_level(id) >= 1 )
+    if ( object_log_level(id) >= 2 )
     {
         print_weights( obj_loc, id );
     }
@@ -37,7 +37,7 @@ int calculate_neuron( obj_loc_t obj_loc, int id )
     {
         for ( int col = 0 ; col < NUM_ROWS ; col++ )
         {
-            local_agg = local_agg + ( input_images_row_col( input_image_number, row, col ) * neuron_weights_row_col( row, col ));
+            local_agg = local_agg + ( input_fonts_images_row_col( input_font_number, input_image_number, row, col ) * neuron_weights_row_col( row, col ));
         }
     }
 
@@ -67,7 +67,7 @@ int calculate_neuron( obj_loc_t obj_loc, int id )
             {
                 for ( int col = 0 ; col < NUM_ROWS ; col++ )
                 {
-                    if ( input_images_row_col( input_image_number, row, col ) == 1 ) 
+                    if ( input_fonts_images_row_col( input_font_number, input_image_number, row, col ) == 1 ) 
                     {
                         neuron_weights_row_col( row, col ) = neuron_weights_row_col( row, col ) - ( 1.0 / NUM_IMAGES );
                     
@@ -87,7 +87,7 @@ int calculate_neuron( obj_loc_t obj_loc, int id )
             {
                 for ( int col = 0 ; col < NUM_ROWS ; col++ )
                 {
-                    if ( input_images_row_col( input_image_number, row, col ) == 1 )
+                    if ( input_fonts_images_row_col( input_font_number, input_image_number, row, col ) == 1 ) 
                     {
                         neuron_weights_row_col( row, col ) = neuron_weights_row_col( row, col ) + 1.0;
                         

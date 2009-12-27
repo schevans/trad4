@@ -2,9 +2,13 @@
 sub
     monitor monitor
 
+static
+    int font_order[NUM_FONTS]
+
 pub
     int image_number
-    image images[NUM_IMAGES]
+    int font_number
+    font fonts[NUM_FONTS]
 
 
 
