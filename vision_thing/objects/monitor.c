@@ -46,7 +46,9 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
             monitor_converged = 1;
             monitor_num_runs = 0;
             monitor_num_cycles_correct = 0;
-//            exit(0);
+
+            if ( input_font_number == NUM_FONTS-1 )
+                exit(0);
         }
 
         monitor_num_cycles_correct++;
