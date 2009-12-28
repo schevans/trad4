@@ -29,8 +29,8 @@ int calculate_input( obj_loc_t obj_loc, int id )
 
     if ( ! object_init( id ) )
     {
-        font_map[1] = "LiberationSerif";
-        font_map[0] = "Harabara";
+        font_map[0] = "LiberationSerif";
+        font_map[1] = "Harabara";
         
         input_image_number = 0;
         input_font_number = 0;
@@ -49,7 +49,7 @@ int calculate_input( obj_loc_t obj_loc, int id )
     }
     else
     {
-        if ( input_image_number < NUM_IMAGES-2 )
+        if ( input_image_number < NUM_IMAGES-1 )
         {
             input_image_number = input_image_number + 1;
         }
