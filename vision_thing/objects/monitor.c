@@ -12,8 +12,11 @@
 #include "monitor_wrapper.c"
 
 void save_weight_matrix( weight_matrix* weight_matrix, string filename );
+void create_animation( obj_loc_t obj_loc, int id );
 
 using namespace std;
+
+static int zoom(2);
 
 int calculate_monitor( obj_loc_t obj_loc, int id )
 {
@@ -44,11 +47,13 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
             cout << endl;
 
             monitor_converged = 1;
-            monitor_num_runs = 0;
             monitor_num_cycles_correct = 0;
 
             if ( input_font_number == NUM_FONTS-1 )
+            {
+                create_animation( obj_loc, id );
                 exit(0);
+            }
         }
 
         monitor_num_cycles_correct++;
@@ -67,11 +72,50 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
     return 1;
 }
 
+void create_animation( obj_loc_t obj_loc, int id )
+{
+    for ( int neuron_id = 0 ; neuron_id < NUM_NEURONS ; neuron_id++ )
+    {
+        gdImagePtr imgs[monitor_num_runs];
+
+        imgs[0] = gdImageCreate(NUM_COLS*zoom, NUM_ROWS*zoom);
+
+        (void)gdImageColorAllocate(imgs[0], 127, 127, 127 ); 
+
+        std::ostringstream outfile;
+        outfile << "animation_" << neuron_id << ".gif";
+        FILE *out = fopen(outfile.str().c_str(), "wb");
+
+        gdImageGifAnimBegin(imgs[0], out, 1, monitor_num_runs);
+
+        gdImageGifAnimAdd(imgs[0], out, 0, 0, 0, 100, 1, NULL);
+
+        for ( int i=1 ; i < monitor_num_runs ; i++ )
+        {
+            std::ostringstream filename;
+            filename << object_name( ((t4::monitor*)obj_loc[id])->neurons[neuron_id]) << "_" << i << ".png";
+            FILE *in = fopen(filename.str().c_str(), "rb");
+            imgs[i] = gdImageCreateFromPng(in);
+
+            gdImageGifAnimAdd(imgs[i], out, 1, 0, 0, 100, 1, NULL);
+
+            fclose(in);
+        }
+
+        gdImageGifAnimEnd(out);
+          
+        fclose(out);
+
+        for ( int i = 0 ; i < monitor_num_runs ; i++ )
+        {
+            gdImageDestroy(imgs[i]);
+        }
+    }
+}
+
 void save_weight_matrix( weight_matrix* weight_matrix, string filename )
 {
     FILE *pngout = fopen( filename.c_str(), "wb");
-
-    int zoom(2);
 
     gdImagePtr im = gdImageCreate(NUM_COLS*zoom, NUM_ROWS*zoom);
 
@@ -111,7 +155,7 @@ void save_weight_matrix( weight_matrix* weight_matrix, string filename )
             {
                 if ( ! colour_table[this_weight] )
                 {
-                    int colour = 127 - ( this_weight * max_weight_coeff );
+                    int colour = 127 - (int)( this_weight * max_weight_coeff );
 
                     colour_table[this_weight] = gdImageColorAllocate(im, colour, colour, colour ); 
 
@@ -122,7 +166,7 @@ void save_weight_matrix( weight_matrix* weight_matrix, string filename )
             {
                 if ( ! colour_table[this_weight] )
                 {
-                    int colour = 127 - ( this_weight * -min_weight_coeff );
+                    int colour = 127 - (int)( this_weight * -min_weight_coeff );
 
                     colour_table[this_weight] = gdImageColorAllocate(im, colour, colour, colour ); 
 
