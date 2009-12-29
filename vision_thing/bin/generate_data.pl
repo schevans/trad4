@@ -23,7 +23,7 @@ print OUTFILE "delete from neuron;\n";
 
 print OUTFILE "insert into object values ( $input_id, 1, 1, \"input\", 0, 1 );\n";
 print OUTFILE "insert into input values ( $input_id, $monitor_id );\n";
-print OUTFILE "insert into input_font_order values ( $input_id, 0, 1 );\n";
+print OUTFILE "insert into input_font_order values ( $input_id, 0, 1, 2 );\n";
 
 my $image;
 my $neuron_id;

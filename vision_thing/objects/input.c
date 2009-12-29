@@ -31,6 +31,7 @@ int calculate_input( obj_loc_t obj_loc, int id )
     {
         font_map[0] = "LiberationSerif";
         font_map[1] = "Harabara";
+        font_map[2] = "optimusprinceps";
         
         input_image_number = 0;
         input_font_number = 0;
@@ -61,7 +62,14 @@ int calculate_input( obj_loc_t obj_loc, int id )
 
     if ( monitor_converged )
     {
-        input_font_number = 1;
+        if ( input_font_number < NUM_FONTS-1 )
+        {
+            input_font_number = input_font_number + 1;
+        }
+        else
+        {
+            input_font_number = 0;
+        }
     }
 
 /*

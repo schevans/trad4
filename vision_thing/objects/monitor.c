@@ -43,7 +43,9 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
     {
         if ( monitor_num_cycles_correct >= NUM_IMAGES ) 
         {
-            cout << "Converged in " << monitor_num_runs << " runs on font " << input_font_number << endl;
+            int adjusted_num_runs = monitor_num_runs - ( NUM_IMAGES * ( 1 + input_font_number ));
+
+            cout << "Converged in " << adjusted_num_runs << " runs on font " << input_font_number << endl;
             cout << endl;
 
             monitor_converged = 1;
