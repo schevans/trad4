@@ -25,7 +25,6 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
     {
         monitor_num_runs = 0;
         monitor_num_cycles_correct = 0;
-        monitor_converged = 0;
     }
 
     int local_all_correct = 1;
@@ -39,6 +38,8 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
             break;
         }
     }
+
+    monitor_converged = 0;
 
     if ( local_all_correct == 1 )
     {
