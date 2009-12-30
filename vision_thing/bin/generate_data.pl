@@ -12,9 +12,6 @@ open OUTFILE, ">$outfile" or die "Can't open $outfile.\n";
 
 my $row;
 
-my $NUM_ROWS = 16;
-my $NUM_COLUMNS = 16;
-
 my $input_id = 9999;
 my $monitor_id = 10000;
 
