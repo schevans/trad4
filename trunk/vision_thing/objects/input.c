@@ -43,7 +43,7 @@ int calculate_input( obj_loc_t obj_loc, int id )
             for ( int image = 0 ; image < NUM_IMAGES ; image++ )
             {
                 std::ostringstream filename;
-                filename << vs_data_dir << "/" << font_map[input_font_number] << "/" << image << ".png";
+                filename << vs_data_dir << "/" << font_map[font] << "/" << image << ".png";
 
                 load_image( &input_fonts_images( font, image), filename.str() );
             }
