@@ -73,17 +73,19 @@ int calculate_input( obj_loc_t obj_loc, int id )
         }
     }
 
-/*
-    for ( int row = 0 ; row < NUM_ROWS ; row++ )
+    if ( object_log_level(id) >= 2 )
     {
-        for ( int col = 0 ; col < NUM_ROWS ; col++ )
+        for ( int row = 0 ; row < NUM_ROWS ; row++ )
         {
-            cout << input_fonts_images_row_col( 0, input_image_number, row, col );
-        }
+            for ( int col = 0 ; col < NUM_ROWS ; col++ )
+            {
+                cout << input_fonts_images_row_col( 0, input_image_number, row, col );
+            }
 
-        cout << endl;
+            cout << endl;
+        }
     }
-*/
+
     return 1;
 }
 
