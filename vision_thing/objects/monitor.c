@@ -25,6 +25,7 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
     {
         monitor_num_runs = 0;
         monitor_num_cycles_correct = 0;
+        monitor_results_start( 0 ) = 0;
     }
 
     int local_all_correct = 1;
@@ -50,13 +51,25 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
             cout << "Converged in " << adjusted_num_runs << " runs on font " << input_font_number << endl;
             cout << endl;
 
+            monitor_results_end(input_font_number) = adjusted_num_runs;
+            
             monitor_converged = 1;
             monitor_num_cycles_correct = 0;
 
             if ( input_font_number == NUM_FONTS-1 )
             {
+
+                for ( int i=0 ; i < NUM_FONTS ; i++ )
+                {
+                    cout << "Font " << i << " start: " << monitor_results_start(i) << ", end: " << monitor_results_end(i) << ", total: " << monitor_results_end(i) - monitor_results_start(i) << endl;
+                }
+
                 create_animation( obj_loc, id );
                 exit(0);
+            }
+            else
+            {
+                monitor_results_start(input_font_number+1) = adjusted_num_runs+1;
             }
         }
 
