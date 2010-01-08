@@ -8,4 +8,5 @@ pub
     int num_runs
     int num_cycles_correct
     int converged
+    result results[NUM_FONTS]
 

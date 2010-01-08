@@ -17,3 +17,7 @@ weight_matrix
     weight_row row[NUM_ROWS]
 
 
+result
+    int start
+    int end
+     
