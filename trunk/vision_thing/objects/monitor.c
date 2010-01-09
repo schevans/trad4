@@ -21,6 +21,7 @@ static int zoom(2);
 
 int calculate_monitor( obj_loc_t obj_loc, int id )
 {
+
     if ( ! object_init( id ) )
     {
         monitor_num_runs = 0;
@@ -91,43 +92,71 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
 
 void create_animation( obj_loc_t obj_loc, int id )
 {
-    for ( int neuron_id = 0 ; neuron_id < NUM_NEURONS ; neuron_id++ )
+    int border_width = 2;
+    int num_row_png = 2;
+    int num_col_png = 5;
+
+    int png_frame_height = (( NUM_COLS*zoom ) + ( border_width * 2 ));
+    int png_frame_width = (( NUM_ROWS*zoom ) + ( border_width * 2 ));
+    
+    int master_img_height = png_frame_height * num_row_png;
+    int master_img_width = png_frame_width * num_col_png;
+
+    gdImagePtr master_img = gdImageCreate(master_img_width, master_img_height);
+
+    (void)gdImageColorAllocate(master_img, 127, 127, 127 ); 
+
+    std::ostringstream outfile;
+    outfile << "animation" << ".gif";
+    FILE *out = fopen(outfile.str().c_str(), "wb");
+
+    gdImageGifAnimBegin(master_img, out, 1, monitor_num_runs);
+
+    gdImageGifAnimAdd(master_img, out, 0, 0, 0, 100, 1, NULL);
+
+    gdImagePtr frame_imgs[200];
+
+    for ( int font_num=0 ; font_num < NUM_FONTS ; font_num++ )
     {
-        gdImagePtr imgs[monitor_num_runs];
-
-        imgs[0] = gdImageCreate(NUM_COLS*zoom, NUM_ROWS*zoom);
-
-        (void)gdImageColorAllocate(imgs[0], 127, 127, 127 ); 
-
-        std::ostringstream outfile;
-        outfile << "animation_" << neuron_id << ".gif";
-        FILE *out = fopen(outfile.str().c_str(), "wb");
-
-        gdImageGifAnimBegin(imgs[0], out, 1, monitor_num_runs);
-
-        gdImageGifAnimAdd(imgs[0], out, 0, 0, 0, 100, 1, NULL);
-
-        for ( int i=1 ; i < monitor_num_runs ; i++ )
+        for ( int run_num = monitor_results_start(font_num) ; run_num < monitor_results_end(font_num) ; run_num++ )
         {
-            std::ostringstream filename;
-            filename << object_name( ((t4::monitor*)obj_loc[id])->neurons[neuron_id]) << "_" << i << ".png";
-            FILE *in = fopen(filename.str().c_str(), "rb");
-            imgs[i] = gdImageCreateFromPng(in);
+            frame_imgs[run_num] = gdImageCreate(master_img_width, master_img_height);
 
-            gdImageGifAnimAdd(imgs[i], out, 1, 0, 0, 100, 1, NULL);
+            gdImagePtr imgs[NUM_IMAGES];
 
-            fclose(in);
-        }
+            for ( int neuron_id = 0 ; neuron_id < NUM_NEURONS ; neuron_id++ )
+            {
+                std::ostringstream filename;
+                filename << object_name( ((t4::monitor*)obj_loc[id])->neurons[neuron_id]) << "_" << run_num+1 << ".png";
+                FILE *in = fopen(filename.str().c_str(), "rb");
 
-        gdImageGifAnimEnd(out);
-          
-        fclose(out);
+                imgs[neuron_id] = gdImageCreateFromPng(in);
 
-        for ( int i = 0 ; i < monitor_num_runs ; i++ )
-        {
-            gdImageDestroy(imgs[i]);
+                int dstX = neuron_id * png_frame_width;
+                if ( neuron_id >= 5 )
+                    dstX = ( neuron_id - 5 ) * png_frame_width;
+
+                int dstY = 0;
+                if ( neuron_id >= 5 )
+                    dstY = png_frame_height;
+
+                gdImageCopy(frame_imgs[run_num], imgs[neuron_id], dstX, dstY, 0, 0, png_frame_width, png_frame_height );
+
+                fclose(in);
+            }
+
+            gdImageGifAnimAdd(frame_imgs[run_num], out, 1, 0, 0, 100, 1, NULL);
+
+            for ( int i = 0 ; i < NUM_IMAGES ; i++ )
+            {
+                gdImageDestroy(imgs[i]);
+            }
         }
     }
+
+    gdImageGifAnimEnd(out);
+      
+    fclose(out);
 }
 
 void save_weight_matrix( weight_matrix* weight_matrix, string filename )
