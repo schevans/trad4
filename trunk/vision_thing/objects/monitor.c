@@ -111,12 +111,11 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
 
 void create_animation( obj_loc_t obj_loc, int id )
 {
-    int border_width = 2;
     int num_row_png = 2;
     int num_col_png = 5;
 
-    int png_frame_height = (( NUM_COLS*zoom ) + ( border_width * 2 ));
-    int png_frame_width = (( NUM_ROWS*zoom ) + ( border_width * 2 ));
+    int png_frame_height = NUM_COLS * zoom;
+    int png_frame_width = NUM_ROWS * zoom;
     
     int master_img_height = png_frame_height * num_row_png;
     int master_img_width = png_frame_width * num_col_png;
@@ -150,6 +149,32 @@ void create_animation( obj_loc_t obj_loc, int id )
                 FILE *in = fopen(filename.str().c_str(), "rb");
 
                 imgs[neuron_id] = gdImageCreateFromPng(in);
+
+                int red = gdImageColorAllocate(imgs[neuron_id], 255, 0, 0);  
+                int green = gdImageColorAllocate(imgs[neuron_id], 0, 255, 0);  
+
+                int this_colour;
+
+                if ( monitor_run_results_run_row( run_num, neuron_id ) == 1 )
+                    this_colour = green;
+                else
+                    this_colour = red;
+
+                // Left side
+                gdImageLine(imgs[neuron_id], 0, 0, 0, png_frame_height, this_colour);
+                gdImageLine(imgs[neuron_id], 1, 0, 1, png_frame_height, this_colour);
+
+                // Top
+                gdImageLine(imgs[neuron_id], 0, 0, png_frame_width, 0, this_colour);
+                gdImageLine(imgs[neuron_id], 0, 1, png_frame_width, 1, this_colour);
+
+                // Bottom
+                gdImageLine(imgs[neuron_id], 0, png_frame_width-1, png_frame_width-1, png_frame_height-1, this_colour);
+                gdImageLine(imgs[neuron_id], 0, png_frame_width-2, png_frame_width-2, png_frame_height-2, this_colour);
+
+                // Right side
+                gdImageLine(imgs[neuron_id], png_frame_width-1, png_frame_height-1, png_frame_width-1, 0, this_colour);
+                gdImageLine(imgs[neuron_id], png_frame_width-2, png_frame_height-2, png_frame_width-2, 0, this_colour);
 
                 int dstX = neuron_id * png_frame_width;
                 if ( neuron_id >= 5 )
