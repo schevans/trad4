@@ -17,7 +17,10 @@ weight_matrix
     weight_row row[NUM_ROWS]
 
 
-result
+font_result
     int start
     int end
+    
+run_result
+    int run_row[NUM_NEURONS]
      

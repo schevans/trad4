@@ -8,5 +8,6 @@ pub
     int num_runs
     int num_cycles_correct
     int converged
-    result results[NUM_FONTS]
+    font_result font_results[NUM_FONTS]
+    run_result run_results[MAX_NUM_RUNS]
 

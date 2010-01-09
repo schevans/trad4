@@ -26,7 +26,7 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
     {
         monitor_num_runs = 0;
         monitor_num_cycles_correct = 0;
-        monitor_results_start( 0 ) = 0;
+        monitor_font_results_start( 0 ) = 0;
     }
 
     int local_all_correct = 1;
@@ -37,8 +37,11 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
         {
             local_all_correct = 0;
             monitor_num_cycles_correct = 0;
-            break;
+        
+
         }
+
+        monitor_run_results_run_row( monitor_num_runs, i ) = neurons_correct(i);
     }
 
     monitor_converged = 0;
@@ -52,7 +55,7 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
             cout << "Converged in " << adjusted_num_runs << " runs on font " << input_font_number << endl;
             cout << endl;
 
-            monitor_results_end(input_font_number) = adjusted_num_runs;
+            monitor_font_results_end(input_font_number) = adjusted_num_runs;
             
             monitor_converged = 1;
             monitor_num_cycles_correct = 0;
@@ -62,15 +65,26 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
 
                 for ( int i=0 ; i < NUM_FONTS ; i++ )
                 {
-                    cout << "Font " << i << " start: " << monitor_results_start(i) << ", end: " << monitor_results_end(i) << ", total: " << monitor_results_end(i) - monitor_results_start(i) << endl;
+                    cout << "Font " << i << " start: " << monitor_font_results_start(i) << ", end: " << monitor_font_results_end(i) << ", total: " << monitor_font_results_end(i) - monitor_font_results_start(i) << endl;
+
+                    for ( int j=monitor_font_results_start(i)  ; j < monitor_font_results_end(i) ; j++ )
+                    {
+                        for ( int num_neurons=0 ; num_neurons < NUM_NEURONS ; num_neurons++ )
+                        {
+                            cout << monitor_run_results_run_row( j, num_neurons );
+                        }
+                        cout << endl; 
+                    }
                 }
 
                 create_animation( obj_loc, id );
+
+
                 exit(0);
             }
             else
             {
-                monitor_results_start(input_font_number+1) = adjusted_num_runs+1;
+                monitor_font_results_start(input_font_number+1) = monitor_num_runs+1;
             }
         }
 
@@ -78,6 +92,11 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
     }
 
     monitor_num_runs++;
+
+    if ( monitor_num_runs > MAX_NUM_RUNS )
+    {
+        cerr << "Error: Num runs exceeded " << MAX_NUM_RUNS << ". Please increase, precompile, compile and re-start." << endl;
+    }
 
     for ( int i = 0 ; i < NUM_NEURONS ; i++ )
     {
@@ -114,11 +133,11 @@ void create_animation( obj_loc_t obj_loc, int id )
 
     gdImageGifAnimAdd(master_img, out, 0, 0, 0, 100, 1, NULL);
 
-    gdImagePtr frame_imgs[200];
+    gdImagePtr frame_imgs[MAX_NUM_RUNS];
 
     for ( int font_num=0 ; font_num < NUM_FONTS ; font_num++ )
     {
-        for ( int run_num = monitor_results_start(font_num) ; run_num < monitor_results_end(font_num) ; run_num++ )
+        for ( int run_num = monitor_font_results_start(font_num) ; run_num < monitor_font_results_end(font_num) ; run_num++ )
         {
             frame_imgs[run_num] = gdImageCreate(master_img_width, master_img_height);
 
