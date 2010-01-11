@@ -129,6 +129,8 @@ void run_trad4() {
 
     start_threads();
 
+    cout << endl;
+
     sleep(1);
 
     double start_time;
@@ -339,9 +341,6 @@ void set_timestamp( obj_loc_t obj_loc, int id )
 
 void* thread_loop( void* thread_id ) 
 {
-
-    cout << "Starting thread " << (long long)thread_id << endl;
-
     bool thread_fired(false);
 
     while (1) {
@@ -383,6 +382,15 @@ void start_threads()
             cout << "pthread_create() error" << endl;
             abort();
         }
+    }
+
+    if ( num_threads == 1 ) 
+    {
+        cout << "Started " << num_threads << " thread." << endl;
+    }
+    else
+    {
+        cout << "Started " << num_threads << " threads." << endl;
     }
 }
 
