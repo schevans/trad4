@@ -10,7 +10,10 @@
 
 #include "gd.h"
 
+
 #include "input_wrapper.c"
+
+#include "common.c"
 
 void load_image( image* image, string filename );
 
@@ -30,9 +33,7 @@ int calculate_input( obj_loc_t obj_loc, int id )
 
     if ( ! object_init( id ) )
     {
-        font_map[0] = "LiberationSerif";
-        font_map[1] = "Harabara";
-        font_map[2] = "optimusprinceps";
+        init_font_map( font_map );
         
         input_image_number = 0;
         input_font_number = 0;
