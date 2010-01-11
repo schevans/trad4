@@ -100,7 +100,11 @@ sub Generate($$) {
 
                     $function =~ s/ index_/ /g;
 
-                    print $FHD "    $printable->{type} $function\n";
+                    for ( my $i=0 ; $i < $printable->{depth} ; $i++ ) {
+                        print $FHD "    ";
+                    }
+
+                    print $FHD "$printable->{type} $function\n";
                 }
                 else {
 
