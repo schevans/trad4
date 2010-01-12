@@ -10,7 +10,6 @@
 
 #include "gd.h"
 
-
 #include "input_wrapper.c"
 
 #include "common.c"

@@ -12,6 +12,8 @@
 
 #include "monitor_wrapper.c"
 
+#include "common.c"
+
 void save_weight_matrix( weight_matrix* weight_matrix, string filename );
 void create_animation( obj_loc_t obj_loc, int id );
 
@@ -19,11 +21,13 @@ using namespace std;
 
 static int zoom(2);
 
+static map<int, string> font_map;
+
 int calculate_monitor( obj_loc_t obj_loc, int id )
 {
-
     if ( ! object_init( id ) )
     {
+        init_font_map( font_map );
         monitor_num_runs = 0;
         monitor_num_cycles_correct = 0;
         monitor_font_results_start( 0 ) = 0;
@@ -41,8 +45,10 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
 
         }
 
-        monitor_run_results_run_row( monitor_num_runs, i ) = neurons_correct(i);
+        monitor_run_results_row( monitor_num_runs, i ) = neurons_correct(i);
     }
+
+    monitor_run_results_image( monitor_num_runs ) = input_image_number;
 
     monitor_converged = 0;
 
@@ -71,7 +77,7 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
                     {
                         for ( int num_neurons=0 ; num_neurons < NUM_NEURONS ; num_neurons++ )
                         {
-                            cout << monitor_run_results_run_row( j, num_neurons );
+                            cout << monitor_run_results_row( j, num_neurons );
                         }
                         cout << endl; 
                     }
@@ -111,7 +117,7 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
 
 void create_animation( obj_loc_t obj_loc, int id )
 {
-    int num_row_png = 2;
+    int num_row_png = 3;
     int num_col_png = 5;
 
     int png_frame_height = NUM_COLS * zoom;
@@ -122,7 +128,7 @@ void create_animation( obj_loc_t obj_loc, int id )
 
     gdImagePtr master_img = gdImageCreate(master_img_width, master_img_height);
 
-    (void)gdImageColorAllocate(master_img, 127, 127, 127 ); 
+    (void)gdImageColorAllocate(master_img, 255, 255, 255 ); 
 
     std::ostringstream outfile;
     outfile << "animation" << ".gif";
@@ -155,7 +161,7 @@ void create_animation( obj_loc_t obj_loc, int id )
 
                 int this_colour;
 
-                if ( monitor_run_results_run_row( run_num, neuron_id ) == 1 )
+                if ( monitor_run_results_row( run_num, neuron_id ) == 1 )
                     this_colour = green;
                 else
                     this_colour = red;
@@ -189,7 +195,33 @@ void create_animation( obj_loc_t obj_loc, int id )
                 fclose(in);
             }
 
+            // Load and add the image being shown
+            static char* vs_data_dir = getenv("VS_DATA_DIR");
+
+            std::ostringstream input_filename;
+            input_filename << vs_data_dir << "/" << font_map[font_num] << "/" << monitor_run_results_image( run_num ) << ".png";
+
+            FILE *input_in = fopen( input_filename.str().c_str(), "r");
+
+            gdImagePtr input_image = gdImageCreateFromPng(input_in);
+
+            gdImageCopyResized(frame_imgs[run_num], input_image, 0, (png_frame_height*2), 0, 0, png_frame_width, png_frame_height, NUM_COLS, NUM_ROWS );
+
+            fclose(input_in);
+
+            // Add the text pane
+            gdImagePtr text_pane = gdImageCreate( png_frame_width*3, png_frame_height);
+
+            // Set text pane background colour (white)
+            (void)gdImageColorAllocate(text_pane, 255, 255, 255 ); 
+
+
+            gdImageCopy(frame_imgs[run_num], text_pane, png_frame_width, png_frame_height*2, 0, 0, png_frame_width*4, png_frame_height );
+
             gdImageGifAnimAdd(frame_imgs[run_num], out, 1, 0, 0, 100, 1, NULL);
+
+            gdImageDestroy(text_pane);
+            gdImageDestroy(input_image);
 
             for ( int i = 0 ; i < NUM_IMAGES ; i++ )
             {
