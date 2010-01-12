@@ -187,9 +187,6 @@ if( $opts{d} ) {
     PreComp::Docco::Generate( $master_hash );
 }
 
-# Hack alert
-`touch $ENV{APP_ROOT}/objects/common.h`;
-
 my $main_file = "$ENV{APP_ROOT}/objects/main.c";
 
 if ( ! -f $main_file ) {
