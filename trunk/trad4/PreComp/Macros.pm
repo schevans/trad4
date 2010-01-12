@@ -53,6 +53,8 @@ sub Generate($$) {
 
             my $printable;
 
+            my $last_depth = 1;
+
             foreach $printable ( GetPrintablesFromSection( $master_hash, $master_hash->{$type}->{$section}, "0" )) {
 
                 if ( $section =~ /sub/ ) {
@@ -100,16 +102,18 @@ sub Generate($$) {
 
                     $function =~ s/ index_/ /g;
 
-                    for ( my $i=0 ; $i < $printable->{depth} ; $i++ ) {
-                        print $FHD "    ";
+                    if ( ( $last_depth != 1 ) and ( $printable->{depth} == 1 ) ) {
+                        print $FHD "\n";
                     }
 
-                    print $FHD "$printable->{type} $function\n";
+                    print $FHD "    $printable->{type} $function\n";
                 }
                 else {
 
                     print $FHD "#define $function $printable->{code}\n";
                 }
+
+                $last_depth = $printable->{depth};
 
             }
 
