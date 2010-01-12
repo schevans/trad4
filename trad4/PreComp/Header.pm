@@ -24,7 +24,6 @@ sub Generate($) {
     print $FHD "\n";
     print $FHD "#include <sys/types.h>\n";
     print $FHD "\n";
-    print $FHD "#include \"common.h\"\n";
     print $FHD "#include \"structures.h\"\n";
     print $FHD "#include \"enums.h\"\n";
     print $FHD "#include \"constants.h\"\n";
