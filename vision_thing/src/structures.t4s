@@ -22,5 +22,7 @@ font_result
     int end
     
 run_result
-    int run_row[NUM_NEURONS]
+    int image
+    int row[NUM_NEURONS]
+    
      
