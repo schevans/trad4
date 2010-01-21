@@ -10,8 +10,8 @@
 // This is slated for v3.2, but I've done no investigation whatsoever so it may be trickier than I think.
 void init_font_map( map<int, string>& font_map )
 {
-    font_map[0] = "LiberationSerif";
+    font_map[0] = "LiberationSerif-Bold";
     font_map[1] = "Harabara";
-    font_map[2] = "optimusprinceps";
+    font_map[2] = "OptimusPrinceps";
 }
 
