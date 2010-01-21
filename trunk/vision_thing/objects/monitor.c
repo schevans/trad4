@@ -9,6 +9,7 @@
 #include <map>
 
 #include "gd.h"
+#include "gdfontg.h"
 
 #include "monitor_wrapper.c"
 
@@ -68,7 +69,6 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
 
             if ( input_font_number == NUM_FONTS-1 )
             {
-
                 for ( int i=0 ; i < NUM_FONTS ; i++ )
                 {
                     cout << "Font " << i << " start: " << monitor_font_results_start(i) << ", end: " << monitor_font_results_end(i) << ", total: " << monitor_font_results_end(i) - monitor_font_results_start(i) << endl;
@@ -85,7 +85,6 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
 
                 create_animation( obj_loc, id );
 
-
                 exit(0);
             }
             else
@@ -101,7 +100,7 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
 
     if ( monitor_num_runs > MAX_NUM_RUNS )
     {
-        cerr << "Error: Num runs exceeded " << MAX_NUM_RUNS << ". Please increase, precompile, compile and re-start." << endl;
+        cerr << "Error: Num runs exceeded MAX_NUM_RUNS=" << MAX_NUM_RUNS << ". Please increase, precompile, compile and re-start." << endl;
     }
 
     for ( int i = 0 ; i < NUM_NEURONS ; i++ )
@@ -110,6 +109,7 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
         filename << object_name( ((t4::monitor*)obj_loc[id])->neurons[i]) << "_" << monitor_num_runs << ".png";
 
         save_weight_matrix( &neurons_weights( i ), filename.str() );
+
     }
 
     return 1;
@@ -142,6 +142,9 @@ void create_animation( obj_loc_t obj_loc, int id )
 
     for ( int font_num=0 ; font_num < NUM_FONTS ; font_num++ )
     {
+        int num_correct(0);
+        int num_incorrect(0);
+
         for ( int run_num = monitor_font_results_start(font_num) ; run_num < monitor_font_results_end(font_num) ; run_num++ )
         {
             frame_imgs[run_num] = gdImageCreate(master_img_width, master_img_height);
@@ -162,9 +165,15 @@ void create_animation( obj_loc_t obj_loc, int id )
                 int this_colour;
 
                 if ( monitor_run_results_row( run_num, neuron_id ) == 1 )
+                {
                     this_colour = green;
+                    num_correct++;
+                }
                 else
+                {
                     this_colour = red;
+                    num_incorrect++;
+                }
 
                 // Left side
                 gdImageLine(imgs[neuron_id], 0, 0, 0, png_frame_height, this_colour);
@@ -210,11 +219,70 @@ void create_animation( obj_loc_t obj_loc, int id )
             fclose(input_in);
 
             // Add the text pane
-            gdImagePtr text_pane = gdImageCreate( png_frame_width*3, png_frame_height);
+            gdImagePtr text_pane = gdImageCreate( png_frame_width*4, png_frame_height);
 
             // Set text pane background colour (white)
             (void)gdImageColorAllocate(text_pane, 255, 255, 255 ); 
 
+            // Text
+            // 1st row
+            int x, y;
+
+            std::ostringstream font_filename;
+            font_filename << vs_data_dir << "/" << font_map[font_num] << "/" << font_map[font_num] << ".ttf";
+
+            string tmp_str(font_filename.str());
+
+            char *f = (char*)(tmp_str.c_str());
+            double sz = 40.;
+            int brect[8];
+            char *s = (char*)font_map[font_num].c_str();
+
+            char* err = gdImageStringFT(NULL,&brect[0],0,f,sz,0.,0,0,s);
+
+            if (err) {fprintf(stderr,err); exit(1);}
+
+            /* create an image big enough for the string plus a little whitespace */
+            x = brect[2]-brect[6] + 12;
+            y = brect[3]-brect[7] + 12;
+
+            int n_black = gdImageColorResolve(text_pane, 0, 0, 0);
+
+            /* render the string, offset origin to center string*/
+            /* note that we use top-left coordinate for adjustment
+            * since gd origin is in top-left with y increasing downwards. */
+            x = 3 - brect[6];
+            y = 3 - brect[7];
+
+            err = gdImageStringFT(text_pane,&brect[0],n_black,f,sz,0.0,x,y,s);
+            if (err) {fprintf(stderr,err); exit(1);}
+
+            // 2nd row
+            std::ostringstream second_row_text;
+            second_row_text << num_correct << "," << num_incorrect;
+
+            string tmp_str2 = second_row_text.str();
+
+            char *s2 = (char*)tmp_str2.c_str();
+
+            err = gdImageStringFT(NULL,&brect[0],0,f,sz,0.,0,0,s2);
+
+            if (err) {fprintf(stderr,err); exit(1);}
+
+            /* create an image big enough for the string plus a little whitespace */
+            x = brect[2]-brect[6] + 6;
+            y = brect[3]-brect[7] + 6;
+
+            /* render the string, offset origin to center string*/
+            /* note that we use top-left coordinate for adjustment
+            * since gd origin is in top-left with y increasing downwards. */
+            x = 3 - brect[6];
+            y = 3 - brect[7];
+
+            y = y + 64;
+
+            err = gdImageStringFT(text_pane,&brect[0],n_black,f,sz,0.0,x,y,s2);
+            if (err) {fprintf(stderr,err); exit(1);}
 
             gdImageCopy(frame_imgs[run_num], text_pane, png_frame_width, png_frame_height*2, 0, 0, png_frame_width*4, png_frame_height );
 
