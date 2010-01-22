@@ -286,7 +286,7 @@ void create_animation( obj_loc_t obj_loc, int id )
 
             gdImageCopy(frame_imgs[run_num], text_pane, png_frame_width, png_frame_height*2, 0, 0, png_frame_width*4, png_frame_height );
 
-            gdImageGifAnimAdd(frame_imgs[run_num], out, 1, 0, 0, 100, 1, NULL);
+            gdImageGifAnimAdd(frame_imgs[run_num], out, 1, 0, 0, 100, 1, frame_imgs[run_num-1]);
 
             gdImageDestroy(text_pane);
             gdImageDestroy(input_image);
