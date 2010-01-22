@@ -286,13 +286,15 @@ void create_animation( obj_loc_t obj_loc, int id )
 
             gdImageCopy(frame_imgs[run_num], text_pane, png_frame_width, png_frame_height*2, 0, 0, png_frame_width*4, png_frame_height );
 
+            int delay = (( run_num+1 == monitor_font_results_end(font_num) ) ? 500 : 100 );
+
             if ( run_num == 0 ) 
             {
-                gdImageGifAnimAdd(frame_imgs[run_num], out, 1, 0, 0, 100, 1, NULL);
+                gdImageGifAnimAdd(frame_imgs[run_num], out, 1, 0, 0, delay, 1, NULL);
             }
             else 
             {
-                gdImageGifAnimAdd(frame_imgs[run_num], out, 1, 0, 0, 100, 1, frame_imgs[run_num-1]);
+                gdImageGifAnimAdd(frame_imgs[run_num], out, 1, 0, 0, delay, 1, frame_imgs[run_num-1]);
             }
 
             gdImageDestroy(text_pane);
@@ -302,6 +304,11 @@ void create_animation( obj_loc_t obj_loc, int id )
             {
                 gdImageDestroy(imgs[i]);
             }
+        }
+
+        for ( int run_num = monitor_font_results_start(font_num) ; run_num < monitor_font_results_end(font_num) ; run_num++ )
+        {
+            gdImageDestroy(frame_imgs[run_num]);
         }
     }
 
