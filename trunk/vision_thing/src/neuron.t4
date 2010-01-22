@@ -2,6 +2,7 @@
 
 sub
     input input
+    monitor monitor
 
 static
     int image

@@ -7,15 +7,23 @@
 
 #include <iostream>
 #include <iomanip>
+#include <map>
+
+#include "gd.h"
 
 #include "neuron_wrapper.c"
 
+void print_weights( obj_loc_t obj_loc, int id );
+void save_weight_matrix( weight_matrix* weight_matrix, string filename );
+
 using namespace std;
 
-void print_weights( obj_loc_t obj_loc, int id );
+static int zoom(2);
 
 int calculate_neuron( obj_loc_t obj_loc, int id )
 {
+    int local_run_number = monitor_num_runs;
+
     if ( ! object_init( id ) )
     {
         for ( int row = 0 ; row < NUM_ROWS ; row++ )
@@ -25,6 +33,8 @@ int calculate_neuron( obj_loc_t obj_loc, int id )
                 neuron_weights_row_col( row, col ) = 0.0;
             }
         }
+
+        local_run_number = 0;
     }
 
     if ( object_log_level(id) >= 2 )
@@ -104,6 +114,10 @@ int calculate_neuron( obj_loc_t obj_loc, int id )
 
     //print_weights( obj_loc, id );
 
+    std::ostringstream filename;
+    filename << object_name( id ) << "_" << local_run_number<< ".png";
+    save_weight_matrix( &neuron_weights, filename.str() );
+
     return 1;
 }
 
@@ -119,3 +133,94 @@ void print_weights( obj_loc_t obj_loc, int id )
         cout << endl;
     }
 }
+
+void save_weight_matrix( weight_matrix* weight_matrix, string filename )
+{
+    FILE *pngout = fopen( filename.c_str(), "wb");
+
+    gdImagePtr im = gdImageCreate(NUM_COLS*zoom, NUM_ROWS*zoom);
+
+    double max_weight = 0;
+    double min_weight = 0;
+
+    for ( int row = 0 ; row < NUM_ROWS ; row++ )
+    {
+        for ( int col = 0 ; col < NUM_COLS ; col++ )
+        {
+            if ( (*weight_matrix).row[row].col[col] > max_weight )
+                max_weight = (*weight_matrix).row[row].col[col];
+
+            if ( (*weight_matrix).row[row].col[col] < min_weight )
+                min_weight = (*weight_matrix).row[row].col[col];
+        }
+    }
+
+    double max_weight_coeff = 127/max_weight;
+    double min_weight_coeff = 127/min_weight;
+
+    //cout << "max_weight: " << max_weight << ", min_weight: " << min_weight << "max_weight_coeff: " << max_weight_coeff << ", min_weight_coeff: " << min_weight_coeff << endl;
+
+    int grey = gdImageColorAllocate(im, 127, 127, 127 ); 
+
+    std::map<double, int> colour_table;
+
+    double this_weight(0);
+
+    for ( int row = 0 ; row < NUM_ROWS ; row++ )
+    {
+        for ( int col = 0 ; col < NUM_COLS ; col++ )
+        {
+            this_weight = (*weight_matrix).row[row].col[col]; 
+
+            if ( this_weight > 0 )
+            {
+                if ( ! colour_table[this_weight] )
+                {
+                    int colour = 127 - (int)( this_weight * max_weight_coeff );
+
+                    colour_table[this_weight] = gdImageColorAllocate(im, colour, colour, colour ); 
+
+                   //cout << "Creating new colour for " << this_weight << ": " << colour << "("<< colour_table[this_weight]  <<")" <<endl;
+                }
+            } 
+            else if ( this_weight < 0 )
+            {
+                if ( ! colour_table[this_weight] )
+                {
+                    int colour = 127 - (int)( this_weight * -min_weight_coeff );
+
+                    colour_table[this_weight] = gdImageColorAllocate(im, colour, colour, colour ); 
+
+                   //cout << "Creating new colour for " << this_weight << ": " << colour << "("<< colour_table[this_weight]  <<")" <<endl;
+                }
+
+            }
+            else 
+            {
+                colour_table[this_weight] = grey;
+            }
+
+        }
+    }
+
+    int this_colour(0);
+
+    for ( int row = 0 ; row < NUM_ROWS*zoom ; row++ )
+    {
+        for ( int col = 0 ; col < NUM_COLS*zoom ; col++ )
+        {
+            this_weight = (*weight_matrix).row[row/zoom].col[col/zoom]; 
+            this_colour = colour_table[this_weight];
+
+            gdImageSetPixel( im, col, row, this_colour );
+        }
+    }
+
+    gdImagePng(im, pngout);
+
+    fclose(pngout);
+    gdImageDestroy(im);
+
+}
+
+

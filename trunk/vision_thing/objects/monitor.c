@@ -15,7 +15,6 @@
 
 #include "common.c"
 
-void save_weight_matrix( weight_matrix* weight_matrix, string filename );
 void create_animation( obj_loc_t obj_loc, int id );
 
 using namespace std;
@@ -71,15 +70,15 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
             {
                 for ( int i=0 ; i < NUM_FONTS ; i++ )
                 {
-                    cout << "Font " << i << " start: " << monitor_font_results_start(i) << ", end: " << monitor_font_results_end(i) << ", total: " << monitor_font_results_end(i) - monitor_font_results_start(i) << endl;
+                    //cout << "Font " << i << " start: " << monitor_font_results_start(i) << ", end: " << monitor_font_results_end(i) << ", total: " << monitor_font_results_end(i) - monitor_font_results_start(i) << endl;
 
                     for ( int j=monitor_font_results_start(i)  ; j < monitor_font_results_end(i) ; j++ )
                     {
                         for ( int num_neurons=0 ; num_neurons < NUM_NEURONS ; num_neurons++ )
                         {
-                            cout << monitor_run_results_row( j, num_neurons );
+                            //cout << monitor_run_results_row( j, num_neurons );
                         }
-                        cout << endl; 
+                        //cout << endl; 
                     }
                 }
 
@@ -101,15 +100,6 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
     if ( monitor_num_runs > MAX_NUM_RUNS )
     {
         cerr << "Error: Num runs exceeded MAX_NUM_RUNS=" << MAX_NUM_RUNS << ". Please increase, precompile, compile and re-start." << endl;
-    }
-
-    for ( int i = 0 ; i < NUM_NEURONS ; i++ )
-    {
-        std::ostringstream filename;
-        filename << object_name( ((t4::monitor*)obj_loc[id])->neurons[i]) << "_" << monitor_num_runs << ".png";
-
-        save_weight_matrix( &neurons_weights( i ), filename.str() );
-
     }
 
     return 1;
@@ -138,12 +128,14 @@ void create_animation( obj_loc_t obj_loc, int id )
 
     gdImageGifAnimAdd(master_img, out, 0, 0, 0, 100, 1, NULL);
 
-    gdImagePtr frame_imgs[MAX_NUM_RUNS];
+    int num_correct(0);
+    int num_incorrect(0);
 
     for ( int font_num=0 ; font_num < NUM_FONTS ; font_num++ )
     {
-        int num_correct(0);
-        int num_incorrect(0);
+        gdImagePtr frame_imgs[MAX_NUM_RUNS];
+        int num_font_correct(0);
+        int num_font_incorrect(0);
 
         for ( int run_num = monitor_font_results_start(font_num) ; run_num < monitor_font_results_end(font_num) ; run_num++ )
         {
@@ -154,7 +146,7 @@ void create_animation( obj_loc_t obj_loc, int id )
             for ( int neuron_id = 0 ; neuron_id < NUM_NEURONS ; neuron_id++ )
             {
                 std::ostringstream filename;
-                filename << object_name( ((t4::monitor*)obj_loc[id])->neurons[neuron_id]) << "_" << run_num+1 << ".png";
+                filename << object_name( ((t4::monitor*)obj_loc[id])->neurons[neuron_id]) << "_" << run_num << ".png";
                 FILE *in = fopen(filename.str().c_str(), "rb");
 
                 imgs[neuron_id] = gdImageCreateFromPng(in);
@@ -167,11 +159,13 @@ void create_animation( obj_loc_t obj_loc, int id )
                 if ( monitor_run_results_row( run_num, neuron_id ) == 1 )
                 {
                     this_colour = green;
+                    num_font_correct++;
                     num_correct++;
                 }
                 else
                 {
                     this_colour = red;
+                    num_font_incorrect++;
                     num_incorrect++;
                 }
 
@@ -259,7 +253,7 @@ void create_animation( obj_loc_t obj_loc, int id )
 
             // 2nd row
             std::ostringstream second_row_text;
-            second_row_text << num_correct << "," << num_incorrect;
+            second_row_text << num_font_correct << "," << num_font_incorrect << "    " << num_correct << "," << num_incorrect;
 
             string tmp_str2 = second_row_text.str();
 
@@ -316,94 +310,4 @@ void create_animation( obj_loc_t obj_loc, int id )
       
     fclose(out);
 }
-
-void save_weight_matrix( weight_matrix* weight_matrix, string filename )
-{
-    FILE *pngout = fopen( filename.c_str(), "wb");
-
-    gdImagePtr im = gdImageCreate(NUM_COLS*zoom, NUM_ROWS*zoom);
-
-    double max_weight = 0;
-    double min_weight = 0;
-
-    for ( int row = 0 ; row < NUM_ROWS ; row++ )
-    {
-        for ( int col = 0 ; col < NUM_COLS ; col++ )
-        {
-            if ( (*weight_matrix).row[row].col[col] > max_weight )
-                max_weight = (*weight_matrix).row[row].col[col];
-
-            if ( (*weight_matrix).row[row].col[col] < min_weight )
-                min_weight = (*weight_matrix).row[row].col[col];
-        }
-    }
-
-    double max_weight_coeff = 127/max_weight;
-    double min_weight_coeff = 127/min_weight;
-
-    //cout << "max_weight: " << max_weight << ", min_weight: " << min_weight << "max_weight_coeff: " << max_weight_coeff << ", min_weight_coeff: " << min_weight_coeff << endl;
-
-    int grey = gdImageColorAllocate(im, 127, 127, 127 ); 
-
-    std::map<double, int> colour_table;
-
-    double this_weight(0);
-
-    for ( int row = 0 ; row < NUM_ROWS ; row++ )
-    {
-        for ( int col = 0 ; col < NUM_COLS ; col++ )
-        {
-            this_weight = (*weight_matrix).row[row].col[col]; 
-
-            if ( this_weight > 0 )
-            {
-                if ( ! colour_table[this_weight] )
-                {
-                    int colour = 127 - (int)( this_weight * max_weight_coeff );
-
-                    colour_table[this_weight] = gdImageColorAllocate(im, colour, colour, colour ); 
-
-                   //cout << "Creating new colour for " << this_weight << ": " << colour << "("<< colour_table[this_weight]  <<")" <<endl;
-                }
-            } 
-            else if ( this_weight < 0 )
-            {
-                if ( ! colour_table[this_weight] )
-                {
-                    int colour = 127 - (int)( this_weight * -min_weight_coeff );
-
-                    colour_table[this_weight] = gdImageColorAllocate(im, colour, colour, colour ); 
-
-                   //cout << "Creating new colour for " << this_weight << ": " << colour << "("<< colour_table[this_weight]  <<")" <<endl;
-                }
-
-            }
-            else 
-            {
-                colour_table[this_weight] = grey;
-            }
-
-        }
-    }
-
-    int this_colour(0);
-
-    for ( int row = 0 ; row < NUM_ROWS*zoom ; row++ )
-    {
-        for ( int col = 0 ; col < NUM_COLS*zoom ; col++ )
-        {
-            this_weight = (*weight_matrix).row[row/zoom].col[col/zoom]; 
-            this_colour = colour_table[this_weight];
-
-            gdImageSetPixel( im, col, row, this_colour );
-        }
-    }
-
-    gdImagePng(im, pngout);
-
-    fclose(pngout);
-    gdImageDestroy(im);
-
-}
-
 
