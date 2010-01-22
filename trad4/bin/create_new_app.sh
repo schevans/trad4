@@ -28,7 +28,7 @@ then
     echo > ../../$NEW_APP/$NEW_APP.conf
     echo "echo \"Sourcing $NEW_APP.conf\"" >> ../../$NEW_APP/$NEW_APP.conf
     echo >> ../../$NEW_APP/$NEW_APP.conf
-    echo "NUM_THREADS=4; export NUM_THREADS" >> ../../$NEW_APP/$NEW_APP.conf
+    echo "NUM_THREADS=0; export NUM_THREADS" >> ../../$NEW_APP/$NEW_APP.conf
     echo >> ../../$NEW_APP/$NEW_APP.conf
     echo "BATCH_MODE=1; export BATCH_MODE" >> ../../$NEW_APP/$NEW_APP.conf
     echo >> ../../$NEW_APP/$NEW_APP.conf
