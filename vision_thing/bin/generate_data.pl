@@ -36,7 +36,7 @@ for $image ( @images ) {
     $neuron_id = $image+1; 
 
     print OUTFILE "insert into object values ( $neuron_id, 2, 2, \"neuron_$image\", 0, 1 );\n";
-    print OUTFILE "insert into neuron values ( $neuron_id, $image, $input_id );\n";
+    print OUTFILE "insert into neuron values ( $neuron_id, $image, $input_id, $monitor_id );\n";
 
 }
 
