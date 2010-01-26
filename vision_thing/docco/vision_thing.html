@@ -47,6 +47,8 @@ vision_thing
 
 <ul>
 <li><a href="#introduction">Introduction</a></li>
+<li><a href="#the_input">The The Input</a></li>
+<li><a href="#the_neuron">The Neuron</a></li>
 <li><a href="#the_model">The Model</a></li>
 <li><a href="#implementation">Implementation</a></li>
 <li><a href="#results">Results</a></li>
@@ -59,7 +61,57 @@ vision_thing
 
 <h2><a name="introduction">Introduction</a></h2>
 <p>
-The plan is to create a McCullogh-Pits single layer artificial neural network, show it some images of the digits 0-9 in various fonts, and see what happens. In this case we will create one neuron for each of the target images.
+The plan is to create a McCullogh-Pits single layer artificial neural network, show it some images of the digits 0-9 in various fonts, and see what happens. In this case we will create one neuron for each of the target numbers.
+</p>
+<p>
+You might want to skip straight to the results, which are <a href="./animations.html">here</a>.
+</p>
+<h2><a name="the_input">The Input</a></h2>
+<p>
+The input show to the neurons is a matrix of pixels representing the numbers 0-9 in three different fonts. For example, below are the number 1 in the three fonts.
+</p>
+<img src="./1.LiberationSerif-Bold.png" alt="LiberationSerif-Bold"/>
+<img src="./1.Harabara.png" alt="Harabara"/>
+<img src="./1.OptimusPrinceps.png" alt="OptimusPrinceps"/>
+<p>
+The three fonts are <a href="http://www.dafont.com/liberation-serif.font">LiberationSerif-Bold</a>, <a href="http://www.dafont.com/harabara.font">Harabara</a> and <a href="http://www.dafont.com/optimusprinceps.font">OptimusPrinceps</a>.
+</p>
+<p>
+The numbers 0-9 in each font are shown to the network until the network converges, then the numbers in the next font are shown until the network converges on the new font etcetera until all fonts have been displayed.
+</p>
+
+<h2><a name="the_neuron">The Neuron</a></h2>
+<p>
+Each neuron is tasked with recognising a single digit, so in this section we'll be concentrating on the neuron who's job is it to recognise '1'.
+</p>
+<p>
+At the heart of the neuron lies the weight matrix where each cell in the matrix corresponds to a single pixel of the input image. Each number in the matrix gives the weight or importance of a particular pixel in recognising our overall target number. We'll start with a very simple 8-bit example of the number 1: 
+</p>
+00111000<br>
+01111000<br>
+11011000<br>
+00011000<br>
+00011000<br>
+00011000<br>
+01111110<br>
+01111110<br>
+<p>
+As you can see this is a (crude) monochrome bit map of the number 1. When this is shown to our neuron, it will multiply each 1 in the image by the corresponding value in the 8-bit weight matrix, and sum the result. If that result is greater than 0, it means it thinks it's being shown a 1 and will set it's output flag to 1.. If the result is less than or equal to 0 it meant the neuron thinks it's not a 1, and set's it's output flag to 0. It's important to note that if the neuron doesn't think it's being shown a 1, it doesn't care what it might otherwise be - that's a job for the other neurons.
+</p>
+<p>
+Next, the neuron checks to see it it's correct. (The teaching mechanism is internal to the neurons themselves, partially to allow for concurrency but mainly because it made the most sense programatically.) There are three possible outcomes:
+</p>
+<p>
+1) The neuron could be correct, either in correctly identifying a 1 or by correctly identifying that it's not a 1. In this case we do nothing to the weight matrix.
+</p>
+<p>
+2) The neuron could be incorrect, by thinking it hasn't been shown a 1 when it has. In this case we need to increase the chance the next time it's show a 1 to get it correct. We do by increasing the values in the weight matrix that correspond to an active pixel. This means next time this image is shown and the results are summed we'll be above the firing threshold of 0.0.
+</p>
+<p>
+3) The neuron could be incorrect, by thinking it has been shown a 1 where in fact it hasn't. In this case we need to decrease the chance of this happening again by decreasing the values in the weight matrix that correspond to an active pixel. This means next time the neuron will take less notice of those pixels.
+</p>
+<p>
+This process is repeated for each of the input images until the neuron converges, convergence being defined as no adjustment to the weight matrix is made after being shown the complete set of 0-0 images.
 </p>
 <h2><a name="the_model">The Model</a></h2>
 <p>
