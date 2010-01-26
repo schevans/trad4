@@ -52,7 +52,7 @@ int calculate_neuron( obj_loc_t obj_loc, int id )
         }
     }
 
-    if ( local_agg > 0.0 )
+    if ( local_agg >= 0.0 )
     {
         neuron_output = 1;
     }
