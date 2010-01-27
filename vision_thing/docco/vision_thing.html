@@ -131,120 +131,17 @@ This process is repeated for each of the input images until the neuron converges
 </p>
 <p>
 
-</p>
-<h3>The t4 files</h3>
-<h4>input.t4:</h4>
-<blockquote><pre>
-sub
-    monitor monitor
 
-static
-    int font_order[NUM_FONTS]
-
-pub
-    int image_number
-    int font_number
-    font fonts[NUM_FONTS]
-
-</pre></blockquote>
-<ul>
-<li>sub:
-    <ul>
-    <li>monitor - the input object subscribes to the monitor so convergence of one font can be detected</li>
-    </ul>
-</li>
-
-<li>static:
-    <ul>
-    <li>font_order[NUM_FONTS] - the order the fonts are displayed</li>
-    </ul>
-</li>
-
-<li>pub:
-    <ul>
-    <li>image_number - the current image number being displayed</li>
-    <li>font_number - the current font being displayed</li>
-    <li>fonts[NUM_FONTS] - the list of fonts</li>
-    </ul>
-</li>
-
-</ul>
-<p>
-
-</p>
-<h4>neuron.t4:</h4>
-<blockquote><pre>
-sub
-    input input
-
-static
-    int image
-
-pub
-    weight_matrix weights
-    int output
-    int correct
-
-</pre></blockquote>
-<ul>
-<li>sub:
-    <ul>
-    <li>input - all neurons subscribe to a single input</li>
-    </ul>
-</li>
-
-<li>static:
-    <ul>
-    <li>image - the image number which this neuron is looking for (for teaching)</li>
-    </ul>
-</li>
-
-<li>pub:
-    <ul>
-    <li>weights - this neuron's weight matrix</li>
-    <li>output - if this neuron thinks it's being shown the image it's looking for</li>
-    <li>correct - whether the neuron is correct or not (found by comparing input, image and output)</li>
-    </ul>
-</li>
-
-</ul>
-<p>
-
-</p>
-<h4>monitor.t4:</h4>
-<blockquote><pre>
-sub
-    input input
-    neuron neurons[NUM_NEURONS]
-
-pub
-    int num_runs
-    int num_cycles_correct
-    int converged
-
-</pre></blockquote>
-<ul>
-<li>sub:
-    <ul>
-    <li>input - the single input object</li>
-    <li>neurons[NUM_NEURONS] - the array of neuron objects</li>
-    </ul>
-</li>
-
-<li>pub:
-    <ul>
-    <li>num_runs - number of times all tiers have been run (used internally for detecting convergence)</li>
-    <li>num_cycles_correct - the number of correct runs in a row (used internally for detecting convergence)</li>
-    <li>converged - if the neurons have converged on a particular font</li>
-    </ul>
-</li>
-
-</ul>
-<p>
 </p>
 <h2><a name="results">Results</a></h2>
 <p>
 <a  href="animations.html">Animations</a>
+</p>
+<p>
+<img src="results1.png" alt="results1"/>
+</p>
+<p>
+<img src="results2.png" alt="results2"/>
 </p>
 <h2><a name="new_usages">New Language usages</a></h2>
 <p>
@@ -256,10 +153,10 @@ pub
 One notable feature about the model presented above it that it makes no difference what order the pixels are presented to the neurons - were you to scramble all the images by remapping the pixels randomly but consistently, the model will still converge. This, it turns out, is a bad thing - it means there is no account taken of the context of each pixel, which is obviously very important. More work needs to be done in this area.
 </p>
 <p>
-The animations could be better presented and synchronised. Welcome to my life.
+
 </p>
 <p>
-The neuron write weight matrix could be moved down to the neuron (I think - libgd seems to have some peculiar requirements of the heap)
+
 </p>
 <h2><a name="usage">Usage</a></h2>
 <h3>Running</h3>
