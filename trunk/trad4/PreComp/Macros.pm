@@ -37,8 +37,8 @@ sub Generate($$) {
 
             $code_comment = "// ";
 
-            print $FHD "#ifndef __$type"."_macros_h__\n";
-            print $FHD "#define __$type"."_macros_h__\n";
+            print $FHD "#ifndef __t4_app_$type"."_macros_h__\n";
+            print $FHD "#define __t4_app_$type"."_macros_h__\n";
             print $FHD "\n";
 
         }

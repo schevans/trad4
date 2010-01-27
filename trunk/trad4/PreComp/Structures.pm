@@ -17,8 +17,8 @@ sub Generate($) {
     if( ! $FHD ) { return; }
 
     print $FHD "\n";
-    print $FHD "#ifndef __structures_h__\n";
-    print $FHD "#define __structures_h__\n";
+    print $FHD "#ifndef __t4_app_structures_h__\n";
+    print $FHD "#define __t4_app_structures_h__\n";
     print $FHD "\n";
     print $FHD "#include \"constants.h\"\n";
     print $FHD "#include \"aliases.h\"\n";
