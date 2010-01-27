@@ -15,8 +15,8 @@ sub Generate($) {
     if( ! $FHD ) { return; }
 
     print $FHD "\n";
-    print $FHD "#ifndef __constants_h__\n";
-    print $FHD "#define __constants_h__\n";
+    print $FHD "#ifndef __t4_app_constants_h__\n";
+    print $FHD "#define __t4_app_constants_h__\n";
     print $FHD "\n";
 
     foreach $key ( keys %{$constants_hash} ) {

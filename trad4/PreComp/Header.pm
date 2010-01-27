@@ -19,8 +19,8 @@ sub Generate($) {
     if( ! $FHD ) { return; }
 
     print $FHD "\n";
-    print $FHD "#ifndef __$name"."__\n";
-    print $FHD "#define __$name"."__\n";
+    print $FHD "#ifndef __t4_app_$name"."__\n";
+    print $FHD "#define __t4_app_$name"."__\n";
     print $FHD "\n";
     print $FHD "#include <sys/types.h>\n";
     print $FHD "\n";
