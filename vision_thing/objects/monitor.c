@@ -76,10 +76,11 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
                     {
                         for ( int num_neurons=0 ; num_neurons < NUM_NEURONS ; num_neurons++ )
                         {
-                            //cout << monitor_run_results_row( j, num_neurons );
+                            //cout << monitor_run_results_row( j, num_neurons ) << ",";
                         }
                         //cout << endl; 
                     }
+                    //cout << endl; 
                 }
 
                 create_animation( obj_loc, id );
@@ -137,7 +138,7 @@ void create_animation( obj_loc_t obj_loc, int id )
         int num_font_correct(0);
         int num_font_incorrect(0);
 
-        for ( int run_num = monitor_font_results_start(font_num) ; run_num < monitor_font_results_end(font_num) ; run_num++ )
+        for ( int run_num = monitor_font_results_start(font_num) ; run_num <= monitor_font_results_end(font_num) ; run_num++ )
         {
             frame_imgs[run_num] = gdImageCreate(master_img_width, master_img_height);
 
@@ -280,7 +281,7 @@ void create_animation( obj_loc_t obj_loc, int id )
 
             gdImageCopy(frame_imgs[run_num], text_pane, png_frame_width, png_frame_height*2, 0, 0, png_frame_width*4, png_frame_height );
 
-            int delay = (( run_num+1 == monitor_font_results_end(font_num) ) ? 500 : 100 );
+            int delay = (( run_num == monitor_font_results_end(font_num) ) ? 500 : 100 );
 
             if ( run_num == 0 ) 
             {
