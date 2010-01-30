@@ -58,11 +58,11 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
         {
             int adjusted_num_runs = monitor_num_runs - ( NUM_IMAGES * ( 1 + input_font_number ));
 
-            cout << "Converged in " << adjusted_num_runs << " runs on font " << input_font_number << endl;
-            cout << endl;
-
             monitor_font_results_end(input_font_number) = adjusted_num_runs;
             
+            cout << "Converged in " << monitor_font_results_end(input_font_number) - monitor_font_results_start(input_font_number) << " runs on font " << input_font_number << endl;
+            cout << endl;
+
             monitor_converged = 1;
             monitor_num_cycles_correct = 0;
 
@@ -70,8 +70,6 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
             {
                 for ( int i=0 ; i < NUM_FONTS ; i++ )
                 {
-                    //cout << "Font " << i << " start: " << monitor_font_results_start(i) << ", end: " << monitor_font_results_end(i) << ", total: " << monitor_font_results_end(i) - monitor_font_results_start(i) << endl;
-
                     for ( int j=monitor_font_results_start(i)  ; j < monitor_font_results_end(i) ; j++ )
                     {
                         for ( int num_neurons=0 ; num_neurons < NUM_NEURONS ; num_neurons++ )
