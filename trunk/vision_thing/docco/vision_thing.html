@@ -25,15 +25,15 @@ vision_thing
 <table border="1">
 <tr>
 <td>Application version</td>
-<td>1.0</td>
+<td><a href="http://sourceforge.net/projects/trad4/files/trad4v3/trad4v3.1/trad4_v3_1_beta01.tar.gz/download">beta01</a></td>
 </tr>
 <tr>
 <td>Trad4 version</td>
-<td>3.1</td>
+<td><a href="http://sourceforge.net/projects/trad4/files/trad4v3/trad4v3.1/trad4_v3_1_beta01.tar.gz/download">3.1</a></td>
 </tr>
 <tr>
 <td>Document version</td>
-<td>1.0</td>
+<td>beta02</td>
 </tr>
 <tr>
 <td>Author</td>
@@ -41,16 +41,15 @@ vision_thing
 </tr>
 <tr>
 <td>Date</td>
-<td>31-12-09</td>
+<td>05-02-10</td>
 </tr>
 </table>
 
 <ul>
 <li><a href="#introduction">Introduction</a></li>
+<li><a href="#the_model">The Model</a></li>
 <li><a href="#the_input">The The Input</a></li>
 <li><a href="#the_neuron">The Neuron</a></li>
-<li><a href="#the_model">The Model</a></li>
-<li><a href="#implementation">Implementation</a></li>
 <li><a href="#results">Results</a></li>
 <li><a href="#new_usages">New language usages</a></li>
 <li><a href="#further_work">Further Work</a></li>
@@ -61,13 +60,13 @@ vision_thing
 
 <h2><a name="introduction">Introduction</a></h2>
 <p>
-The plan is to create a McCullogh-Pits single layer artificial neural network, show it some images of the digits 0-9 in various fonts, and see what happens. In this case we will create one neuron for each of the target numbers.
+The plan is to create a McCulloch-Pitts single layer artificial neural network, show it some images of the digits 0-9 in various fonts, and see what happens. In this case we will create one neuron for each of the target numbers.
 </p>
 <p>
 You might want to skip straight to the results, which are <a href="./animations.html">here</a>.
 </p>
 <p>
-<h2><a name="implementation">Implementation</a></h2>
+<h2><a name="the_model">The Model</a></h2>
 <h3>The abstract diagram</h3>
 <p>
 <img src="abstract.jpg" alt="abstract"/>
@@ -148,13 +147,14 @@ In the next case above the neuron has been shown a 1, but as many of it's weight
 </p>
 <p>
 In the above case, the neuron has been presented with a "2". As the weight matrix has just been heavily biased in favour of seeing "1"s everywhere, it will wrongly produce a yes output. Again as in the first example, the weight matrix will be adjusted downwards for those active pixels. This means that the portion of the image that corresponds to both "1" and "2" will be given less weight than those only pertaining to "1". If you zoom in your browser view (ctrl-mousewheel) you can see the shadows. It's worth noting two points at this stage.
+</p>
 <p>
-The first is that the incorrect cases 2) and 3) carry different weight adjustments. Case3 (where it wrongly thinks it has been shown a "1" when it hasn't will occur far more frequently than case2 (where it is being shown a "1" but gets it wrong), so the down adjustment to active pixels will be smaller than the up adjustment, by a factor of 10.
+The first is that the incorrect cases 2) and 3) carry different weight adjustments. Case3 (where it wrongly thinks it has been shown a "1" when it hasn't) will occur far more frequently than case2 (where it is being shown a "1" but gets it wrong), so the down adjustment to active pixels will be smaller than the up adjustment, by a factor of 10.
 </p>
 <p>
 The second point is that the images of the weight matrix produced are scaled, so that max(up)=black and min(down)=white. This, combined with the first point above means that it will appear that black features more highly in the images than white, when in fact internally the effects of the white region are more pronounced.
 </p>
-<h2><a name="the_model">The Model</a></h2>
+
 <p>
 
 </p>
@@ -181,21 +181,32 @@ By far the most important contribution this app has made to the trad4 architectu
 <i><b>Third-party libs are OK, as long as you keep them on the stack.</b></i>
 </p>
 <p>
-This app makes extensive use of the excellent <a href="http://www.libgd.org/Main_Page">libgd</a>, a graphics library used for converting from fonts to pngs, and creating the output. Libgd may or may not be thread-safe (I haven't checked), but it can be used in a multi-threaded environment as long as you know that any heap <i>it</i> uses will be cleaned up on exit from the calculate function. Apologies to anyone I might have scared off by my assertions in the v3.0 docco - this will be corrected shortly.
+This app makes extensive use of the excellent <a href="http://www.libgd.org/Main_Page">libgd</a>, a graphics library used here for converting from fonts to bit maps, and creating the output. Libgd may or may not be thread-safe (I haven't checked), but it can be used in a multi-threaded environment as long as you know that any heap <i>it</i> uses will be cleaned up on exit from the calculate function. Apologies to anyone I might have scared off with my assertions in the v3.0 manual - this will be corrected shortly.
 </p>
 <p>
-That being said, there are circumstances where keeping 3rd party code on the stack is not an option. Witness jpm_cds, where we are actually porting an existing application to the trad4 architecture. This discussion is beyond the scope of this document, but will be addressed in the all-new trad4v3.1 manual. The jpm_cdsv2 model is actually a high priority for me, but quite frankly feels like a bit of a busman's holiday, so I haven't given it as much time as I should have.
+That being said, there are circumstances where keeping 3rd party code on the stack is not an option. Witness jpm_cds, where we are actually porting an existing application to the trad4 architecture. This discussion is beyond the scope of this document, but will be addressed in the all-new trad4v3.1 manual (forthcoming). The jpm_cdsv2 model is actually a very high priority of mine, but quite frankly feels like a bit of a busman's holiday, so I haven't given it as much time as I should have done.
 </p>
 <p>
 -Passing images by pointer
--3rd party libs ok
 </p>
 <h2><a name="further_work">Further Work</a></h2>
+<p>
+By far the greatest omission from this model as presented here it that the fonts are not re-run. Once font1 has converged, the corrections to the weight matrix through learning font2 may (in fact, probably will) break the convergence on font1. This can be corrected by iterating between the two font until the model converges on both. Once it's converged on both, the third font is shown, and once that converges again all three fonts should be iterated over until the model has converged on all three. This may have been corrected by the time this is out of beta.
+</p>
+<p>
+Another notable issue is that the fonts do not fill the weight matrix frames - they fill a central strip but are surrounded by neutral greyspace. There is scope for a lot more work here.
+</p>
+<p>
+The order the fonts are displayed will effect the results. Optimus is a lot more wispy than the others, so if this font was to be shown first you would expect slower convergence from the others. As this tends towards a rather abstract and pointless discussion about how 'different' fonts are from one another I've chosen not to pursue this, and kept them in the order I found them.
+</p>
+<p>
+While we're on the subject of the fonts another important issue to note is selection bias - I picked these three fonts because I thought they would prove and test the model. Throw me a bone here - v1.0 is a single layer McCulloch-Pitts model (which, in case you haven't followed the links, was published in 1943).
+</p>
 <p>
 One notable feature about the model presented above it that it makes no difference what order the pixels are presented to the neurons - were you to scramble all the images by remapping the pixels randomly but consistently, the model will still converge. This, it turns out, is a bad thing - it means there is no account taken of the context of each pixel, which is obviously very important. More work needs to be done in this area.
 </p>
 <p>
-
+The code needs a clean-up, as it always does.
 </p>
 <p>
 
