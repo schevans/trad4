@@ -59,8 +59,9 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
             int adjusted_num_runs = monitor_num_runs - ( NUM_IMAGES * ( 1 + input_font_number ));
 
             monitor_font_results_end(input_font_number) = adjusted_num_runs;
-            
-            cout << "Converged in " << monitor_font_results_end(input_font_number) - monitor_font_results_start(input_font_number) << " runs on font " << input_font_number << endl;
+           
+            cout << "Font " << font_map[input_font_number] << " converged in " << monitor_font_results_end(input_font_number) - monitor_font_results_start(input_font_number) << " cycles." << endl;
+ 
             cout << endl;
 
             monitor_converged = 1;
@@ -81,7 +82,11 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
                     //cout << endl; 
                 }
 
+                cout << "Creating animation.." << endl;
+
                 create_animation( obj_loc, id );
+
+                cout << "Done." << endl;
 
                 exit(0);
             }
