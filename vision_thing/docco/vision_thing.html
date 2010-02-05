@@ -25,11 +25,11 @@ vision_thing
 <table border="1">
 <tr>
 <td>Application version</td>
-<td><a href="http://sourceforge.net/projects/trad4/files/trad4v3/trad4v3.1/trad4_v3_1_beta01.tar.gz/download">beta01</a></td>
+<td><a href="https://sourceforge.net/projects/trad4/files/trad4v3.1/trad4_v3_1_beta02.tar.gz/download">beta02</a></td>
 </tr>
 <tr>
 <td>Trad4 version</td>
-<td><a href="http://sourceforge.net/projects/trad4/files/trad4v3/trad4v3.1/trad4_v3_1_beta01.tar.gz/download">3.1</a></td>
+<td><a href="https://sourceforge.net/projects/trad4/files/trad4v3.1/trad4_v3_1_beta02.tar.gz/download">3.1</a></td>
 </tr>
 <tr>
 <td>Document version</td>
@@ -93,7 +93,7 @@ The input show to the neurons is a matrix of pixels representing the numbers 0-9
 The three fonts are <a href="http://www.dafont.com/liberation-serif.font">LiberationSerif-Bold</a>, <a href="http://www.dafont.com/harabara.font">Harabara</a> and <a href="http://www.dafont.com/optimusprinceps.font">OptimusPrinceps</a>.
 </p>
 <p>
-The numbers 0-9 in each font are shown to the network until the network converges, then the numbers in the next font are shown until the network converges on the new font etcetera until all fonts have been displayed.
+The numbers 0-9 in each font are shown to the network until the network converges, then the numbers in the next font are shown until the network converges on the new font etc. until all fonts have been displayed.
 </p>
 
 <h2><a name="the_neuron">The Neuron</a></h2>
@@ -101,7 +101,10 @@ The numbers 0-9 in each font are shown to the network until the network converge
 Each neuron is tasked with recognising a single digit, so in this section we'll be concentrating on the neuron who's job is it to recognise '1'.
 </p>
 <p>
-At the heart of the neuron lies the weight matrix where each cell in the matrix corresponds to a single pixel of the input image. Each number in the matrix gives the weight or importance of a particular pixel in recognising our overall target number. We'll start with a very simple 8-bit example of the number 1 **FIXME - not weight matrix**: 
+At the heart of the neuron lies the weight matrix where each cell in the matrix corresponds to a single pixel of the input image. Each number in the matrix gives the weight or importance of a particular pixel in recognising our overall target number. 
+</p>
+<p>
+This neuron is shown various images. We'll start with a very simple 8-bit example.
 </p>
 00111000<br>
 01111000<br>
@@ -149,17 +152,19 @@ In the next case above the neuron has been shown a 1, but as many of it's weight
 <img src="./neuron_1_2.png" alt="neuron_1_2"/>
 </p>
 <p>
-In the above case, the neuron has been presented with a "2". As the weight matrix has just been heavily biased in favour of seeing "1"s everywhere, it will wrongly produce a yes output. Again as in the first example, the weight matrix will be adjusted downwards for those active pixels. This means that the portion of the image that corresponds to both "1" and "2" will be given less weight than those only pertaining to "1". If you zoom in your browser view (ctrl-mousewheel) you can see the shadows. It's worth noting two points at this stage.
+In the above case, the neuron has been presented with a 2. As the weight matrix has just been heavily biased in favour of seeing "1"s everywhere, it will wrongly produce a yes output. Again as in the first example, the weight matrix will be adjusted downwards for those active pixels. This means that the portion of the image that corresponds to both 1 and 2 will be given less weight than those only pertaining to "1". If you zoom in your browser view (ctrl-mousewheel) you can see the shadows. It's worth noting two points at this stage.
 </p>
 <p>
-The first is that the incorrect cases 2) and 3) carry different weight adjustments. Case3 (where it wrongly thinks it has been shown a "1" when it hasn't) will occur far more frequently than case2 (where it is being shown a "1" but gets it wrong), so the down adjustment to active pixels will be smaller than the up adjustment, by a factor of 10.
+The first is that the incorrect cases 2) and 3) carry different weight adjustments. Case3 (where it wrongly thinks it has been shown a 1 when it hasn't) will occur far more frequently than case2 (where it is being shown a 1 but gets it wrong), so the down adjustment to active pixels will be smaller than the up adjustment, by a factor of 10.
 </p>
 <p>
 The second point is that the images of the weight matrix produced are scaled, so that max(up)=black and min(down)=white. This, combined with the first point above means that it will appear that black features more highly in the images than white, when in fact internally the effects of the white region are more pronounced.
 </p>
-
 <p>
-
+<img src="./neuron_1_31.png" alt="neuron_1_31"/>
+</p>
+<p>
+The above frame shows the neuron converged on Liberation - all the pixels associated with non-1 numbers have been negatively weighted, while those associated with 1 are positively weighted.
 </p>
 
 <p>
@@ -174,9 +179,17 @@ The second point is that the images of the weight matrix produced are scaled, so
 <img src="results1.png" alt="results1"/>
 </p>
 <p>
+The above graph shows the number of incorrect answers across the neurons per cycle. The first peak corresponds to Liberation etc. This is the only published data set that shows the 10 cycles used to test for convergence.
+</p>
+<p>
 <img src="results2.png" alt="results2"/>
 </p>
+<p>
+The above graph shows number of correct and incorrect answers in total by font.
+</p>
+
 <h2><a name="new_usages">New Language usages</a></h2>
+<h3>Third party libraries</h3>
 <p>
 By far the most important contribution this app has made to the trad4 architecture is the following (and it's so important it deserves it's own line, in bold italics):
 </p>
@@ -184,13 +197,35 @@ By far the most important contribution this app has made to the trad4 architectu
 <i><b>Third-party libs are OK, as long as you keep them on the stack.</b></i>
 </p>
 <p>
-This app makes extensive use of the excellent <a href="http://www.libgd.org/Main_Page">libgd</a>, a graphics library used here for converting from fonts to bit maps, and creating the animations. Libgd may or may not be thread-safe (I haven't checked XXX filesystem locks), but it can be used in a multi-threaded environment as long as you know that any heap <i>it</i> uses will be cleaned up on exit from the calculate function. Apologies to anyone I might have scared off with my assertions in the v3.0 manual - this will be corrected shortly.
+This app makes extensive use of the excellent <a href="http://www.libgd.org/Main_Page">libgd</a>, a graphics library used here for converting from fonts to bit maps, and creating the animations. Libgd may or may not be thread-safe (in this case it writes to the filesystem so there will some limit on scalability), but it can be used in a multi-threaded environment as long as you know that any heap <i>it</i> uses will be cleaned up on exit from the calculate function. Apologies to anyone I might have scared off with my assertions in the v3.0 manual - this will be corrected shortly.
 </p>
 <p>
 That being said, there are circumstances where keeping 3rd party code on the stack is not an option. Witness jpm_cds, where we are actually porting an existing application to the trad4 architecture. This discussion is beyond the scope of this document, but will be addressed in the all-new trad4v3.1 manual (forthcoming). The jpm_cds Phase2 model is actually a very high priority of mine, but quite frankly feels like a bit of a busman's holiday, so I haven't given it as much time as I should have done.
 </p>
+<h3>User function signatures</h3>
 <p>
--Passing images by pointer
+The calculate functions in this app call other user-supplied functions inside the calculate source files. The first is create_animation from monitor.c, which uses the classic:
+</p>
+<blockquote><pre>
+void create_animation( obj_loc_t obj_loc, int id );
+</pre></blockquote>
+<p>
+Which is discussed (perhaps rather vaguely) in the manual. The idea being if your function signatures are thus all the macros will work and you can carry on as normal.
+</p>
+<p>
+The second case is save_weight_matrix from neuron.c, and this just passes the structure by pointer:
+</p>
+<blockquote><pre>
+void save_weight_matrix( weight_matrix* weight_matrix, string filename );
+</pre></blockquote>
+<p>
+In this case it's just the structure we need (and the filename), so it doesn't matter if the macros won't work. However, to de-reference the structure within that function you need to use the rather clumsy notation:
+</p>
+<blockquote><pre>
+(*weight_matrix).row[1].col[3] = 6;	// or whatever
+</pre></blockquote>
+<p>
+And this is because a) the standard function signature is not used so the macros won't work, and b) there aren't any nice macros for the structures anyway. I see the above notation as a plexiglass window into the sausage factory, so I plan to provide macros for these in the medium term.
 </p>
 <h2><a name="further_work">Further Work</a></h2>
 <p>
@@ -209,7 +244,10 @@ While we're on the subject of the fonts another important issue to note is selec
 One notable feature about the model presented above it that it makes no difference what order the pixels are presented to the neurons - were you to scramble all the images by remapping the pixels randomly but consistently, the model will still converge. This, it turns out, is a bad thing - it means there is no account taken of the context of each pixel, which is obviously very important. More work needs to be done in this area.
 </p>
 <p>
-There's a bug in the animation where the the paused, converged frame for the Harabara font is off by one. Fixing this means re-recording all the output so this isn't going to happen for the beta.
+There's a bug in the animation where the the paused, converged frame for the Harabara font is off by one. Fixing this means re-recording all the output, which isn't going to happen for the beta.
+</p>
+<p>
+Should you run the precompiler you'll see warnings about locally modified Makefiles. Like jpm_cds (though a different situation), this reflects a half-arsed approach to third party library integration in trad4 - another topic beyond the scope of this document. Ignore these warnings, unless you're adding objects, in which case you're looking at a manual merge - sorry.  
 </p>
 <p>
 The code needs a clean-up, as it always does.
@@ -233,14 +271,18 @@ To increase or decrease the number of threads used (the default is 4), set NUM_T
 </p>
 <blockquote><pre>$ export NUM_THREADS=64
 $ vision_thing</pre></blockquote>
+
 <!-- ==================================================================== -->
 
 <div align="center" class="copyright">
-Copyright (c) Steve Evans 2009
+Copyright (c) Steve Evans 2010
 </div>
 
 <!-- ==================================================================== -->
 <br />
+<center>
+<a href="http://sourceforge.net/projects/trad4"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=202177&type=16" width="150" height="40" border="0" alt="Get trad4 at SourceForge.net. Fast, secure and Free Open Source software downloads" /></a>
+</center>
 
 </body>
 </html>
