@@ -60,7 +60,10 @@ vision_thing
 
 <h2><a name="introduction">Introduction</a></h2>
 <p>
-The plan is to create a McCulloch-Pitts single layer artificial neural network, show it some images of the digits 0-9 in various fonts, and see what happens. In this case we will create one neuron for each of the target numbers.
+<p>
+This document is in beta. All questions, corrections and requests for clarifications welcome.
+</p>
+The plan is to create a <a href="http://en.wikipedia.org/wiki/Artificial_neuron">McCulloch-Pitts</a> single layer artificial neural network, show it some images of the digits 0-9 in various fonts, and see what happens. In this case we will create one neuron for each of the target numbers.
 </p>
 <p>
 You might want to skip straight to the results, which are <a href="./animations.html">here</a>.
@@ -98,7 +101,7 @@ The numbers 0-9 in each font are shown to the network until the network converge
 Each neuron is tasked with recognising a single digit, so in this section we'll be concentrating on the neuron who's job is it to recognise '1'.
 </p>
 <p>
-At the heart of the neuron lies the weight matrix where each cell in the matrix corresponds to a single pixel of the input image. Each number in the matrix gives the weight or importance of a particular pixel in recognising our overall target number. We'll start with a very simple 8-bit example of the number 1: 
+At the heart of the neuron lies the weight matrix where each cell in the matrix corresponds to a single pixel of the input image. Each number in the matrix gives the weight or importance of a particular pixel in recognising our overall target number. We'll start with a very simple 8-bit example of the number 1 **FIXME - not weight matrix**: 
 </p>
 00111000<br>
 01111000<br>
@@ -181,10 +184,10 @@ By far the most important contribution this app has made to the trad4 architectu
 <i><b>Third-party libs are OK, as long as you keep them on the stack.</b></i>
 </p>
 <p>
-This app makes extensive use of the excellent <a href="http://www.libgd.org/Main_Page">libgd</a>, a graphics library used here for converting from fonts to bit maps, and creating the output. Libgd may or may not be thread-safe (I haven't checked), but it can be used in a multi-threaded environment as long as you know that any heap <i>it</i> uses will be cleaned up on exit from the calculate function. Apologies to anyone I might have scared off with my assertions in the v3.0 manual - this will be corrected shortly.
+This app makes extensive use of the excellent <a href="http://www.libgd.org/Main_Page">libgd</a>, a graphics library used here for converting from fonts to bit maps, and creating the animations. Libgd may or may not be thread-safe (I haven't checked XXX filesystem locks), but it can be used in a multi-threaded environment as long as you know that any heap <i>it</i> uses will be cleaned up on exit from the calculate function. Apologies to anyone I might have scared off with my assertions in the v3.0 manual - this will be corrected shortly.
 </p>
 <p>
-That being said, there are circumstances where keeping 3rd party code on the stack is not an option. Witness jpm_cds, where we are actually porting an existing application to the trad4 architecture. This discussion is beyond the scope of this document, but will be addressed in the all-new trad4v3.1 manual (forthcoming). The jpm_cdsv2 model is actually a very high priority of mine, but quite frankly feels like a bit of a busman's holiday, so I haven't given it as much time as I should have done.
+That being said, there are circumstances where keeping 3rd party code on the stack is not an option. Witness jpm_cds, where we are actually porting an existing application to the trad4 architecture. This discussion is beyond the scope of this document, but will be addressed in the all-new trad4v3.1 manual (forthcoming). The jpm_cds Phase2 model is actually a very high priority of mine, but quite frankly feels like a bit of a busman's holiday, so I haven't given it as much time as I should have done.
 </p>
 <p>
 -Passing images by pointer
@@ -197,13 +200,16 @@ By far the greatest omission from this model as presented here it that the fonts
 Another notable issue is that the fonts do not fill the weight matrix frames - they fill a central strip but are surrounded by neutral greyspace. There is scope for a lot more work here.
 </p>
 <p>
-The order the fonts are displayed will effect the results. Optimus is a lot more wispy than the others, so if this font was to be shown first you would expect slower convergence from the others. As this tends towards a rather abstract and pointless discussion about how 'different' fonts are from one another I've chosen not to pursue this, and kept them in the order I found them.
+The order the fonts are displayed will effect the results. Optimus is a lot more wispy than the others, so if this font was to be shown first you would expect slower convergence from the next. As this tends towards a rather abstract and pointless discussion about how 'different' fonts are from one another I've chosen not to pursue this, and kept them in the order I found them.
 </p>
 <p>
 While we're on the subject of the fonts another important issue to note is selection bias - I picked these three fonts because I thought they would prove and test the model. Throw me a bone here - v1.0 is a single layer McCulloch-Pitts model (which, in case you haven't followed the links, was published in 1943).
 </p>
 <p>
 One notable feature about the model presented above it that it makes no difference what order the pixels are presented to the neurons - were you to scramble all the images by remapping the pixels randomly but consistently, the model will still converge. This, it turns out, is a bad thing - it means there is no account taken of the context of each pixel, which is obviously very important. More work needs to be done in this area.
+</p>
+<p>
+There's a bug in the animation where the the paused, converged frame for the Harabara font is off by one. Fixing this means re-recording all the output so this isn't going to happen for the beta.
 </p>
 <p>
 The code needs a clean-up, as it always does.
@@ -227,7 +233,14 @@ To increase or decrease the number of threads used (the default is 4), set NUM_T
 </p>
 <blockquote><pre>$ export NUM_THREADS=64
 $ vision_thing</pre></blockquote>
+<!-- ==================================================================== -->
 
+<div align="center" class="copyright">
+Copyright (c) Steve Evans 2009
+</div>
+
+<!-- ==================================================================== -->
+<br />
 
 </body>
 </html>
