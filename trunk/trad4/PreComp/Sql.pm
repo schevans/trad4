@@ -277,7 +277,13 @@ sub GenerateExtraDummyData($$$$$$) {
             print $FHD ", 1";
         }
 
-        print $FHD ", $PI";
+        my $size = PreComp::Utilities::GetArraySize( $master_hash, $var_name );
+
+        for ( $i = 1 ; $i < $size ; $i++ ) {
+
+            print $FHD ", 1";
+        }
+
         print $FHD " );\n";
         PreComp::Utilities::CloseFile();
     }
