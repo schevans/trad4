@@ -390,7 +390,11 @@ void start_threads()
         }
     }
 
-    if ( num_threads == 1 ) 
+    if ( num_threads == 0 ) 
+    {
+        cout << "Running in single-threaded mode." << endl;
+    }
+    else if ( num_threads == 1 ) 
     {
         cout << "Started " << num_threads << " thread." << endl;
     }
