@@ -219,6 +219,12 @@ int run_tier( int tier ) {
 
     int num_objects_fired = 0;
 
+    if ( tier_manager[1][0] == 1  )
+    {
+        cerr << "Error: No objects found on tier 1. Exiting." << endl;
+        exit(1);
+    }
+
     for ( int i=1 ; i < tier_manager[tier][0] ; i++ )
     {
 
