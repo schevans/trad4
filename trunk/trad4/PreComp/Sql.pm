@@ -276,16 +276,18 @@ sub GenerateExtraDummyData($$$$$$) {
         print $FHD "insert into $table_name values ( $type_num";
 
         my $i;
-        for ( $i = 1 ; $i <= $depth ; $i++ ) {
+        for ( $i = 1 ; $i < $depth ; $i++ ) {
 
-            print $FHD ", 1";
+            print $FHD ", $i";
         }
 
         my $size = PreComp::Utilities::GetArraySize( $master_hash, $var_name );
 
-        for ( $i = 1 ; $i < $size ; $i++ ) {
+        my $type_id = PreComp::Utilities::Type2GenDataValue( $master_hash, $var_type );
 
-            print $FHD ", 1";
+        for ( $i = 0 ; $i < $size ; $i++ ) {
+
+            print $FHD ", $type_id";
         }
 
         print $FHD " );\n";

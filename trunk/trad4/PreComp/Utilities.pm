@@ -784,6 +784,41 @@ sub Type2Sql($) {
     return $sql_type;
 }
 
+sub Type2GenDataValue($$) {
+    my $master_hash = shift;
+    my $type = shift;
+
+    my $ret_val;
+
+    if ( exists $master_hash->{aliases}->{data}->{$type} ) {
+
+        $type = $master_hash->{aliases}->{data}->{$type};
+    }
+
+    if ( $type =~ 'double' ) {
+        $ret_val = 3.14;
+    }
+    elsif ( $type =~ 'char' ) {
+        $ret_val = "X";
+    }
+    elsif ( $type =~ 'float' ) {
+        $ret_val = 3.14;
+    }
+    elsif ( $type =~ 'int' || $type =~ 'long') {
+        $ret_val = "999";
+    }
+    elsif ( exists $master_hash->{$type} ) {
+        $ret_val = $master_hash->{$type}->{type_id};
+    }
+    else {
+        
+        print "Error: Unrecognised typed $type.\n";
+        ExitOnError()
+    }
+
+    
+}
+
 sub ExitOnError() {
 
     if ( $exit_on_error ) {
