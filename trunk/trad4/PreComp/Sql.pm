@@ -172,6 +172,11 @@ sub GenerateDummyData($$) {
     my $PI = 3.14;
 
     my $tier = $master_hash->{$type}->{tier};
+
+    if ( $tier == 0 ) {
+        $tier = 1;
+    }
+
     my $type_num = $master_hash->{$type}->{type_id};
 
     my $FHD = PreComp::Utilities::OpenFile( $ENV{APP_ROOT}."/data/default_set/$type.sql" );
@@ -228,7 +233,6 @@ sub GenerateExtraDummyData($$$$$$) {
     if ( exists $master_hash->{structures}->{data}->{$var_type} ) {
 
         my ( $struct_var_name, $struct_var_type, $struct_var_name_stripped );
-
 
         foreach $struct_var_name ( @{$master_hash->{structures}->{data}->{$var_type}->{order}} ) {
 
