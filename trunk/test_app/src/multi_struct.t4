@@ -3,4 +3,5 @@
 
 
 static
-    ms_outer my_outers[4]
+    image images[NUM_IMAGES]
+

@@ -12,10 +12,16 @@ using namespace std;
 
 int calculate_multi_struct( obj_loc_t obj_loc, int id )
 {
-    T4_TEST( multi_struct_my_outers_ig( 0 ), 99 );
-    T4_TEST( multi_struct_my_outers_fr( 3 ), 39.9 );
-    T4_TEST( multi_struct_my_outers_my_inner_ms_d(0,1), 1 );
-    T4_TEST( multi_struct_my_outers_my_inner_ms_ha(3,2,7), 32.7 );
+
+    for ( int row = 0 ; row < NUM_ROWS ; row++ )
+    {
+        for ( int col = 0 ; col < NUM_ROWS ; col++ )
+        {
+            cout << multi_struct_images_row_col( 1, row, col );
+        }
+
+        cout << endl;
+    }
 
     return 1;
 }

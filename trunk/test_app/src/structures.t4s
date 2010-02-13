@@ -11,13 +11,10 @@ struct2
 struct3
     struct1 my_struct1
 
-ms_inner
-    int d
-    float ha[NUM_RATES]
 
+image_row
+   int col[NUM_COLS]
 
-ms_outer
-    ms_inner my_inner_ms[3]
-    int ig
-    float fr
+image
+    image_row row[NUM_ROWS]
 

@@ -15,21 +15,10 @@ int calculate_tier2( obj_loc_t obj_loc, int id )
 
 //cout << "tier2_struct3_nested_scalar_my_struct1_x: " << tier2_struct3_nested_scalar_my_struct1_x << endl;
 
-    T4_TEST( multi_struct_my_outers_ig( 0 ), 99 );
-    T4_TEST( multi_struct_my_outers_ig( 1 ), 199 );
-    T4_TEST( multi_struct_my_outers_ig( 2 ), 299 );
-    T4_TEST( multi_struct_my_outers_ig( 3 ), 399 );
-
-    T4_TEST( multi_struct_my_outers_fr( 0 ), 9.9 );
-    T4_TEST( multi_struct_my_outers_fr( 1 ), 19.9 );
-    T4_TEST( multi_struct_my_outers_fr( 2 ), 29.9 );
-    T4_TEST( multi_struct_my_outers_fr( 3 ), 39.9 );
-
-    T4_TEST( multi_struct_my_outers_my_inner_ms_d(0,1), 1 );
-    T4_TEST( multi_struct_my_outers_my_inner_ms_d(3,2), 32 );
-
-    T4_TEST( multi_struct_my_outers_my_inner_ms_ha(0,0,1), 0.1 );
-    T4_TEST( multi_struct_my_outers_my_inner_ms_ha(3,2,7), 32.7 );
+    T4_TEST( multi_struct_images_row_col( 1, 0, 0), 0 );
+    T4_TEST( multi_struct_images_row_col( 1, 8, 8), 1 );
+    T4_TEST( multi_struct_images_row_col( 0, 8, 8), 0 );
+    T4_TEST( multi_struct_images_row_col( 2, 8, 8), 1 );
 
     T4_TEST( tier1_double_array[ 2 ], 3.14 );
     T4_TEST( tier1_struct_scalar_dates[ 2 ], 5002 );
