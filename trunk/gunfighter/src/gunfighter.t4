@@ -1,0 +1,16 @@
+
+
+sub
+    gunfighter gunfighter1
+    gunfighter gunfighter2
+    monitor monitor
+
+static
+    double kill_prob
+
+pub
+    int alive
+    int killed_someone
+    int killed_whom
+
+
