@@ -180,9 +180,15 @@ sub GetPrintablesFromSection($$$) {
         my $sub_printable;
 
         $printable{name} = $var_name;
-        $printable{type} = $var_type;
         $printable{code} = $var_name;
         $printable{depth} = $depth;
+
+        if ( exists $master_hash->{$var_type} ) {
+            $printable{type} = "id";
+        }
+        else {
+            $printable{type} = $var_type;
+        }
 
         push @ret_array, \%printable;
 
