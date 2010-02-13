@@ -1,0 +1,10 @@
+
+
+sub
+    gunfighter gunfighters[NUM_GUNFIGHTERS]
+
+pub 
+    int reset
+    int num_cycles
+    int mr_black_first_shot
+
