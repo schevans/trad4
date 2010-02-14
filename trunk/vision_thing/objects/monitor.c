@@ -41,14 +41,13 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
         {
             local_all_correct = 0;
             monitor_num_cycles_correct = 0;
-        
-
         }
 
         monitor_run_results_row( monitor_num_runs, i ) = neurons_correct(i);
     }
 
     monitor_run_results_image( monitor_num_runs ) = input_image_number;
+    monitor_run_results_font( monitor_num_runs ) = input_font_number;
 
     monitor_converged = 0;
 
@@ -56,7 +55,7 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
     {
         if ( monitor_num_cycles_correct >= NUM_IMAGES ) 
         {
-            int adjusted_num_runs = monitor_num_runs - ( NUM_IMAGES * ( 1 + input_font_number ));
+            int adjusted_num_runs = monitor_num_runs - NUM_IMAGES;
 
             monitor_font_results_end(input_font_number) = adjusted_num_runs;
            
@@ -69,15 +68,13 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
 
             if ( input_font_number == NUM_FONTS-1 )
             {
-                for ( int i=0 ; i < NUM_FONTS ; i++ )
+                for ( int j=0 ; j <= monitor_num_runs ; j++)
                 {
-                    for ( int j=monitor_font_results_start(i)  ; j < monitor_font_results_end(i) ; j++ )
+                    //cout << j << "," << monitor_run_results_font(j);
+
+                    for ( int num_neurons=0 ; num_neurons < NUM_NEURONS ; num_neurons++ )
                     {
-                        for ( int num_neurons=0 ; num_neurons < NUM_NEURONS ; num_neurons++ )
-                        {
-                            //cout << monitor_run_results_row( j, num_neurons ) << ",";
-                        }
-                        //cout << endl; 
+                        //cout << "," << monitor_run_results_row( j, num_neurons );
                     }
                     //cout << endl; 
                 }
@@ -152,6 +149,7 @@ void create_animation( obj_loc_t obj_loc, int id )
                 std::ostringstream filename;
                 filename << object_name( ((t4::monitor*)obj_loc[id])->neurons[neuron_id]) << "_" << run_num << ".png";
                 FILE *in = fopen(filename.str().c_str(), "rb");
+
 
                 imgs[neuron_id] = gdImageCreateFromPng(in);
 
@@ -238,7 +236,7 @@ void create_animation( obj_loc_t obj_loc, int id )
 
             char* err = gdImageStringFT(NULL,&brect[0],0,f,sz,0.,0,0,s);
 
-            if (err) {fprintf(stderr,err); exit(1);}
+            if (err) { cerr << err << endl; exit(1); }
 
             /* create an image big enough for the string plus a little whitespace */
             x = brect[2]-brect[6] + 12;
@@ -253,7 +251,7 @@ void create_animation( obj_loc_t obj_loc, int id )
             y = 3 - brect[7];
 
             err = gdImageStringFT(text_pane,&brect[0],n_black,f,sz,0.0,x,y,s);
-            if (err) {fprintf(stderr,err); exit(1);}
+            if (err) { cerr << err << endl; exit(1); }
 
             // 2nd row
             std::ostringstream second_row_text;
@@ -265,7 +263,7 @@ void create_animation( obj_loc_t obj_loc, int id )
 
             err = gdImageStringFT(NULL,&brect[0],0,f,sz,0.,0,0,s2);
 
-            if (err) {fprintf(stderr,err); exit(1);}
+            if (err) { cerr << err << endl; exit(1); }
 
             /* create an image big enough for the string plus a little whitespace */
             x = brect[2]-brect[6] + 6;
@@ -280,7 +278,7 @@ void create_animation( obj_loc_t obj_loc, int id )
             y = y + 64;
 
             err = gdImageStringFT(text_pane,&brect[0],n_black,f,sz,0.0,x,y,s2);
-            if (err) {fprintf(stderr,err); exit(1);}
+            if (err) { cerr << err << endl; exit(1); }
 
             gdImageCopy(frame_imgs[run_num], text_pane, png_frame_width, png_frame_height*2, 0, 0, png_frame_width*4, png_frame_height );
 
