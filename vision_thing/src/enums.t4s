@@ -1,0 +1,6 @@
+
+output_enum
+    CORRECT
+    FALSE_POSITIVE
+    FALSE_NEGATIVE
+
