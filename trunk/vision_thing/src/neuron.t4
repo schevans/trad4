@@ -9,6 +9,5 @@ static
 
 pub
     weight_matrix weights
-    int output
-    int correct
+    output_enum output
 

@@ -37,13 +37,13 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
 
     for ( int i = 0 ; i < NUM_NEURONS ; i++ )
     {
-        if ( neurons_correct(i) == 0 )  
+        if ( neurons_output(i) != CORRECT )  
         {
             local_all_correct = 0;
             monitor_num_cycles_correct = 0;
         }
 
-        monitor_run_results_row( monitor_num_runs, i ) = neurons_correct(i);
+        monitor_run_results_neuron_output( monitor_num_runs, i ) = neurons_output(i);
     }
 
     monitor_run_results_image( monitor_num_runs ) = input_image_number;
@@ -74,7 +74,7 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
 
                     for ( int num_neurons=0 ; num_neurons < NUM_NEURONS ; num_neurons++ )
                     {
-                        //cout << "," << monitor_run_results_row( j, num_neurons );
+                        //cout << "," << monitor_run_results_neuron_correct( j, num_neurons );
                     }
                     //cout << endl; 
                 }
@@ -155,18 +155,25 @@ void create_animation( obj_loc_t obj_loc, int id )
 
                 int red = gdImageColorAllocate(imgs[neuron_id], 255, 0, 0);  
                 int green = gdImageColorAllocate(imgs[neuron_id], 0, 255, 0);  
+                int blue = gdImageColorAllocate(imgs[neuron_id], 0, 0, 255);  
 
                 int this_colour;
 
-                if ( monitor_run_results_row( run_num, neuron_id ) == 1 )
+                if ( monitor_run_results_neuron_output( run_num, neuron_id ) == CORRECT )
                 {
                     this_colour = green;
                     num_font_correct++;
                     num_correct++;
                 }
-                else
+                else if ( monitor_run_results_neuron_output( run_num, neuron_id ) == FALSE_NEGATIVE )
                 {
                     this_colour = red;
+                    num_font_incorrect++;
+                    num_incorrect++;
+                }
+                else if ( monitor_run_results_neuron_output( run_num, neuron_id ) == FALSE_POSITIVE )
+                {
+                    this_colour = blue;
                     num_font_incorrect++;
                     num_incorrect++;
                 }

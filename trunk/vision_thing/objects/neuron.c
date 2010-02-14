@@ -52,27 +52,29 @@ int calculate_neuron( obj_loc_t obj_loc, int id )
         }
     }
 
+    int local_correct(0);
+
     if ( local_agg >= 0.0 )
     {
-        neuron_output = 1;
+        local_correct = 1;
     }
     else
     {
-        neuron_output = 0;
+        local_correct = 0;
     }
 
-    if ( ( neuron_output && ( neuron_image == input_image_number )) || ( ! neuron_output && ( neuron_image != input_image_number )))
+    if ( ( local_correct && ( neuron_image == input_image_number )) || ( ! local_correct && ( neuron_image != input_image_number )))
     {
-        DEBUG( "Correct: " << object_name(id) << " says " << ( neuron_output ? "yes" : "no" ) << ", it's looking for " << neuron_image << " and being shown " << input_image_number << "." );
+        DEBUG( "Correct: " << object_name(id) << " says " << ( local_correct ? "yes" : "no" ) << ", it's looking for " << neuron_image << " and being shown " << input_image_number << "." );
 
-        neuron_correct = 1;
+        neuron_output = CORRECT;
     }
     else
     {
-        neuron_correct = 0;
-
-        if ( neuron_output == 1 && neuron_image != input_image_number )
+        if ( local_correct == 1 && neuron_image != input_image_number )
         {
+            neuron_output = FALSE_POSITIVE;
+
             DEBUG( "Incorrect: " << object_name(id) << " says yes but it's looking for " << neuron_image << " but being shown " << input_image_number << ". Reducing active inputs by " << ( 1.0 / NUM_IMAGES ) << "." );
             for ( int row = 0 ; row < NUM_ROWS ; row++ )
             {
@@ -91,8 +93,10 @@ int calculate_neuron( obj_loc_t obj_loc, int id )
             }
         }
 
-        if ( neuron_output == 0 && neuron_image == input_image_number )
+        if ( local_correct == 0 && neuron_image == input_image_number )
         { 
+            neuron_output = FALSE_NEGATIVE;
+
             DEBUG( "Incorrect: " << object_name(id) << " says no but it's looking for " << neuron_image << " and being shown " << input_image_number << ". Increasing active inputs by " << 1.0 << "." );
             for ( int row = 0 ; row < NUM_ROWS ; row++ )
             {

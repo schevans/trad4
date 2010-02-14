@@ -24,6 +24,6 @@ font_result
 run_result
     int image
     int font
-    int row[NUM_NEURONS]
+    output_enum neuron_output[NUM_NEURONS]
     
      
