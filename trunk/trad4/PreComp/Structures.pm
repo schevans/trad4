@@ -22,6 +22,7 @@ sub Generate($) {
     print $FHD "\n";
     print $FHD "#include \"constants.h\"\n";
     print $FHD "#include \"aliases.h\"\n";
+    print $FHD "#include \"enums.h\"\n";
     print $FHD "\n";
 
     my ( $structure, $var );
