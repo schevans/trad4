@@ -16,6 +16,8 @@
 #include "common.c"
 
 void create_animation( obj_loc_t obj_loc, int id );
+void collect_data( obj_loc_t obj_loc, int id );
+int all_neurons_correct( obj_loc_t obj_loc, int id );
 
 using namespace std;
 
@@ -28,79 +30,66 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
     if ( ! object_init( id ) )
     {
         init_font_map( font_map );
-        monitor_num_runs = 0;
-        monitor_num_cycles_correct = 0;
+        monitor_image_number = 0;
+        monitor_font_number = 0;
+        monitor_run_number = 0;
+        monitor_num_correct_neurons = 0;
         monitor_font_results_start( 0 ) = 0;
+        monitor_converged = 0;
     }
 
-    int local_all_correct = 1;
+    collect_data( obj_loc, id );
+    
+    int local_all_correct = all_neurons_correct( obj_loc, id );
 
-    for ( int i = 0 ; i < NUM_NEURONS ; i++ )
+    if ( local_all_correct )
     {
-        if ( neurons_output(i) != CORRECT )  
+        monitor_num_correct_neurons++;
+    }
+    else
+    {
+        monitor_num_correct_neurons = 0;
+    }
+
+    if ( monitor_num_correct_neurons >= NUM_IMAGES )
+    {
+        int adjusted_num_runs = monitor_run_number;
+
+        monitor_font_results_end(monitor_font_number) = adjusted_num_runs;
+
+        cout << "Font " << font_map[monitor_font_number] << " start " << monitor_font_results_start(monitor_font_number) << ", end " << monitor_font_results_end(monitor_font_number) <<  " and took " << monitor_font_results_end(monitor_font_number) - monitor_font_results_start(monitor_font_number) << " cycles." << endl;
+
+        if ( monitor_font_number == NUM_FONTS-1 )
         {
-            local_all_correct = 0;
-            monitor_num_cycles_correct = 0;
+            cout << "Creating animation.." << endl;
+
+            create_animation( obj_loc, id );
+
+            cout << "Done." << endl;
+
+            exit(0);
         }
 
-        monitor_run_results_neuron_output( monitor_num_runs, i ) = neurons_output(i);
+        monitor_font_number++;
+
+        monitor_font_results_start(monitor_font_number) = monitor_run_number+1;
     }
 
-    monitor_run_results_image( monitor_num_runs ) = input_image_number;
-    monitor_run_results_font( monitor_num_runs ) = input_font_number;
-
-    monitor_converged = 0;
-
-    if ( local_all_correct == 1 )
+    if ( monitor_image_number < NUM_IMAGES-1 )
     {
-        if ( monitor_num_cycles_correct >= NUM_IMAGES ) 
-        {
-            int adjusted_num_runs = monitor_num_runs - NUM_IMAGES;
-
-            monitor_font_results_end(input_font_number) = adjusted_num_runs;
-           
-            cout << "Font " << font_map[input_font_number] << " converged in " << monitor_font_results_end(input_font_number) - monitor_font_results_start(input_font_number) << " cycles." << endl;
- 
-            cout << endl;
-
-            monitor_converged = 1;
-            monitor_num_cycles_correct = 0;
-
-            if ( input_font_number == NUM_FONTS-1 )
-            {
-                for ( int j=0 ; j <= monitor_num_runs ; j++)
-                {
-                    //cout << j << "," << monitor_run_results_font(j);
-
-                    for ( int num_neurons=0 ; num_neurons < NUM_NEURONS ; num_neurons++ )
-                    {
-                        //cout << "," << monitor_run_results_neuron_correct( j, num_neurons );
-                    }
-                    //cout << endl; 
-                }
-
-                cout << "Creating animation.." << endl;
-
-                create_animation( obj_loc, id );
-
-                cout << "Done." << endl;
-
-                exit(0);
-            }
-            else
-            {
-                monitor_font_results_start(input_font_number+1) = monitor_num_runs+1;
-            }
-        }
-
-        monitor_num_cycles_correct++;
+        monitor_image_number++;
+    }
+    else
+    {
+        monitor_image_number = 0;
     }
 
-    monitor_num_runs++;
+    monitor_run_number++;
 
-    if ( monitor_num_runs > MAX_NUM_RUNS )
+    if ( monitor_run_number > MAX_NUM_RUNS )
     {
-        cerr << "Error: Num runs exceeded MAX_NUM_RUNS=" << MAX_NUM_RUNS << ". Please increase, precompile, compile and re-start." << endl;
+        cerr << "Error: Num runs exceeded MAX_NUM_RUNS=" << MAX_NUM_RUNS << ". Please increase, precompile, compile and re-start. Exiting." << endl;
+        exit(1);
     }
 
     return 1;
@@ -125,7 +114,7 @@ void create_animation( obj_loc_t obj_loc, int id )
     outfile << "animation" << ".gif";
     FILE *out = fopen(outfile.str().c_str(), "wb");
 
-    gdImageGifAnimBegin(master_img, out, 1, monitor_num_runs);
+    gdImageGifAnimBegin(master_img, out, 1, monitor_run_number);
 
     gdImageGifAnimAdd(master_img, out, 0, 0, 0, 100, 1, NULL);
 
@@ -320,3 +309,28 @@ void create_animation( obj_loc_t obj_loc, int id )
     fclose(out);
 }
 
+void collect_data( obj_loc_t obj_loc, int id )
+{
+    for ( int i = 0 ; i < NUM_NEURONS ; i++ )
+    {
+        monitor_run_results_neuron_output( monitor_run_number, i ) = neurons_output(i);
+    }
+
+    monitor_run_results_image( monitor_run_number ) = monitor_image_number;
+    monitor_run_results_font( monitor_run_number ) = monitor_font_number;
+}
+
+int all_neurons_correct( obj_loc_t obj_loc, int id )
+{
+    int retval=1;
+
+    for ( int i = 0 ; ( i < NUM_NEURONS && retval ) ; i++ )
+    {
+        if ( neurons_output(i) != CORRECT )  
+        {
+            retval = 0;
+        }
+    }
+
+    return retval;
+}

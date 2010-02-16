@@ -22,8 +22,6 @@ static int zoom(2);
 
 int calculate_neuron( obj_loc_t obj_loc, int id )
 {
-    int local_run_number = monitor_num_runs;
-
     if ( ! object_init( id ) )
     {
         for ( int row = 0 ; row < NUM_ROWS ; row++ )
@@ -33,8 +31,6 @@ int calculate_neuron( obj_loc_t obj_loc, int id )
                 neuron_weights_row_col( row, col ) = 0.0;
             }
         }
-
-        local_run_number = 0;
     }
 
     if ( object_log_level(id) >= 2 )
@@ -48,7 +44,7 @@ int calculate_neuron( obj_loc_t obj_loc, int id )
     {
         for ( int col = 0 ; col < NUM_ROWS ; col++ )
         {
-            local_agg = local_agg + ( input_fonts_images_row_col( input_font_number, input_image_number, row, col ) * neuron_weights_row_col( row, col ));
+            local_agg = local_agg + ( input_fonts_images_row_col( monitor_font_number, monitor_image_number, row, col ) * neuron_weights_row_col( row, col ));
         }
     }
 
@@ -63,24 +59,24 @@ int calculate_neuron( obj_loc_t obj_loc, int id )
         local_correct = 0;
     }
 
-    if ( ( local_correct && ( neuron_image == input_image_number )) || ( ! local_correct && ( neuron_image != input_image_number )))
+    if ( ( local_correct && ( neuron_image == monitor_image_number )) || ( ! local_correct && ( neuron_image != monitor_image_number )))
     {
-        DEBUG( "Correct: " << object_name(id) << " says " << ( local_correct ? "yes" : "no" ) << ", it's looking for " << neuron_image << " and being shown " << input_image_number << "." );
+        DEBUG( "Correct: " << object_name(id) << " says " << ( local_correct ? "yes" : "no" ) << ", it's looking for " << neuron_image << " and being shown " << monitor_image_number << "." );
 
         neuron_output = CORRECT;
     }
     else
     {
-        if ( local_correct == 1 && neuron_image != input_image_number )
+        if ( local_correct == 1 && neuron_image != monitor_image_number )
         {
             neuron_output = FALSE_POSITIVE;
 
-            DEBUG( "Incorrect: " << object_name(id) << " says yes but it's looking for " << neuron_image << " but being shown " << input_image_number << ". Reducing active inputs by " << ( 1.0 / NUM_IMAGES ) << "." );
+            DEBUG( "Incorrect: " << object_name(id) << " says yes but it's looking for " << neuron_image << " but being shown " << monitor_image_number << ". Reducing active inputs by " << ( 1.0 / NUM_IMAGES ) << "." );
             for ( int row = 0 ; row < NUM_ROWS ; row++ )
             {
                 for ( int col = 0 ; col < NUM_ROWS ; col++ )
                 {
-                    if ( input_fonts_images_row_col( input_font_number, input_image_number, row, col ) == 1 ) 
+                    if ( input_fonts_images_row_col( monitor_font_number, monitor_image_number, row, col ) == 1 ) 
                     {
                         neuron_weights_row_col( row, col ) = neuron_weights_row_col( row, col ) - ( 1.0 / NUM_IMAGES );
                     
@@ -93,16 +89,16 @@ int calculate_neuron( obj_loc_t obj_loc, int id )
             }
         }
 
-        if ( local_correct == 0 && neuron_image == input_image_number )
+        if ( local_correct == 0 && neuron_image == monitor_image_number )
         { 
             neuron_output = FALSE_NEGATIVE;
 
-            DEBUG( "Incorrect: " << object_name(id) << " says no but it's looking for " << neuron_image << " and being shown " << input_image_number << ". Increasing active inputs by " << 1.0 << "." );
+            DEBUG( "Incorrect: " << object_name(id) << " says no but it's looking for " << neuron_image << " and being shown " << monitor_image_number << ". Increasing active inputs by " << 1.0 << "." );
             for ( int row = 0 ; row < NUM_ROWS ; row++ )
             {
                 for ( int col = 0 ; col < NUM_ROWS ; col++ )
                 {
-                    if ( input_fonts_images_row_col( input_font_number, input_image_number, row, col ) == 1 ) 
+                    if ( input_fonts_images_row_col( monitor_font_number, monitor_image_number, row, col ) == 1 ) 
                     {
                         neuron_weights_row_col( row, col ) = neuron_weights_row_col( row, col ) + 1.0;
                         
@@ -119,7 +115,7 @@ int calculate_neuron( obj_loc_t obj_loc, int id )
     //print_weights( obj_loc, id );
 
     std::ostringstream filename;
-    filename << object_name( id ) << "_" << local_run_number<< ".png";
+    filename << object_name( id ) << "_" << monitor_run_number << ".png";
     save_weight_matrix( &neuron_weights, filename.str() );
 
     return 1;
