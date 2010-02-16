@@ -2,12 +2,7 @@
 sub
     monitor monitor
 
-static
-    int font_order[NUM_FONTS]
-
 pub
-    int image_number
-    int font_number
     font fonts[NUM_FONTS]
 
 

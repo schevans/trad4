@@ -4,9 +4,14 @@ sub
     input input
     neuron neurons[NUM_NEURONS]
 
+static
+    int font_order[NUM_FONTS]
+
 pub 
-    int num_runs
-    int num_cycles_correct
+    int image_number
+    int font_number
+    int run_number
+    int num_correct_neurons
     int converged
     font_result font_results[NUM_FONTS]
     run_result run_results[MAX_NUM_RUNS]
