@@ -61,16 +61,14 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
 
         if ( monitor_font_number == NUM_FONTS-1 )
         {
-            cout << "Creating animation.." << endl;
-
-            create_animation( obj_loc, id );
-
-            cout << "Done." << endl;
-
-            exit(0);
+            monitor_font_number = 0;
+            monitor_num_correct_neurons = 0;
         }
-
-        monitor_font_number++;
+        else
+        {
+            monitor_font_number++;
+            monitor_num_correct_neurons = 0;
+        }
 
         monitor_font_results_start(monitor_font_number) = monitor_run_number+1;
     }
@@ -88,8 +86,13 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
 
     if ( monitor_run_number > MAX_NUM_RUNS )
     {
-        cerr << "Error: Num runs exceeded MAX_NUM_RUNS=" << MAX_NUM_RUNS << ". Please increase, precompile, compile and re-start. Exiting." << endl;
-        exit(1);
+        cout << "Creating animation.." << endl;
+
+        create_animation( obj_loc, id );
+
+        cout << "Done." << endl;
+
+        exit(0);
     }
 
     return 1;
@@ -121,191 +124,192 @@ void create_animation( obj_loc_t obj_loc, int id )
     int num_correct(0);
     int num_incorrect(0);
 
-    for ( int font_num=0 ; font_num < NUM_FONTS ; font_num++ )
+    for ( int run_num = 0 ; run_num < MAX_NUM_RUNS ; run_num++ )
     {
+        int font_num = monitor_run_results_font( run_num ); 
+
         gdImagePtr frame_imgs[MAX_NUM_RUNS];
         int num_font_correct(0);
         int num_font_incorrect(0);
 
-        for ( int run_num = monitor_font_results_start(font_num) ; run_num <= monitor_font_results_end(font_num) ; run_num++ )
+        frame_imgs[run_num] = gdImageCreate(master_img_width, master_img_height);
+
+        gdImagePtr imgs[NUM_IMAGES];
+
+        for ( int neuron_id = 0 ; neuron_id < NUM_NEURONS ; neuron_id++ )
         {
-            frame_imgs[run_num] = gdImageCreate(master_img_width, master_img_height);
+            std::ostringstream filename;
+            filename << object_name( ((t4::monitor*)obj_loc[id])->neurons[neuron_id]) << "_" << run_num << ".png";
+            FILE *in = fopen(filename.str().c_str(), "rb");
 
-            gdImagePtr imgs[NUM_IMAGES];
+            imgs[neuron_id] = gdImageCreateFromPng(in);
 
-            for ( int neuron_id = 0 ; neuron_id < NUM_NEURONS ; neuron_id++ )
+            int red = gdImageColorAllocate(imgs[neuron_id], 255, 0, 0);  
+            int green = gdImageColorAllocate(imgs[neuron_id], 0, 255, 0);  
+            int blue = gdImageColorAllocate(imgs[neuron_id], 0, 0, 255);  
+
+            int this_colour;
+
+            if ( monitor_run_results_neuron_output( run_num, neuron_id ) == CORRECT )
             {
-                std::ostringstream filename;
-                filename << object_name( ((t4::monitor*)obj_loc[id])->neurons[neuron_id]) << "_" << run_num << ".png";
-                FILE *in = fopen(filename.str().c_str(), "rb");
-
-
-                imgs[neuron_id] = gdImageCreateFromPng(in);
-
-                int red = gdImageColorAllocate(imgs[neuron_id], 255, 0, 0);  
-                int green = gdImageColorAllocate(imgs[neuron_id], 0, 255, 0);  
-                int blue = gdImageColorAllocate(imgs[neuron_id], 0, 0, 255);  
-
-                int this_colour;
-
-                if ( monitor_run_results_neuron_output( run_num, neuron_id ) == CORRECT )
-                {
-                    this_colour = green;
-                    num_font_correct++;
-                    num_correct++;
-                }
-                else if ( monitor_run_results_neuron_output( run_num, neuron_id ) == FALSE_NEGATIVE )
-                {
-                    this_colour = red;
-                    num_font_incorrect++;
-                    num_incorrect++;
-                }
-                else if ( monitor_run_results_neuron_output( run_num, neuron_id ) == FALSE_POSITIVE )
-                {
-                    this_colour = blue;
-                    num_font_incorrect++;
-                    num_incorrect++;
-                }
-
-                // Left side
-                gdImageLine(imgs[neuron_id], 0, 0, 0, png_frame_height, this_colour);
-                gdImageLine(imgs[neuron_id], 1, 0, 1, png_frame_height, this_colour);
-
-                // Top
-                gdImageLine(imgs[neuron_id], 0, 0, png_frame_width, 0, this_colour);
-                gdImageLine(imgs[neuron_id], 0, 1, png_frame_width, 1, this_colour);
-
-                // Bottom
-                gdImageLine(imgs[neuron_id], 0, png_frame_width-1, png_frame_width-1, png_frame_height-1, this_colour);
-                gdImageLine(imgs[neuron_id], 0, png_frame_width-2, png_frame_width-2, png_frame_height-2, this_colour);
-
-                // Right side
-                gdImageLine(imgs[neuron_id], png_frame_width-1, png_frame_height-1, png_frame_width-1, 0, this_colour);
-                gdImageLine(imgs[neuron_id], png_frame_width-2, png_frame_height-2, png_frame_width-2, 0, this_colour);
-
-                int dstX = neuron_id * png_frame_width;
-                if ( neuron_id >= 5 )
-                    dstX = ( neuron_id - 5 ) * png_frame_width;
-
-                int dstY = 0;
-                if ( neuron_id >= 5 )
-                    dstY = png_frame_height;
-
-                gdImageCopy(frame_imgs[run_num], imgs[neuron_id], dstX, dstY, 0, 0, png_frame_width, png_frame_height );
-
-                fclose(in);
+                this_colour = green;
+                num_font_correct++;
+                num_correct++;
+            }
+            else if ( monitor_run_results_neuron_output( run_num, neuron_id ) == FALSE_NEGATIVE )
+            {
+                this_colour = red;
+                num_font_incorrect++;
+                num_incorrect++;
+            }
+            else if ( monitor_run_results_neuron_output( run_num, neuron_id ) == FALSE_POSITIVE )
+            {
+                this_colour = blue;
+                num_font_incorrect++;
+                num_incorrect++;
             }
 
-            // Load and add the image being shown
-            static char* vs_data_dir = getenv("VS_DATA_DIR");
+            // Left side
+            gdImageLine(imgs[neuron_id], 0, 0, 0, png_frame_height, this_colour);
+            gdImageLine(imgs[neuron_id], 1, 0, 1, png_frame_height, this_colour);
 
-            std::ostringstream input_filename;
-            input_filename << vs_data_dir << "/" << font_map[font_num] << "/" << monitor_run_results_image( run_num ) << ".png";
+            // Top
+            gdImageLine(imgs[neuron_id], 0, 0, png_frame_width, 0, this_colour);
+            gdImageLine(imgs[neuron_id], 0, 1, png_frame_width, 1, this_colour);
 
-            FILE *input_in = fopen( input_filename.str().c_str(), "r");
+            // Bottom
+            gdImageLine(imgs[neuron_id], 0, png_frame_width-1, png_frame_width-1, png_frame_height-1, this_colour);
+            gdImageLine(imgs[neuron_id], 0, png_frame_width-2, png_frame_width-2, png_frame_height-2, this_colour);
 
-            gdImagePtr input_image = gdImageCreateFromPng(input_in);
+            // Right side
+            gdImageLine(imgs[neuron_id], png_frame_width-1, png_frame_height-1, png_frame_width-1, 0, this_colour);
+            gdImageLine(imgs[neuron_id], png_frame_width-2, png_frame_height-2, png_frame_width-2, 0, this_colour);
 
-            gdImageCopyResized(frame_imgs[run_num], input_image, 0, (png_frame_height*2), 0, 0, png_frame_width, png_frame_height, NUM_COLS, NUM_ROWS );
+            int dstX = neuron_id * png_frame_width;
+            if ( neuron_id >= 5 )
+                dstX = ( neuron_id - 5 ) * png_frame_width;
 
-            fclose(input_in);
+            int dstY = 0;
+            if ( neuron_id >= 5 )
+                dstY = png_frame_height;
 
-            // Add the text pane
-            gdImagePtr text_pane = gdImageCreate( png_frame_width*4, png_frame_height);
+            gdImageCopy(frame_imgs[run_num], imgs[neuron_id], dstX, dstY, 0, 0, png_frame_width, png_frame_height );
 
-            // Set text pane background colour (white)
-            (void)gdImageColorAllocate(text_pane, 255, 255, 255 ); 
-
-            // Text
-            // 1st row
-            int x, y;
-
-            std::ostringstream font_filename;
-            font_filename << vs_data_dir << "/" << font_map[font_num] << "/" << font_map[font_num] << ".ttf";
-
-            string tmp_str(font_filename.str());
-
-            char *f = (char*)(tmp_str.c_str());
-            double sz = 40.;
-            int brect[8];
-            char *s = (char*)font_map[font_num].c_str();
-
-            char* err = gdImageStringFT(NULL,&brect[0],0,f,sz,0.,0,0,s);
-
-            if (err) { cerr << err << endl; exit(1); }
-
-            /* create an image big enough for the string plus a little whitespace */
-            x = brect[2]-brect[6] + 12;
-            y = brect[3]-brect[7] + 12;
-
-            int n_black = gdImageColorResolve(text_pane, 0, 0, 0);
-
-            /* render the string, offset origin to center string*/
-            /* note that we use top-left coordinate for adjustment
-            * since gd origin is in top-left with y increasing downwards. */
-            x = 3 - brect[6];
-            y = 3 - brect[7];
-
-            err = gdImageStringFT(text_pane,&brect[0],n_black,f,sz,0.0,x,y,s);
-            if (err) { cerr << err << endl; exit(1); }
-
-            // 2nd row
-            std::ostringstream second_row_text;
-            second_row_text << num_font_correct << "," << num_font_incorrect << "    " << num_correct << "," << num_incorrect;
-
-            string tmp_str2 = second_row_text.str();
-
-            char *s2 = (char*)tmp_str2.c_str();
-
-            err = gdImageStringFT(NULL,&brect[0],0,f,sz,0.,0,0,s2);
-
-            if (err) { cerr << err << endl; exit(1); }
-
-            /* create an image big enough for the string plus a little whitespace */
-            x = brect[2]-brect[6] + 6;
-            y = brect[3]-brect[7] + 6;
-
-            /* render the string, offset origin to center string*/
-            /* note that we use top-left coordinate for adjustment
-            * since gd origin is in top-left with y increasing downwards. */
-            x = 3 - brect[6];
-            y = 3 - brect[7];
-
-            y = y + 64;
-
-            err = gdImageStringFT(text_pane,&brect[0],n_black,f,sz,0.0,x,y,s2);
-            if (err) { cerr << err << endl; exit(1); }
-
-            gdImageCopy(frame_imgs[run_num], text_pane, png_frame_width, png_frame_height*2, 0, 0, png_frame_width*4, png_frame_height );
-
-            int delay = (( run_num == monitor_font_results_end(font_num) ) ? 500 : 100 );
-
-            if ( run_num == 0 ) 
-            {
-                gdImageGifAnimAdd(frame_imgs[run_num], out, 1, 0, 0, delay, 1, NULL);
-            }
-            else 
-            {
-                gdImageGifAnimAdd(frame_imgs[run_num], out, 1, 0, 0, delay, 1, frame_imgs[run_num-1]);
-            }
-
-            gdImageDestroy(text_pane);
-            gdImageDestroy(input_image);
-
-            for ( int i = 0 ; i < NUM_IMAGES ; i++ )
-            {
-                gdImageDestroy(imgs[i]);
-            }
+            fclose(in);
         }
 
-        for ( int run_num = monitor_font_results_start(font_num) ; run_num < monitor_font_results_end(font_num) ; run_num++ )
+        // Load and add the image being shown
+        static char* vs_data_dir = getenv("VS_DATA_DIR");
+
+        std::ostringstream input_filename;
+        input_filename << vs_data_dir << "/" << font_map[font_num] << "/" << monitor_run_results_image( run_num ) << ".png";
+
+        FILE *input_in = fopen( input_filename.str().c_str(), "r");
+
+        gdImagePtr input_image = gdImageCreateFromPng(input_in);
+
+        gdImageCopyResized(frame_imgs[run_num], input_image, 0, (png_frame_height*2), 0, 0, png_frame_width, png_frame_height, NUM_COLS, NUM_ROWS );
+
+        fclose(input_in);
+
+        // Add the text pane
+        gdImagePtr text_pane = gdImageCreate( png_frame_width*4, png_frame_height);
+
+        // Set text pane background colour (white)
+        (void)gdImageColorAllocate(text_pane, 255, 255, 255 ); 
+
+        // Text
+        // 1st row
+        int x, y;
+
+        std::ostringstream font_filename;
+        font_filename << vs_data_dir << "/" << font_map[font_num] << "/" << font_map[font_num] << ".ttf";
+
+        string tmp_str(font_filename.str());
+
+        char *f = (char*)(tmp_str.c_str());
+        double sz = 40.;
+        int brect[8];
+        char *s = (char*)font_map[font_num].c_str();
+
+        char* err = gdImageStringFT(NULL,&brect[0],0,f,sz,0.,0,0,s);
+
+        if (err) { cerr << err << endl; exit(1); }
+
+        /* create an image big enough for the string plus a little whitespace */
+        x = brect[2]-brect[6] + 12;
+        y = brect[3]-brect[7] + 12;
+
+        int n_black = gdImageColorResolve(text_pane, 0, 0, 0);
+
+        /* render the string, offset origin to center string*/
+        /* note that we use top-left coordinate for adjustment
+        * since gd origin is in top-left with y increasing downwards. */
+        x = 3 - brect[6];
+        y = 3 - brect[7];
+
+        err = gdImageStringFT(text_pane,&brect[0],n_black,f,sz,0.0,x,y,s);
+        if (err) { cerr << err << endl; exit(1); }
+
+        // 2nd row
+        std::ostringstream second_row_text;
+        second_row_text << num_font_correct << "," << num_font_incorrect << "    " << num_correct << "," << num_incorrect;
+
+        string tmp_str2 = second_row_text.str();
+
+        char *s2 = (char*)tmp_str2.c_str();
+
+        err = gdImageStringFT(NULL,&brect[0],0,f,sz,0.,0,0,s2);
+
+        if (err) { cerr << err << endl; exit(1); }
+
+        /* create an image big enough for the string plus a little whitespace */
+        x = brect[2]-brect[6] + 6;
+        y = brect[3]-brect[7] + 6;
+
+        /* render the string, offset origin to center string*/
+        /* note that we use top-left coordinate for adjustment
+        * since gd origin is in top-left with y increasing downwards. */
+        x = 3 - brect[6];
+        y = 3 - brect[7];
+
+        y = y + 64;
+
+        err = gdImageStringFT(text_pane,&brect[0],n_black,f,sz,0.0,x,y,s2);
+        if (err) { cerr << err << endl; exit(1); }
+
+        gdImageCopy(frame_imgs[run_num], text_pane, png_frame_width, png_frame_height*2, 0, 0, png_frame_width*4, png_frame_height );
+
+        int delay = 100; //(( run_num == monitor_font_results_end(font_num) ) ? 500 : 100 );
+
+        if ( run_num == 0 ) 
         {
-            gdImageDestroy(frame_imgs[run_num]);
+            gdImageGifAnimAdd(frame_imgs[run_num], out, 1, 0, 0, delay, 1, NULL);
+        }
+        else 
+        {
+            gdImageGifAnimAdd(frame_imgs[run_num], out, 1, 0, 0, delay, 1, frame_imgs[run_num-1]);
+        }
+
+        gdImageDestroy(text_pane);
+        gdImageDestroy(input_image);
+
+        for ( int i = 0 ; i < NUM_IMAGES ; i++ )
+        {
+            gdImageDestroy(imgs[i]);
         }
     }
 
     gdImageGifAnimEnd(out);
-      
+
+// FIXME    
+/*  
+    for ( int run_num = 0 ; run_num < MAX_NUM_RUNS ; run_num++ )
+    {
+        gdImageDestroy(frame_imgs[run_num]);
+    }
+*/
+
     fclose(out);
 }
 
