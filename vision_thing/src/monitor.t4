@@ -12,6 +12,7 @@ pub
     int font_number
     int run_number
     int num_correct_neurons
+    int num_correct_fonts
     int converged
     font_result font_results[NUM_FONTS]
     run_result run_results[MAX_NUM_RUNS]
