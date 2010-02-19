@@ -38,6 +38,8 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
         monitor_font_results_start( 0 ) = 0;
         monitor_converged = 0;
     }
+    else
+    {
 
     collect_data( obj_loc, id );
     
@@ -134,6 +136,8 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
         cout << "Done." << endl;
 
         exit(0);
+    }
+
     }
 
     return 1;
