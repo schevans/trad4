@@ -32,79 +32,82 @@ int calculate_neuron( obj_loc_t obj_loc, int id )
             }
         }
     }
-
-    if ( object_log_level(id) >= 2 )
+    else 
     {
-        print_weights( obj_loc, id );
-    }
 
-    double local_agg(0);
-
-    for ( int row = 0 ; row < NUM_ROWS ; row++ )
-    {
-        for ( int col = 0 ; col < NUM_ROWS ; col++ )
+        if ( object_log_level(id) >= 2 )
         {
-            local_agg = local_agg + ( input_fonts_images_row_col( monitor_font_number, monitor_image_number, row, col ) * neuron_weights_row_col( row, col ));
+            print_weights( obj_loc, id );
         }
-    }
 
-    int local_correct(0);
+        double local_agg(0);
 
-    if ( local_agg >= 0.0 )
-    {
-        local_correct = 1;
-    }
-    else
-    {
-        local_correct = 0;
-    }
-
-    if ( ( local_correct && ( neuron_image == monitor_image_number )) || ( ! local_correct && ( neuron_image != monitor_image_number )))
-    {
-        DEBUG( "Correct: " << object_name(id) << " says " << ( local_correct ? "yes" : "no" ) << ", it's looking for " << neuron_image << " and being shown " << monitor_image_number << "." );
-
-        neuron_output = CORRECT;
-    }
-    else
-    {
-        if ( local_correct == 1 && neuron_image != monitor_image_number )
+        for ( int row = 0 ; row < NUM_ROWS ; row++ )
         {
-            neuron_output = FALSE_POSITIVE;
-
-            DEBUG( "Incorrect: " << object_name(id) << " says yes but it's looking for " << neuron_image << " but being shown " << monitor_image_number << ". Reducing active inputs by " << ( 1.0 / NUM_IMAGES ) << "." );
-            for ( int row = 0 ; row < NUM_ROWS ; row++ )
+            for ( int col = 0 ; col < NUM_ROWS ; col++ )
             {
-                for ( int col = 0 ; col < NUM_ROWS ; col++ )
+                local_agg = local_agg + ( input_fonts_images_row_col( monitor_font_number, monitor_image_number, row, col ) * neuron_weights_row_col( row, col ));
+            }
+        }
+
+        int local_correct(0);
+
+        if ( local_agg >= 0.0 )
+        {
+            local_correct = 1;
+        }
+        else
+        {
+            local_correct = 0;
+        }
+
+        if ( ( local_correct && ( neuron_image == monitor_image_number )) || ( ! local_correct && ( neuron_image != monitor_image_number )))
+        {
+            DEBUG( "Correct: " << object_name(id) << " says " << ( local_correct ? "yes" : "no" ) << ", it's looking for " << neuron_image << " and being shown " << monitor_image_number << "." );
+
+            neuron_output = CORRECT;
+        }
+        else
+        {
+            if ( local_correct == 1 && neuron_image != monitor_image_number )
+            {
+                neuron_output = FALSE_POSITIVE;
+
+                DEBUG( "Incorrect: " << object_name(id) << " says yes but it's looking for " << neuron_image << " but being shown " << monitor_image_number << ". Reducing active inputs by " << ( 1.0 / NUM_IMAGES ) << "." );
+                for ( int row = 0 ; row < NUM_ROWS ; row++ )
                 {
-                    if ( input_fonts_images_row_col( monitor_font_number, monitor_image_number, row, col ) == 1 ) 
+                    for ( int col = 0 ; col < NUM_ROWS ; col++ )
                     {
-                        neuron_weights_row_col( row, col ) = neuron_weights_row_col( row, col ) - ( 1.0 / NUM_IMAGES );
-                    
-                        if ( fabs( neuron_weights_row_col( row, col )) < 1.0e-10 )
+                        if ( input_fonts_images_row_col( monitor_font_number, monitor_image_number, row, col ) == 1 ) 
                         {
-                            neuron_weights_row_col( row, col ) = 0.0;
+                            neuron_weights_row_col( row, col ) = neuron_weights_row_col( row, col ) - ( 1.0 / NUM_IMAGES );
+                        
+                            if ( fabs( neuron_weights_row_col( row, col )) < 1.0e-10 )
+                            {
+                                neuron_weights_row_col( row, col ) = 0.0;
+                            }
                         }
                     }
                 }
             }
-        }
 
-        if ( local_correct == 0 && neuron_image == monitor_image_number )
-        { 
-            neuron_output = FALSE_NEGATIVE;
+            if ( local_correct == 0 && neuron_image == monitor_image_number )
+            { 
+                neuron_output = FALSE_NEGATIVE;
 
-            DEBUG( "Incorrect: " << object_name(id) << " says no but it's looking for " << neuron_image << " and being shown " << monitor_image_number << ". Increasing active inputs by " << 1.0 << "." );
-            for ( int row = 0 ; row < NUM_ROWS ; row++ )
-            {
-                for ( int col = 0 ; col < NUM_ROWS ; col++ )
+                DEBUG( "Incorrect: " << object_name(id) << " says no but it's looking for " << neuron_image << " and being shown " << monitor_image_number << ". Increasing active inputs by " << 1.0 << "." );
+                for ( int row = 0 ; row < NUM_ROWS ; row++ )
                 {
-                    if ( input_fonts_images_row_col( monitor_font_number, monitor_image_number, row, col ) == 1 ) 
+                    for ( int col = 0 ; col < NUM_ROWS ; col++ )
                     {
-                        neuron_weights_row_col( row, col ) = neuron_weights_row_col( row, col ) + 1.0;
-                        
-                        if ( fabs( neuron_weights_row_col( row, col ) ) < 1.0e-10 )
+                        if ( input_fonts_images_row_col( monitor_font_number, monitor_image_number, row, col ) == 1 ) 
                         {
-                            neuron_weights_row_col( row, col ) = 0.0;
+                            neuron_weights_row_col( row, col ) = neuron_weights_row_col( row, col ) + 1.0;
+                            
+                            if ( fabs( neuron_weights_row_col( row, col ) ) < 1.0e-10 )
+                            {
+                                neuron_weights_row_col( row, col ) = 0.0;
+                            }
                         }
                     }
                 }
