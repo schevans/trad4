@@ -6,6 +6,7 @@
 //  to see what's in-scope.
 
 #include <iostream>
+#include <fstream>
 #include <map>
 
 #include "gd.h"
@@ -57,12 +58,25 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
 
         monitor_font_results_end(monitor_font_number) = adjusted_num_runs;
 
-        cout << "Font " << font_map[monitor_font_number] << " start " << monitor_font_results_start(monitor_font_number) << ", end " << monitor_font_results_end(monitor_font_number) <<  " and took " << monitor_font_results_end(monitor_font_number) - monitor_font_results_start(monitor_font_number) << " cycles." << endl;
+        cout << "Font " << font_map[monitor_font_number];
+
+        int local_num_converged = monitor_font_results_end(monitor_font_number) - monitor_font_results_start(monitor_font_number) - NUM_IMAGES+1;
+
+        if ( local_num_converged == 0 )
+        {
+            cout << " has converged." << endl;
+        }
+        else
+        {
+            cout << " converged in " << local_num_converged << " cycles." << endl;
+        }
 
         if ( monitor_font_number == NUM_FONTS-1 )
         {
             monitor_font_number = 0;
             monitor_num_correct_neurons = 0;
+
+            cout << endl;
         }
         else
         {
@@ -89,6 +103,33 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
         cout << "Creating animation.." << endl;
 
         create_animation( obj_loc, id );
+
+        cout << "Creating output file.." << endl;
+
+        ofstream outfile("vt_out.csv");
+
+        outfile << "run,image,font";
+
+        for ( int neuron_id = 0 ; neuron_id < NUM_NEURONS ; neuron_id++ )
+        {
+            outfile << "," << object_name( monitor_neurons[neuron_id] );
+        }
+
+        outfile << endl;
+
+        for ( int run_num = 0 ; run_num < MAX_NUM_RUNS ; run_num++ )
+        {
+            outfile << run_num << "," << monitor_run_results_image(run_num) << "," << monitor_run_results_font(run_num);
+
+            for ( int neuron_id = 0 ; neuron_id < NUM_NEURONS ; neuron_id++ )
+            {
+                outfile << "," << monitor_run_results_neuron_output( run_num, neuron_id );
+            }
+
+            outfile << endl;
+        }
+
+        outfile.close();
 
         cout << "Done." << endl;
 
@@ -124,11 +165,12 @@ void create_animation( obj_loc_t obj_loc, int id )
     int num_correct(0);
     int num_incorrect(0);
 
+    gdImagePtr frame_imgs[MAX_NUM_RUNS];
+
     for ( int run_num = 0 ; run_num < MAX_NUM_RUNS ; run_num++ )
     {
         int font_num = monitor_run_results_font( run_num ); 
 
-        gdImagePtr frame_imgs[MAX_NUM_RUNS];
         int num_font_correct(0);
         int num_font_incorrect(0);
 
@@ -302,13 +344,10 @@ void create_animation( obj_loc_t obj_loc, int id )
 
     gdImageGifAnimEnd(out);
 
-// FIXME    
-/*  
     for ( int run_num = 0 ; run_num < MAX_NUM_RUNS ; run_num++ )
     {
         gdImageDestroy(frame_imgs[run_num]);
     }
-*/
 
     fclose(out);
 }
