@@ -144,12 +144,13 @@ sub Generate($) {
     print $FHD "<p>\n";
     print $FHD "To run the application:\n";
 
-    print $FHD "1) Download and unpack the distribution<br>\n";
-    print $FHD "2) cd into trad4_v$trad4_version/$app_name:<br>\n";
+    print $FHD "1) Download and unpack the distribution<br/>\n";
+    print $FHD "2) cd into trad4_v$trad4_version/$app_name:<br/>\n";
+    print $FHD "</p>\n";
     print $FHD "<blockquote><pre>\$ cd trad4_v$trad4_version/$app_name</pre></blockquote>\n";
-    print $FHD "3) Source $app_name.conf:<br>\n";
+    print $FHD "3) Source $app_name.conf:<br/>\n";
     print $FHD "<blockquote><pre>$app_name\$ . ./$app_name.conf</pre></blockquote>\n";
-    print $FHD "4) Start $app_name:<br>\n";
+    print $FHD "4) Start $app_name:<br/>\n";
     print $FHD "<blockquote><pre>$app_name\$ $app_name</pre></blockquote>\n";
     print $FHD "<p>\n";
     print $FHD "To increase or decrease the number of threads used (the default is 4), set NUM_THREADS and re-start the application:\n";
