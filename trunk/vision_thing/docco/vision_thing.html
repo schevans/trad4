@@ -25,15 +25,15 @@ vision_thing
 <table border="1">
 <tr>
 <td>Application version</td>
-<td><a href="https://sourceforge.net/projects/trad4/files/trad4v3.1/trad4_v3_1_beta02.tar.gz/download">beta02</a></td>
+<td><a href="https://sourceforge.net/projects/trad4/files/trad4v3.1/trad4_v3_1.tar.gz/download">1.0</a></td>
 </tr>
 <tr>
 <td>Trad4 version</td>
-<td><a href="https://sourceforge.net/projects/trad4/files/trad4v3.1/trad4_v3_1_beta02.tar.gz/download">3.1</a></td>
+<td><a href="https://sourceforge.net/projects/trad4/files/trad4v3.1/trad4_v3_1.tar.gz/download">3.1</a></td>
 </tr>
 <tr>
 <td>Document version</td>
-<td>beta02</td>
+<td>1.0</td>
 </tr>
 <tr>
 <td>Author</td>
@@ -41,7 +41,7 @@ vision_thing
 </tr>
 <tr>
 <td>Date</td>
-<td>05-02-10</td>
+<td>20-02-2010</td>
 </tr>
 </table>
 
@@ -60,15 +60,14 @@ vision_thing
 
 <h2><a name="introduction">Introduction</a></h2>
 <p>
-<p>
 This document is in beta. All questions, corrections and requests for clarifications welcome.
 </p>
+<p>
 The plan is to create a <a href="http://en.wikipedia.org/wiki/Artificial_neuron">McCulloch-Pitts</a> single layer artificial neural network, show it some images of the digits 0-9 in various fonts, and see what happens. In this case we will create one neuron for each of the target numbers.
 </p>
 <p>
 You might want to skip straight to the results, which are <a href="./animations.html">here</a>.
 </p>
-<p>
 <h2><a name="the_model">The Model</a></h2>
 <h3>The abstract diagram</h3>
 <p>
@@ -106,14 +105,16 @@ At the heart of the neuron lies the weight matrix where each cell in the matrix 
 <p>
 This neuron is shown various images. We'll start with a very simple 8-bit example.
 </p>
-00111000<br>
-01111000<br>
-11011000<br>
-00011000<br>
-00011000<br>
-00011000<br>
-01111110<br>
-01111110<br>
+<blockquote><pre>
+00111000
+01111000
+11011000
+00011000
+00011000
+00011000
+01111110
+01111110
+</pre></blockquote>
 <p>
 As you can see this is a (crude) monochrome bit map of the number 1. When this is shown to our neuron, it will multiply each 1 in the image by the corresponding value in the 8-bit weight matrix, and sum the result. If that result is greater than 0, it means it thinks it's being shown a 1 and will set it's output flag to 1.. If the result is less than or equal to 0 it meant the neuron thinks it's not a 1, and set's it's output flag to 0. It's important to note that if the neuron doesn't think it's being shown a 1, it doesn't care what it might otherwise be - that's a job for the other neurons.
 </p>
@@ -229,42 +230,28 @@ And this is because a) the standard function signature is not used so the macros
 </p>
 <h2><a name="further_work">Further Work</a></h2>
 <p>
-By far the greatest omission from this model as presented here it that the fonts are not re-run. Once font1 has converged, the corrections to the weight matrix through learning font2 may (in fact, probably will) break the convergence on font1. This can be corrected by iterating between the two font until the model converges on both. Once it's converged on both, the third font is shown, and once that converges again all three fonts should be iterated over until the model has converged on all three. This may have been corrected by the time this is out of beta.
-</p>
-<p>
-Another notable issue is that the fonts do not fill the weight matrix frames - they fill a central strip but are surrounded by neutral greyspace. There is scope for a lot more work here.
-</p>
-<p>
-The order the fonts are displayed will effect the results. Optimus is a lot more wispy than the others, so if this font was to be shown first you would expect slower convergence from the next. As this tends towards a rather abstract and pointless discussion about how 'different' fonts are from one another I've chosen not to pursue this, and kept them in the order I found them.
-</p>
-<p>
-While we're on the subject of the fonts another important issue to note is selection bias - I picked these three fonts because I thought they would prove and test the model. Throw me a bone here - v1.0 is a single layer McCulloch-Pitts model (which, in case you haven't followed the links, was published in 1943).
-</p>
-<p>
 One notable feature about the model presented above it that it makes no difference what order the pixels are presented to the neurons - were you to scramble all the images by remapping the pixels randomly but consistently, the model will still converge. This, it turns out, is a bad thing - it means there is no account taken of the context of each pixel, which is obviously very important. More work needs to be done in this area.
 </p>
 <p>
-There's a bug in the animation where the the paused, converged frame for the Harabara font is off by one. Fixing this means re-recording all the output, which isn't going to happen for the beta.
+Another issue is that the fonts do not fill the weight matrix frames - they fill a central strip but are surrounded by neutral greyspace. There is scope for a lot more work here.
+</p>
+<p>
+Another important issue to note is selection bias - I picked these three fonts because I thought they would prove and test the model. There was a plan to allow the user to add any fonts as they chose, but this didn't make it into v1.0.
 </p>
 <p>
 Should you run the precompiler you'll see warnings about locally modified Makefiles. Like jpm_cds (though a different situation), this reflects a half-arsed approach to third party library integration in trad4 - another topic beyond the scope of this document. Ignore these warnings, unless you're adding objects, in which case you're looking at a manual merge - sorry.  
-</p>
-<p>
-The code needs a clean-up, as it always does.
-</p>
-<p>
-
 </p>
 <h2><a name="usage">Usage</a></h2>
 <h3>Running</h3>
 <p>
 To run the application:
-1) Download and unpack the distribution<br>
-2) cd into trad4_v3_1_0/vision_thing:<br>
+1) Download and unpack the distribution<br/>
+2) cd into trad4_v3_1_0/vision_thing:<br/>
+</p>
 <blockquote><pre>$ cd trad4_v3_1_0/vision_thing</pre></blockquote>
-3) Source vision_thing.conf:<br>
+3) Source vision_thing.conf:<br/>
 <blockquote><pre>vision_thing$ . ./vision_thing.conf</pre></blockquote>
-4) Start vision_thing:<br>
+4) Start vision_thing:<br/>
 <blockquote><pre>vision_thing$ vision_thing</pre></blockquote>
 <p>
 To increase or decrease the number of threads used (the default is 4), set NUM_THREADS and re-start the application:
@@ -281,7 +268,9 @@ Copyright (c) Steve Evans 2010
 <!-- ==================================================================== -->
 <br />
 <center>
+<!--
 <a href="http://sourceforge.net/projects/trad4"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=202177&type=16" width="150" height="40" border="0" alt="Get trad4 at SourceForge.net. Fast, secure and Free Open Source software downloads" /></a>
+-->
 </center>
 
 </body>
