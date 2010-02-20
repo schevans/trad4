@@ -171,12 +171,18 @@ void create_animation( obj_loc_t obj_loc, int id )
 
     gdImagePtr frame_imgs[MAX_NUM_RUNS];
 
+    int num_font_correct(0);
+    int num_font_incorrect(0);
+    int font_num(0);
+
     for ( int run_num = 0 ; run_num < MAX_NUM_RUNS ; run_num++ )
     {
-        int font_num = monitor_run_results_font( run_num ); 
-
-        int num_font_correct(0);
-        int num_font_incorrect(0);
+        if ( font_num != monitor_run_results_font( run_num ) )
+        {
+            num_font_correct = 0;
+            num_font_incorrect = 0;
+            font_num = monitor_run_results_font( run_num );
+        }
 
         frame_imgs[run_num] = gdImageCreate(master_img_width, master_img_height);
 
@@ -326,7 +332,7 @@ void create_animation( obj_loc_t obj_loc, int id )
 
         gdImageCopy(frame_imgs[run_num], text_pane, png_frame_width, png_frame_height*2, 0, 0, png_frame_width*4, png_frame_height );
 
-        int delay = 100; //(( run_num == monitor_font_results_end(font_num) ) ? 500 : 100 );
+        int delay = 100;
 
         if ( run_num == 0 ) 
         {
