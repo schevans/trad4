@@ -74,7 +74,7 @@ You might want to skip straight to the results, which are <a href="./animations.
 <img src="abstract.jpg" alt="abstract"/>
 </p>
 <p>
-
+Note that this differs slightly from the code - the monitor subscribing to the input object is not shown. This is because this relationship is not required, but the this was discovered too late in the release process to make it into v1.0. The above diagram shows how the relationship should be.
 </p>
 <h3>The concrete diagram</h3>
 <p>
@@ -116,51 +116,49 @@ This neuron is shown various images. We'll start with a very simple 8-bit exampl
 01111110
 </pre></blockquote>
 <p>
-As you can see this is a (crude) monochrome bit map of the number 1. When this is shown to our neuron, it will multiply each 1 in the image by the corresponding value in the 8-bit weight matrix, and sum the result. If that result is greater than 0, it means it thinks it's being shown a 1 and will set it's output flag to 1.. If the result is less than or equal to 0 it meant the neuron thinks it's not a 1, and set's it's output flag to 0. It's important to note that if the neuron doesn't think it's being shown a 1, it doesn't care what it might otherwise be - that's a job for the other neurons.
+As you can see this is a monochrome bit map of the number 1. When this is shown to our neuron, it will multiply each 1 in the image by the corresponding value in the 8-bit weight matrix, and sum the result. If that result is greater than 0, it means it thinks it's being shown a 1, and if the result is less than or equal to 0 it meant the neuron thinks it's not a 1. It's important to note that if the neuron doesn't think it's being shown a 1, it doesn't care what it might otherwise be - that's a job for the other neurons.
 </p>
 <p>
 Next, the neuron checks to see it it's correct. (The teaching mechanism is internal to the neurons themselves, partially to allow for concurrency but mainly because it made the most sense programatically.) There are three possible outcomes:
 </p>
 <p>
-Case 1) The neuron could be correct, either in correctly identifying a 1 or by correctly identifying that it's not a 1. In this case we do nothing to the weight matrix.
+Case CORRECT) The neuron is correct, either in correctly identifying a 1 or by correctly identifying that it's not a 1. In this case we do nothing to the weight matrix.
 </p>
 <p>
-Case 2) The neuron could be incorrect, by thinking it hasn't been shown a 1 when it has. In this case we need to increase the chance the next time it's show a 1 to get it correct. We do by increasing the values in the weight matrix that correspond to an active pixel. This means next time this image is shown and the results are summed we'll be above the firing threshold of 0.0.
+Case FALSE_POSITIVE) The neuron is incorrect, thinking it has been shown a 1 where in fact it hasn't. In this case we need to decrease the chance of this happening again by decreasing the values in the weight matrix that correspond to an active pixel. This means next time the neuron will take less notice of those pixels.
 </p>
 <p>
-Case 3) The neuron could be incorrect, by thinking it has been shown a 1 where in fact it hasn't. In this case we need to decrease the chance of this happening again by decreasing the values in the weight matrix that correspond to an active pixel. This means next time the neuron will take less notice of those pixels.
+Case FALSE_NEGATIVE) The neuron is incorrect, by thinking it hasn't been shown a 1 when in fact it has. In this case we need to increase the chance the next time it's show a 1 to get it correct. We do by increasing the values in the weight matrix that correspond to an active pixel. This means next time this image is shown and the results are summed we'll be above the firing threshold of 0.0.
+</p>
+<p>
+It is worth noting that the incorrect cases FALSE_POSITIVE and FALSE_NEGATIVE carry different weight adjustments. Case FALSE_POSITIVE (where it wrongly thinks it has been shown a 1 when it hasn't) will occur far more frequently than case FALSE_NEGATIVE (where it is being shown a 1 but gets it wrong), so the down adjustment to active pixels will be smaller than the up adjustment, by a factor of 10.
 </p>
 <p>
 This process is repeated for each of the input images until the neuron converges, convergence being defined as no adjustment to the weight matrix is made after being shown the complete set of 0-9 images.
 </p>
 <p>
-We'll walk through the first few cycles looking again at the neuron looking for 1. This shows the weight matrix after the neuron has made it's guess and has had the learning algorithm applied. Black means that pixel is strongly positively associated with the number 1. While means that pixel is strongly negatively associated with the number 1. Gray is neutral. 
+We'll walk through the first few cycles looking again at the neuron looking for 1. This shows the weight matrix after the neuron has made it's guess and has had the learning algorithm applied. Black means that pixel is strongly positively associated with the number 1. While white means that pixel is strongly negatively associated with the number 1. Gray is neutral. 
 </p>
 <p>
 <img src="./neuron_1_0.png" alt="neuron_1_0"/>
 </p>
 <p>
-In the above case neuron_1 is shown the number 0. As the weight matrix is initialised to 0 the sum is  0, which is greater than or equal to 0, so triggers a yes output, meaning it thinks it's a "1". As it's actually being shown a "0", it's incorrect, and the weight matrix is adjusted downwards for active pixels as described above.
+In the above case neuron_1 is shown the number 0. As the weight matrix is initialised to 0, the sum of which is  0, which is greater than or equal to 0 and so triggers a yes output, meaning it thinks it's a "1". As it's actually being shown a "0", it's incorrect, and the weight matrix is adjusted downwards for active pixels as described above.
 </p>
 <p>
 <img src="./neuron_1_1.png" alt="neuron_1_1"/>
 </p>
 <p>
-In the next case above the neuron has been shown a 1, but as many of it's weights have been negatively set by the previous cycle, it will wrongly produce a no output. In this case, the weight matrix is adjusted upwards to active pixels as described above.
+In the next case above the neuron has been shown a 1, but as many of it's weights have been negatively set by the previous cycle, it will wrongly produce a no output. In this case, the weight matrix is adjusted upwards for every active pixel as described above.
 </p>
 
 <p>
 <img src="./neuron_1_2.png" alt="neuron_1_2"/>
 </p>
 <p>
-In the above case, the neuron has been presented with a 2. As the weight matrix has just been heavily biased in favour of seeing "1"s everywhere, it will wrongly produce a yes output. Again as in the first example, the weight matrix will be adjusted downwards for those active pixels. This means that the portion of the image that corresponds to both 1 and 2 will be given less weight than those only pertaining to "1". If you zoom in your browser view (ctrl-mousewheel) you can see the shadows. It's worth noting two points at this stage.
+In the next case the neuron has been shown a 2. As the weight matrix has just been heavily biased in favour of seeing 1s everywhere, it will wrongly produce a yes output. Again as in the first example, the weight matrix will be adjusted downwards for those active pixels. This means that the portion of the image that corresponds to both 1 and 2 will be given less weight than those only pertaining to "1". If you zoom in your browser (ctrl-mousewheel) you can see the shadows more clearly.
 </p>
-<p>
-The first is that the incorrect cases 2) and 3) carry different weight adjustments. Case3 (where it wrongly thinks it has been shown a 1 when it hasn't) will occur far more frequently than case2 (where it is being shown a 1 but gets it wrong), so the down adjustment to active pixels will be smaller than the up adjustment, by a factor of 10.
-</p>
-<p>
-The second point is that the images of the weight matrix produced are scaled, so that max(up)=black and min(down)=white. This, combined with the first point above means that it will appear that black features more highly in the images than white, when in fact internally the effects of the white region are more pronounced.
-</p>
+
 <p>
 <img src="./neuron_1_31.png" alt="neuron_1_31"/>
 </p>
@@ -175,6 +173,9 @@ The above frame shows the neuron converged on Liberation - all the pixels associ
 <h2><a name="results">Results</a></h2>
 <p>
 <a  href="animations.html">Animations</a>
+</p>
+<p>
+The raw data set the graphs below were derived from is avilable <a  href="vt_out.csv">here</a>. Note that the neuron output value is an enum, with CORRECT=0, FALSE_POSITIVE=1 and FALSE_NEGATIVE=2.
 </p>
 <p>
 <img src="results1.png" alt="results1"/>
@@ -201,7 +202,10 @@ By far the most important contribution this app has made to the trad4 architectu
 This app makes extensive use of the excellent <a href="http://www.libgd.org/Main_Page">libgd</a>, a graphics library used here for converting from fonts to bit maps, and creating the animations. Libgd may or may not be thread-safe (in this case it writes to the filesystem so there will some limit on scalability), but it can be used in a multi-threaded environment as long as you know that any heap <i>it</i> uses will be cleaned up on exit from the calculate function. Apologies to anyone I might have scared off with my assertions in the v3.0 manual - this will be corrected shortly.
 </p>
 <p>
-That being said, there are circumstances where keeping 3rd party code on the stack is not an option. Witness jpm_cds, where we are actually porting an existing application to the trad4 architecture. This discussion is beyond the scope of this document, but will be addressed in the all-new trad4v3.1 manual (forthcoming). The jpm_cds Phase2 model is actually a very high priority of mine, but quite frankly feels like a bit of a busman's holiday, so I haven't given it as much time as I should have done.
+That being said, there are circumstances where keeping 3rd party code on the stack is not an option. Witness jpm_cds, where we are actually porting an existing application to the trad4 architecture. This discussion is beyond the scope of this document, but will be addressed in the all-new trad4v3.1 manual (forthcoming). The jpm_cds Phase2 model is actually a very high priority of mine, but quite frankly feels like a bit of a busman's holiday, so I haven't given it as much time as I should have done. FIXME - more on planned 2nd and 3rd party integration.
+</p>
+<p>
+
 </p>
 <h3>User function signatures</h3>
 <p>
