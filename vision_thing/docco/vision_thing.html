@@ -74,11 +74,14 @@ You might want to skip straight to the results, which are <a href="./animations.
 <img src="abstract.jpg" alt="abstract"/>
 </p>
 <p>
-Note that this differs slightly from the code - the monitor subscribing to the input object is not shown. This is because this relationship is not required, but the this was discovered too late in the release process to make it into v1.0. The above diagram shows how the relationship should be.
+This shows the three types and their abstract relationships.
 </p>
 <h3>The concrete diagram</h3>
 <p>
 <img src="concrete.jpg" alt="concrete"/>
+</p>
+<p>
+This shows the relationship between the running (instantiated) objects.
 </p>
 
 <h2><a name="the_input">The Input</a></h2>
@@ -175,19 +178,19 @@ The above frame shows the neuron converged on Liberation - all the pixels associ
 <a  href="animations.html">Animations</a>
 </p>
 <p>
-The raw data set the graphs below were derived from is avilable <a  href="vt_out.csv">here</a>. Note that the neuron output value is an enum, with CORRECT=0, FALSE_POSITIVE=1 and FALSE_NEGATIVE=2.
+The raw data set the graphs below were derived from is available <a  href="vt_out.csv">here</a>. Note that the neuron output value is an enum, with CORRECT=0, FALSE_POSITIVE=1 and FALSE_NEGATIVE=2.
 </p>
 <p>
 <img src="results1.png" alt="results1"/>
 </p>
 <p>
-The above graph shows the number of incorrect answers across the neurons per cycle. The first peak corresponds to Liberation etc. This is the only published data set that shows the 10 cycles used to test for convergence.
+The above graph shows the number of incorrect answers across the neurons per cycle. The first set corresponds to Liberation, the second to Harabara, the third Optimus then the fonts are replayed. Each font run is separated by 10 correct cycles used to determine convergence on that font.
 </p>
 <p>
 <img src="results2.png" alt="results2"/>
 </p>
 <p>
-The above graph shows number of correct and incorrect answers in total by font.
+The above graph shows number of correct and incorrect answers in total by font. L1 is the first run where Liberation is shown, O2 the second Optimus run etc.
 </p>
 
 <h2><a name="new_usages">New Language usages</a></h2>
@@ -202,10 +205,7 @@ By far the most important contribution this app has made to the trad4 architectu
 This app makes extensive use of the excellent <a href="http://www.libgd.org/Main_Page">libgd</a>, a graphics library used here for converting from fonts to bit maps, and creating the animations. Libgd may or may not be thread-safe (in this case it writes to the filesystem so there will some limit on scalability), but it can be used in a multi-threaded environment as long as you know that any heap <i>it</i> uses will be cleaned up on exit from the calculate function. Apologies to anyone I might have scared off with my assertions in the v3.0 manual - this will be corrected shortly.
 </p>
 <p>
-That being said, there are circumstances where keeping 3rd party code on the stack is not an option. Witness jpm_cds, where we are actually porting an existing application to the trad4 architecture. This discussion is beyond the scope of this document, but will be addressed in the all-new trad4v3.1 manual (forthcoming). The jpm_cds Phase2 model is actually a very high priority of mine, but quite frankly feels like a bit of a busman's holiday, so I haven't given it as much time as I should have done. FIXME - more on planned 2nd and 3rd party integration.
-</p>
-<p>
-
+That being said, there are circumstances where keeping 3rd party code on the stack is not an option. Witness jpm_cds, where we are actually porting an existing application to the trad4 architecture. This discussion is beyond the scope of this document, but will be addressed in the all-new trad4v3.1 manual (forthcoming).
 </p>
 <h3>User function signatures</h3>
 <p>
@@ -230,7 +230,7 @@ In this case it's just the structure we need (and the filename), so it doesn't m
 (*weight_matrix).row[1].col[3] = 6;	// or whatever
 </pre></blockquote>
 <p>
-And this is because a) the standard function signature is not used so the macros won't work, and b) there aren't any nice macros for the structures anyway. I see the above notation as a plexiglass window into the sausage factory, so I plan to provide macros for these in the medium term.
+And this is because a) the standard function signature is not used so the macros won't work, and b) there aren't any nice macros for the structures anyway. This will be addressed in the medium term.
 </p>
 <h2><a name="further_work">Further Work</a></h2>
 <p>
@@ -245,6 +245,8 @@ Another important issue to note is selection bias - I picked these three fonts b
 <p>
 Should you run the precompiler you'll see warnings about locally modified Makefiles. Like jpm_cds (though a different situation), this reflects a half-arsed approach to third party library integration in trad4 - another topic beyond the scope of this document. Ignore these warnings, unless you're adding objects, in which case you're looking at a manual merge - sorry.  
 </p>
+
+
 <h2><a name="usage">Usage</a></h2>
 <h3>Running</h3>
 <p>
@@ -262,7 +264,10 @@ To increase or decrease the number of threads used (the default is 4), set NUM_T
 </p>
 <blockquote><pre>$ export NUM_THREADS=64
 $ vision_thing</pre></blockquote>
-
+<h2>Further Reading</h2>
+<p>
+For a good introductory text on artificial neural networks see "Neural Computing: An Introduction" by R. Beale and T Jackson.
+</p>
 <!-- ==================================================================== -->
 
 <div align="center" class="copyright">
