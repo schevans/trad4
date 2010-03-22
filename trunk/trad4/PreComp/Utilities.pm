@@ -799,7 +799,7 @@ sub Type2GenDataValue($$) {
         $ret_val = 3.14;
     }
     elsif ( $type =~ 'char' ) {
-        $ret_val = "X";
+        $ret_val = "\'X\'";
     }
     elsif ( $type =~ 'float' ) {
         $ret_val = 3.14;
