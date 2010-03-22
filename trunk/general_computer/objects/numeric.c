@@ -13,7 +13,7 @@ using namespace std;
 
 int calculate_numeric( obj_loc_t obj_loc, int id )
 {
-    cout << "Warning: calculate_numeric is being called. Doing nothing" << endl;
+    cout << "Warning: calculate_numeric is being called, but it's an abstract base type in this context. Doing nothing." << endl;
 
     return 1;
 }
