@@ -40,7 +40,7 @@ sub generate_top_lvl_make($) {
     print $FHD "all: objs $ENV{APP}\n";
     print $FHD "\n";
     print $FHD "$ENV{APP}: objects/main.o\n";
-    print $FHD "	g++ objects/main.o \$(TRAD4_ROOT)/objects/sqlite3.o -o bin/$ENV{APP} -ltrad4 -L\$(TRAD4_ROOT)/objects -lpthread -ldl -L\$(APP_ROOT)/lib \$(T4_3RD_PARTY_LIBRARY_LIBS)\n";
+    print $FHD "	g++ objects/main.o \$(TRAD4_ROOT)/objects/sqlite3.o -o bin/$ENV{APP} -ltrad4 -L\$(TRAD4_ROOT)/objects -lpthread -ldl -L\$(APP_ROOT)/lib \$(T4_3RD_PARTY_LIBS)\n";
     print $FHD "\n";
     print $FHD "objs:\n";
 
