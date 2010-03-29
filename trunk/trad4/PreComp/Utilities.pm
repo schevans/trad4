@@ -55,9 +55,9 @@ sub Clean() {
     `rm -f $ENV{APP_ROOT}/data/default_set/*`; 
 
     print "Cleaning Makefiles..\n";
-    `rm -f $ENV{APP_ROOT}/Makefile`;
-    `rm -f $ENV{APP_ROOT}/lib/Makefile`;
-    `rm -f $ENV{APP_ROOT}/objects/Makefile`;
+    `rm -f $ENV{APP_ROOT}/Makefile*`;
+    `rm -f $ENV{APP_ROOT}/lib/Makefile*`;
+    `rm -f $ENV{APP_ROOT}/objects/Makefile*`;
 }    
 
 sub OpenFile($) {
