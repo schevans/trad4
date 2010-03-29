@@ -142,7 +142,7 @@ sub generate_lib_make($) {
 
     print $FHD "\n";
     print $FHD "clean:\n";
-    print $FHD "	rm -f \$(LIBS)\n";
+    print $FHD "	rm -f *.so\n";
     print $FHD "\n";
 
     PreComp::Utilities::CloseFile();
