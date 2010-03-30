@@ -1,0 +1,7 @@
+
+ 
+pub
+    int wave[SAMPLE_COUNT]
+
+
+
