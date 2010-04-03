@@ -1,5 +1,6 @@
 #type_id, tier, name
-1,1,harmonic
-2,2,mixer
+1,0,harmonic
+2,0,mixer
+9,0,sample
 
 

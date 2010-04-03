@@ -1,12 +1,11 @@
 
 
+implements sample
+
 sub
-    harmonic harmonics[NUM_HARMONICS_PER_MIXER]
+    sample harmonics[NUM_HARMONICS_PER_MIXER]
 
 static
     int write_wav_file
-
-pub
-    int wave[SAMPLE_COUNT]
 
 
