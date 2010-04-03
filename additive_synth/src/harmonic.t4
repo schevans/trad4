@@ -1,7 +1,8 @@
 
+
+implements sample
  
-pub
-    int wave[SAMPLE_COUNT]
+
 
 
 
