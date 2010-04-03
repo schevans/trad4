@@ -495,7 +495,7 @@ sub LoadDefs() {
 
                 my $temp = $master_hash{$master_hash{$type}{data}{implements}}{data};
 
-                foreach $section ( "sub", "static", "pub" ) {
+                foreach $section ( "sub", "sub_vec", "static", "static_vec", "pub", "pub_vec" ) {
 
                     foreach $var ( keys %{$master_hash{$master_hash{$type}{data}{implements}}{data}{$section}} ) {
                     
@@ -504,7 +504,7 @@ sub LoadDefs() {
 
                 }
 
-                foreach $section ( "sub_order", "static_order", "pub_order" ) {
+                foreach $section ( "sub_order", "sub_vec_order", "static_order", "static_vec_order", "pub_order", "pub_vec_order" ) {
 
                     foreach $var ( @{$master_hash{$master_hash{$type}{data}{implements}}{data}{$section}} ) {
 
@@ -590,7 +590,7 @@ sub LoadDef($) {
 
             $object_hash{implements} = $implements;
 
-            last;
+            next;
         }
 
         if ( $line =~ /^sub$|^pub$|^static$/ ) {
