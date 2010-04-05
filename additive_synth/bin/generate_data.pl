@@ -25,8 +25,9 @@ for ( my $i=0 ; $i < $NUM_HARMONICS ; $i++ )
     my $harmonic_id = $harmonic_base_id + $i;
 
     print OUTFILE "insert into object values ( $harmonic_id, 1, 1, \"harmonic_$harmonic_id\", 1, 1 );\n";
-    print OUTFILE "insert into harmonic values ( $harmonic_id );\n";
+    print OUTFILE "insert into harmonic values ( $harmonic_id, 0 );\n";
 
+    print OUTFILE "insert into harmonic_samples values ( $harmonic_id, $harmonic_id, $harmonic_id );\n";
 }
 
 my $num_mixers=0;
@@ -44,14 +45,14 @@ my $h2id = ( $i * 2 ) + 2;
 
 print "M $mixer_id $h1id $h2id\n";
 
-    print OUTFILE "insert into mixer_harmonics values ( $mixer_id, $h1id, $h2id );\n";
+    print OUTFILE "insert into mixer_samples values ( $mixer_id, $h1id, $h2id );\n";
 }
 
 print OUTFILE "insert into object values ( 1002, 2, 3, \"mixer_1002\", 1, 1 );\n";
 
 print OUTFILE "insert into mixer values ( 1002, 1 );\n";
 
-print OUTFILE "insert into mixer_harmonics values ( 1002, 1000, 1001 );\n";
+print OUTFILE "insert into mixer_samples values ( 1002, 1000, 1001 );\n";
 
 print OUTFILE "COMMIT;\n";
 

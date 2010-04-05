@@ -9,27 +9,21 @@
 
 #include "harmonic_wrapper.c"
 
-#define         LEFT_FREQ                       (344.0 / SAMPLE_RATE)
-#define         RIGHT_FREQ                      (466.0 / SAMPLE_RATE)
-
-
 using namespace std;
+
+double get_level( int id );
 
 int calculate_harmonic( obj_loc_t obj_loc, int id )
 {
     for ( int i = 0 ; i <= SAMPLE_COUNT ; i++ ) 
     {
-        if ( id == 1 )
-        {
-            harmonic_wave[i] = AMPLITUDE * sin ( LEFT_FREQ * 2 * i * PI );
-        }
-        else
-        {
-            harmonic_wave[i] = AMPLITUDE * sin ( RIGHT_FREQ * 2 * i * PI );
-
-        }
+        harmonic_wave[i] = AMPLITUDE * sin ( BASE_FREQUENCY * 2 * i * PI * id ) * get_level(id);
     }
 
     return 1;
 }
 
+double get_level( int id )
+{
+    return 1.0;
+}
