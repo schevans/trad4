@@ -19,8 +19,9 @@ int calculate_mixer( obj_loc_t obj_loc, int id )
     {
         for ( int j = 1 ; j <= NUM_HARMONICS_PER_MIXER ; j++ )
         {
-            mixer_wave[i] += harmonics_wave( j, i ) / NUM_HARMONICS_PER_MIXER;
+            mixer_wave[i] += samples_wave( j, i ) / NUM_HARMONICS_PER_MIXER;
         }
+
     }
 
     if ( mixer_write_wav_file )
@@ -35,7 +36,10 @@ int calculate_mixer( obj_loc_t obj_loc, int id )
         sfinfo.channels = 1;
         sfinfo.format = (SF_FORMAT_WAV | SF_FORMAT_PCM_24);
 
-        if (! (file = sf_open ("sine.wav", SFM_WRITE, &sfinfo)))
+        ostringstream filename;
+        filename << object_name( id ) << ".wav";
+
+        if (! (file = sf_open ( filename.str().c_str(), SFM_WRITE, &sfinfo)))
         {       
             printf ("Error : Not able to open output file.\n");
             return 0;

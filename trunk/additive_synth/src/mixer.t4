@@ -2,10 +2,4 @@
 
 implements sample
 
-sub
-    sample harmonics[NUM_HARMONICS_PER_MIXER]
-
-static
-    int write_wav_file
-
 
