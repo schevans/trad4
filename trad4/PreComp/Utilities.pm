@@ -590,7 +590,7 @@ sub LoadDef($) {
 
             $object_hash{implements} = $implements;
 
-            next;
+            last;
         }
 
         if ( $line =~ /^sub$|^pub$|^static$/ ) {
