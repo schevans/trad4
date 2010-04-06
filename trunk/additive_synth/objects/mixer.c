@@ -15,13 +15,13 @@ using namespace std;
 
 int calculate_mixer( obj_loc_t obj_loc, int id )
 {
+
     for ( int i = 0 ; i < SAMPLE_COUNT ; i++ )
     {
-        for ( int j = 1 ; j <= NUM_HARMONICS_PER_MIXER ; j++ )
+        for ( int j = 0 ; j < NUM_HARMONICS_PER_MIXER ; j++ )
         {
             mixer_wave[i] += samples_wave( j, i ) / NUM_HARMONICS_PER_MIXER;
         }
-
     }
 
     if ( mixer_write_wav_file )
