@@ -15,12 +15,33 @@ using namespace std;
 
 int calculate_mixer( obj_loc_t obj_loc, int id )
 {
-
     for ( int i = 0 ; i < SAMPLE_COUNT ; i++ )
     {
         for ( int j = 0 ; j < NUM_HARMONICS_PER_MIXER ; j++ )
         {
             mixer_wave[i] += samples_wave( j, i ) / NUM_HARMONICS_PER_MIXER;
+        }
+
+    }
+
+    // Amplifier
+    if ( id == 1004 )
+    {
+        double max_level(0.0);
+
+        for ( int i = 0 ; i < SAMPLE_COUNT ; i++ )
+        {
+            if ( fabs(mixer_wave[i]) > max_level )
+            {
+                max_level = fabs(mixer_wave[i]);
+            }
+        }
+
+        double level_coeff = MAX_VOLUME / (max_level / AMPLITUDE);
+
+        for ( int i = 0 ; i < SAMPLE_COUNT ; i++ )
+        {
+            mixer_wave[i] *= level_coeff;
         }
     }
 

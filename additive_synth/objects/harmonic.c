@@ -15,9 +15,11 @@ double get_level( int id );
 
 int calculate_harmonic( obj_loc_t obj_loc, int id )
 {
+    double level = get_level(id);
+
     for ( int i = 0 ; i <= SAMPLE_COUNT ; i++ ) 
     {
-        harmonic_wave[i] = AMPLITUDE * sin ( BASE_FREQUENCY * 2 * i * PI * id ) * get_level(id);
+        harmonic_wave[i] = AMPLITUDE * sin ( BASE_FREQUENCY * 2 * i * PI * id ) * level;
     }
 
     return 1;
@@ -25,5 +27,26 @@ int calculate_harmonic( obj_loc_t obj_loc, int id )
 
 double get_level( int id )
 {
-    return 1.0;
+    double level(0);
+
+    // Pulse waveform
+    //level = 1.0;
+
+    // Sawtooth
+    //level = 1.0 / id;
+
+    if ( id % 2 != 0 )
+    {
+        // Square wave
+        level = 1.0 / id;
+
+        // Triangle (broken)
+        //level = 1.0 / (id*id);
+    }
+    else
+    {
+        level = 0.0;
+    }
+
+    return level;
 }
