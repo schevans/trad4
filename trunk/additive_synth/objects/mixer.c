@@ -6,10 +6,9 @@
 
 #include <iostream>
 
-#include "sndfile.h"
-
 #include "mixer_wrapper.c"
 
+#include "write_wav_file.c"
 
 using namespace std;
 
@@ -21,57 +20,11 @@ int calculate_mixer( obj_loc_t obj_loc, int id )
         {
             mixer_wave[i] += samples_wave( j, i ) / NUM_HARMONICS_PER_MIXER;
         }
-
     }
 
-    // Amplifier
-    if ( id == 1004 )
+    if ( object_log_level(id) > NONE )
     {
-        double max_level(0.0);
-
-        for ( int i = 0 ; i < SAMPLE_COUNT ; i++ )
-        {
-            if ( fabs(mixer_wave[i]) > max_level )
-            {
-                max_level = fabs(mixer_wave[i]);
-            }
-        }
-
-        double level_coeff = MAX_VOLUME / (max_level / AMPLITUDE);
-
-        for ( int i = 0 ; i < SAMPLE_COUNT ; i++ )
-        {
-            mixer_wave[i] *= level_coeff;
-        }
-    }
-
-    if ( mixer_write_wav_file )
-    {
-        SNDFILE *file;
-        SF_INFO sfinfo;
-
-        memset (&sfinfo, 0, sizeof (sfinfo));
-
-        sfinfo.samplerate = SAMPLE_RATE;
-        sfinfo.frames = SAMPLE_COUNT;
-        sfinfo.channels = 1;
-        sfinfo.format = (SF_FORMAT_WAV | SF_FORMAT_PCM_24);
-
-        ostringstream filename;
-        filename << object_name( id ) << ".wav";
-
-        if (! (file = sf_open ( filename.str().c_str(), SFM_WRITE, &sfinfo)))
-        {       
-            printf ("Error : Not able to open output file.\n");
-            return 0;
-        }
-
-        if (sf_write_int (file, mixer_wave, sfinfo.channels * SAMPLE_COUNT) != sfinfo.channels * SAMPLE_COUNT)
-        {
-            puts (sf_strerror (file));
-        }
-
-        sf_close(file);
+        write_wav_file( mixer_wave, object_name(id) );
     }
 
     return 1;
