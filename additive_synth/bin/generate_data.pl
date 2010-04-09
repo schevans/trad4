@@ -53,10 +53,11 @@ print "M $i $mixer_id $h1id $h2id $h3id $h4id\n";
 }
 
 print OUTFILE "insert into object values ( 1004, 2, 3, \"master\", 1, 1 );\n";
-
 print OUTFILE "insert into mixer values ( 1004, 1 );\n";
-
 print OUTFILE "insert into mixer_samples values ( 1004, 1000, 1001, 1002, 1003 );\n";
+
+print OUTFILE "insert into object values ( 1005, 3, 4, \"amplifier\", 1, 1 );\n";
+print OUTFILE "insert into amplifier values ( 1005, 1004 );\n";
 
 print OUTFILE "COMMIT;\n";
 

@@ -9,6 +9,8 @@
 
 #include "harmonic_wrapper.c"
 
+#include "write_wav_file.c"
+
 using namespace std;
 
 double get_level( int id );
@@ -20,6 +22,11 @@ int calculate_harmonic( obj_loc_t obj_loc, int id )
     for ( int i = 0 ; i <= SAMPLE_COUNT ; i++ ) 
     {
         harmonic_wave[i] = AMPLITUDE * sin ( BASE_FREQUENCY * 2 * i * PI * id ) * level;
+    }
+
+    if ( object_log_level(id) > NONE )
+    {
+        write_wav_file( harmonic_wave, object_name(id) );
     }
 
     return 1;
