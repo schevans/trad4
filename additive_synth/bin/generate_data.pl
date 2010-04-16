@@ -7,60 +7,135 @@
 use warnings;
 use strict;
 
+use Data::Dumper;
+
+use PreComp::AppConstants;
+use PreComp::Utilities;
+
+
+my $constants_hash;
+
+if (  -f $ENV{SRC_DIR}."/constants.t4s" ) {
+
+    $constants_hash = PreComp::Utilities::LoadAppConstants();
+}
+
+my $amp_id=9999;
+
+my %tier_id_hash;
+
+my $NUM_HARMONICS = $constants_hash->{NUM_HARMONICS};
+my $NUM_HARMONICS_PER_MIXER = $constants_hash->{NUM_HARMONICS_PER_MIXER};
+
 my $outfile = $ENV{APP_ROOT}."/data/worked_example/gen.sql";
 open OUTFILE, ">$outfile" or die "Can't open $outfile.\n";
 
 my $harmonic_base_id = 1;
-my $mixer_base_id = 1000;
-
-my $NUM_HARMONICS=16;
-my $NUM_HARMONICS_PER_MIXER=4;
 
 print OUTFILE "BEGIN;\n";
 print OUTFILE "delete from object;\n";
 print OUTFILE "delete from harmonic;\n";
 print OUTFILE "delete from mixer;\n";
 print OUTFILE "delete from mixer_samples;\n";
+print OUTFILE "delete from amplifier;\n";
 
-for ( my $i=0 ; $i < $NUM_HARMONICS ; $i++ )
+my $current_id=1;
+
+my $tier = 1;
+
+print "Generating $NUM_HARMONICS harmonics..\n";
+
+for ( ; $current_id <= $NUM_HARMONICS ; $current_id++ )
 {
-    my $harmonic_id = $harmonic_base_id + $i;
+    print OUTFILE "insert into object values ( $current_id, 1, 1, \"harmonic_$current_id\", 0, 1 );\n";
+    print OUTFILE "insert into harmonic values ( $current_id, 0 );\n";
 
-    print OUTFILE "insert into object values ( $harmonic_id, 1, 1, \"harmonic_$harmonic_id\", 1, 1 );\n";
-    print OUTFILE "insert into harmonic values ( $harmonic_id, 0 );\n";
+    print OUTFILE "insert into harmonic_samples values ( $current_id";
 
-    print OUTFILE "insert into harmonic_samples values ( $harmonic_id, $harmonic_id, $harmonic_id, $harmonic_id, $harmonic_id );\n";
+    for ( my $i=0 ; $i < $NUM_HARMONICS_PER_MIXER ; $i++ ) {
+
+        print OUTFILE ", $current_id";
+    }
+
+    print OUTFILE " );\n";
+
+    push @{$tier_id_hash{$tier}}, $current_id; 
+
 }
 
-my $num_mixers=0;
+my $digger = $NUM_HARMONICS;
 
-for ( my $i=0 ; $i < $NUM_HARMONICS / $NUM_HARMONICS_PER_MIXER ; $i++ )
-{
-    my $mixer_id = $mixer_base_id + $i;
+while ( $digger != $NUM_HARMONICS_PER_MIXER ) {
 
-    print OUTFILE "insert into object values ( $mixer_id, 2, 2, \"mixer_$mixer_id\", 1, 1 );\n";
+    $tier++;
 
-    print OUTFILE "insert into mixer values ( $mixer_id, 1 );\n";
+    if ( $digger % $NUM_HARMONICS_PER_MIXER == 0 ) {
 
-my $h1id = ( $i * $NUM_HARMONICS_PER_MIXER ) + 1;
-my $h2id = ( $i * $NUM_HARMONICS_PER_MIXER ) + 2;
-my $h3id = ( $i * $NUM_HARMONICS_PER_MIXER ) + 3;
-my $h4id = ( $i * $NUM_HARMONICS_PER_MIXER ) + 4;
+        $digger = $digger / $NUM_HARMONICS_PER_MIXER;
 
-print "M $i $mixer_id $h1id $h2id $h3id $h4id\n";
+        print "Generating $digger mixers on tier $tier..\n";
 
-    print OUTFILE "insert into mixer_samples values ( $mixer_id, $h1id, $h2id, $h3id, $h4id );\n";
+        for ( my $i=0 ; $i < $digger ; $i++ )
+        {
+            print OUTFILE "insert into object values ( $current_id, 2, $tier, \"mixer_$current_id\", 0, 1 );\n";
+
+            print OUTFILE "insert into mixer values ( $current_id, 1 );\n";
+
+            print OUTFILE "insert into mixer_samples values ( $current_id";
+
+            my @sub_array = @{$tier_id_hash{$tier-1}};
+
+            for ( my $j=0 ; $j < $NUM_HARMONICS_PER_MIXER ; $j++ ) {
+
+                my $sub_index = ($i*$NUM_HARMONICS_PER_MIXER) + $j;
+        
+                my $sub_id = $sub_array[$sub_index];
+
+                print OUTFILE ", $sub_id";
+            }
+
+            print OUTFILE " );\n";
+
+            push @{$tier_id_hash{$tier}}, $current_id; 
+
+            $current_id++;
+        }
+    }
+    else {
+        print "Error: Indivisible inputs\n";
+        exit(0);
+
+    }
+
 }
 
-print OUTFILE "insert into object values ( 1004, 2, 3, \"master\", 1, 1 );\n";
-print OUTFILE "insert into mixer values ( 1004, 1 );\n";
-print OUTFILE "insert into mixer_samples values ( 1004, 1000, 1001, 1002, 1003 );\n";
+print OUTFILE "\n";
 
-print OUTFILE "insert into object values ( 1005, 3, 4, \"amplifier\", 1, 1 );\n";
-print OUTFILE "insert into amplifier values ( 1005, 1004 );\n";
+print "Generating master mixer..\n";
+
+$tier++;
+
+print OUTFILE "insert into object values ( $current_id, 2, $tier, \"master\", 0, 1 );\n";
+print OUTFILE "insert into mixer values ( $current_id, 1 );\n";
+print OUTFILE "insert into mixer_samples values ( $current_id";
+
+for ( my $i=0 ; $i < $NUM_HARMONICS_PER_MIXER ; $i++ ) {
+
+    print OUTFILE ", ".(($current_id-$NUM_HARMONICS_PER_MIXER) + $i);
+}
+
+print OUTFILE " );\n";
+
+print "Generating amplifier..\n";
+
+$tier++;
+
+print OUTFILE "insert into object values ( $amp_id, 3, $tier, \"amplifier\", 0, 1 );\n";
+print OUTFILE "insert into amplifier values ( $amp_id, $current_id );\n";
 
 print OUTFILE "COMMIT;\n";
 
 close OUTFILE;
 
+print "Done.\n";
 
