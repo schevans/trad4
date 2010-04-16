@@ -45,10 +45,10 @@ double get_level( int id )
     if ( id % 2 != 0 )
     {
         // Square wave
-        level = 1.0 / id;
+        //level = 1.0 / id;
 
-        // Triangle (broken)
-        //level = 1.0 / (id*id);
+        // Triangle 
+        level = pow( -1.0, ( id - 1 ) / 2 ) * ( 1.0 / (id*id) );
     }
     else
     {
