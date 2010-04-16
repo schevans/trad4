@@ -36,23 +36,33 @@ double get_level( int id )
 {
     double level(0);
 
-    // Pulse waveform
-    //level = 1.0;
+    int waveform = 1;
 
-    // Sawtooth
-    //level = 1.0 / id;
-
-    if ( id % 2 != 0 )
+    if ( waveform == 1) // Pulse
     {
-        // Square wave
-        //level = 1.0 / id;
-
-        // Triangle 
-        level = pow( -1.0, ( id - 1 ) / 2 ) * ( 1.0 / (id*id) );
+        level = 1.0;
     }
-    else
+    else if ( waveform == 2 ) // Sawtooth
     {
-        level = 0.0;
+        level = 1.0 / id;
+    }
+    else if ( waveform == 3 || waveform == 4 )
+    {
+        if ( id % 2 != 0 )
+        {
+            if ( waveform == 3 ) // Square
+            {
+                level = 1.0 / id;
+            }
+            else // Triangle
+            {
+                level = pow( -1.0, ( id - 1 ) / 2 ) * ( 1.0 / (id*id) );
+            }
+        }
+        else
+        {
+            level = 0.0;
+        }
     }
 
     return level;
