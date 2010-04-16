@@ -19,7 +19,7 @@ int calculate_harmonic( obj_loc_t obj_loc, int id )
 {
     double level = get_level(id);
 
-    for ( int i = 0 ; i <= SAMPLE_COUNT ; i++ ) 
+    for ( int i = 0 ; i < SAMPLE_COUNT ; i++ ) 
     {
         harmonic_wave[i] = AMPLITUDE * sin ( BASE_FREQUENCY * 2 * i * PI * id ) * level;
     }
