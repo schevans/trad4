@@ -35,6 +35,7 @@ my $harmonic_base_id = 1;
 print OUTFILE "BEGIN;\n";
 print OUTFILE "delete from object;\n";
 print OUTFILE "delete from harmonic;\n";
+print OUTFILE "delete from harmonic_samples;\n";
 print OUTFILE "delete from mixer;\n";
 print OUTFILE "delete from mixer_samples;\n";
 print OUTFILE "delete from amplifier;\n";
