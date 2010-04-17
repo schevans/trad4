@@ -18,10 +18,23 @@ double get_level( int id );
 int calculate_harmonic( obj_loc_t obj_loc, int id )
 {
     double level = get_level(id);
-
-    for ( int i = 0 ; i < SAMPLE_COUNT ; i++ ) 
+    double frequency = BASE_FREQUENCY * id;
+       
+    if ( frequency > NYQUIST_FREQUENCY )
     {
-        harmonic_wave[i] = AMPLITUDE * sin ( BASE_FREQUENCY * 2 * i * PI * id ) * level;
+        cout << "Warning: Frequency of " << object_name(id) << " (" << frequency << "Hz) exceeds Nyquist frequency (" << NYQUIST_FREQUENCY << "Hz). Ignoring harmonic." << endl;
+
+        for ( int i = 0 ; i < SAMPLE_COUNT ; i++ ) 
+        {
+            harmonic_wave[i] = 0.0;
+        }
+    }
+    else
+    { 
+        for ( int i = 0 ; i < SAMPLE_COUNT ; i++ ) 
+        {
+            harmonic_wave[i] = AMPLITUDE * sin ( ( frequency * 2 * i * PI ) / (double)SAMPLE_RATE ) * level;
+        }
     }
 
     if ( object_log_level(id) > NONE )
@@ -36,7 +49,7 @@ double get_level( int id )
 {
     double level(0);
 
-    int waveform = 1;
+    int waveform = 3;
 
     if ( waveform == 1) // Pulse
     {
