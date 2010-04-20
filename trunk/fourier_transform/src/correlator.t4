@@ -1,0 +1,10 @@
+
+
+sub
+    source source
+
+
+pub
+    double harmonic[SAMPLE_COUNT]
+    double amplitude
+
