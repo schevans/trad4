@@ -16,34 +16,27 @@ int calculate_source( obj_loc_t obj_loc, int id )
 {
     if ( ! object_init(id ) )
     {
-        for ( int i = 0 ; i <= SAMPLE_COUNT ; i++ )
+        SNDFILE *file;
+
+        SF_INFO sfinfo;
+
+        memset (&sfinfo, 0, sizeof (sfinfo));
+
+        sfinfo.format = 0;
+
+        if (! (file = sf_open ( "source.wav", SFM_READ, &sfinfo)))
         {
-            source_wave[i] = sin ( ( 2 * i * PI ) / (double)SAMPLE_COUNT ) ;
+            printf ("Error : Not able to open input file.\n");
+            exit(0);
         }
+
+        if (sf_read_int (file, source_wave, SAMPLE_COUNT) != SAMPLE_COUNT)
+        {
+            puts (sf_strerror (file));
+        }
+
+        sf_close(file);
     }
-
-    SNDFILE *file;
-
-    SF_INFO sfinfo;
-
-    memset (&sfinfo, 0, sizeof (sfinfo));
-
-    sfinfo.format = 0;
-
-    if (! (file = sf_open ( "source.wav", SFM_READ, &sfinfo)))
-    {
-        printf ("Error : Not able to open input file.\n");
-        exit(0);
-    }
-
-    int wave[SAMPLE_COUNT];
-
-    if (sf_read_int (file, wave, SAMPLE_COUNT) != SAMPLE_COUNT)
-    {
-        puts (sf_strerror (file));
-    }
-
-    sf_close(file);
 
     return 1;
 }
