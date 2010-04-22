@@ -30,8 +30,6 @@ my $NUM_HARMONICS_PER_MIXER = $constants_hash->{NUM_HARMONICS_PER_MIXER};
 my $outfile = $ENV{APP_ROOT}."/data/worked_example/gen.sql";
 open OUTFILE, ">$outfile" or die "Can't open $outfile.\n";
 
-my $harmonic_base_id = 1;
-
 print OUTFILE "BEGIN;\n";
 print OUTFILE "delete from object;\n";
 print OUTFILE "delete from harmonic;\n";
@@ -49,7 +47,7 @@ print "Generating $NUM_HARMONICS harmonics..\n";
 for ( ; $current_id <= $NUM_HARMONICS ; $current_id++ )
 {
     print OUTFILE "insert into object values ( $current_id, 1, 1, \"harmonic_$current_id\", 0, 1 );\n";
-    print OUTFILE "insert into harmonic values ( $current_id, 0 );\n";
+    print OUTFILE "insert into harmonic values ( $current_id, 1 );\n";
 
     print OUTFILE "insert into harmonic_samples values ( $current_id";
 
@@ -80,7 +78,7 @@ while ( $digger != $NUM_HARMONICS_PER_MIXER ) {
         {
             print OUTFILE "insert into object values ( $current_id, 2, $tier, \"mixer_$current_id\", 0, 1 );\n";
 
-            print OUTFILE "insert into mixer values ( $current_id, 1 );\n";
+            print OUTFILE "insert into mixer values ( $current_id, 0 );\n";
 
             print OUTFILE "insert into mixer_samples values ( $current_id";
 
@@ -117,7 +115,7 @@ print "Generating master mixer..\n";
 $tier++;
 
 print OUTFILE "insert into object values ( $current_id, 2, $tier, \"master\", 0, 1 );\n";
-print OUTFILE "insert into mixer values ( $current_id, 1 );\n";
+print OUTFILE "insert into mixer values ( $current_id, 0 );\n";
 print OUTFILE "insert into mixer_samples values ( $current_id";
 
 for ( my $i=0 ; $i < $NUM_HARMONICS_PER_MIXER ; $i++ ) {
