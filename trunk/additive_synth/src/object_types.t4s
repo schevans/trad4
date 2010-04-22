@@ -1,3 +1,7 @@
+# Copyright (c) Steve Evans 2010
+# steve@topaz.myzen.co.uk
+# This code is licenced under the BSD licence. For details see $APP_ROOT/LICENCE
+#
 #type_id, tier, name
 1,0,harmonic
 2,0,mixer

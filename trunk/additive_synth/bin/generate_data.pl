@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright (c) Steve Evans 2009
+# Copyright (c) Steve Evans 2010
 # steve@topaz.myzen.co.uk
 # This code is licenced under the BSD licence. For details see $INSTANCE_ROOT/LICENCE
 
