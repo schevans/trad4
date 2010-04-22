@@ -3,7 +3,7 @@ sub
     sample samples[NUM_HARMONICS_PER_MIXER]
 
 static
-    int write_wav_file
+    waveform_enum waveform    
 
 pub
     int wave[SAMPLE_COUNT]

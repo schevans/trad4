@@ -13,11 +13,11 @@
 
 using namespace std;
 
-double get_level( int id );
+double get_level( obj_loc_t obj_loc, int id );
 
 int calculate_harmonic( obj_loc_t obj_loc, int id )
 {
-    double level = get_level(id);
+    double level = get_level( obj_loc, id );
     double frequency = BASE_FREQUENCY * id;
        
     if ( frequency > NYQUIST_FREQUENCY )
@@ -45,25 +45,23 @@ int calculate_harmonic( obj_loc_t obj_loc, int id )
     return 1;
 }
 
-double get_level( int id )
+double get_level( obj_loc_t obj_loc, int id )
 {
     double level(0);
 
-    int waveform = 3;
-
-    if ( waveform == 1) // Pulse
+    if ( harmonic_waveform == 1) // Pulse
     {
         level = 1.0;
     }
-    else if ( waveform == 2 ) // Sawtooth
+    else if ( harmonic_waveform == 2 ) // Sawtooth
     {
         level = 1.0 / id;
     }
-    else if ( waveform == 3 || waveform == 4 )
+    else if ( harmonic_waveform == 3 || harmonic_waveform == 4 )
     {
         if ( id % 2 != 0 )
         {
-            if ( waveform == 3 ) // Square
+            if ( harmonic_waveform == 3 ) // Square
             {
                 level = 1.0 / id;
             }
@@ -77,6 +75,10 @@ double get_level( int id )
             level = 0.0;
         }
     }
+    else
+    {
+        cerr << "Unknown waveform_enum " << harmonic_waveform << " in harmonic id " << id << "." << endl;
+    } 
 
     return level;
 }
