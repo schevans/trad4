@@ -63,7 +63,6 @@ sub Generate($) {
     print $FHD "<ul>\n";
     print $FHD "<li><a href=\"#introduction\">Introduction</a></li>\n";
     print $FHD "<li><a href=\"#the_model\">The Model</a></li>\n";
-    print $FHD "<li><a href=\"#implementation\">Implementation</a></li>\n";
     print $FHD "<li><a href=\"#usage\">Usage</a></li>\n";
     print $FHD "</ul>\n";
     print $FHD "\n";
@@ -77,7 +76,6 @@ sub Generate($) {
     print $FHD "<p>\n";
     print $FHD "\n";
     print $FHD "</p>\n";
-    print $FHD "<h2><a name=\"implementation\">Implementation</a></h2>\n";
     print $FHD "<h3>The abstract diagram</h3>\n";
     print $FHD "<p>\n";
     print $FHD "\n";
@@ -86,58 +84,6 @@ sub Generate($) {
     print $FHD "<p>\n";
     print $FHD "\n";
     print $FHD "</p>\n";
-    print $FHD "<h3>The t4 files</h3>\n";
-
-    my %simple_hash;
-
-    foreach $type ( keys %{$master_hash} ) {
-
-        $simple_hash{$type} = $master_hash->{$type}->{type_num};
-    }
-
-    foreach $type ( sort{ $simple_hash{$a} <=> $simple_hash{$b} } keys %simple_hash ) {
-
-        my $is_ul_list = 0;
-
-        print $FHD "<h4>$type.t4:</h4>\n";
-        print $FHD "<blockquote><pre>\n";
-
-        if ( $master_hash->{$type}->{data}->{implements} eq $type ) {
-
-            foreach $section ( "sub", "static", "pub" ) {
-
-                PrintT4Section( $master_hash, $section, $type, $is_ul_list, $FHD );
-
-            }
-        }
-        else {
-
-            print $FHD "implements $master_hash->{$type}->{data}->{implements}\n";
-        }
-
-        print $FHD "</pre></blockquote>\n";
-
-        $is_ul_list = 1;
-
-        if ( $master_hash->{$type}->{data}->{implements} eq $type ) {
-
-            print $FHD "<ul>\n";
-
-            foreach $section ( "sub", "static", "pub" ) {
-
-                PrintT4Section( $master_hash, $section, $type, $is_ul_list, $FHD );
-
-            }
-
-            print $FHD "</ul>\n";
-
-        }
-
-        print $FHD "<p>\n";
-        print $FHD "\n";
-        print $FHD "</p>\n";
-    }
-
     print $FHD "\n";
     print $FHD "<h2><a name=\"usage\">Usage</a></h2>\n";
     print $FHD "<h3>Running</h3>\n";
