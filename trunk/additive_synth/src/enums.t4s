@@ -1,6 +1,7 @@
 
 
 waveform_enum
+    SINE
     PULSE
     SAWTOOTH
     SQUARE
