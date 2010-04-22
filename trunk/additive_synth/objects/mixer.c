@@ -14,11 +14,18 @@ using namespace std;
 
 int calculate_mixer( obj_loc_t obj_loc, int id )
 {
-    for ( int i = 0 ; i < SAMPLE_COUNT ; i++ )
+    mixer_level = 0.0;
+
+    for ( int j = 0 ; j < NUM_HARMONICS_PER_MIXER ; j++ )
     {
-        for ( int j = 0 ; j < NUM_HARMONICS_PER_MIXER ; j++ )
+        if ( samples_level(j) != 0.0 )
         {
-            mixer_wave[i] += samples_wave( j, i ) / NUM_HARMONICS_PER_MIXER;
+            for ( int i = 0 ; i < SAMPLE_COUNT ; i++ )
+            {
+                mixer_wave[i] += samples_wave( j, i ) / (double)NUM_HARMONICS_PER_MIXER;
+            }
+
+            mixer_level += samples_level(j) / (double)NUM_HARMONICS_PER_MIXER;
         }
     }
 
