@@ -1,6 +1,8 @@
+// Copyright (c) Steve Evans 2010
+// steve@topaz.myzen.co.uk
+// This code is licenced under the BSD licence. For details see $APP_ROOT/LICENCE
 
 #include "sndfile.h"
-
 
 void write_wav_file( int* wave, std::string filename )
 {
