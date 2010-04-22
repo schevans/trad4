@@ -88,7 +88,7 @@ sub Generate($) {
     print $FHD "<h2><a name=\"usage\">Usage</a></h2>\n";
     print $FHD "<h3>Running</h3>\n";
     print $FHD "<p>\n";
-    print $FHD "To run the application:\n";
+    print $FHD "To run the application:<br/>\n";
 
     print $FHD "1) Download and unpack the distribution<br/>\n";
     print $FHD "2) cd into trad4_v$trad4_version/$app_name:<br/>\n";
