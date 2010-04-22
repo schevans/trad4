@@ -2,13 +2,13 @@
 # steve@topaz.myzen.co.uk
 # This code is licenced under the BSD licence. For details see $APP_ROOT/LICENCE
 
-NUM_HARMONICS=1024
+NUM_HARMONICS=16
 
 NUM_HARMONICS_PER_MIXER=4
 
 SAMPLE_RATE=44100
 
-BASE_FREQUENCY = 1
+BASE_FREQUENCY = MIDDLE_C
 
 NYQUIST_FREQUENCY = SAMPLE_RATE / 2.0
 
