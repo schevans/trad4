@@ -21,14 +21,12 @@ int calculate_correlator( obj_loc_t obj_loc, int id )
 
     }
 
-    double accumulator(0.0);
+    correlator_amplitude = 0.0;
 
     for ( int i = 1 ; i <= SAMPLE_COUNT ; i++ )
     {
-        accumulator += source_wave[i] * correlator_harmonic[i];
+        correlator_amplitude += source_wave[i] * correlator_harmonic[i];
     }
-
-cout << "accumulator: " << accumulator << endl;
 
     return 1;
 }

@@ -1,0 +1,5 @@
+
+sub
+    correlator correlators[NUM_CORRELATORS]
+
+
