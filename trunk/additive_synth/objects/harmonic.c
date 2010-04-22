@@ -26,8 +26,9 @@ int calculate_harmonic( obj_loc_t obj_loc, int id )
 
         harmonic_level = 0.0;
     }
-    else
-    { 
+
+    if ( harmonic_level != 0.0 )
+    {
         for ( int i = 0 ; i < SAMPLE_COUNT ; i++ ) 
         {
             harmonic_wave[i] = AMPLITUDE * sin ( ( frequency * 2 * i * PI ) / (double)SAMPLE_RATE ) * harmonic_level;
