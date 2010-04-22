@@ -1,0 +1,9 @@
+
+
+waveform_enum
+    PULSE
+    SAWTOOTH
+    SQUARE
+    TRIANGLE
+    HAMMOND
+
