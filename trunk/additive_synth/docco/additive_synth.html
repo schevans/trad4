@@ -65,11 +65,21 @@ additive_synth
 
 <h2><a name="introduction">Introduction</a></h2>
 <p>
-
+This application is a concurrent additive synthesiser. The principal of additive synthesis is that any periodic waveform can be synthesised by adding together sine waves. There's a good introduction to additive synthesis <a href="http://en.wikibooks.org/wiki/Sound_Synthesis_Theory/Additive_Synthesis#Additive_Synthesis">here</a>.
 </p>
+<p>
+This is a simplified model using no phase shifting and therefore only sinusoidal components. <a href="http://en.wikipedia.org/wiki/Synthesizer#ADSR_envelope">ADSR envelopes</a> are not implemented.
+</p>
+<p>
+In this beta six presets are available: sine, pulse, sawtooth, square, triangle and Hammond.
+</p>
+
 <h2><a name="the_model">The Model</a></h2>
 <p>
-
+The model itself is made up of three or more tiers. On the first tier are the harmonics - the pure sine wave feedstock of our synthesiser. Next come one or more tiers of mixers, where the harmonics are added concurrently. On the last tier there is only an amplifier, which serves to normalise the output as appropriate.
+</p>
+<p>
+The concurrency comes from the fact that each mixer subscribes to a sub-set of harmonics - in all the configurations presented here there are four harmonics per mixer - and the mixers in turn run concurrently. This model uses the Inheritance of Interface (IoI) feature of trad4 where a mixer can subscribe to four harmonics <i>or</i> four mixers. 
 </p>
 <h3>The abstract diagram</h3>
 <p>
@@ -80,6 +90,9 @@ additive_synth
 <img src="concrete.png" alt="concrete"/>
 </p>
 <h2><a name="the_waveforms">The Waveforms</a></h2>
+<p>
+The naming convention for the files below is as follows: name+frequency+num_harmonics. So "square_f1_h1024.wav" is a square wave with frequency 1Hz, synthesised using 1024 harmonics. Likewise "hammond_f261_h16.wav" is the Hammond preset with frequency 262Hz (middle C), synthesised using 16 harmonics. These files are best viewed using a sound editor such as <a href="http://audacity.sourceforge.net/">Audacity</a>. Be aware that only the Hammond wave is at an audible frequency.
+</p>
 <p>
 
 </p>
