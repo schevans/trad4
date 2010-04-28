@@ -192,4 +192,50 @@ sub PrintT4Section($$$$) {
     }
 }
 
+sub GenerateAbstractDiagram($) {
+    my $master_hash = shift;
+
+    my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::DoccoRoot()."abstract.dot");
+    if( ! $FHD ) { return; }
+
+    print $FHD "digraph abstract {\n";
+    print $FHD "\n";
+
+
+    foreach $type ( keys %{$master_hash} ) {
+
+        if ( exists $master_hash->{$type}->{type_id} ) {
+
+            print $FHD " Node".$master_hash->{$type}->{type_id}." [label=\"$type\"] \n";
+        }
+    }
+
+    print $FHD "\n";
+
+    foreach $type ( keys %{$master_hash} ) {
+
+        if ( exists $master_hash->{$type}->{type_id} ) {
+
+            my $var_name;
+
+            foreach $var_name ( @{$master_hash->{$type}->{sub}->{order}} ) {
+
+                $var_type = $master_hash->{$type}->{sub}->{data}->{$var_name};
+
+                print $FHD " Node".$master_hash->{$type}->{type_id}."->Node".$master_hash->{$var_type}->{type_id}." [dir=back]\n";
+
+            }
+        }
+
+    }
+
+    print $FHD "\n";
+    print $FHD "}\n";
+    print $FHD "\n";
+        
+
+    PreComp::Utilities::CloseFile();
+}
+
+
 1;

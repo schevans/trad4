@@ -93,7 +93,7 @@ sub OpenFile($) {
     if ( $file =~ /Makefile/ ) {
         $comment_start = "#";
     }
-    elsif ( $file_type =~ /^h$/ or $file_type =~ /^c$/ ) {
+    elsif ( $file_type =~ /^h$/ or $file_type =~ /^c$/ or $file_type =~ /^dot$/ ) {
         $comment_start = "//";
     }
     elsif ( $file_type =~ /table|sql/ ) {
@@ -105,7 +105,8 @@ sub OpenFile($) {
     }
     else
     {
-        print "Unknown file type $file_type\n";
+        print "Error: Unknown file type $file_type\n";
+        ExitOnError();
     }
        
     if ( -f $file ) {
