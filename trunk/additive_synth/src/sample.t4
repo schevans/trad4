@@ -2,12 +2,6 @@
 # steve@topaz.myzen.co.uk
 # This code is licenced under the BSD licence. For details see $APP_ROOT/LICENCE
 
-sub
-    sample samples[NUM_HARMONICS_PER_MIXER]
-
-static
-    waveform_enum waveform    
-
 pub
     int wave[SAMPLE_COUNT]
     double level
