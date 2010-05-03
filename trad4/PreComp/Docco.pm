@@ -201,31 +201,71 @@ sub GenerateAbstractDiagram($) {
     print $FHD "digraph abstract {\n";
     print $FHD "\n";
 
+    my %tiers;
 
     foreach $type ( keys %{$master_hash} ) {
 
         if ( exists $master_hash->{$type}->{type_id} ) {
 
-            print $FHD " Node".$master_hash->{$type}->{type_id}." [label=\"$type\"] \n";
+            if ( $master_hash->{$type}->{tier} == 0 ) {
+
+                print $FHD " $type  [label=\"$type\" shape=box] \n";
+
+                if ( scalar( @{$master_hash->{$type}->{sub}->{order}}) ) {
+
+                    push @{$tiers{2}}, $type;
+
+                    foreach $var_name ( @{$master_hash->{$type}->{sub}->{order}} ) {
+
+                        if ( PreComp::Utilities::IsArray( $var_name )) {
+
+                            my $array_size = PreComp::Utilities::GetArraySize( $master_hash, $var_name );
+                            $var_name = PreComp::Utilities::StripBrackets( $var_name );
+                            $var_name = $var_name."[$array_size]";
+
+                        }
+
+                        my $sub_type = $type."_$var_name";
+
+                        print $FHD " $sub_type  [label=\"$var_name\" shape=box] \n";
+
+                        print $FHD " $type->$sub_type [dir=back]\n";
+            
+                        push @{$tiers{1}}, $sub_type;
+                    }
+                }
+                else {
+    
+                    push @{$tiers{1}}, $type;
+                }
+            }
+            else {
+
+                print $FHD " $type  [label=\"$type\" shape=box] \n";
+    
+                push @{$tiers{$master_hash->{$type}->{tier}}}, $type;
+
+                foreach $var_name ( @{$master_hash->{$type}->{sub}->{order}} ) {
+
+                    my $var_type = $master_hash->{$type}->{sub}->{data}->{$var_name};
+
+                    print $FHD " $type->$var_type [dir=back]\n";
+
+                }
+            }
         }
     }
 
-    print $FHD "\n";
+    foreach $tier ( keys %tiers ) {
 
-    foreach $type ( keys %{$master_hash} ) {
+        print $FHD " {rank=same; ";
 
-        if ( exists $master_hash->{$type}->{type_id} ) {
+        foreach $type ( @{$tiers{$tier}} ) {
 
-            my $var_name;
-
-            foreach $var_name ( @{$master_hash->{$type}->{sub}->{order}} ) {
-
-                $var_type = $master_hash->{$type}->{sub}->{data}->{$var_name};
-
-                print $FHD " Node".$master_hash->{$type}->{type_id}."->Node".$master_hash->{$var_type}->{type_id}." [dir=back]\n";
-
-            }
+            print $FHD "$type ";
         }
+
+        print $FHD "}\n";
 
     }
 
