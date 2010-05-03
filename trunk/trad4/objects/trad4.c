@@ -419,6 +419,12 @@ static int load_types_callback(void *NotUsed, int argc, char **row, char **azCol
     int obj_num = atoi(row[0]);
     char* name = row[1];
 
+    if ( obj_num > MAX_TYPES )
+    {
+        cerr << "Error: Num types (" << obj_num << ") greater than MAX_TYPES (" << MAX_TYPES << "). Please increase MAX_TYPES and recompile." << endl;
+        exit(1);
+    }
+
     if ( object_type_struct[obj_num] == 0 )
     {
         cout << "Creating new type " << name << ", type_id: " << obj_num << endl;
