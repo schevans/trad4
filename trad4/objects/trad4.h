@@ -11,7 +11,7 @@
 #define MAX_OBJECTS 1400000
 #define MAX_THREADS 4096
 #define MAX_TIERS 10
-#define MAX_TYPES 15
+#define MAX_TYPES 32
 
 
 #define OBJECT_NAME_LEN 32
