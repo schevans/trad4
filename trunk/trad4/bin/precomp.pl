@@ -156,7 +156,7 @@ PreComp::Structures::Validate( $new_master_hash );
 foreach $type ( keys %doing ) {
 
     print "Generating $type..\n";
-    PreComp::Header::Generate( $master_hash->{$type} );
+    PreComp::Header::Generate( $new_master_hash, $type );
     PreComp::Wrapper::Generate( $master_hash, $type, $struct_hash, $constants_hash, $new_master_hash );
     PreComp::Calculate::Generate( $master_hash->{$type} );
     PreComp::Macros::Generate( $new_master_hash, $type );

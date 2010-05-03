@@ -591,7 +591,7 @@ sub LoadDef($) {
 
             $object_hash{implements} = $implements;
 
-            last;
+            next;
         }
 
         if ( $line =~ /^sub$|^pub$|^static$/ ) {
@@ -638,26 +638,6 @@ sub HasStruct($$) {
     my $object = shift;
 
 
-
-}
-
-sub PrintHeader($$$) {
-    my $fh = shift;
-    my $obj_hash_ref = shift;
-    my $section = shift;
-
-    foreach $key ( keys %{$obj_hash_ref->{data}->{$section}} ) {
-
-        if ( $section =~ /sub/ ) {
-
-            print $fh "        int $key;\n";
-        }
-        else {
-
-            print $fh "        $obj_hash_ref->{data}->{$section}->{$key} $key;\n";
-        }
-
-    }
 
 }
 
