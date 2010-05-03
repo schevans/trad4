@@ -33,7 +33,6 @@ open OUTFILE, ">$outfile" or die "Can't open $outfile.\n";
 print OUTFILE "BEGIN;\n";
 print OUTFILE "delete from object;\n";
 print OUTFILE "delete from harmonic;\n";
-print OUTFILE "delete from harmonic_samples;\n";
 print OUTFILE "delete from mixer;\n";
 print OUTFILE "delete from mixer_samples;\n";
 print OUTFILE "delete from amplifier;\n";
@@ -48,15 +47,6 @@ for ( ; $current_id <= $NUM_HARMONICS ; $current_id++ )
 {
     print OUTFILE "insert into object values ( $current_id, 1, 1, \"harmonic_$current_id\", 0, 1 );\n";
     print OUTFILE "insert into harmonic values ( $current_id, 1 );\n";
-
-    print OUTFILE "insert into harmonic_samples values ( $current_id";
-
-    for ( my $i=0 ; $i < $NUM_HARMONICS_PER_MIXER ; $i++ ) {
-
-        print OUTFILE ", $current_id";
-    }
-
-    print OUTFILE " );\n";
 
     push @{$tier_id_hash{$tier}}, $current_id; 
 

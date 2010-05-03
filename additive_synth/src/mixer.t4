@@ -5,4 +5,9 @@
 
 implements sample
 
+sub
+    sample samples[NUM_HARMONICS_PER_MIXER]
+
+static
+    waveform_enum waveform
 

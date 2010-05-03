@@ -2,9 +2,7 @@
 # steve@topaz.myzen.co.uk
 # This code is licenced under the BSD licence. For details see $APP_ROOT/LICENCE
 
+implements sample
+
 sub
     sample sample
-
-pub
-    int wave[SAMPLE_COUNT]
-
