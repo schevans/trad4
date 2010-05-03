@@ -1,7 +1,6 @@
 #!/bin/sh
 
-
-cd ~/src/test_app
+cd $APP_ROOT 
 . ./test_app.conf
 make clean
 t4p -a
