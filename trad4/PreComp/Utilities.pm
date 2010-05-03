@@ -210,7 +210,7 @@ sub LoadAppConstants() {
             $value =~ s/^\s+//;
             $value =~ s/\s+$//;
 
-            if ( $value =~ /[A-Za-z_]+/ ) {
+            if ( $value =~ /[A-Za-z_]+/ or $value =~ /(\+|\-|\/|\*)/ ) {
 
                 $expression_hash->{$name} = $value;
             }
