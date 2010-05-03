@@ -454,6 +454,12 @@ sub LoadDefs() {
             $type =~ s/^\s+//;
             $type =~ s/\s+$//;
 
+            if ( $num == 0 ) {
+
+                print "Error: Type $type has type_id = 0. These should start at 1.\n";
+                ExitOnError();
+            }
+
             if ( -f $ENV{SRC_DIR}."/$type.t4" ) {
 
                 if ( exists $master_hash{$type} ) {
