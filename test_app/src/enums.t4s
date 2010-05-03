@@ -7,3 +7,7 @@ buy_sell_enum
     BUY
     SELL
 
+waveform_enum
+    SINE
+    PULSE
+
