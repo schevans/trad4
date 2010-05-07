@@ -201,6 +201,14 @@ sub GenerateAbstractDiagram($) {
     print $FHD "digraph abstract {\n";
     print $FHD "\n";
 
+    print $FHD "    rankdir=TD;\n";
+    print $FHD "    {\n";
+    print $FHD "        node [shape=plaintext, fontsize=16 ]\n";
+    print $FHD "\n";
+    print $FHD "        Tm -> Tn [ dir=back ]\n";
+    print $FHD "    }\n";
+    print $FHD "\n";
+
     my %tiers;
 
     foreach $type ( keys %{$master_hash} ) {
@@ -209,7 +217,7 @@ sub GenerateAbstractDiagram($) {
 
             if ( $master_hash->{$type}->{tier} == 0 ) {
 
-                print $FHD " $type  [label=\"$type\" shape=box] \n";
+                print $FHD "    $type  [label=\"$type\" shape=box] \n";
 
                 if ( scalar( @{$master_hash->{$type}->{sub}->{order}}) ) {
 
@@ -227,9 +235,9 @@ sub GenerateAbstractDiagram($) {
 
                         my $sub_type = $type."_$var_name";
 
-                        print $FHD " $sub_type  [label=\"$var_name\" shape=box] \n";
+                        print $FHD "    $sub_type  [label=\"$var_name\" shape=box] \n";
 
-                        print $FHD " $type->$sub_type [dir=back]\n";
+                        print $FHD "    $type->$sub_type [dir=back]\n";
             
                         push @{$tiers{1}}, $sub_type;
                     }
@@ -258,7 +266,7 @@ sub GenerateAbstractDiagram($) {
 
     foreach $tier ( keys %tiers ) {
 
-        print $FHD " {rank=same; ";
+        print $FHD "    {rank=same; ";
 
         foreach $type ( @{$tiers{$tier}} ) {
 
