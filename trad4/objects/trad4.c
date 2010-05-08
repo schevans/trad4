@@ -607,7 +607,7 @@ void print_concrete_graph()
         {
             for ( int i=1 ; i <= tier_manager[tier][0] - 1 ; i++ )
             {
-                outfile << "    " << object_name(tier_manager[tier][i]) << " [label=\"" << object_name(tier_manager[tier][i]) << "\" shape=box]" << endl;
+                outfile << "    " << object_name(tier_manager[tier][i]) << " [label=\"" << object_name(tier_manager[tier][i]) << "\" shape=ellipse]" << endl;
             }
         }
     }
