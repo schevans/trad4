@@ -563,10 +563,9 @@ void print_concrete_graph()
     cout << "print_concrete_graph" << endl;
 
     ofstream outfile;
-    outfile.open ("example.dot");
+    outfile.open ("concrete.dot");
 
     outfile << "digraph concrete {" << endl;
-
 
     outfile << "" << endl;
     outfile << "    rankdir=TD;" << endl;
@@ -574,9 +573,22 @@ void print_concrete_graph()
     outfile << "        node [shape=plaintext, fontsize=16 ]" << endl;
     outfile << "    " << endl;
 
-    outfile << "        T1";
+    int max_tier(0);
 
-    for ( int tier=2; tier < MAX_TIERS ; tier++ )
+    for ( int tier=1 ; tier <= MAX_TIERS ; tier++ )
+    {
+        if ( tier_manager[tier][0] - 1 > 0 )
+        {
+            if ( tier > max_tier ) 
+            {
+                max_tier = tier;
+            }
+        }
+    }
+
+    outfile << "        T" << max_tier;
+
+    for ( int tier=max_tier-1 ; tier > 0 ; tier-- )
     {
         if ( tier_manager[tier][0] - 1 > 0 )
         {
