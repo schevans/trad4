@@ -200,16 +200,60 @@ sub GenerateAbstractDiagram($) {
 
     print $FHD "digraph abstract {\n";
     print $FHD "\n";
-
     print $FHD "    rankdir=TD;\n";
     print $FHD "    {\n";
     print $FHD "        node [shape=plaintext, fontsize=16 ]\n";
     print $FHD "\n";
-    print $FHD "        Tm -> Tn [ dir=back ]\n";
+
+    my $isIoI=0;
+    my %tiers;
+    my $max_tier=0;
+
+    foreach $type ( keys %{$master_hash} ) {
+
+        if ( exists $master_hash->{$type}->{type_id} ) {
+
+            if ( $master_hash->{$type}->{tier} == 0 ) {
+
+                $isIoI =1;
+                
+            }
+            else {
+
+                $tiers{$master_hash->{$type}->{tier}} = 1;
+
+                if ( $master_hash->{$type}->{tier} > $max_tier ) {
+                    
+                    $max_tier = $master_hash->{$type}->{tier};
+                }
+            }
+        }
+    }
+
+    if ( $isIoI ) {
+
+        print $FHD "        Tm -> Tn [ dir=back ]\n";
+    }
+    else {
+
+        print $FHD "        T$max_tier";
+
+        foreach $tier ( reverse sort ( keys %tiers )) {
+
+            if ( $tier != $max_tier ) { 
+
+                print $FHD " -> T$tier";
+            }
+            
+        }
+
+        print $FHD " [ dir=back ]\n";
+    }
+
     print $FHD "    }\n";
     print $FHD "\n";
 
-    my %tiers;
+    %tiers = ();
 
     foreach $type ( keys %{$master_hash} ) {
 
