@@ -42,6 +42,7 @@ int run_tier( int tier );
 void reload_handler( int sig_num );
 void load_objects( int initial_load );
 void load_types( int initial_load );
+void print_concrete_graph();
 
 void run_trad4() {
 
@@ -108,6 +109,8 @@ void run_trad4() {
     }
 
     cout << endl;
+
+    print_concrete_graph();
 
     char* num_threads_env = getenv("NUM_THREADS");
 
@@ -440,6 +443,7 @@ static int load_types_callback(void *NotUsed, int argc, char **row, char **azCol
         object_type_struct[obj_num]->calculate = 0;
         object_type_struct[obj_num]->load_objects = 0;
         object_type_struct[obj_num]->validate = 0;
+        object_type_struct[obj_num]->print_concrete_graph = 0;
     }
 
     ostringstream lib_name;
@@ -470,6 +474,12 @@ static int load_types_callback(void *NotUsed, int argc, char **row, char **azCol
     }
 
     object_type_struct[obj_num]->validate = (validate_fpointer)dlsym(object_type_struct[obj_num]->lib_handle, "validate");
+    if ((error = dlerror()) != NULL)  {
+        fputs(error, stderr);
+        exit(1);
+    }
+
+    object_type_struct[obj_num]->print_concrete_graph = (print_concrete_graph_fpointer)dlsym(object_type_struct[obj_num]->lib_handle, "print_concrete_graph");
     if ((error = dlerror()) != NULL)  {
         fputs(error, stderr);
         exit(1);
@@ -548,3 +558,83 @@ void load_objects( int initial_load )
 
 }
 
+void print_concrete_graph()
+{
+    cout << "print_concrete_graph" << endl;
+
+    ofstream outfile;
+    outfile.open ("example.dot");
+
+    outfile << "digraph concrete {" << endl;
+
+
+    outfile << "" << endl;
+    outfile << "    rankdir=TD;" << endl;
+    outfile << "    {" << endl;
+    outfile << "        node [shape=plaintext, fontsize=16 ]" << endl;
+    outfile << "    " << endl;
+
+    outfile << "        T1";
+
+    for ( int tier=2; tier < MAX_TIERS ; tier++ )
+    {
+        if ( tier_manager[tier][0] - 1 > 0 )
+        {
+            outfile << " -> T" << tier;
+        }
+    }
+
+    outfile << " [ dir=back ]" << endl;
+    outfile << "    " << endl;
+    outfile << "    }" << endl;
+    outfile << "" << endl;
+
+    for ( int tier=1; tier < MAX_TIERS ; tier++ )
+    {
+        if ( tier_manager[tier][0] - 1 > 0 )
+        {
+            for ( int i=1 ; i <= tier_manager[tier][0] - 1 ; i++ )
+            {
+                outfile << "    " << object_name(tier_manager[tier][i]) << " [label=\"" << object_name(tier_manager[tier][i]) << "\" shape=box]" << endl;
+            }
+        }
+    }
+
+    outfile << "" << endl;
+
+    for ( int tier=1; tier < MAX_TIERS ; tier++ )
+    {
+        for ( int i=1 ; i < tier_manager[tier][0] ; i++ )
+        {
+            if ( obj_loc[tier_manager[tier][i]] )
+            {
+                 (*object_type_struct[((object_header*)obj_loc[tier_manager[tier][i]])->type]->print_concrete_graph)(obj_loc, tier_manager[tier][i], outfile );
+            }
+        }
+    }
+
+    outfile << "" << endl;
+
+    for ( int tier=1; tier < MAX_TIERS ; tier++ )
+    {
+        if ( tier_manager[tier][0] - 1 > 0 )
+        {
+            outfile << "{rank=same; ";
+
+            for ( int i=1 ; i <= tier_manager[tier][0] - 1 ; i++ )
+            {
+                outfile << " " << object_name(tier_manager[tier][i]);
+            }
+    
+            outfile << " }" << endl;
+        }
+    }
+
+    outfile << endl;
+    outfile << "}" << endl;
+    outfile << endl;
+
+    outfile.close();
+
+    exit(0);
+}

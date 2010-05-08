@@ -75,6 +75,7 @@ sub Generate($$$$$) {
     GenerateExtraLoaders( $new_master_hash, $name, $FHD );
     GenerateLoaderCallback( $new_master_hash, $name, $FHD );
     GenerateNewLoader( $new_master_hash, $name, $FHD );
+    GenerateConcreteGraph( $new_master_hash, $name, $FHD );
 
     print $FHD "\n";
 
@@ -995,6 +996,46 @@ sub GenerateValidator($$$) {
     }
 
     print $FHD "    return retval;\n";
+    print $FHD "}\n";
+
+}
+
+sub GenerateConcreteGraph($$$) {
+    my $master_hash = shift;
+    my $type = shift;
+    my $FHD = shift;
+
+    print $FHD "extern \"C\" void print_concrete_graph( obj_loc_t obj_loc, int id, ofstream& outfile )\n";
+    print $FHD "{\n";
+    print $FHD "    cout << \"Printing $type..\" << std::endl;\n";
+
+    my $var_name;
+
+    foreach $var_name ( @{$master_hash->{$type}->{sub}->{order}} ) {
+
+        if ( PreComp::Utilities::IsArray( $var_name ) ) {
+
+            my $var_name_stripped = PreComp::Utilities::StripBrackets( $var_name );
+
+            my $size = PreComp::Utilities::GetArraySize( $master_hash, $var_name );
+
+            my $counter=0;
+
+            while ( $counter < $size ) {
+
+                print $FHD " outfile << object_name(id) << \" -> \" << object_name(((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) << \" [dir=back] \" << endl;\n";
+
+                $counter = $counter+1;
+            }
+        }
+        else {
+
+            print $FHD " outfile << object_name(id) << \" -> \" << object_name(((t4::$type*)obj_loc[id])->$var_name) << \" [dir=back] \" << endl;\n";
+
+        }
+    }
+
+    print $FHD "\n";
     print $FHD "}\n";
 
 }

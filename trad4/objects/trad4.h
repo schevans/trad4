@@ -5,6 +5,7 @@
 #ifndef __TRAD4_H__
 #define __TRAD4_H__
 
+#include <fstream>
 #include <sys/types.h>
 #include "math.h"
 
@@ -23,6 +24,7 @@ typedef void (*calculate_fpointer)( obj_loc_t obj_loc, int id );
 typedef int (*need_refresh_fpointer)( obj_loc_t obj_loc, int id );
 typedef void (*load_objects_fpointer)( obj_loc_t obj_loc, int initial_load );
 typedef int (*validate_fpointer)( obj_loc_t obj_loc, int initial_load );
+typedef void (*print_concrete_graph_fpointer)( obj_loc_t obj_loc, int id, std::ofstream& outfile );
 
 void run_trad4();
 
@@ -32,6 +34,7 @@ typedef struct {
     need_refresh_fpointer need_refresh;
     load_objects_fpointer load_objects;
     validate_fpointer validate;
+    print_concrete_graph_fpointer print_concrete_graph;
 } object_type_struct_t;
 
 #define DEBUG_ON
