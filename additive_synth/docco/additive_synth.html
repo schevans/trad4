@@ -37,12 +37,12 @@ additive_synth
 <tr>
 <td>Trad4 version</td>
 <td>
-<a href="https://sourceforge.net/projects/trad4/files/trad4v3.1.1/trad4_v3_1_1_beta01.tar.gz/download">3.1.1</a>
+<a href="https://sourceforge.net/projects/trad4/files/trad4v3.1.1/trad4_v3_1_1_beta01.tar.gz/download">3.1.2</a>
 </td>
 </tr>
 <tr>
 <td>Document version</td>
-<td>beta01</td>
+<td>beta02</td>
 </tr>
 <tr>
 <td>Author</td>
@@ -79,15 +79,30 @@ In this beta six presets are available: sine, pulse, sawtooth, square, triangle 
 The model itself is made up of three or more tiers. On the first tier are the harmonics - the pure sine wave feedstock of our synthesiser. Next come one or more tiers of mixers, where the harmonics are added concurrently. On the last tier there is only an amplifier, which serves to normalise the output as appropriate.
 </p>
 <p>
-The concurrency comes from the fact that each mixer subscribes to a sub-set of harmonics - in all the configurations presented here there are four harmonics per mixer - and the mixers in turn run concurrently. This model uses the Inheritance of Interface (IoI) feature of trad4 where a mixer can subscribe to four harmonics <i>or</i> four mixers. 
+The concurrency comes from the fact that each mixer subscribes to a sub-set of harmonics - in all the configurations presented here there are four harmonics per mixer - and the mixers in turn run concurrently. This model uses the Inheritance of Interface (IoI) feature of trad4 where a mixer can subscribe to a set number of harmonics <i>or</i> a set number of mixers, as both types isa sample.  
+</p>
+<p>
+The number of samples per mixer is an optimisation parameter - the fewer samples per mixer you have the more concurrency you get but you also get more tiers. Optimisation of this application is beyond the scope of this document (though highly suitable for analysis as the app involves simple operations on large slabs of RAM which have to get dragged across buses). The concrete diagram below shows 2 samples per mixer for brevity. The application as configured in the distribution uses 4.
+
+</p>
+<p>
+A new feature in trad4v3.1.2 is that the abstract and concrete graphs can now be generated for you, the first examples of which are below.
 </p>
 <h3>The abstract diagram</h3>
 <p>
 <img src="abstract.png" alt="abstract"/>
 </p>
+<p>
+This application uses inheritance of interface (IoI), so it's abstract graph looks a little strange. Each type is considered separately and the tier axis on the left is relative. So that, from right to left, an amplifier of tier m subscribes to a sample of tier n, where m&gt;n. A harmonic can exist on any tier and subscribes to nothing. A mixer subscribes to an array of in this case 4 samples. A sample as our base type does nothing at all.
+
+</p>
 <h3>The concrete diagram</h3>
 <p>
 <img src="concrete.png" alt="concrete"/>
+</p>
+<p>
+The concrete graph should look more familiar. This shows a graph where NUM_HARMONICS=8 and NUM_HARMONICS_PER_MIXER=2.
+
 </p>
 <h2><a name="the_waveforms">The Waveforms</a></h2>
 <p>
@@ -98,7 +113,7 @@ The naming convention for the files below is as follows: name+frequency+num_harm
 </p>
 <h3>The sine waveform</h3>
 <p>
-
+The sine wave is the simplest waveform, comprising simply of a single sine wave of the base frequency.
 </p>
 <a href="sine_f1_h16.wav">sine_f1_h16.wav</a>
 <a href="sine_f1_h1024.wav">sine_f1_h1024.wav</a>
@@ -113,7 +128,7 @@ The naming convention for the files below is as follows: name+frequency+num_harm
 </p>
 <h3>The pulse waveform</h3>
 <p>
-
+The pulse waveform comprises of an equal amount of each harmonic.
 </p>
 <a href="pulse_f1_h16.wav">pulse_f1_h16.wav</a>
 <a href="pulse_f1_h1024.wav">pulse_f1_h1024.wav</a>
@@ -122,6 +137,7 @@ The naming convention for the files below is as follows: name+frequency+num_harm
 </pre></blockquote>
 <h3>The sawtooth waveform</h3>
 <p>
+The sawtooth waveform has a geometric drop-off of the amplitude of the component harmonics.
 
 </p>
 <a href="sawtooth_f1_h16.wav">sawtooth_f1_h16.wav</a>
@@ -131,7 +147,7 @@ The naming convention for the files below is as follows: name+frequency+num_harm
 </pre></blockquote>
 <h3>The square waveform</h3>
 <p>
-
+The square waveform has a geometric drop-off of the amplitude of the odd component harmonics.
 </p>
 <a href="square_f1_h16.wav">square_f1_h16.wav</a>
 <a href="square_f1_h1024.wav">square_f1_h1024.wav</a>
@@ -143,8 +159,7 @@ The naming convention for the files below is as follows: name+frequency+num_harm
 </pre></blockquote>
 <h3>The triangle waveform</h3>
 <p>
-
-
+The square waveform has an exponential drop-off of the amplitude, where every second active harmonic amplitude is negative.
 </p>
 <a href="triangle_f1_h16.wav">triangle_f1_h16.wav</a>
 <a href="triangle_f1_h1024.wav">triangle_f1_h1024.wav</a>
@@ -156,7 +171,10 @@ The naming convention for the files below is as follows: name+frequency+num_harm
 </pre></blockquote>
 <h3>The Hammond preset</h3>
 <p>
-<a href="http://www.soundonsound.com/sos/nov03/articles/synthsecrets.htm">Details</a>
+This is a basic model of a Hammond tonewheel generator. More detailed information may be found <a href="http://www.soundonsound.com/sos/nov03/articles/synthsecrets.htm">here</a>
+</p>
+<p>
+
 </p>
 <a href="hammond_f261_h16.wav">hammond_f261_h16.wav</a>
 <h2><a name="usage">Usage</a></h2>
