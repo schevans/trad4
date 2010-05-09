@@ -32,6 +32,7 @@ int num_threads_fired(0);
 bool need_reload(false);
 char* timing_debug = 0;
 char* batch_mode = 0;
+char* print_graph = 0;
 void set_timestamp( obj_loc_t obj_loc, int id );
 
 bool fire_object( int id );
@@ -57,6 +58,8 @@ void run_trad4() {
     timing_debug = getenv("TIMING_DEBUG");
 
     batch_mode = getenv("BATCH_MODE");
+
+    print_graph = getenv("PRINT_CONCRETE_GRAPH");
 
     for ( int i = 0 ; i < MAX_OBJECTS+1 ; i++ )
     {
@@ -110,7 +113,12 @@ void run_trad4() {
 
     cout << endl;
 
-    print_concrete_graph();
+    if ( print_graph )
+    {
+        cout << "Printing concrete graph and exiting as PRINT_CONCRETE_GRAPH is set." << endl; 
+        print_concrete_graph();
+        exit(0);
+    }
 
     char* num_threads_env = getenv("NUM_THREADS");
 
@@ -560,8 +568,6 @@ void load_objects( int initial_load )
 
 void print_concrete_graph()
 {
-    cout << "print_concrete_graph" << endl;
-
     ofstream outfile;
     outfile.open ("concrete.dot");
 
@@ -648,5 +654,4 @@ void print_concrete_graph()
 
     outfile.close();
 
-    exit(0);
 }
