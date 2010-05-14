@@ -195,6 +195,8 @@ sub PrintT4Section($$$$) {
 sub GenerateAbstractDiagram($) {
     my $master_hash = shift;
 
+    print "Generating abstract graph..\n";
+
     my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::DoccoRoot()."abstract.dot");
     if( ! $FHD ) { return; }
 
@@ -329,5 +331,65 @@ sub GenerateAbstractDiagram($) {
     PreComp::Utilities::CloseFile();
 }
 
+sub GenerateInheritanceDiagram($) {
+    my $master_hash = shift;
+
+    my $isIoI=0;
+
+    foreach $type ( keys %{$master_hash} ) {
+
+        if ( exists $master_hash->{$type}->{type_id} ) {
+
+            if ( $master_hash->{$type}->{tier} == 0 ) {
+
+                $isIoI =1;
+                last;
+            }
+        }
+    }
+
+    if ( !$isIoI ) {
+
+        return;
+    }
+    
+    print "Generating inheritance graph..\n";
+
+    my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::DoccoRoot()."inheritance.dot");
+    if( ! $FHD ) { return; }
+
+    print $FHD "digraph inheritance {\n";
+    print $FHD "\n";
+
+    my %tiers;
+    my $max_tier=0;
+
+    foreach $type ( keys %{$master_hash} ) {
+
+        if ( exists $master_hash->{$type}->{type_id} ) {
+
+            if ( $master_hash->{$type}->{tier} == 0 ) {
+
+                print $FHD "    $type  [label=\"$type\" shape=diamond] \n";
+
+                if ( $master_hash->{$type}->{implements} ne $type ) {
+
+                    print $FHD " $master_hash->{$type}->{implements} -> $type [dir=back ]\n";
+
+                }
+            }
+        }
+    }
+
+    print $FHD "\n";
+    print $FHD "}\n";
+    print $FHD "\n";
+        
+
+    PreComp::Utilities::CloseFile();
+}
+
+
+1;
 
 1;
