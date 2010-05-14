@@ -52,7 +52,7 @@ for ( ; $current_id <= $NUM_CORRELATORS ; $current_id++ )
 print $FHD ";\n";
 
 
-print $FHD "insert into object values ( $monitor_id, 3, 3, \"source\", 1, 1 );\n";
+print $FHD "insert into object values ( $monitor_id, 3, 3, \"monitor\", 1, 1 );\n";
 print $FHD "insert into monitor values ( $monitor_id );\n";
 
 $current_id = 1;
