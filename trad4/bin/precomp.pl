@@ -185,8 +185,8 @@ if( $opts{d} ) {
 
     print "Generating docco..\n";
     PreComp::Docco::Generate( $master_hash );
-
     PreComp::Docco::GenerateAbstractDiagram( $new_master_hash );
+    PreComp::Docco::GenerateInheritanceDiagram( $new_master_hash );
 }
 
 my $main_file = "$ENV{APP_ROOT}/objects/main.c";
