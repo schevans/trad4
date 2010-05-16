@@ -613,7 +613,7 @@ void print_concrete_graph()
         {
             for ( int i=1 ; i <= tier_manager[tier][0] - 1 ; i++ )
             {
-                outfile << "    " << object_name(tier_manager[tier][i]) << " [label=\"" << object_name(tier_manager[tier][i]) << "\" shape=ellipse]" << endl;
+                outfile << "    t4_" << object_type(tier_manager[tier][i]) << "_" << tier_manager[tier][i] << " [label=\"" << object_name(tier_manager[tier][i]) << "\" shape=ellipse]" << endl;
             }
         }
     }
@@ -637,11 +637,11 @@ void print_concrete_graph()
     {
         if ( tier_manager[tier][0] - 1 > 0 )
         {
-            outfile << "{rank=same; ";
+            outfile << "    {rank=same;";
 
             for ( int i=1 ; i <= tier_manager[tier][0] - 1 ; i++ )
             {
-                outfile << " " << object_name(tier_manager[tier][i]);
+                outfile << " t4_" << object_type(tier_manager[tier][i]) << "_" << tier_manager[tier][i];
             }
     
             outfile << " }" << endl;
