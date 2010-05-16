@@ -42,7 +42,7 @@ additive_synth
 </tr>
 <tr>
 <td>Document version</td>
-<td>beta02</td>
+<td>beta03</td>
 </tr>
 <tr>
 <td>Author</td>
@@ -96,12 +96,25 @@ A new feature in trad4v3.1.2 is that the abstract and concrete graphs can now be
 This application uses inheritance of interface (IoI), so it's abstract graph looks a little strange. Each type is considered separately and the tier axis on the left is relative. So that, from right to left, an amplifier of tier m subscribes to a sample of tier n, where m&gt;n. A harmonic can exist on any tier and subscribes to nothing. A mixer subscribes to an array of in this case 4 samples. A sample as our base type does nothing at all.
 
 </p>
+<h3>The inheritance diagram</h3>
+<p>
+<img src="inheritance.png" alt="inheritance"/>
+</p>
+<p>
+A generated inheritance diagram has been added which should clarify the situation.
+</p>
+<p>
+Amplifier, harmonic and mixer all inherit their interface (i.e. pub section) from sample. This means, looking at the abstract diagram, an amplifier could subscribe to a harmonic, <i>or</i> a mixer, or indeed another amplifier, as all three present the same pub interface. Likewise a mixer could subscribe to an array of harmonics, mixers or amplifiers for the same reason.
+</p>
 <h3>The concrete diagram</h3>
 <p>
 <img src="concrete.png" alt="concrete"/>
 </p>
 <p>
 The concrete graph should look more familiar. This shows a graph where NUM_HARMONICS=8 and NUM_HARMONICS_PER_MIXER=2.
+<p>
+From this you can see that in practice, mixers subscribe to harmonics or other mixers. Only one amplifier is used and is only subscribes to a mixer.
+</p>
 
 </p>
 <h2><a name="the_waveforms">The Waveforms</a></h2>
@@ -113,10 +126,9 @@ The naming convention for the files below is as follows: name+frequency+num_harm
 </p>
 <h3>The sine waveform</h3>
 <p>
-The sine wave is the simplest waveform, comprising simply of a single sine wave of the base frequency.
+The sine wave is the simplest waveform, comprising simply of a single sine wave of the base frequency. As such, there is no difference between the 16- and 1024-harmonic versions, so only the 16-harmonic is shown here.
 </p>
 <a href="sine_f1_h16.wav">sine_f1_h16.wav</a>
-<a href="sine_f1_h1024.wav">sine_f1_h1024.wav</a>
 <blockquote><pre>
     if ( id == 1 )
         level = 1.0;
@@ -194,16 +206,112 @@ To increase or decrease the number of threads used (the default is 4), set NUM_T
 </p>
 <blockquote><pre>$ export NUM_THREADS=64
 $ additive_synth</pre></blockquote>
-<h3>Updating</h3>
+<h3>Reconfiguring</h3>
 <p>
-To update a running system, log into the database:
+The default configuration of the distribution is with NUM_HARMONICS_PER_MIXER=4 and NUM_HARMONICS=16. If you want to increase the number of harmonics, you do so as follows: 
 </p>
-<blockquote><pre>$ t4db
-SQL></pre></blockquote>
+<h4>1) Edit src/constants.t4s</h4>
 <p>
-And make any required updates. Then instruct the running application to collect these changes by using send_reload.sh:
+First, edit src/constants.t4s as appropriate and save. The two values must be set do that NUM_HARMONICS is equal to NUM_HARMONICS_PER_MIXER raised to an integer power, where that integer power specifies the number of tiers of mixers you'll have, so that:
 </p>
-<blockquote><pre>$ send_reload.sh</pre></blockquote>
+<blockquote><pre>
+If NUM_HARMONICS_PER_MIXER=4
+pow=2 gives NUM_HARMONICS=16 so that
+T3: 1 mixer
+T2: 4 mixers
+T1: 16 harmonics
+pow=3 gives NUM_HARMONICS=64 so that
+T4: 1 mixer
+T3: 4 mixers
+T2: 16 mixers
+T1: 64 harmonics
+
+If NUM_HARMONICS_PER_MIXER=8
+pow=2 gives NUM_HARMONICS=64 so that
+T3: 1 mixer
+T2: 8 mixers
+T1: 64 harmonics
+pow=3 gives NUM_HARMONICS=512 so that
+T4: 1 mixer
+T3: 8 mixers
+T2: 64 mixers
+T1: 512 harmonics
+</pre></blockquote>
+<p>
+There's a performance trade-off with NUM_HARMONICS_PER_MIXER where the fewer mixers you have to sum you'll get more concurrency, but more objects to run. The optimal setting will depend on your hardware and the size of the samples you are using. This discussion is beyond the scope of this document but would make in interesting study. 
+</p>
+<h4>2) Run the precompiler and compile</h4>
+<p>
+Next, run the precompiler and compile as normal. There's some flakiness in the makefiles when adjusting just the constants so you should do a clean build (-a for t4p):
+</p>
+<blockquote><pre>
+additive_synth$ t4p -a
+additive_synth$ make clean
+additive_synth$ make
+</pre></blockquote>
+<h4>3) Regenerate and reload the database</h4>
+<p>
+The generated data is keyed off the constants, so it will need regenerating and and the database will need recreating and reloading. The default location of the generated data is data/worked_example. This is done as follows:
+</p>
+<blockquote><pre>
+additive_synth/data$ generate_data.pl
+additive_synth/data$ recreate_db.sh
+additive_synth/data$ reload_db.sh worked_example
+</pre></blockquote>
+<h4>4) Run as usual</h4>
+<blockquote><pre>
+additive_synth$ additive_synth
+</pre></blockquote>
+<h3>Changing the frequency</h3>
+<p>
+To change the base frequency you need to set BASE_FREQUENCY in src/constants.t4s as appropriate, then precompile, recompile and run, again using a clean build: 
+</p>
+<blockquote><pre>
+additive_synth$ t4p -a
+additive_synth$ make clean
+additive_synth$ make
+additive_synth$ additive_synth
+</pre></blockquote>
+<p>
+<b>NOTE:</b> If you try and model very high frequencies using the 44100Hz sample rate and many harmonics you may run up against the Nyquist frequency cutoff. The Nyquist frequency is the highest frequency a particular sample rate can support. If this happens, you will see a warning that these higher frequencies are being ignored.
+
+</p>
+
+
+
+<h3>Adding a new waveform</h3>
+<p>
+The initial harmonics are set up on startup where the calculate function calls get_level. To add a new waveform you'll need to extend this function as appropriate. This is done by:
+</p>
+<h4>1) Add the new enum</h4>
+<p>
+The new enum needs to be added to waveform_enum in src/enum.t4s. Edit this file and save.
+</p>
+<h4>2) Extend the get_level function</h4>
+<p>
+Edit objects/harmonic.c and extend the get_level function as appropriate.
+</p>
+<h4>3) Update your existing database to use the new waveform</h4>
+<blockquote><pre>
+additive_synth$ t4db
+SQL> update harmonic set waveform=&lt;new_waveform_id&gt;
+</pre></blockquote>
+<h4>4) Compile and run as usual</h4>
+<blockquote><pre>
+additive_synth$ make
+additive_synth$ additive_synth
+</pre></blockquote>
+<!-- ==================================================================== -->
+
+<div align="center" class="copyright">
+Copyright (c) Steve Evans 2010
+</div>
+
+<!-- ==================================================================== -->
+<br />
+<center>
+<a href="http://sourceforge.net/projects/trad4"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=202177&type=16" width="150" height="40" border="0" alt="Get trad4 at SourceForge.net. Fast, secure and Free Open Source software downloads" /></a>
+</center>
 
 </body>
 </html>
