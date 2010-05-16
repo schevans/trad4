@@ -24,9 +24,11 @@ int calculate_source( obj_loc_t obj_loc, int id )
 
         sfinfo.format = 0;
 
-        if (! (file = sf_open ( "source.wav", SFM_READ, &sfinfo)))
+        string infile = "./source.wav";
+
+        if (! (file = sf_open ( infile.c_str(), SFM_READ, &sfinfo)))
         {
-            printf ("Error : Not able to open input file.\n");
+            printf ("Error : Not able to open input file %s.\n", infile.c_str());
             exit(0);
         }
 
