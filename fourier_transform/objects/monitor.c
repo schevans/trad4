@@ -13,7 +13,11 @@ using namespace std;
 
 int calculate_monitor( obj_loc_t obj_loc, int id )
 {
-    ofstream outfile( "test.txt" );
+    string outfile_name = "output.txt";
+
+    cout << "Writing " << outfile_name << endl;
+
+    ofstream outfile( outfile_name.c_str() );
 
     for ( int i=0 ; i < NUM_CORRELATORS ; i++ )
     {
