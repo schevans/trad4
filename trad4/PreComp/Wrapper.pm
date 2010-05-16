@@ -1023,14 +1023,14 @@ sub GenerateConcreteGraph($$$) {
 
             while ( $counter < $size ) {
 
-                print $FHD " outfile << object_name(id) << \" -> \" << object_name(((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) << \" [dir=back] \" << endl;\n";
+                print $FHD " outfile << \"    t4_\" << object_type(id) << \"_\" << id << \" -> t4_\" << object_type(((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) << \"_\" << ((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter] << \" [dir=back] \" << endl;\n";
 
                 $counter = $counter+1;
             }
         }
         else {
 
-            print $FHD " outfile << object_name(id) << \" -> \" << object_name(((t4::$type*)obj_loc[id])->$var_name) << \" [dir=back] \" << endl;\n";
+            print $FHD " outfile << \"    t4_\" << object_type(id) << \"_\" << id << \" -> t4_\" << object_type(((t4::$type*)obj_loc[id])->$var_name) << \"_\" << ((t4::$type*)obj_loc[id])->$var_name << \" [dir=back] \" << endl;\n";
 
         }
     }
