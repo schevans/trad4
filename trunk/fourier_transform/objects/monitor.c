@@ -13,7 +13,7 @@ using namespace std;
 
 int calculate_monitor( obj_loc_t obj_loc, int id )
 {
-    string outfile_name = "output.txt";
+    string outfile_name = "output.csv";
 
     cout << "Writing " << outfile_name << endl;
 
