@@ -4,9 +4,9 @@
 
 
 implements sample
- 
-static
-    waveform_enum waveform
 
+sub
+    waveform waveform
+ 
 
 
