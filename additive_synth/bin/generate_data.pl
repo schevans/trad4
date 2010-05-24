@@ -21,7 +21,8 @@ if (  -f $ENV{SRC_DIR}."/constants.t4s" ) {
 }
 
 my $amp_id=9999;
-
+my $waveform_id=8888;
+my $waveform = 1;   # pulse
 my %tier_id_hash;
 
 my $NUM_HARMONICS = $constants_hash->{NUM_HARMONICS};
@@ -39,14 +40,14 @@ print OUTFILE "delete from amplifier;\n";
 
 my $current_id=1;
 
-my $tier = 1;
+my $tier = 2;
 
 print "Generating $NUM_HARMONICS harmonics..\n";
 
 for ( ; $current_id <= $NUM_HARMONICS ; $current_id++ )
 {
-    print OUTFILE "insert into object values ( $current_id, 1, 1, \"harmonic_$current_id\", 0, 1 );\n";
-    print OUTFILE "insert into harmonic values ( $current_id, 1 );\n";
+    print OUTFILE "insert into object values ( $current_id, 1, $tier, \"harmonic_$current_id\", 0, 1 );\n";
+    print OUTFILE "insert into harmonic values ( $current_id, $waveform_id );\n";
 
     push @{$tier_id_hash{$tier}}, $current_id; 
 
@@ -68,7 +69,7 @@ while ( $digger != $NUM_HARMONICS_PER_MIXER ) {
         {
             print OUTFILE "insert into object values ( $current_id, 2, $tier, \"mixer_$current_id\", 0, 1 );\n";
 
-            print OUTFILE "insert into mixer values ( $current_id, 0 );\n";
+            print OUTFILE "insert into mixer values ( $current_id );\n";
 
             print OUTFILE "insert into mixer_samples values ( $current_id";
 
@@ -105,7 +106,7 @@ print "Generating master mixer..\n";
 $tier++;
 
 print OUTFILE "insert into object values ( $current_id, 2, $tier, \"master\", 0, 1 );\n";
-print OUTFILE "insert into mixer values ( $current_id, 0 );\n";
+print OUTFILE "insert into mixer values ( $current_id );\n";
 print OUTFILE "insert into mixer_samples values ( $current_id";
 
 for ( my $i=0 ; $i < $NUM_HARMONICS_PER_MIXER ; $i++ ) {
@@ -121,6 +122,35 @@ $tier++;
 
 print OUTFILE "insert into object values ( $amp_id, 3, $tier, \"amplifier\", 0, 1 );\n";
 print OUTFILE "insert into amplifier values ( $amp_id, $current_id );\n";
+
+print "Generating waveform..\n";
+
+print OUTFILE "insert into object values ( $waveform_id, 8, 1, \"waveform_$waveform_id\", 0, 1 );\n";
+print OUTFILE "insert into waveform values ( $waveform_id );\n";
+print OUTFILE "insert into waveform_amplitude values ( $waveform_id";
+
+for ( my $i=0 ; $i < $NUM_HARMONICS ; $i++ )
+{
+    my $amplitude;
+
+    if ( $waveform == 0 ) { # sine
+
+        if ( $i == 0 ) {
+            $amplitude = 1;
+        }
+        else {
+            $amplitude = 0;
+        }
+    }
+    elsif ( $waveform == 1 ) { # pulse
+
+        $amplitude = 1;
+    }
+
+    print OUTFILE ", $amplitude";
+}
+
+print OUTFILE " );\n";
 
 print OUTFILE "COMMIT;\n";
 

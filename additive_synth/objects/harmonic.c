@@ -14,11 +14,9 @@
 
 using namespace std;
 
-double get_level( obj_loc_t obj_loc, int id );
-
 int calculate_harmonic( obj_loc_t obj_loc, int id )
 {
-    harmonic_level = get_level( obj_loc, id );
+    harmonic_level = waveform_amplitude[id-1];
     double frequency = BASE_FREQUENCY * id;
 
     if ( frequency > NYQUIST_FREQUENCY )
@@ -44,6 +42,7 @@ int calculate_harmonic( obj_loc_t obj_loc, int id )
     return 1;
 }
 
+/*
 double get_level( obj_loc_t obj_loc, int id )
 {
     double level(0);
@@ -137,3 +136,4 @@ double get_level( obj_loc_t obj_loc, int id )
 
     return level;
 }
+*/
