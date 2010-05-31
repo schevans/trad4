@@ -5,6 +5,7 @@
 //  to see what's in-scope.
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 
 #include "monitor_wrapper.c"
@@ -32,7 +33,7 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
 
     for ( int i=0 ; i < NUM_CORRELATORS ; i++ )
     {
-        outfile << correlators_amplitude(i) / max_amplitude << endl;
+        outfile << setprecision(20) << correlators_amplitude(i) / max_amplitude << endl;
     }
 
     outfile.close();
