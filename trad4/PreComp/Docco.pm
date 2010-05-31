@@ -295,7 +295,7 @@ sub GenerateAbstractDiagram($) {
             }
             else {
 
-                print $FHD " $type  [label=\"$type\" shape=box] \n";
+                print $FHD "    $type  [label=\"$type\" shape=box] \n";
     
                 push @{$tiers{$master_hash->{$type}->{tier}}}, $type;
 
@@ -303,12 +303,14 @@ sub GenerateAbstractDiagram($) {
 
                     my $var_type = $master_hash->{$type}->{sub}->{data}->{$var_name};
 
-                    print $FHD " $type->$var_type [dir=back]\n";
+                    print $FHD "    $type->$var_type [dir=back]\n";
 
                 }
             }
         }
     }
+
+    print $FHD "\n";
 
     foreach $tier ( keys %tiers ) {
 
@@ -374,7 +376,7 @@ sub GenerateInheritanceDiagram($) {
 
                 if ( $master_hash->{$type}->{implements} ne $type ) {
 
-                    print $FHD " $master_hash->{$type}->{implements} -> $type [dir=back ]\n";
+                    print $FHD "    $master_hash->{$type}->{implements} -> $type [dir=back ]\n";
 
                 }
             }
