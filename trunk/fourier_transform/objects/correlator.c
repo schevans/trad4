@@ -18,7 +18,7 @@ int calculate_correlator( obj_loc_t obj_loc, int id )
 
         for ( int i = 1 ; i <= SAMPLE_COUNT ; i++ )
         {
-            correlator_harmonic[i] = sin ( ( frequency * 2 * i * id * PI ) / (double)SAMPLE_COUNT ) ;
+            correlator_harmonic[i] = sin ( ( frequency * 2 * i * PI ) / (double)SAMPLE_COUNT ) ;
         }
 
     }
