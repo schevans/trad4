@@ -12,8 +12,6 @@ use Data::Dumper;
 use PreComp::AppConstants;
 use PreComp::Utilities;
 
-print $#ARGV."\n";
-
 if ( $#ARGV != 0 ) {
 
     print "Usage: load_waveform.pl <filename>\n";
@@ -41,20 +39,18 @@ my $i=1;
 
 my $sqlstring = "insert into waveform_amplitude values ( 8888"; 
 
-while ( $line = <INFILE> ) {
+for ( my $i=1 ; $i <= $NUM_HARMONICS ; $i++ ) {
 
-    if ( $i > $NUM_HARMONICS ) {
-
-        print "Warning: Number of rows ($i) exceeding NUM_HARMONICS ($NUM_HARMONICS). Ignoring row.\n";
-    }
-    else {
+    if ( $line = <INFILE> ) {
 
         chomp $line;
 
         $sqlstring = $sqlstring.", $line";
     }
+    else {
 
-    $i++;
+        $sqlstring = $sqlstring.", 0";
+    }
 }
 
 $sqlstring = $sqlstring." );";
