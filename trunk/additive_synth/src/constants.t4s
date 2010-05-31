@@ -2,7 +2,7 @@
 # steve@topaz.myzen.co.uk
 # This code is licenced under the BSD licence. For details see $APP_ROOT/LICENCE
 
-NUM_HARMONICS=16
+NUM_HARMONICS=64
 
 NUM_HARMONICS_PER_MIXER=4
 
