@@ -13,6 +13,17 @@ using namespace std;
 
 int calculate_monitor( obj_loc_t obj_loc, int id )
 {
+
+    double max_amplitude(0);
+
+    for ( int i=0 ; i < NUM_CORRELATORS ; i++ )
+    {
+        if( correlators_amplitude(i) > max_amplitude )
+        {
+            max_amplitude = correlators_amplitude(i);
+        }
+    }
+
     string outfile_name = "output.csv";
 
     cout << "Writing " << outfile_name << endl;
@@ -21,7 +32,7 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
 
     for ( int i=0 ; i < NUM_CORRELATORS ; i++ )
     {
-        outfile << correlators_amplitude(i) << endl;
+        outfile << correlators_amplitude(i) / max_amplitude << endl;
     }
 
     outfile.close();
