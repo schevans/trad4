@@ -23,10 +23,24 @@ int calculate_mixer( obj_loc_t obj_loc, int id )
         {
             for ( int i = 0 ; i < SAMPLE_COUNT ; i++ )
             {
-                mixer_wave[i] += samples_wave( j, i ) / (double)NUM_HARMONICS_PER_MIXER;
+                if ( j == 0 )
+                {
+                    mixer_wave[i] = samples_wave( j, i ) / (double)NUM_HARMONICS_PER_MIXER;
+                }
+                else
+                {
+                    mixer_wave[i] += samples_wave( j, i ) / (double)NUM_HARMONICS_PER_MIXER;
+                }
             }
 
-            mixer_level += samples_level(j) / (double)NUM_HARMONICS_PER_MIXER;
+            if ( j == 0 )
+            {
+                mixer_level = samples_level(j) / (double)NUM_HARMONICS_PER_MIXER;
+            }
+            else
+            {
+                mixer_level += samples_level(j) / (double)NUM_HARMONICS_PER_MIXER;
+            }
         }
     }
 
