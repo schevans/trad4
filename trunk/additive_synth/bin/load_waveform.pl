@@ -12,13 +12,14 @@ use Data::Dumper;
 use PreComp::AppConstants;
 use PreComp::Utilities;
 
-if ( $#ARGV != 0 ) {
+if ( $#ARGV != 1 ) {
 
-    print "Usage: load_waveform.pl <filename>\n";
+    print "Usage: load_waveform.pl <filename> <frequency>\n";
     exit(1);
 }
 
 my $input_filename=$ARGV[0];
+my $base_frequency=$ARGV[1];
 
 my $constants_hash;
 
@@ -70,4 +71,6 @@ $sqlstring = $sqlstring." );";
 `echo "$sqlstring" | $ENV{SQLITE} $ENV{APP_DB}`;
 
 close INFILE;
+
+`echo "update waveform set base_frequency=$base_frequency;" | $ENV{SQLITE} $ENV{APP_DB}`;
 
