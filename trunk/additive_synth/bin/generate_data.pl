@@ -133,18 +133,11 @@ for ( my $i=0 ; $i < $NUM_HARMONICS ; $i++ )
 {
     my $amplitude;
 
-    if ( $waveform == 0 ) { # sine
-
-        if ( $i == 0 ) {
-            $amplitude = 1;
-        }
-        else {
-            $amplitude = 0;
-        }
-    }
-    elsif ( $waveform == 1 ) { # pulse
-
+    if ( $i == 0 ) {
         $amplitude = 1;
+    }
+    else {
+        $amplitude = 0;
     }
 
     print OUTFILE ", $amplitude";
