@@ -1,5 +1,6 @@
 
 
 static
+    double base_frequency
     double amplitude[NUM_HARMONICS]
 

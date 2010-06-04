@@ -126,7 +126,7 @@ print OUTFILE "insert into amplifier values ( $amp_id, $current_id );\n";
 print "Generating waveform..\n";
 
 print OUTFILE "insert into object values ( $waveform_id, 8, 1, \"waveform_$waveform_id\", 0, 1 );\n";
-print OUTFILE "insert into waveform values ( $waveform_id );\n";
+print OUTFILE "insert into waveform values ( $waveform_id, 1.0 );\n";
 print OUTFILE "insert into waveform_amplitude values ( $waveform_id";
 
 for ( my $i=0 ; $i < $NUM_HARMONICS ; $i++ )

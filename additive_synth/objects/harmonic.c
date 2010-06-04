@@ -17,7 +17,7 @@ using namespace std;
 int calculate_harmonic( obj_loc_t obj_loc, int id )
 {
     harmonic_level = waveform_amplitude[id-1];
-    double frequency = BASE_FREQUENCY * id;
+    double frequency = waveform_base_frequency * id;
 
     if ( frequency > NYQUIST_FREQUENCY )
     {
