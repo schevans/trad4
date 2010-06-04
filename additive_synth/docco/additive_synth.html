@@ -30,19 +30,19 @@ additive_synth
 <td>Application version</td>
 <td>
 
-<a href="https://sourceforge.net/projects/trad4/files/trad4v3.1.2/trad4_v3_1_2_beta01.tar.gz/download">beta02</a>
+<a href="https://sourceforge.net/projects/trad4/files/trad4v3.1.3/trad4_v3_1_3.tar.gz/download">beta03</a>
 
 </td>
 </tr>
 <tr>
 <td>Trad4 version</td>
 <td>
-<a href="https://sourceforge.net/projects/trad4/files/trad4v3.1.2/trad4_v3_1_2_beta01.tar.gz/download">3.1.2</a>
+<a href="https://sourceforge.net/projects/trad4/files/trad4v3.1.3/trad4_v3_1_3.tar.gz/download">3.1.3</a>
 </td>
 </tr>
 <tr>
 <td>Document version</td>
-<td>beta03</td>
+<td>beta04</td>
 </tr>
 <tr>
 <td>Author</td>
@@ -50,7 +50,7 @@ additive_synth
 </tr>
 <tr>
 <td>Date</td>
-<td>09-05-2010</td>
+<td>04-06-2010</td>
 </tr>
 </table>
 
@@ -73,7 +73,9 @@ This is a simplified model using no phase shifting and therefore only sinusoidal
 <p>
 In this beta six presets are available: sine, pulse, sawtooth, square, triangle and Hammond.
 </p>
-
+<p>
+This model has an inverse - <a href="http://trad4.sourceforge.net/fourier_transform/fourier_transform.html">fourier_transform</a>. Once you've read through this you should take a look at that.
+</p>
 <h2><a name="the_model">The Model</a></h2>
 <p>
 The model itself is made up of three or more tiers. On the first tier are the harmonics - the pure sine wave feedstock of our synthesiser. Next come one or more tiers of mixers, where the harmonics are added concurrently. On the last tier there is only an amplifier, which serves to normalise the output as appropriate.
@@ -119,7 +121,7 @@ From this you can see that in practice, mixers subscribe to harmonics or other m
 </p>
 <h2><a name="the_waveforms">The Waveforms</a></h2>
 <p>
-The naming convention for the files below is as follows: name+frequency+num_harmonics. So "square_f1_h1024.wav" is a square wave with frequency 1Hz, synthesised using 1024 harmonics. Likewise "hammond_f261_h16.wav" is the Hammond preset with frequency 262Hz (middle C), synthesised using 16 harmonics. These files are best viewed using a sound editor such as <a href="http://audacity.sourceforge.net/">Audacity</a>. Be aware that only the Hammond wave is at an audible frequency.
+The naming convention for the files below is as follows: name+frequency+num_harmonics. So "square_f1_h1024.wav" is a square wave with frequency 1Hz, synthesised using 1024 harmonics. Likewise "hammond_f261_h16.wav" is the Hammond preset with frequency 262Hz (middle C), synthesised using 16 harmonics. Be aware that only the Hammond wave is at an audible frequency.
 </p>
 <p>
 
@@ -128,7 +130,13 @@ The naming convention for the files below is as follows: name+frequency+num_harm
 <p>
 The sine wave is the simplest waveform, comprising simply of a single sine wave of the base frequency. As such, there is no difference between the 16- and 1024-harmonic versions, so only the 16-harmonic is shown here.
 </p>
+<p>
+<img src="sine_f1.png" alt="sine_f1"/>
+</p>
 <a href="sine_f1_h16.wav">sine_f1_h16.wav</a>
+<p>
+This is given by:
+</p>
 <blockquote><pre>
     if ( id == 1 )
         level = 1.0;
@@ -142,8 +150,14 @@ The sine wave is the simplest waveform, comprising simply of a single sine wave 
 <p>
 The pulse waveform comprises of an equal amount of each harmonic.
 </p>
+<p>
+<img src="pulse_f1_h16.png" alt="pulse_f1_h16"/>
+<p>
 <a href="pulse_f1_h16.wav">pulse_f1_h16.wav</a>
-<a href="pulse_f1_h1024.wav">pulse_f1_h1024.wav</a>
+</p>
+<p>
+This is given by:
+</p>
 <blockquote><pre>
     level = 1.0;
 </pre></blockquote>
@@ -152,8 +166,31 @@ The pulse waveform comprises of an equal amount of each harmonic.
 The sawtooth waveform has a geometric drop-off of the amplitude of the component harmonics.
 
 </p>
+<p>
+Using 16 harmonics:
+</p>
+<p>
+<img src="sawtooth_f1_h16.png" alt="sawtooth_f1_h16"/>
+</p>
+<p>
 <a href="sawtooth_f1_h16.wav">sawtooth_f1_h16.wav</a>
-<a href="sawtooth_f1_h1024.wav">sawtooth_f1_h1024.wav</a>
+</p>
+<p>
+Using 64 harmonics:
+</p>
+<p>
+<img src="sawtooth_f1_h64.png" alt="sawtooth_f1_h64"/>
+</p>
+<p>
+<a href="sawtooth_f1_h64.wav">sawtooth_f1_h64.wav</a>
+</p>
+<p>
+</p>
+
+
+<p>
+This is given by:
+</p>
 <blockquote><pre>
     level = 1.0 / id;
 </pre></blockquote>
@@ -161,8 +198,30 @@ The sawtooth waveform has a geometric drop-off of the amplitude of the component
 <p>
 The square waveform has a geometric drop-off of the amplitude of the odd component harmonics.
 </p>
+<p>
+Using 16 harmonics:
+</p>
+<p>
+<img src="square_f1_h16.png" alt="square_f1_h16"/>
+</p>
+<p>
 <a href="square_f1_h16.wav">square_f1_h16.wav</a>
+</p>
+<p>
+</p>
+<p>
+Using 1024 harmonics:
+</p>
+<p>
+<img src="square_f1_h1024.png" alt="square_f1_h1024"/>
+</p>
+<p>
 <a href="square_f1_h1024.wav">square_f1_h1024.wav</a>
+</p>
+<p>
+This is given by:
+</p>
+
 <blockquote><pre>
     if ( id % 2 != 0 )		// Is odd id
 	level = 1.0 / id;
@@ -173,8 +232,29 @@ The square waveform has a geometric drop-off of the amplitude of the odd compone
 <p>
 The square waveform has an exponential drop-off of the amplitude, where every second active harmonic amplitude is negative.
 </p>
+<p>
+Using 16 harmonics:
+</p>
+<p>
+<img src="triangle_f1_h16.png" alt="triangle_f1_h16"/>
+</p>
+<p>
 <a href="triangle_f1_h16.wav">triangle_f1_h16.wav</a>
+</p>
+<p>
+</p>
+<p>
+Using 1024 harmonics:
+</p>
+<p>
+<img src="triangle_f1_h1024.png" alt="triangle_f1_h1024"/>
+</p>
+<p>
 <a href="triangle_f1_h1024.wav">triangle_f1_h1024.wav</a>
+</p>
+<p>
+This is given by:
+</p>
 <blockquote><pre>
     if ( id % 2 != 0 )		// Is odd id
 	level = pow( -1.0, ( id - 1 ) / 2 ) * ( 1.0 / (id*id) );
@@ -183,12 +263,29 @@ The square waveform has an exponential drop-off of the amplitude, where every se
 </pre></blockquote>
 <h3>The Hammond preset</h3>
 <p>
-This is a basic model of a Hammond tonewheel generator. More detailed information may be found <a href="http://www.soundonsound.com/sos/nov03/articles/synthsecrets.htm">here</a>
+This is a basic model of a Hammond tonewheel organ. 
 </p>
 <p>
-
+The classic Hammond organ has nine drawbars, each controlling the amplitude of a subset of harmonics. The drawbar amplitudes are labeled from 0 to 8, so it's characteristic to discuss the various arrangements or 'presets' as '800000000' for just a sine wave of the fundamental frequency or '88888888' - all the drawbars fully open.  
 </p>
-<a href="hammond_f261_h16.wav">hammond_f261_h16.wav</a>
+<p>
+More detailed information  may be found <a href="http://www.soundonsound.com/sos/nov03/articles/synthsecrets.htm">here</a>
+</p>
+<p>
+As these files are at an audible frequency they are best downloaded and viewed using a sound editor such as <a href="http://audacity.sourceforge.net/">Audacity</a>.
+</p>
+<p>
+<a href="hammond_888000000.wav">hammond_888000000.wav</a>
+</p>
+<p>
+<a href="hammond_888888888.wav">hammond_888888888.wav</a>
+</p>
+<p>
+<a href="hammond_834211100.wav">hammond_834211100.wav</a>
+</p>
+<p>
+<a href="hammond_008030200.wav">hammond_008030200.wav</a>
+</p>
 <h2><a name="usage">Usage</a></h2>
 <h3>Running</h3>
 <p>
@@ -204,8 +301,37 @@ To run the application:<br/>
 <p>
 To increase or decrease the number of threads used (the default is 4), set NUM_THREADS and re-start the application:
 </p>
-<blockquote><pre>$ export NUM_THREADS=64
-$ additive_synth</pre></blockquote>
+<blockquote><pre>
+$ export NUM_THREADS=64
+$ additive_synth
+</pre></blockquote>
+
+<h3>Changing waveforms and frequency</h3>
+<p>
+To load a different waveform to be generated or to change the base frequency, use the load_waveform command, with the two arguments being the waveform.csv file and the fundamental frequency of the sample you want generated. E.g (261.626Hz is middle C):
+</p>
+<blockquote><pre>
+additive_synth$ load_waveform.pl input/sine.csv 261.626
+</pre></blockquote>
+<p>
+This can be done while additive_synth is running. If it isn't running the database will still be updated for the next time it's started but an error message will be produced as the application is running to be informed.
+</p>
+<p>
+<b>NOTE:</b> If you try and model very high frequencies using the 44100Hz sample rate and many harmonics you may run up against the Nyquist frequency cutoff. The Nyquist frequency is the highest frequency a particular sample rate can support. If this happens, you will see a warning that these higher frequencies are being ignored.
+</p>
+<h3>Adding new waveforms</h3>
+<p>
+To add a new waveform, set up a new input.csv file and place it in additive_synth/input. It should have the format "id,amplitude" e.g. (for sine):
+</p>
+ <blockquote><pre>
+1,1.0
+2,0.0
+3.0.0
+...
+</pre></blockquote>
+<p>
+See the existing files in this directory for examples.
+</p>
 <h3>Reconfiguring</h3>
 <p>
 The default configuration of the distribution is with NUM_HARMONICS_PER_MIXER=4 and NUM_HARMONICS=16. If you want to increase the number of harmonics, you do so as follows: 
@@ -262,45 +388,9 @@ additive_synth/data$ reload_db.sh worked_example
 <blockquote><pre>
 additive_synth$ additive_synth
 </pre></blockquote>
-<h3>Changing the frequency</h3>
-<p>
-To change the base frequency you need to set BASE_FREQUENCY in src/constants.t4s as appropriate, then precompile, recompile and run, again using a clean build: 
-</p>
-<blockquote><pre>
-additive_synth$ t4p -a
-additive_synth$ make clean
-additive_synth$ make
-additive_synth$ additive_synth
-</pre></blockquote>
-<p>
-<b>NOTE:</b> If you try and model very high frequencies using the 44100Hz sample rate and many harmonics you may run up against the Nyquist frequency cutoff. The Nyquist frequency is the highest frequency a particular sample rate can support. If this happens, you will see a warning that these higher frequencies are being ignored.
-
-</p>
 
 
 
-<h3>Adding a new waveform</h3>
-<p>
-The initial harmonics are set up on startup where the calculate function calls get_level. To add a new waveform you'll need to extend this function as appropriate. This is done by:
-</p>
-<h4>1) Add the new enum</h4>
-<p>
-The new enum needs to be added to waveform_enum in src/enum.t4s. Edit this file and save.
-</p>
-<h4>2) Extend the get_level function</h4>
-<p>
-Edit objects/harmonic.c and extend the get_level function as appropriate.
-</p>
-<h4>3) Update your existing database to use the new waveform</h4>
-<blockquote><pre>
-additive_synth$ t4db
-SQL> update harmonic set waveform=&lt;new_waveform_id&gt;
-</pre></blockquote>
-<h4>4) Compile and run as usual</h4>
-<blockquote><pre>
-additive_synth$ make
-additive_synth$ additive_synth
-</pre></blockquote>
 <!-- ==================================================================== -->
 
 <div align="center" class="copyright">
@@ -309,6 +399,7 @@ Copyright (c) Steve Evans 2010
 
 <!-- ==================================================================== -->
 <br />
+
 <center>
 <a href="http://sourceforge.net/projects/trad4"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=202177&type=16" width="150" height="40" border="0" alt="Get trad4 at SourceForge.net. Fast, secure and Free Open Source software downloads" /></a>
 </center>
