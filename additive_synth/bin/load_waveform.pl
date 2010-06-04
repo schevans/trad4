@@ -74,3 +74,7 @@ close INFILE;
 
 `echo "update waveform set base_frequency=$base_frequency;" | $ENV{SQLITE} $ENV{APP_DB}`;
 
+my $result=`$ENV{TRAD4_BIN}/send_reload.sh`;
+
+print "$result";
+
