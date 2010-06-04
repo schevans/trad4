@@ -29,6 +29,13 @@ if (  -f $ENV{SRC_DIR}."/constants.t4s" ) {
 
 my $NUM_HARMONICS = $constants_hash->{NUM_HARMONICS};
 
+my @waveform;
+
+for ( my $id=1 ; $id <= $NUM_HARMONICS ; $id++ ) {
+
+    $waveform[$id] = 0.0;
+}
+
 open INFILE, "$input_filename" or die "Can't open $input_filename.";
 
 my $line;
@@ -37,20 +44,25 @@ my $line;
 
 my $i=1;
 
+
+
+while ( $line = <INFILE> ) {
+
+    chomp $line;
+
+    if ( $line ) {
+
+        my ( $id, $amplitude ) = split /,/, $line;
+
+        $waveform[$id] = $amplitude 
+    }
+}
+
 my $sqlstring = "insert into waveform_amplitude values ( 8888"; 
 
-for ( my $i=1 ; $i <= $NUM_HARMONICS ; $i++ ) {
+for ( my $id=1 ; $id <= $NUM_HARMONICS ; $id++ ) {
 
-    if ( $line = <INFILE> ) {
-
-        chomp $line;
-
-        $sqlstring = $sqlstring.", $line";
-    }
-    else {
-
-        $sqlstring = $sqlstring.", 0";
-    }
+    $sqlstring = $sqlstring.", $waveform[$id]";
 }
 
 $sqlstring = $sqlstring." );";
