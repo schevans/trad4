@@ -1,6 +1,6 @@
 #!/bin/sh
 
-NUM_APPS=`ps -ef | grep $APP | grep -v grep | grep -v sqlite3 | grep -v send_reload | wc -l`
+NUM_APPS=`ps -C $APP | grep -v PID | wc -l`
 
 if [ $NUM_APPS = 0 ]
 then
@@ -14,7 +14,7 @@ then
     exit 0
 fi
 
-PID=`ps -ef | grep $APP | grep -v grep | grep -v sqlite3 | grep -v send_reload | awk '{print $2}'`
+PID=`ps -C $APP | grep -v PID | awk '{print $1}'`
 
 if [ $PID ]
 then
