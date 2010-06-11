@@ -16,21 +16,27 @@ using namespace std;
 
 int calculate_harmonic( obj_loc_t obj_loc, int id )
 {
-    harmonic_level = waveform_amplitude[id-1];
+    harmonic_is_active = 1;
+    double level = waveform_amplitude[id-1];
     double frequency = waveform_base_frequency * id;
 
     if ( frequency > NYQUIST_FREQUENCY )
     {
         cout << "Warning: Frequency of " << object_name(id) << " (" << frequency << "Hz) exceeds Nyquist frequency (" << NYQUIST_FREQUENCY << "Hz). Ignoring harmonic." << endl;
 
-        harmonic_level = 0.0;
+        harmonic_is_active = 0;
     }
 
-    if ( harmonic_level != 0.0 )
+    if ( level == 0.0 )
+    {
+        harmonic_is_active = 0;
+    }
+
+    if ( harmonic_is_active )
     {
         for ( int i = 0 ; i < SAMPLE_COUNT ; i++ ) 
         {
-            harmonic_wave[i] = AMPLITUDE * sin ( ( frequency * 2 * i * PI ) / (double)SAMPLE_RATE ) * harmonic_level;
+            harmonic_wave[i] = AMPLITUDE * sin ( ( frequency * 2 * i * PI ) / (double)SAMPLE_RATE ) * waveform_amplitude[id-1];
         }
     }
 
