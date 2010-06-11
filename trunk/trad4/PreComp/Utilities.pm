@@ -591,6 +591,12 @@ sub LoadDef($) {
             next;
         }
 
+        if ( $line =~ /;/ ) {
+
+            print "Error: Stray ';' in $object.t4: $line.\n";
+            ExitOnError();
+        }
+
         if ( $line =~ /^implements \w/ ) {
 
             ( $ignore, $implements ) = split / /, $line;
