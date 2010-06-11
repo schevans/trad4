@@ -314,7 +314,7 @@ To load a different waveform to be generated or to change the base frequency, us
 additive_synth$ load_waveform.pl input/sine.csv 261.626
 </pre></blockquote>
 <p>
-This can be done while additive_synth is running. If it isn't running the database will still be updated for the next time it's started but an error message will be produced as the application is running to be informed.
+This can be done while additive_synth is running.
 </p>
 <p>
 <b>NOTE:</b> If you try and model very high frequencies using the 44100Hz sample rate and many harmonics you may run up against the Nyquist frequency cutoff. The Nyquist frequency is the highest frequency a particular sample rate can support. If this happens, you will see a warning that these higher frequencies are being ignored.
