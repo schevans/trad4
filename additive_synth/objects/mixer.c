@@ -15,33 +15,22 @@ using namespace std;
 
 int calculate_mixer( obj_loc_t obj_loc, int id )
 {
-    mixer_level = 0.0;
+    for ( int i = 0 ; i < SAMPLE_COUNT ; i++ )
+    {
+        mixer_wave[i] = 0.0;
+    }
 
     for ( int j = 0 ; j < NUM_HARMONICS_PER_MIXER ; j++ )
     {
-        if ( samples_level(j) != 0.0 )
+        if ( samples_is_active(j) != 0.0 )
         {
             for ( int i = 0 ; i < SAMPLE_COUNT ; i++ )
             {
-                if ( j == 0 )
-                {
-                    mixer_wave[i] = samples_wave( j, i ) / (double)NUM_HARMONICS_PER_MIXER;
-                }
-                else
-                {
-                    mixer_wave[i] += samples_wave( j, i ) / (double)NUM_HARMONICS_PER_MIXER;
-                }
-            }
-
-            if ( j == 0 )
-            {
-                mixer_level = samples_level(j) / (double)NUM_HARMONICS_PER_MIXER;
-            }
-            else
-            {
-                mixer_level += samples_level(j) / (double)NUM_HARMONICS_PER_MIXER;
+                mixer_wave[i] += samples_wave( j, i ) / (double)NUM_HARMONICS_PER_MIXER;
             }
         }
+
+        mixer_is_active = mixer_is_active || samples_is_active(j);
     }
 
     if ( object_log_level(id) > NONE )
