@@ -74,7 +74,14 @@ close INFILE;
 
 `echo "update waveform set base_frequency=$base_frequency;" | $ENV{SQLITE} $ENV{APP_DB}`;
 
-my $result=`$ENV{TRAD4_BIN}/send_reload.sh`;
+my $is_running = `ps -C $ENV{APP} | grep -v PID | wc -l`;
 
-print "$result";
+chomp( $is_running );
+
+if ( $is_running ) {
+
+    print "Sending reload signal.\n";
+    
+    `$ENV{TRAD4_BIN}/send_reload.sh`;
+}
 
