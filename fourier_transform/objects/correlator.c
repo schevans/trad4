@@ -14,7 +14,7 @@ int calculate_correlator( obj_loc_t obj_loc, int id )
 {
     if ( ! object_init(id ) )
     {
-        double frequency = BASE_FREQUENCY * id;
+        double frequency = source_base_frequency * id;
 
         for ( int i = 1 ; i <= SAMPLE_COUNT ; i++ )
         {
