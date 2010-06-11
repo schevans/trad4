@@ -51,6 +51,7 @@ fourier_transform
 <ul>
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#the_model">The Model</a></li>
+<li><a href="#example_sine">Example: Sine wave</a></li>
 <li><a href="#example_clarinet">Example: Clarinet</a></li>
 <li><a href="#usage">Usage</a></li>
 </ul>
@@ -85,7 +86,15 @@ The way each harmonic is tested for correlation is that a pure sine wave of the 
 <p>
 
 </p>
+<h2><a name="example_sine">Example: Sine wave</a></h2>
+<p>
+When a sine wave such as sine_f1_h16.wav from additive_synth is run through the transform, we see that is is composed of a singe wave of the fundamental frequency as expected:
 
+</p>
+<h3>The frequency domain</h3>
+<p>
+<img src="sine_out.png" alt="sine_out"/>
+</p>
 <h2><a name="example_clarinet">Example: Clarinet</a></h2>
 <p>
 
@@ -128,16 +137,21 @@ To increase or decrease the number of threads used (the default is 4), set NUM_T
 </p>
 <blockquote><pre>$ export NUM_THREADS=64
 $ fourier_transform</pre></blockquote>
-<h3>Updating</h3>
+<h3>Loading different waveforms</h3>
 <p>
-To update a running system, log into the database:
+To load a different waveform use the load_waveform command, with the two arguments being the waveform.wav file and the fundamental frequency of the sample you want analysed, which you must know in advance. E.g:
 </p>
-<blockquote><pre>$ t4db
-SQL></pre></blockquote>
+<blockquote><pre>
+fourier_transform$ load_waveform.pl input/sine_f1_h16.wav 1.0
+</pre></blockquote>
 <p>
-And make any required updates. Then instruct the running application to collect these changes by using send_reload.sh:
+Or (where 261.626Hz equals middle C):
 </p>
-<blockquote><pre>$ send_reload.sh</pre></blockquote>
-
+<blockquote><pre>
+fourier_transform$ load_waveform.pl input/hammond_888000000.wav 261.626 
+</pre></blockquote>
+<p>
+This can be done while fourier_transform is running.
+</p>
 </body>
 </html>
