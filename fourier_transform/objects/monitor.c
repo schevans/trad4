@@ -33,7 +33,7 @@ int calculate_monitor( obj_loc_t obj_loc, int id )
 
     for ( int i=0 ; i < NUM_CORRELATORS ; i++ )
     {
-        outfile << setprecision(20) << correlators_amplitude(i) / max_amplitude << endl;
+        outfile << monitor_correlators[i] << "," << setprecision(20) << correlators_amplitude(i) / max_amplitude << endl;
     }
 
     outfile.close();
