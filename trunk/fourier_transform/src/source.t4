@@ -1,4 +1,6 @@
 
+static
+    double base_frequency
 
 pub
     int wave[SAMPLE_COUNT]

@@ -37,7 +37,7 @@ print $FHD "delete from monitor_correlators;\n";
 
 
 print $FHD "insert into object values ( $source_id, 1, 1, \"source\", 1, 1 );\n";
-print $FHD "insert into source values ( $source_id );\n";
+print $FHD "insert into source values ( $source_id, 1.0 );\n";
 
 print $FHD ";\n";
 
