@@ -37,7 +37,7 @@ fourier_transform
 </tr>
 <tr>
 <td>Document version</td>
-<td>beta01</td>
+<td>beta02</td>
 </tr>
 <tr>
 <td>Author</td>
@@ -79,14 +79,14 @@ The way each harmonic is tested for correlation is that a pure sine wave of the 
 <img src="abstract.png" alt="abstract"/>
 </p>
 <p>
-
+We have, form the bottom, the source object into which, then the correlator, lastly the monitor which writes out the frequencies domain report.
 </p>
 <h3>The concrete diagram</h3>
 <p>
 <img src="concrete.png" alt="concrete"/>
 </p>
 <p>
-
+From the above diagram we can see how the correlators run concurrently. Each correlator is tasked with finding the correlation to a specific harmonic. The first correlator looks for the base frequency f1 (the frequency of the underlying sample). The next correlator looks for f2 - twice the base frequency, and so on.
 </p>
 <h2><a name="example_sine">Example: Sine wave</a></h2>
 <p>
@@ -100,8 +100,34 @@ When a sine wave such as sine_f1_h16.wav from additive_synth is run through the 
 
 <h2><a name="example_square">Example: Square wave</a></h2>
 <p>
-
+Recall the square wave from additive_synth was given by:
 </p>
+<blockquote><pre>
+    if ( id % 2 != 0 )		// Is odd id
+	level = 1.0 / id;
+    else			// Is even id
+	level = 0.0;
+</pre></blockquote>
+<p>
+Which gives:
+</p>
+<table border="1">
+<tr>
+<td>id</td><td>correlation</td>
+</tr>
+<tr><td>1</td><td>1.0</td></tr>
+<tr><td>2</td><td>0.0</td></tr>
+<tr><td>3</td><td>0.333</td></tr>
+<tr><td>4</td><td>0.0</td></tr>
+<tr><td>5</td><td>0.2</td></tr>
+<tr><td>6</td><td>0.0</td></tr>
+<tr><td>7</td><td>0.111</td></tr>
+<tr><td>...</td><td>...</td></tr>
+</table> 
+<p>
+And this is what we see when the square wave is analysed:
+</p>
+
 <h3>The frequency domain</h3>
 <p>
 <img src="square_out.png" alt="square_out"/>
@@ -109,8 +135,35 @@ When a sine wave such as sine_f1_h16.wav from additive_synth is run through the 
 
 <h2><a name="example_triangle">Example: Triangle wave</a></h2>
 <p>
-
+Likewise the triangle wave, which is given by:
 </p>
+<blockquote><pre>
+    if ( id % 2 != 0 )		// Is odd id
+	level = pow( -1.0, ( id - 1 ) / 2 ) * ( 1.0 / (id*id) );
+    else			// Is even id
+	level = 0.0;
+</pre></blockquote>
+
+<p>
+Which gives:
+</p>
+<table border="1">
+<tr>
+<td>id</td><td>correlation</td>
+</tr>
+<tr><td>1</td><td>1.0</td></tr>
+<tr><td>2</td><td>0.0</td></tr>
+<tr><td>3</td><td>-0.1111</td></tr>
+<tr><td>4</td><td>0.0</td></tr>
+<tr><td>5</td><td>0.04</td></tr>
+<tr><td>6</td><td>0.0</td></tr>
+<tr><td>7</td><td>-0.204</td></tr>
+<tr><td>...</td><td>...</td></tr>
+</table> 
+<p>
+Which is again what we see when the sample is analysed:
+</p>
+
 <h3>The frequency domain</h3>
 <p>
 <img src="triangle_out.png" alt="triangle_out"/>
@@ -119,14 +172,14 @@ When a sine wave such as sine_f1_h16.wav from additive_synth is run through the 
 
 <h2><a name="example_clarinet">Example: Clarinet</a></h2>
 <p>
-
+Next we're going to try something different. Up until now we've been analysing output samples from additive_synth where we know their composition. In this next example we're going to analyse a sample from a <a href="http://en.wikipedia.org/wiki/Yamaha_CS1x">Yamaha CS1x</a>. 
 </p>
 <h3>The original sample</h3>
 <p>
 <img src="Clarinet_orig.png" alt="Clarinet_orig"/>
 </p>
 <p>
-
+The sample is <a href="./Clarinet.wav">Clarinet</a>. We're then going to analyse it, and in order to verify it's worked correctly, we're then going to plug the resultant frequency domain report back into additive_synth and see if we can re-synthesise the sample.
 </p>
 <h3>The frequency domain</h3>
 <p>
@@ -140,7 +193,7 @@ When a sine wave such as sine_f1_h16.wav from additive_synth is run through the 
 <img src="Clarinet_synth.png" alt="Clarinet_synth"/>
 </p>
 <p>
-
+From this we can see it's pretty close. So why aren't they closer? The likely answer is that the original sample contains some phase-shifted components which we would pick up if we were looking for cosine correlation, but we are only looking for correlation with the main sinusoidal components (because they make up the bulk of an audible tone). Scope for further work here.
 </p>
 <h2><a name="usage">Usage</a></h2>
 <h3>Running</h3>
