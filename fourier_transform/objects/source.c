@@ -30,10 +30,7 @@ int calculate_source( obj_loc_t obj_loc, int id )
         exit(0);
     }
 
-    if (sf_read_int (file, source_wave, SAMPLE_COUNT) != SAMPLE_COUNT)
-    {
-        puts (sf_strerror (file));
-    }
+    sf_read_int (file, source_wave, SAMPLE_COUNT);
 
     sf_close(file);
 
