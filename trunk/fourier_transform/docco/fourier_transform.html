@@ -51,10 +51,8 @@ fourier_transform
 <ul>
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#the_model">The Model</a></li>
-<li><a href="#example_sine">Example: Sine wave</a></li>
-<li><a href="#example_square">Example: Square wave</a></li>
-<li><a href="#example_triangle">Example: Triangle wave</a></li>
-<li><a href="#example_clarinet">Example: Clarinet</a></li>
+<li><a href="#example_as">Source: additive_synth</a></li>
+<li><a href="#example_cs1x">Source: Yamaha CS1x</a></li>
 <li><a href="#usage">Usage</a></li>
 </ul>
 
@@ -68,7 +66,7 @@ This is a concurrent model of the discrete Fourier transform. This allows us to 
 The principal of the discrete Fourier transform is that, given the base frequency of the sample, we calculate the amplitude of each harmonic using a process called correlation, in a way that allows us to reconstruct the sample using additive synthesis.
 </p>
 <p>
-The way each harmonic is tested for correlation is that a pure sine wave of the frequency of that harmonic is multiplied by the sample we're analysing. This is not particularly intuitive so for further reading please see Steven W. Smith's excellent DSP book, available <a href="http://www.dspguide.com/">for free online</a> and in all good bookshops. Correlation is described <a href="http://www.dspguide.com/ch7/3.htm">here</a>, but you should probably also read the whole of <a href="http://www.dspguide.com/ch8.htm">chapter 8</a>.
+The way each harmonic is tested for correlation is that a pure sine wave of the frequency of that harmonic is multiplied by the sample we're analysing. This is not particularly intuitive so for further reading please see Steven W. Smith's excellent DSP book, available <a href="http://www.dspguide.com/">for free online</a> and in all good bookshops. Correlation is described <a href="http://www.dspguide.com/ch7/3.htm">here</a>, but you should probably also read most of <a href="http://www.dspguide.com/ch8.htm">Chapter 8</a>.
 </p>
 <h2><a name="the_model">The Model</a></h2>
 <p>
@@ -88,7 +86,10 @@ We have, form the bottom, the source object into which, then the correlator, las
 <p>
 From the above diagram we can see how the correlators run concurrently. Each correlator is tasked with finding the correlation to a specific harmonic. The first correlator looks for the base frequency f1 (the frequency of the underlying sample). The next correlator looks for f2 - twice the base frequency, and so on.
 </p>
-<h2><a name="example_sine">Example: Sine wave</a></h2>
+<h2><a name="example_as">Source: additive_synth</a></h2>
+<p>
+</p>
+<h3>Example: Sine wave</h3>
 <p>
 When a sine wave such as sine_f1_h16.wav from additive_synth is run through the transform, we see that is is composed of a singe wave of the fundamental frequency as expected:
 
@@ -98,7 +99,7 @@ When a sine wave such as sine_f1_h16.wav from additive_synth is run through the 
 <img src="sine_out.png" alt="sine_out"/>
 </p>
 
-<h2><a name="example_square">Example: Square wave</a></h2>
+<h3>Example: Square wave</h3>
 <p>
 Recall the square wave from additive_synth was given by:
 </p>
@@ -128,12 +129,12 @@ Which gives:
 And this is what we see when the square wave is analysed:
 </p>
 
-<h3>The frequency domain</h3>
+<h4>The frequency domain</h4>
 <p>
 <img src="square_out.png" alt="square_out"/>
 </p>
 
-<h2><a name="example_triangle">Example: Triangle wave</a></h2>
+<h2>Example: Triangle wave</h2>
 <p>
 Likewise the triangle wave, which is given by:
 </p>
@@ -164,37 +165,74 @@ Which gives:
 Which is again what we see when the sample is analysed:
 </p>
 
-<h3>The frequency domain</h3>
+<h4>The frequency domain</h4>
 <p>
 <img src="triangle_out.png" alt="triangle_out"/>
 </p>
 
-
-<h2><a name="example_clarinet">Example: Clarinet</a></h2>
+<h2><a name="example_cs1x">Source: Yamaha CS1</a></h2>
 <p>
 Next we're going to try something different. Up until now we've been analysing output samples from additive_synth where we know their composition. In this next example we're going to analyse a sample from a <a href="http://en.wikipedia.org/wiki/Yamaha_CS1x">Yamaha CS1x</a>. 
 </p>
-<h3>The original sample</h3>
+<p>
+We're first going to analyse the samples, then we're then going to plug the resultant frequency domain report back into additive_synth and see if we can re-synthesise the sample.
+</p>
+<p>
+
+</p>
+<h3>Example: Clarinet</h3>
+<p>
+The first CS1x sample we'll analyse is Clarinet. The original full length sample is <a href="./Clarinet.wav">here</a>, and the single waveform <a href="./Clarinet.wav">here</a>. It looks like this:
+</p>
+<h4>The original sample</h4>
 <p>
 <img src="Clarinet_orig.png" alt="Clarinet_orig"/>
 </p>
 <p>
-The sample is <a href="./Clarinet.wav">Clarinet</a>. We're then going to analyse it, and in order to verify it's worked correctly, we're then going to plug the resultant frequency domain report back into additive_synth and see if we can re-synthesise the sample.
 </p>
-<h3>The frequency domain</h3>
+<h4>The frequency domain</h4>
 <p>
 <img src="Clarinet_out.png" alt="Clarinet_out"/>
 </p>
 <p>
 
 </p>
-<h3>The synthetic sample</h3>
+<h4>The synthetic sample</h4>
 <p>
 <img src="Clarinet_synth.png" alt="Clarinet_synth"/>
 </p>
 <p>
 From this we can see it's pretty close. So why aren't they closer? The likely answer is that the original sample contains some phase-shifted components which we would pick up if we were looking for cosine correlation, but we are only looking for correlation with the main sinusoidal components (because they make up the bulk of an audible tone). Scope for further work here.
 </p>
+<h3>Example: ChrchOrg</h3>
+<p>
+The next CS1x sample we'll analyse is ChrchOrg. The original full length sample is <a href="./ChrchOrg.wav">here</a>, and the single waveform <a href="./ChrchOrg.wav">here</a>. It looks like this:
+</p>
+
+<h4>The original sample</h4>
+<p>
+<img src="ChrchOrg_orig.png" alt="ChrchOrg_orig"/>
+</p>
+<p>
+</p>
+<h4>The frequency domain</h4>
+<p>
+The frequency domain report is shown below.
+</p>
+<p>
+<img src="ChrchOrg_out.png" alt="ChrchOrg_out"/>
+</p>
+<p>
+
+</p>
+<h4>The synthetic sample</h4>
+<p>
+<img src="ChrchOrg_synth.png" alt="ChrchOrg_synth"/>
+</p>
+<p>
+This is also close, and sounds pretty similar too. 
+</p>
+
 <h2><a name="usage">Usage</a></h2>
 <h3>Running</h3>
 <p>
@@ -226,7 +264,7 @@ Or (where 261.626Hz equals middle C):
 fourier_transform$ load_waveform.pl input/hammond_888000000.wav 261.626 
 </pre></blockquote>
 <p>
-This can be done while fourier_transform is running.
+This can be done while fourier_transform is running, i.e. when the environment variable BATCH_MODE is unset.
 </p>
 </body>
 </html>
