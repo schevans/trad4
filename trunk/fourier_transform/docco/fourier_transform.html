@@ -60,10 +60,10 @@ fourier_transform
 
 <h1><a name="introduction">Introduction</a></h1>
 <p>
-This is a concurrent model of the discrete Fourier transform. This allows us to decompose a particular sample into it's component frequencies. It's the inverse of additive_synth, and their iteration is shown below.
+This is a concurrent model of the discrete Fourier transform. This allows us to decompose a particular sample into it's component frequencies. It's the inverse of additive_synth, and their interaction is shown below.
 </p>
 <p>
-The principal of the discrete Fourier transform is that, given the base frequency of the sample, we calculate the amplitude of each harmonic using a process called correlation, in a way that allows us to reconstruct the sample using additive synthesis.
+The principal of the discrete Fourier transform is that, given the base frequency of the sample, we calculate the amplitude of each harmonic using a process called correlation in a way that allows us to reconstruct the sample using additive synthesis.
 </p>
 <p>
 The way each harmonic is tested for correlation is that a pure sine wave of the frequency of that harmonic is multiplied by the sample we're analysing. This is not particularly intuitive so for further reading please see Steven W. Smith's excellent DSP book, available <a href="http://www.dspguide.com/">for free online</a> and in all good bookshops. Correlation is described <a href="http://www.dspguide.com/ch7/3.htm">here</a>, but you should probably also read most of <a href="http://www.dspguide.com/ch8.htm">Chapter 8</a>.
@@ -88,13 +88,14 @@ From the above diagram we can see how the correlators run concurrently. Each cor
 </p>
 <h2><a name="example_as">Source: additive_synth</a></h2>
 <p>
+We start with analysing samples from additive_synth. The advantage here is we know how they were synthesised, so we can compare the results of the transform with the inputs to the synthesiser.
 </p>
 <h3>Example: Sine wave</h3>
 <p>
 When a sine wave such as sine_f1_h16.wav from additive_synth is run through the transform, we see that is is composed of a singe wave of the fundamental frequency as expected:
 
 </p>
-<h3>The frequency domain</h3>
+<h4>The frequency domain</h4>
 <p>
 <img src="sine_out.png" alt="sine_out"/>
 </p>
@@ -134,7 +135,7 @@ And this is what we see when the square wave is analysed:
 <img src="square_out.png" alt="square_out"/>
 </p>
 
-<h2>Example: Triangle wave</h2>
+<h3>Example: Triangle wave</h3>
 <p>
 Likewise the triangle wave, which is given by:
 </p>
@@ -172,13 +173,16 @@ Which is again what we see when the sample is analysed:
 
 <h2><a name="example_cs1x">Source: Yamaha CS1</a></h2>
 <p>
-Next we're going to try something different. Up until now we've been analysing output samples from additive_synth where we know their composition. In this next example we're going to analyse a sample from a <a href="http://en.wikipedia.org/wiki/Yamaha_CS1x">Yamaha CS1x</a>. 
+Up until now we've been analysing output samples from additive_synth where we know their composition. In this next example we're going to analyse a sample from a <a href="http://en.wikipedia.org/wiki/Yamaha_CS1x">Yamaha CS1x</a>. 
 </p>
 <p>
 We're first going to analyse the samples, then we're then going to plug the resultant frequency domain report back into additive_synth and see if we can re-synthesise the sample.
 </p>
 <p>
-
+When discussing the original samples below two are included, a recording a few seconds long of the original sample and a short "_single" version which just contains a single cycle of the waveform. These can be quite different, for example if the original sample had a low frequency oscillator applied (LFO), this causes a warble in the sound which won't be captured by listening to the single waveform.
+</p>
+<p>
+These single waveforms are very short audio files, so when you open them in an editor like Audacity you may not see or hear anything. So see anything zoom in on the start of the file. To hear anything play the waveform in a loop, which is done in Audacity by holding down Shift when clicking Play.
 </p>
 <h3>Example: Clarinet</h3>
 <p>
@@ -198,6 +202,9 @@ The first CS1x sample we'll analyse is Clarinet. The original full length sample
 
 </p>
 <h4>The synthetic sample</h4>
+<p>
+The synthetic sample is available <a href="./Clarinet_synth.wav">here</a>.
+</p>
 <p>
 <img src="Clarinet_synth.png" alt="Clarinet_synth"/>
 </p>
@@ -226,6 +233,9 @@ The frequency domain report is shown below.
 
 </p>
 <h4>The synthetic sample</h4>
+<p>
+The synthetic sample is available <a href="./ChrchOrg_synth.wav">here</a>.
+</p>
 <p>
 <img src="ChrchOrg_synth.png" alt="ChrchOrg_synth"/>
 </p>
