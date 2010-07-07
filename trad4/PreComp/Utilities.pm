@@ -489,7 +489,7 @@ sub LoadDefs() {
         }
         else {
 
-            print "Error: Malformed line in object_types.t4s, line $counter.\n";
+            print "Error: Malformed line in object_types.t4s, line ".($counter+1).".\n";
             ExitOnError();
         }
     }
