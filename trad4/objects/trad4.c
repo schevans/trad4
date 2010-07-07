@@ -427,67 +427,67 @@ static int load_types_callback(void *NotUsed, int argc, char **row, char **azCol
 {
     char *error;
 
-    int obj_num = atoi(row[0]);
+    int type_id = atoi(row[0]);
     char* name = row[1];
 
-    if ( obj_num > MAX_TYPES )
+    if ( type_id > MAX_TYPES )
     {
-        cerr << "Error: Num types (" << obj_num << ") greater than MAX_TYPES (" << MAX_TYPES << "). Please increase MAX_TYPES and recompile." << endl;
+        cerr << "Error: Type '" << name << "' has type id " << type_id << " which is greater than MAX_TYPES (" << MAX_TYPES << "). Please increase MAX_TYPES in trad4.h and recompile." << endl;
         exit(1);
     }
 
-    if ( object_type_struct[obj_num] == 0 )
+    if ( object_type_struct[type_id] == 0 )
     {
-        cout << "Creating new type " << name << ", type_id: " << obj_num << endl;
+        cout << "Creating new type " << name << ", type_id: " << type_id << endl;
 
-        object_type_struct[obj_num] = new object_type_struct_t;
+        object_type_struct[type_id] = new object_type_struct_t;
     }
     else 
     {
-        cout << "Reloading type " << name << ", type_id: " << obj_num << endl;
+        cout << "Reloading type " << name << ", type_id: " << type_id << endl;
 
-        dlclose(object_type_struct[obj_num]->lib_handle);
-        object_type_struct[obj_num]->need_refresh = 0;
-        object_type_struct[obj_num]->calculate = 0;
-        object_type_struct[obj_num]->load_objects = 0;
-        object_type_struct[obj_num]->validate = 0;
-        object_type_struct[obj_num]->print_concrete_graph = 0;
+        dlclose(object_type_struct[type_id]->lib_handle);
+        object_type_struct[type_id]->need_refresh = 0;
+        object_type_struct[type_id]->calculate = 0;
+        object_type_struct[type_id]->load_objects = 0;
+        object_type_struct[type_id]->validate = 0;
+        object_type_struct[type_id]->print_concrete_graph = 0;
     }
 
     ostringstream lib_name;
     lib_name << getenv("APP_ROOT") << "/lib/lib" << name << ".so";
 
-    (object_type_struct[obj_num])->lib_handle = dlopen (lib_name.str().c_str(), RTLD_LAZY);
-    if (!object_type_struct[obj_num]->lib_handle) {
+    (object_type_struct[type_id])->lib_handle = dlopen (lib_name.str().c_str(), RTLD_LAZY);
+    if (!object_type_struct[type_id]->lib_handle) {
         fputs (dlerror(), stderr);
         exit(1);
     }
 
-    object_type_struct[obj_num]->need_refresh = (need_refresh_fpointer)dlsym(object_type_struct[obj_num]->lib_handle, "need_refresh");
+    object_type_struct[type_id]->need_refresh = (need_refresh_fpointer)dlsym(object_type_struct[type_id]->lib_handle, "need_refresh");
     if ((error = dlerror()) != NULL)  {
         fputs(error, stderr);
         exit(1);
     }
 
-    object_type_struct[obj_num]->calculate = (calculate_fpointer)dlsym(object_type_struct[obj_num]->lib_handle, "calculate");
+    object_type_struct[type_id]->calculate = (calculate_fpointer)dlsym(object_type_struct[type_id]->lib_handle, "calculate");
     if ((error = dlerror()) != NULL)  {
         fputs(error, stderr);
         exit(1);
     }
 
-    object_type_struct[obj_num]->load_objects = (load_objects_fpointer)dlsym(object_type_struct[obj_num]->lib_handle, "load_objects");
+    object_type_struct[type_id]->load_objects = (load_objects_fpointer)dlsym(object_type_struct[type_id]->lib_handle, "load_objects");
     if ((error = dlerror()) != NULL)  {
         fputs(error, stderr);
         exit(1);
     }
 
-    object_type_struct[obj_num]->validate = (validate_fpointer)dlsym(object_type_struct[obj_num]->lib_handle, "validate");
+    object_type_struct[type_id]->validate = (validate_fpointer)dlsym(object_type_struct[type_id]->lib_handle, "validate");
     if ((error = dlerror()) != NULL)  {
         fputs(error, stderr);
         exit(1);
     }
 
-    object_type_struct[obj_num]->print_concrete_graph = (print_concrete_graph_fpointer)dlsym(object_type_struct[obj_num]->lib_handle, "print_concrete_graph");
+    object_type_struct[type_id]->print_concrete_graph = (print_concrete_graph_fpointer)dlsym(object_type_struct[type_id]->lib_handle, "print_concrete_graph");
     if ((error = dlerror()) != NULL)  {
         fputs(error, stderr);
         exit(1);
