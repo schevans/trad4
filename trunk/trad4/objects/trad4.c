@@ -455,7 +455,7 @@ static int load_types_callback(void *NotUsed, int argc, char **row, char **azCol
     }
 
     ostringstream lib_name;
-    lib_name << getenv("APP_ROOT") << "/lib/lib" << name << ".so";
+    lib_name << getenv("APP_ROOT") << "/lib/libt4" << name << ".so";
 
     (object_type_struct[type_id])->lib_handle = dlopen (lib_name.str().c_str(), RTLD_LAZY);
     if (!object_type_struct[type_id]->lib_handle) {
