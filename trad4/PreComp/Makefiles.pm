@@ -122,7 +122,7 @@ sub generate_lib_make($) {
 
         $name = $obj_hash->{$type}->{name};
 
-        print $FHD " lib$name.so";
+        print $FHD " libt4$name.so";
     }
 
     print $FHD "\n";
@@ -134,8 +134,8 @@ sub generate_lib_make($) {
 
         $name = $obj_hash->{$type}->{name};
 
-        print $FHD "lib$name.so: ../objects/$type.c ../gen/objects/$type"."_wrapper.c\n";
-        print $FHD "	g++ -shared -Wl,-soname,lib$name.so -o lib$name.so \$(TRAD4_ROOT)/objects/sqlite3.o ../objects/$type.o\n";
+        print $FHD "libt4$name.so: ../objects/$type.c ../gen/objects/$type"."_wrapper.c\n";
+        print $FHD "	g++ -shared -Wl,-soname,libt4$name.so -o libt4$name.so \$(TRAD4_ROOT)/objects/sqlite3.o ../objects/$type.o\n";
         print $FHD "\n";
     
     }
