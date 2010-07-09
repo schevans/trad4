@@ -869,6 +869,7 @@ sub GenerateCalculate($$$) {
 
     print $FHD "    DEBUG_FINE( \"pub:\" );\n";
     PrintSectionDebug( $master_hash, $master_hash->{$type}->{pub}, $type, $FHD );
+    print $FHD "    DEBUG_FINE( \"\" );\n";
 
     print $FHD "\n";
     print $FHD "}\n";
@@ -889,7 +890,7 @@ sub PrintSectionDebug($$$$) {
 
         if ( exists $master_hash->{structures}->{data}->{$var_type} ) {
 
-            print $FHD "    DEBUG_FINE( \"\\t$stem"."_$var_name_stripped: \" << &$stem"."_$var_name_stripped );\n";
+            print $FHD "    DEBUG_FINE( \"    $stem"."_$var_name_stripped: \" << &$stem"."_$var_name_stripped );\n";
 
         } 
         elsif ( PreComp::Utilities::IsArray( $var_name )) {
@@ -914,14 +915,14 @@ sub PrintSectionDebug($$$$) {
                     next; 
                 }
  
-                print $FHD "    DEBUG_FINE( \"\\t$stem"."_$var_name_stripped"."[$counter]: \" << $stem"."_$var_name_stripped"."[$counter] );\n";
+                print $FHD "    DEBUG_FINE( \"    $stem"."_$var_name_stripped"."[$counter]: \" << $stem"."_$var_name_stripped"."[$counter] );\n";
 
                 $counter = $counter+1;
             }
         }
         else {
 
-            print $FHD "    DEBUG_FINE( \"\\t$stem"."_$var_name: \" << $stem"."_$var_name );\n";
+            print $FHD "    DEBUG_FINE( \"    $stem"."_$var_name: \" << $stem"."_$var_name );\n";
 
         }
     }
