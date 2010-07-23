@@ -32,7 +32,6 @@ int num_threads_fired(0);
 bool need_reload(false);
 char* timing_debug = 0;
 char* batch_mode = 0;
-char* print_graph = 0;
 void set_timestamp( obj_loc_t obj_loc, int id );
 
 bool fire_object( int id );
@@ -45,8 +44,8 @@ void load_objects( int initial_load );
 void load_types( int initial_load );
 void print_concrete_graph();
 
-void run_trad4() {
-
+void run_trad4( int print_graph ) 
+{
     signal(SIGUSR1, reload_handler);
 
     if ( sqlite3_open(getenv("APP_DB"), &db) != SQLITE_OK )
@@ -58,8 +57,6 @@ void run_trad4() {
     timing_debug = getenv("TIMING_DEBUG");
 
     batch_mode = getenv("BATCH_MODE");
-
-    print_graph = getenv("PRINT_CONCRETE_GRAPH");
 
     for ( int i = 0 ; i < MAX_OBJECTS+1 ; i++ )
     {
