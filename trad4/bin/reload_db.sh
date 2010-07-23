@@ -16,7 +16,7 @@ DATA_DIR=$1
 
 if [ ! "$DATA_DIR" = "." ]
 then
-    cd $APP_ROOT/data/$DATA_DIR
+    cd $DATA_DIR
 fi
 
 for i in `ls *.sql`
