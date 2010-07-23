@@ -200,10 +200,31 @@ if ( ! -f $main_file ) {
     print $FHD "\n";
     print $FHD "#include \"trad4.h\"\n";
     print $FHD "\n";
-    print $FHD "int main()\n";
+    print $FHD "int main( int argc, char *argv[] )\n";
     print $FHD "{\n";
-    print $FHD "    run_trad4();\n";
+    print $FHD "    int print_concrete_graph = 0;\n";
+    print $FHD "\n";
+    print $FHD "    for ( int i=1 ; i < argc ; i++ ) \n";
+    print $FHD "    {\n";
+    print $FHD "\n";
+    print $FHD "        if ( argv[i][0] == \'-\' ) \n";
+    print $FHD "        {\n";
+    print $FHD "\n";
+    print $FHD "            switch (argv[i][1]) {\n";
+    print $FHD "\n";
+    print $FHD "                case \'d\':\n";
+    print $FHD "                    print_concrete_graph =1;\n";
+    print $FHD "                    break;\n";
+    print $FHD "\n";
+    print $FHD "                default:\n";
+    print $FHD "                    printf(\"Unknown flag.\\n\");\n";
+    print $FHD "            }\n";
+    print $FHD "        }\n";
+    print $FHD "    }\n";
+    print $FHD "\n";
+    print $FHD "    run_trad4( print_concrete_graph );\n";
     print $FHD "}\n";
+
 
     PreComp::Utilities::CloseFile();
 

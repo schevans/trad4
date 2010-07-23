@@ -26,7 +26,7 @@ typedef void (*load_objects_fpointer)( obj_loc_t obj_loc, int initial_load );
 typedef int (*validate_fpointer)( obj_loc_t obj_loc, int initial_load );
 typedef void (*print_concrete_graph_fpointer)( obj_loc_t obj_loc, int id, std::ofstream& outfile );
 
-void run_trad4();
+void run_trad4( int print_graph );
 
 typedef struct {
     void* lib_handle;
