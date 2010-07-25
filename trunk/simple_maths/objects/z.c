@@ -14,6 +14,8 @@ int calculate_z( obj_loc_t obj_loc, int id )
 {
     z_out = x_out + y_out;
 
+    cout << "z_out: " << z_out << endl;
+
     return 1;
 }
 
