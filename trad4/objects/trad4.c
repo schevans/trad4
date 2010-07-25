@@ -104,7 +104,7 @@ void run_trad4( int print_graph )
     {
         if ( tier_manager[tier][0] - 1 > 0 )
         {
-            std::cout << "Num objects in tier" << tier << ": " << tier_manager[tier][0] - 1 << std::endl; 
+            std::cout << "Num objects on T" << tier << ": " << tier_manager[tier][0] - 1 << std::endl; 
         }
     }
 
