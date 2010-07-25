@@ -561,6 +561,13 @@ void load_objects( int initial_load )
         }
     }
 
+    dbstream.str("");
+    dbstream << "update object set need_reload=0";
+
+    if( sqlite3_exec(db, dbstream.str().c_str(), 0, 0, &zErrMsg) != SQLITE_OK ){
+        fprintf(stderr, "SQL error: %s. File %s, line %d.\n", zErrMsg, __FILE__, __LINE__);
+        sqlite3_free(zErrMsg);
+    }
 }
 
 void print_concrete_graph()
