@@ -44,8 +44,8 @@ Loading world..
 Loading hello_world..
 Validating objects...
 
-Num objects in tier1: 2
-Num objects in tier2: 1
+Num objects on T1: 2
+Num objects on T2: 1
 
 Running in single-threaded mode.
 
@@ -86,6 +86,16 @@ Each type must also have an entry in the object_types.t4s file (the 's' stands f
 3,2,hello_world
 \end{verbatim}
 
+
+
+\begin{verbatim}
+#type_id, tier, name
+1,1,hello
+2,1,world
+3,2,hello_world
+\end{verbatim}
+
+
 The type_id muse be unique. From this we can see type hello has an id of 1 and exists on tier 1 and world has an id of 2 and also exists on tier 1. The hello_world type has an id of 3 and exists on tier 2.
 
 \section{The Calculate Function}
@@ -119,7 +129,7 @@ So this shows that within calculate_hello_world there's a variable hello_world_h
 
 \section{Introduction}
 
-We're going to move on to a more complex example in order to demonstrate the concurrency. We want to model the following simple equation:
+We're going to move on to a more complex example in order to demonstrate the concurrency. We want to model the following simple problem:
 
 \begin{math}
   \begin{array}{ l c }
@@ -199,7 +209,18 @@ pub:
 
 Here you can see for each sub member two variables are provided, in a's case these are x_a which provides it's id, and a_out where a will publish it's static data. Also in the pub section is the int x_out, where the result of  \(a + b\) is published. So calculate_x takes the published a_out and b_out variables, adds them and publishes the result in x_out.
 
-The calculate functions for y and z are very similar to that of x and is not shown.
+The calculate functions for y is very similar to that of x, but z's includes some debug:
+
+\begin{verbatim}
+int calculate_z( obj_loc_t obj_loc, int id )
+{
+    z_out = x_out + y_out;
+
+    cout << "z_out: " << z_out << endl;
+
+    return 1;
+}
+\end{verbatim}
 
 \section{The Data}
 
@@ -235,25 +256,160 @@ create table a (
 There is the primary key id, plus the static value of the out variable. So the data for object a of type a is given by (from data/worked_example/a.sql):
 
 \begin{verbatim}
-insert into object values ( 1, 1, 1, "a", 2, 1 );
+insert into object values ( 1, 1, 1, "a", 1, 0 );
 insert into a values ( 1, 7 );
 \end{verbatim}
 
-So we can see an object with id of 1, type 1 running on tier 1 called "a" with log_level 2 and need_reload set to 1. In type-specific table a there's the primary key id and the value of out, given by 7. The data for objects b, c and d are similar to this, except they have different ids, type_ids, names and static out values as described above. The data for object x is given by:
+So we can see an object with id of 1, type 1 running on tier 1 called "a" with log_level 1 and need_reload set to 0. In type-specific table a there's the primary key id and the value of out, given by 7. The data for objects b, c and d are similar to this, except they have different ids, type_ids, names and static out values as described above. The data for object x is given by:
 
 
 \begin{verbatim}
-insert into object values ( 5, 5, 2, "x", 2, 1 );
+insert into object values ( 5, 5, 2, "x", 1, 0 );
 insert into x values ( 5, 1, 2 );
 \end{verbatim}
 
 This shows an object with id 5, type 5, tier 2 etc. In type-specific table x there's the primary key id and the ids of the two objects to which x subscribes, namely a with id 1 and b with id 2. 
 
+Now we have the full description of this application we can run it:
 
+\begin{verbatim}
 
+~/src/simple_maths$ simple_maths
+Creating new type y, type_id: 6
+Creating new type c, type_id: 3
+Creating new type a, type_id: 1
+Creating new type b, type_id: 2
+Creating new type x, type_id: 5
+Creating new type d, type_id: 4
+Creating new type z, type_id: 7
+Loading objects...
+Loading y..
+Loading c..
+Loading a..
+Loading b..
+Loading x..
+Loading d..
+Loading z..
+Validating objects...
 
+Num objects on T1: 4
+Num objects on T2: 2
+Num objects on T3: 1
 
+Running in single-threaded mode.
 
+Tier 1 running.
+calculate_a( a )
+calculate_b( b )
+calculate_c( c )
+calculate_d( d )
+Tier 1 ran 4 objects in 8.89301e-05 seconds.
+
+Tier 2 running.
+calculate_x( x )
+calculate_y( y )
+Tier 2 ran 2 objects in 4.60148e-05 seconds.
+
+Tier 3 running.
+calculate_z( z )
+z_out: 54
+Tier 3 ran 1 objects in 3.60012e-05 seconds.
+
+All tiers ran 7 objects in 0.000287056 seconds.
+
+\end{verbatim}
+
+As in the previous example you can see the types being created and the objects being loaded and validated. Then from the report you can see we have 4 objects in T1, 2 on T2 and 1 on T3, as expected. Then the tiers are run as before, with z producing the output 54.
+
+\section{Feeding in change}
+
+In this case the applications doesn't terminate after the first time all the tiers are run, but loops over the objects on T1 looking for change. We introduce change as follows:
+
+\begin{enumerate}
+
+\item Change the required values in the database and set the need_reload flag.
+\item Send the application a signal to indicate something has changed.
+
+\end{enumerate}
+
+So we'll update a's static data and trigger a reload. First we log into the database and make the changes:
+
+\begin{verbatim}
+
+~/src/simple_maths$ t4db
+sqlite> update a set out=19 where id=1;
+sqlite> update object set need_reload=1 where id=1;
+
+\end{verbatim}
+
+And send the reload signal:
+
+\begin{verbatim}
+
+~/src/simple_maths$ send_reload.sh
+
+\end{verbatim}
+
+This produces the following output:
+
+\begin{verbatim}
+
+Tier 1 running.
+calculate_a( a )
+Tier 1 ran 1 objects in 5.00679e-05 seconds.
+
+Tier 2 running.
+calculate_x( x )
+Tier 2 ran 1 objects in 3.91006e-05 seconds.
+
+Tier 3 running.
+calculate_z( z )
+z_out: 66
+Tier 3 ran 1 objects in 4.19617e-05 seconds.
+
+\end{verbatim}
+
+Notice only a, x and z fired, the minimum needed to recalculate z given that only a had changed. Next we'll update b and c (ids 2 and 3):
+
+\begin{verbatim}
+
+~/src/simple_maths$ t4db
+sqlite> update b set out=23 where id=2;
+sqlite> update c set out=46 where id=3;
+sqlite> update object set need_reload=1 where id in ( 2, 3 );
+
+\end{verbatim}
+
+This produces the following output:
+
+\begin{verbatim}
+Tier 1 running.
+calculate_b( b )
+calculate_c( c )
+Tier 1 ran 2 objects in 7.29561e-05 seconds.
+
+Tier 2 running.
+calculate_x( x )
+calculate_y( y )
+Tier 2 ran 2 objects in 3.60012e-05 seconds.
+
+Tier 3 running.
+calculate_z( z )
+z_out: 115
+Tier 3 ran 1 objects in 2.69413e-05 seconds.
+
+\end{verbatim}
+
+From this you can see both b and c on T1 and x and y on T2 both run concurrently. 
+
+If fact in this example they don't as we're running is single threaded mode to keep the output orderly, but this is easily set with the environment variable NUM_THREADS, e.g.:
+
+\begin{verbatim}
+
+~/src/simple_maths$ export NUM_THREADS=64
+~/src/simple_maths$ simple_maths
+
+\end{verbatim}
 
 \chapter{New Application Walkthrough}
 
