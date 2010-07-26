@@ -1037,6 +1037,29 @@ sub Validate($$) {
 
             $var_type = $master_hash->{$type}->{$section}->{data}->{$var_name};
 
+            my $check_section;
+
+            foreach $check_section ( 'static', 'pub' ) {
+
+                if ( $check_section ne $section ) {
+
+                    if ( exists $master_hash->{$type}->{$check_section}->{data}->{$var_name} ) {
+                        
+                        print "Error: Type \'$type\' has duplicate variable names in $section and $check_section sections: \'$var_name\'.\n";
+                        ExitOnError();
+                    }
+
+                }
+                else {
+
+                    if ( scalar( @{$master_hash->{$type}->{$section}->{order}} ) != scalar keys %{$master_hash->{$type}->{$section}->{data}} )
+                    {
+                        print "Error: Type \'$type\' has duplicate variable names in the $section section: \'$var_name\'.\n";
+                        ExitOnError();
+                    }
+                }
+            }
+
             if ( IsArray( $var_name ) ) {
 
                 if ( ! GetArraySize( $master_hash, $var_name ) ) {
@@ -1056,7 +1079,7 @@ sub Validate($$) {
                 {
                     if ( $var_name eq $var_type ) {
 
-                        print "Error: Type \'$type\' has a structure \'$var_name\' called \'$var_type\'. Please rename the structure in $type.t4.\n";
+                        print "Error: Type \'$type\' has a structure \'$var_name\' called \'$var_type\'. Please rename the structure in $type.t4 or structures.t4s.\n";
                         ExitOnError();
                     } 
 
@@ -1082,6 +1105,7 @@ sub Validate($$) {
                 ExitOnError();
 
             }
+
         }
     }
 }
