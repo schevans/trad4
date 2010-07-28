@@ -278,11 +278,14 @@ sub LoadAppConstants() {
     }
 
     foreach $expression_name ( keys %{$constants_hash} ) {
- 
-        if ( $constants_hash->{$expression_name} =~ /[A-Za-z_]+/ ) {
 
-            print "Error: Can't evaluate expression \'$expression_name = $constants_hash->{$expression_name}\' in constants.t4s.\n";
-            ExitOnError();
+        if ( !$constants_hash->{$expression_name} =~ /[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?/ )
+        {
+            if ( $constants_hash->{$expression_name} =~ /[A-Za-z_]+/ ) {
+
+                print "Error: Can't evaluate expression \'$expression_name = $constants_hash->{$expression_name}\' in constants.t4s.\n";
+                ExitOnError();
+            }
         }
     }
 
