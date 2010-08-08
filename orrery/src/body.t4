@@ -1,0 +1,13 @@
+
+sub
+    body other_bodies[NUM_OTHER_BODIES]
+
+static
+    double mass
+    position_struct initial_position
+    velocity_struct initial_velocity
+
+pub
+    position_struct position
+    velocity_struct velocity
+
