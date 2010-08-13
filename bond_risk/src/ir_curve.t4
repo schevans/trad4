@@ -2,11 +2,11 @@
 # steve@topaz.myzen.co.uk
 
 static
-    rate input_rates[INTEREST_RATE_LEN]
+    rate input_rates[NUM_INPUT_RATES]
 
 pub
-    double interest_rate_interpol[DISCOUNT_RATE_LEN]
-    double discount_rate[DISCOUNT_RATE_LEN]
-    double discount_rate_p01[DISCOUNT_RATE_LEN]
-    double discount_rate_m01[DISCOUNT_RATE_LEN]
+    double interest_rate_interpol[NUM_FORWARD_DAYS]
+    double discount_rate[NUM_FORWARD_DAYS]
+    double discount_rate_p01[NUM_FORWARD_DAYS]
+    double discount_rate_m01[NUM_FORWARD_DAYS]
 
