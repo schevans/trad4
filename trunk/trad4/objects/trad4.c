@@ -112,7 +112,7 @@ void run_trad4( int print_graph )
 
     if ( print_graph )
     {
-        cout << "Printing concrete graph and exiting as PRINT_CONCRETE_GRAPH is set." << endl; 
+        cout << "Printing concrete graph and exiting as app run with the -d flag." << endl; 
         print_concrete_graph();
         exit(0);
     }
