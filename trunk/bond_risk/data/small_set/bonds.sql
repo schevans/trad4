@@ -1,0 +1,13 @@
+BEGIN;
+delete from bond;
+insert into object values (  201, 2, 2, "US01", 0, 1 );
+insert into bond values (  201, 6206,19508,4,0.23,1);
+insert into object values (  202, 2, 2, "US02", 0, 1 );
+insert into bond values (  202, 7151,18528,1,1.93,1);
+insert into object values (  203, 2, 2, "UK01", 0, 1 );
+insert into bond values (  203, 7263,18893,4,1.57,2);
+insert into object values (  204, 2, 2, "UK02", 0, 1 );
+insert into bond values (  204, 7356,18046,4,0.93,2);
+insert into object values (  205, 2, 2, "UK03", 0, 1 );
+insert into bond values (  205, 6946,19470,2,0.44,2);
+COMMIT;
