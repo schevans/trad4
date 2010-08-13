@@ -145,7 +145,7 @@ We're going to move on to a more complex example in order to demonstrate the con
   \end{array} 
 \end{math}
 
-The abstract diagram for simple_maths is as follows:
+The abstract graph for simple_maths is as follows:
 
 \includegraphics[scale=0.5]{simplemathsabstract.png}
 
@@ -223,8 +223,9 @@ int calculate_z( obj_loc_t obj_loc, int id )
 \end{verbatim}
 
 \section{The Data}
+\label{sec:The Data}
 
-In the first example hello_world we ignored the database. This is a serverless sqlite db, the structure of which is generated for you by the precompiler. At this stage we also need to distinguish between objects and types.
+In the first example hello_world we ignored the database. This is a server-less sqlite db, the structure of which is generated for you by the precompiler. At this stage we also need to distinguish between objects and types.
 
 Types are the trad4 types as described in their .t4 files and calculate function. Objects are the running, instantiated types, described in the database. This discussion is confused by the fact that in this app and hello_world, each type has a single instantiate object, but this will become clearer later as we have multiple objects of particular types.
 
@@ -411,7 +412,134 @@ If fact in this example they don't as we're running is single threaded mode to k
 
 \end{verbatim}
 
-\chapter{New Application Walkthrough}
+\chapter{Example: Bond Risk}
+
+\section{Introduction}
+
+Now we're going to examine a real world example of the trad4 architecture from the world of finance - bond_risk. This is a model that calculates the risk on two financial instruments - bonds and outright trades - that depend on the expected future values of interest rates. This is explained in more detail below, but first, the abstract graph:
+
+
+
+
+\includegraphics[scale=0.5]{bondriskabstract1.png}
+
+\subsection{T1: ir_curve}
+
+The first type on T1 is ir_curve. This contains information about the expected future value of interest rates. We observe information from the markets to obtain a set of input_rates, and construct a curve starting today and going forward to a set endpoint (say 20 years). This constructed curve has an entry for each day from today to 20 years containing information derived from our input rates, which will be consumed by the T2 bond objects. The key point to note about ir_curves is that they are expensive to construct - the various algorithms used to bootstrap and interpolate the various curves are computationally expensive.
+
+\subsection{T2: bond}
+
+The second type on T2 is bond. A bond is a financial instrument that you buy for a certain price, and pays you fixed payments or coupons at a certain rate until it matures (say 20 years). Because it pays you money at a fixed rate (say 3% per year), it will become more or less valuable depending on the current and expected future value of interents rates. A bond that pays 3% will have a higher price when interest rates are at 1% then when they are at 5%.
+
+\subsection{T3: outright_trade}
+
+The last type on T3 is outright_trade. This trade captures value of the purchase of a bond at a particular time. If you buy a bond with a price of £100 today, and the bond price rises in the future because interest rates have fallen, the present value (pv) of that trade increases. If you sell the bond at that future time you stand to make a profit. This profit or loss (pnl) is calculated by the trade based on the original price of the bond and the bond's current published price.
+
+\subsection{Risk: dv10}
+
+In addition to bond's price and outright_trade's pv and pnl, there are other risk measures we can produce for these types, and in this example we're going to focus on s pv01. The pv01 of a bond is the amount the price will change given a small shift - 1 basis point (bp - 100th of a percent) - in interest rates. If a bond has a high pv01 it's price is likely to be very sensitive to interest rate movements and be inherently more risky. A bond with a low pv01 will be less sensitive to interest rates. 
+
+Likewise an outright_trade on a bond with a high pv01 will itself be sensitive to the volatility of the bond, so it will have an indirect sensitivity to interest rates. For an outright_trade we're concerned about the variability of the trade's pv, so the risk measure is known as pv01.
+
+The way pv01 is calculate is that the ir_curve is bumped or perturbed by 1bp and the bond is priced against that perturbed curve. Then then original ir_curve is bumped by -1bp and again the bond is priced. The difference between these two prices is the dv10.
+
+From the perspective of the trad4 architecture this is quite easy to achieve: We just have the ir_curve type also produce bootstrapped curve perturbed up and down by 1bp. Then bond can read the bumped and un-bumped forward rates directly from he ir_curve objects. 
+
+That's the bulk of the finance bit over for now. We can now discuss the t4 files.
+
+\section{The t4s files}
+
+The bond_risk application uses some more advanced features of trad4, specifically constants, enums, aliases and structures. These will be introduced in the next section and expanded on in section ~\ref{sec:Language Features}. Additionally ir_curve uses array members, which will be discussed in that section.
+
+The t4s files are the trad4 system files that you supply as you need the relevant features. They described below.
+
+\subsection{constants.t4s}
+
+The constants.t4s file allows you to define your own constants that will be in scope in all calculate functions. Below, a simplified version of bond_risk's constants.t4s file:
+
+
+\begin{verbatim}
+TODAY = 40403            # 13/08/2010
+END_DATE = 47708         # 13/08/2030
+
+NUM_DAYS = END_DATE - START_DATE
+
+NUM_INPUT_RATES = 10
+\end{verbatim}
+
+This describes the start and end dates covered by this model, and the number of forward dates are calculated from that data. Also the number of input_rates is set here.
+
+\subsection{enums.t4s}
+
+You can define your own enums to use in the t4 files in src/enums.t4s. There's only one enum used in bond_risk, used to indicate the direction of the trade:
+
+\begin{verbatim}
+
+buy_sell_enum
+    BUY
+    SELL
+
+\end{verbatim}
+
+
+\subsection{aliases.t4s}
+
+Aliases are simply typedefs, used to clarify your t4 files and structures:
+
+\begin{verbatim}
+
+date = long int
+
+\end{verbatim}
+
+\subsection{structures.t4s}
+
+Any structures you require in your t4 files can be described in structures.t4s. Again there's only one structure used in bond_risk, and that's a rate, described by a value on a particular date (the date given in aliases.t4s):
+
+\begin{verbatim}
+
+rate
+    double value
+    date asof
+
+\end{verbatim}
+
+Given the above definitions, we can now tackle bond_risk's t4 files.
+
+\section{The t4 files}
+
+\subsection{ir_rate}
+
+\subsection{bond}
+
+\subsection{outright_trade}
+
+
+
+
+
+
+
+
+
+
+\section{The Concrete Graph}
+
+In Section ~\ref{sec:The Data} the distinction between types and objects was made. This becomes clearer now as in this data set we will have two ir_curves, five bonds and nine outright_trades. These objects - instantiated types - are shown on the concrete graph represented by ovals containing the object name. This is shown below:
+
+\includegraphics[scale=0.3]{bondriskconcretesmallset.png}
+
+From this we can see the two ir_curves in two different currencies LIBOR.USD and LIBOR.GBP on T1. Then we can see the five bonds on T2, two of which were issued in USD (US01 and US02) which subscribe to LIBOR.USD, and three of which were issued in GBP which subscribe to LIBOR.GBP. Lastly we have the nine outright_trades (OT01 etc.) which subscribe to various bonds.
+
+
+
+
+
+
+
+
+
+\chapter{New Application Walk-through}
 
 \section{Run create_new_app.sh}
 
@@ -535,7 +663,7 @@ As with all the environment variables, they can be set in app.conf file.
 
 \section{Create the database}
 
-Trad4 uses sqlite, a serverless flat file database. The structure is generated for you by the precompiler, as is some dummy data to get you started.
+Trad4 uses sqlite, a server-less flat file database. The structure is generated for you by the precompiler, as is some dummy data to get you started.
 
 \begin{verbatim}
     $ recreate_db.sh
@@ -595,7 +723,8 @@ Note that the dummy_data set created for you has need_reload=1 for all objects.
 
 Keep it simple for now and restrict yourself to two or three types when you're starting a new application.
 
-\chapter{Further Language features}
+\chapter{Language Features}
+\label{sec:Language Features}
 
 \chapter{Tips and tricks}
 
