@@ -18,7 +18,7 @@ int calculate_ir_curve( obj_loc_t obj_loc, int id )
     double y_intercept;
 
     // Interpolate the IR first..
-    for ( int indx = 0; indx < INTEREST_RATE_LEN - 1 ; indx++)
+    for ( int indx = 0; indx < NUM_INPUT_RATES - 1 ; indx++)
     {
         current_period_start = ir_curve_input_rates_asof(indx);
         current_period_end = ir_curve_input_rates_asof(indx+1);
@@ -36,15 +36,15 @@ int calculate_ir_curve( obj_loc_t obj_loc, int id )
 */
         for ( int i = current_period_start ; i < current_period_end ; i++ )
         {
-            //cout << "\tDate " << i << " index  " << i - DATE_RANGE_START << " rate: " <<(  i*gradient + y_intercept ) << endl;
-            ir_curve_interest_rate_interpol[i - DATE_RANGE_START] = (  i*gradient + y_intercept );
+            //cout << "\tDate " << i << " index  " << i - TODAY << " rate: " <<(  i*gradient + y_intercept ) << endl;
+            ir_curve_interest_rate_interpol[i - TODAY] = (  i*gradient + y_intercept );
         }
 
     }
     
     // Then calc the discount rates..
 
-    for ( int i = 0 ; i <= DATE_RANGE_LEN ; i++ )
+    for ( int i = 0 ; i <= NUM_FORWARD_DAYS ; i++ )
     {
         ir_curve_discount_rate[i] = exp( -ir_curve_interest_rate_interpol[i] * (( i / YEAR_BASIS)/ YEAR_BASIS ) );
 
