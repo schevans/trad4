@@ -2,7 +2,7 @@
 # steve@topaz.myzen.co.uk
 
 static
-    rate ir_rates[INTEREST_RATE_LEN]
+    rate input_rates[INTEREST_RATE_LEN]
 
 pub
     double interest_rate_interpol[DISCOUNT_RATE_LEN]
