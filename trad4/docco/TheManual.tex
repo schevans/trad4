@@ -398,7 +398,6 @@ Tier 3 running.
 calculate_z( z )
 z_out: 115
 Tier 3 ran 1 objects in 2.69413e-05 seconds.
-
 \end{verbatim}
 
 From this you can see both b and c on T1 and x and y on T2 both run concurrently. 
@@ -406,10 +405,8 @@ From this you can see both b and c on T1 and x and y on T2 both run concurrently
 If fact in this example they don't as we're running is single threaded mode to keep the output orderly, but this is easily set with the environment variable NUM_THREADS, e.g.:
 
 \begin{verbatim}
-
 ~/src/simple_maths$ export NUM_THREADS=64
 ~/src/simple_maths$ simple_maths
-
 \end{verbatim}
 
 \chapter{Example: Bond Risk}
@@ -474,11 +471,9 @@ This describes the start and end dates covered by this model, and the number of 
 You can define your own enums to use in the t4 files in src/enums.t4s. There's only one enum used in bond_risk, used to indicate the direction of the trade:
 
 \begin{verbatim}
-
 buy_sell_enum
     BUY
     SELL
-
 \end{verbatim}
 
 
@@ -487,9 +482,7 @@ buy_sell_enum
 Aliases are simply typedefs, used to clarify your t4 files and structures:
 
 \begin{verbatim}
-
 date = long int
-
 \end{verbatim}
 
 \subsection{structures.t4s}
@@ -497,18 +490,78 @@ date = long int
 Any structures you require in your t4 files can be described in structures.t4s. Again there's only one structure used in bond_risk, and that's a rate, described by a value on a particular date (the date given in aliases.t4s):
 
 \begin{verbatim}
-
 rate
     double value
     date asof
-
 \end{verbatim}
 
 Given the above definitions, we can now tackle bond_risk's t4 files.
 
 \section{The t4 files}
 
-\subsection{ir_rate}
+The t4 files are divided into three different sections (all of them optional) - there's the sub section, which lists the other types to which this type subscribes, the static section which is driven by the object's database tables, and the pub section where the results of the calculations using it's static and the pub and static sections of the objects to which it subscribes. These will be discussed in more detail below.
+
+\subsection{ir_curve}
+
+\begin{verbatim}
+static
+    rate input_rates[NUM_INPUT_RATES]
+
+pub
+    double interest_rate_interpol[NUM_FORWARD_DAYS]
+    double discount_rate[NUM_FORWARD_DAYS]
+    double discount_rate_p01[NUM_FORWARD_DAYS]
+    double discount_rate_m01[NUM_FORWARD_DAYS]
+\end{verbatim}
+
+
+\subsubsection{The static section}
+
+The static section is populated from the object's database tables. This data is loaded when the object starts, and may be reloaded at run-time. The static section is published to the rest of the world, but it's not touched by the calculate function.
+
+In this section above we can just see the input_rates, which are an array of rates - the structure defined above - of length NUM_INPUT_RATES as defined in constants.. This is an input to our model, as we're going to move interest rates up and down to see how our bond's and trade's price and risk respond. 
+
+This static data is available in the calculate function using the provided macros:
+
+\begin{verbatim}
+static:
+    rate ir_curve_input_rates[NUM_INPUT_RATES]
+    double ir_curve_input_rates_value( NUM_INPUT_RATES )
+    date ir_curve_input_rates_asof( NUM_INPUT_RATES )
+\end{verbatim}
+
+Given NUM_INPUT_RATES=10, you can use these macros to access the static data in your calculate function as follows:
+
+\begin{verbatim}
+
+    rate start_rate = ir_curve_input_rates[0];     // Get the first rate ?? *** ( a copy of????) ***
+
+
+
+
+
+
+
+
+
+
+\end{verbatim}
+
+For those financial professionals among you I should make clear that these input_rates contain the bootstrapped forward rates as I've avoided including a bootstrapper to keep things simple. These rates still require interpolation at a daily granularity and conversion into discount factors.
+
+\subsubsection{The pub section}
+
+\begin{verbatim}
+pub
+    double interest_rate_interpol[NUM_FORWARD_DAYS]
+    double discount_rate[NUM_FORWARD_DAYS]
+    double discount_rate_p01[NUM_FORWARD_DAYS]
+    double discount_rate_m01[NUM_FORWARD_DAYS]
+\end{verbatim}
+
+The pub section is where the results of the object's calculate function are published to the rest of the world. The variables in this section are zeroed when the object starts, and are used as intermediate and final results in the calculate function. If you add a variable to the pub section you will not need to modify the database.  
+
+
 
 \subsection{bond}
 
