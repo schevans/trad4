@@ -26,7 +26,7 @@ int calculate_body( obj_loc_t obj_loc, int id )
     {
         for ( int i=0 ; i < NUM_OTHER_BODIES ; i++ )
         {
-            double r = sqrt( pow( body_position_x, 2 ) + pow( other_bodies_position_x(i), 2 ));
+            double r = sqrt( pow( (body_position_x-other_bodies_position_x(i)), 2 ) + pow( (body_position_y-other_bodies_position_y(i)), 2 ));
 
             double a = ( G * other_bodies_mass(i) ) / pow( r, 2 );
 
