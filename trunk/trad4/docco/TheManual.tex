@@ -426,7 +426,7 @@ The first type on T1 is ir_curve. This contains information about the expected f
 
 \subsection{T2: bond}
 
-The second type on T2 is bond. A bond is a financial instrument that you buy for a certain price, and pays you fixed payments or coupons at a certain rate until it matures (say 20 years). Because it pays you money at a fixed rate (say 3% per year), it will become more or less valuable depending on the current and expected future value of interents rates. A bond that pays 3% will have a higher price when interest rates are at 1% then when they are at 5%.
+The second type on T2 is bond. A bond is a financial instrument that you buy for a certain price, and pays you fixed payments or coupons at a certain rate until it matures (say 20 years). Because it pays you money at a fixed rate (say 3\% per year), it will become more or less valuable depending on the current and expected future value of interest rates. A bond that pays 3\% will have a higher price when interest rates are at 1\% then when they are at 5\%.
 
 \subsection{T3: outright_trade}
 
@@ -459,7 +459,7 @@ The constants.t4s file allows you to define your own constants that will be in s
 TODAY = 40403            # 13/08/2010
 END_DATE = 47708         # 13/08/2030
 
-NUM_DAYS = END_DATE - START_DATE
+NUM_DAYS = END_DATE - TODAY
 
 NUM_INPUT_RATES = 10
 \end{verbatim}
@@ -534,16 +534,21 @@ Given NUM_INPUT_RATES=10, you can use these macros to access the static data in 
 
 \begin{verbatim}
 
-    rate start_rate = ir_curve_input_rates[0];     // Get the first rate ?? *** ( a copy of????) ***
+    // Get a copy of the first rate
+    rate start_rate = ir_curve_input_rates[0];
+    // Get a copy of the last rate
+    rate end_rate = ir_curve_input_rates[NUM_INPUT_RATES-1];
 
+    // Output the asof date and rate of the start_rate
+    cout << "start_rate.asof: " << start_rate.asof << endl;
+    cout << "start_rate.value: " << start_rate.value << endl;
 
-
-
-
-
-
-
-
+    // Loop thought the input rates, outputting the rate and date.
+    for ( int i = 0 ; i < NUM_INPUT_RATES ; i++ )
+    {
+        cout << ir_curve_input_rates_asof( i ) << endl;
+        cout << ir_curve_input_rates_value( i ) << endl;
+    }
 
 \end{verbatim}
 
@@ -551,15 +556,36 @@ For those financial professionals among you I should make clear that these input
 
 \subsubsection{The pub section}
 
+The pub section is where the results of the object's calculate function are published to the rest of the world. The variables in this section are zeroed when the object starts, and are used as intermediate and final results in the calculate function. If you add a variable to the pub section you will not need to modify the database.  
+
+In this section we have four arrays of doubles of length NUM_FORWARD_DAYS. The interest_rate_interpol array is used to store the interpolated input_rates. The other three arrays store the discount_rate - calculated form the interpolated input_rates, and the discount_rate perturbed up and down by one basis point ( _p01 and _m01 respectively). This will be used by other objects to calculate their risk as described below. 
+
+This pub data can be written to within the calculate function using the provided macros:
 \begin{verbatim}
-pub
-    double interest_rate_interpol[NUM_FORWARD_DAYS]
-    double discount_rate[NUM_FORWARD_DAYS]
-    double discount_rate_p01[NUM_FORWARD_DAYS]
-    double discount_rate_m01[NUM_FORWARD_DAYS]
+pub:
+    double ir_curve_interest_rate_interpol[NUM_FORWARD_DAYS]
+    double ir_curve_discount_rate[NUM_FORWARD_DAYS]
+    double ir_curve_discount_rate_p01[NUM_FORWARD_DAYS]
+    double ir_curve_discount_rate_m01[NUM_FORWARD_DAYS]
 \end{verbatim}
 
-The pub section is where the results of the object's calculate function are published to the rest of the world. The variables in this section are zeroed when the object starts, and are used as intermediate and final results in the calculate function. If you add a variable to the pub section you will not need to modify the database.  
+Given NUM_FORWARD_DAYS = END_DATE - TODAY, you can use these macros in your calculate function as follows:
+
+\begin{verbatim}
+    // Calculate the interpolated rate
+    // For details please see bond_risk/objects/ir_curve.c
+    ir_curve_interest_rate_interpol[i - TODAY] = ( i*gradient + y_intercept );
+
+    // Calculate the discount factor, plus the two perturbed discount factors
+    for ( int i = 0 ; i < NUM_FORWARD_DAYS ; i++ )
+    {
+        num_years = i / YEAR_BASIS;
+
+        ir_curve_discount_rate[i] = exp( -ir_curve_interest_rate_interpol[i] * num_years );
+        ir_curve_discount_rate_p01[i] = exp( -(ir_curve_interest_rate_interpol[i] +0.0001) * num_years );
+        ir_curve_discount_rate_m01[i] = exp( -(ir_curve_interest_rate_interpol[i] -0.0001) * num_years );
+    }
+\end{verbatim}
 
 
 
