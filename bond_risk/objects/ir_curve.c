@@ -11,11 +11,11 @@ using namespace std;
 
 int calculate_ir_curve( obj_loc_t obj_loc, int id )
 {
-    int current_period_start;
-    int current_period_end;
+    int current_period_start(0);
+    int current_period_end(0);
 
-    double gradient;
-    double y_intercept;
+    double gradient(0);
+    double y_intercept(0);
 
     // Interpolate the IR first..
     for ( int indx = 0; indx < NUM_INPUT_RATES - 1 ; indx++)
@@ -37,29 +37,30 @@ int calculate_ir_curve( obj_loc_t obj_loc, int id )
         for ( int i = current_period_start ; i < current_period_end ; i++ )
         {
             //cout << "\tDate " << i << " index  " << i - TODAY << " rate: " <<(  i*gradient + y_intercept ) << endl;
-            ir_curve_interest_rate_interpol[i - TODAY] = (  i*gradient + y_intercept );
+            ir_curve_interest_rate_interpol[i - TODAY] = ( i*gradient + y_intercept );
         }
 
     }
     
-    // Then calc the discount rates..
+    // Then calculate the discount rates..
+    double num_years(0);
 
-    for ( int i = 0 ; i <= NUM_FORWARD_DAYS ; i++ )
+    for ( int i = 0 ; i < NUM_FORWARD_DAYS ; i++ )
     {
-        ir_curve_discount_rate[i] = exp( -ir_curve_interest_rate_interpol[i] * (( i / YEAR_BASIS)/ YEAR_BASIS ) );
+        num_years = i / YEAR_BASIS;
 
-        ir_curve_discount_rate_p01[i] = exp( -(ir_curve_interest_rate_interpol[i] +0.0001) * (( i / YEAR_BASIS)/ YEAR_BASIS ) );
-
-        ir_curve_discount_rate_m01[i] = exp( -(ir_curve_interest_rate_interpol[i] -0.0001) * (( i / YEAR_BASIS)/ YEAR_BASIS ) );
+        ir_curve_discount_rate[i] = exp( -ir_curve_interest_rate_interpol[i] * num_years );
+        ir_curve_discount_rate_p01[i] = exp( -(ir_curve_interest_rate_interpol[i] +0.0001) * num_years );
+        ir_curve_discount_rate_m01[i] = exp( -(ir_curve_interest_rate_interpol[i] -0.0001) * num_years );
 
 /*
-        cout << "ir_curve_discount_rate[ " << i << "]: " << ir_curve_discount_rate[i]
-            << ", ir_curve_discount_rate_p01[ " << i << "]: " << ir_curve_discount_rate_p01[i]
-            << ", ir_curve_discount_rate_m01[ " << i << "]: " << ir_curve_discount_rate_m01[i]
+        cout << "ir_curve_discount_rate[" << i << "]: " << ir_curve_discount_rate[i]
+            << ", ir_curve_discount_rate_p01[" << i << "]: " << ir_curve_discount_rate_p01[i]
+            << ", ir_curve_discount_rate_m01[" << i << "]: " << ir_curve_discount_rate_m01[i]
             << endl;
 */
-    }
 
+    }
 
     return 1;
 }
