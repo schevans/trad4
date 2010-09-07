@@ -66,6 +66,36 @@ sub Validate($) {
                     PreComp::Utilities::ExitOnError();
                 }
             }
+
+            my $var_type = $master_hash->{structures}->{data}->{$structure}->{data}->{$var_name};
+
+            if ( $var_type !~ /^int$|^double$|^float$|^long$|^char$/ )
+            {
+                if ( exists $master_hash->{structures}->{data}->{$var_type} )
+                {
+                    next;
+                }
+
+                if ( exists $master_hash->{enums}->{$var_type} )
+                {
+                    next;
+                }
+
+                if ( exists $master_hash->{aliases}->{data}->{$var_type} )
+                {
+                    next;
+                }
+
+                print "Error: Structure \'$structure\' has a variable \'$var_name\' with an unknown type \'$var_type\'. It's not:\n";
+                print "    a) an int, double, float, long or char.\n";
+                print "    b) another structure, as defined in structures.t4s\n";
+                print "    c) an enum, as defined in enums.t4s\n";
+                print "    d) an alias, as defined in aliases.t4s\n";
+
+                PreComp::Utilities::ExitOnError();
+
+            }
+
         }
 
     }

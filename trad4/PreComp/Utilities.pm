@@ -1076,7 +1076,7 @@ sub Validate($$) {
                 }
             }
 
-            if ( $var_type !~ /int|double|float|long|char/ )
+            if ( $var_type !~ /^int$|^double$|^float$|^long$|^char$/ )
             {
                 if ( exists $master_hash->{structures}->{data}->{$var_type} )
                 {
