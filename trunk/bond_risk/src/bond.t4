@@ -5,15 +5,15 @@
 sub
     ir_curve ir_curve
 
-pub
-    double price
-    double pv01
-
 static
     int start_date
     int maturity_date
     int coupons_per_year
     double coupon
+
+pub
+    double price
+    double pv01
 
 
 
