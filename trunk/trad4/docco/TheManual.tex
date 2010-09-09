@@ -18,6 +18,16 @@
 
 Trad4 is a programming language with which you describe the relationship and behaviour of a set of object of different types. 
 
+Features:
+
+\begin{itemize}
+\item add and remove objects at run time
+\item add and remove types at run time
+\item full lock-free concurrency
+\item run-time fault-tolerance
+\item 3rd-party library integration (restrictions apply: you have to keep them on the stack)
+\end{itemize}
+
 Time for an example.
 
 \chapter{Example: Hello world!}
@@ -28,7 +38,7 @@ The first trad4 application we'll examine is the venerable "Hello world!".
 
 \includegraphics[scale=0.5]{helloworldabstract.png}
 
-The above application is a directed acyclic graph, and it shows three types. Two on tier1 (T1) - hello and world, and one on T2 - hello_world. The T2 hello_world object subscribes to the two T1 objects. The hello_world object simple concatenates the names of the two objects and prints them out.
+The above application is a directed acyclic graph, and it shows three types. Two on tier1 (T1) - hello and world, and one on T2 - hello_world. The T2 hello_world object subscribes to the two T1 objects. The hello_world object simply concatenates the names of the two objects and prints them out.
 
 What will happen when the application starts is that the T1 objects will run concurrently (they do nothing in this simple example), then the T2 object will run. This will read the names of the T1 objects and concatenate them and print the result. The output is below.
 
@@ -77,6 +87,8 @@ sub
 
 The .t4 files are split into three sections. The sub section as shown above describes the type and name of the other trad4 types to which this this type subscribes. In this case hello_world subscribes to two types, the first being a hello object called hello, and the second a world object called world.
 
+The other two sections are static - where the object keeps it's static data which is loaded from the database, and the pub section - where the intermediate and final values of the object's calculate function are stores and published to the world. Neither of these two sections are used in this simple model.
+
 Each type must also have an entry in the object_types.t4s file (the 's' stands for system). This is shown below:
 
 \begin{verbatim}
@@ -87,16 +99,7 @@ Each type must also have an entry in the object_types.t4s file (the 's' stands f
 \end{verbatim}
 
 
-
-\begin{verbatim}
-#type_id, tier, name
-1,1,hello
-2,1,world
-3,2,hello_world
-\end{verbatim}
-
-
-The type_id muse be unique. From this we can see type hello has an id of 1 and exists on tier 1 and world has an id of 2 and also exists on tier 1. The hello_world type has an id of 3 and exists on tier 2.
+The type_id must be unique. From this we can see type hello has an type_id of 1 and exists on tier 1 and world has an type_id of 2 and also exists on tier 1. The hello_world type has an type_id of 3 and exists on tier 2.
 
 \section{The Calculate Function}
 
@@ -113,7 +116,7 @@ int calculate_hello_world( obj_loc_t obj_loc, int id )
 }
 \end{verbatim}
 
-Trad4 pulls all the information from the sub objects into the scope of this function using macros. You need not concern yourself how these macros work, just think of then as variables which will do what you expect. The functions signature is boilerplate to allow the macros to work and should be ignored. Also ignore return value for now.
+Trad4 pulls all the information from the sub objects into the scope of this function using macros. You need not concern yourself how these macros work, just think of then as variables which will do what you expect. The functions signature is boilerplate to allow the macros to work and can be ignored. Also ignore the return value for now.
 
 In this case there's very little information in the sub objects, just their id. The macros used above are shown below (from gen/objects/hello_world_macros.h):
 
@@ -179,7 +182,7 @@ The .t4 files for y and z are similar to x's and not shown. In fact there's a mo
 
 \section{The Calculate Function}
 
-The calculate functions for a, b, c and d do nothing, as they consist entirely of a single static member which is just published to to the world at large without any processing. The calculate_x function is shown below:
+The calculate functions for a, b, c and d do nothing, as the types consist entirely of a single static member which is just published to to the world at large without any processing. The calculate_x function is shown below:
 
 \begin{verbatim}
 int calculate_x( obj_loc_t obj_loc, int id )
@@ -209,7 +212,7 @@ pub:
 
 Here you can see for each sub member two variables are provided, in a's case these are x_a which provides it's id, and a_out where a will publish it's static data. Also in the pub section is the int x_out, where the result of  \(a + b\) is published. So calculate_x takes the published a_out and b_out variables, adds them and publishes the result in x_out.
 
-The calculate functions for y is very similar to that of x, but z's includes some debug:
+The calculate functions for y is very similar to that of x, but z's includes some output:
 
 \begin{verbatim}
 int calculate_z( obj_loc_t obj_loc, int id )
@@ -225,11 +228,11 @@ int calculate_z( obj_loc_t obj_loc, int id )
 \section{The Data}
 \label{sec:The Data}
 
-In the first example hello_world we ignored the database. This is a server-less sqlite db, the structure of which is generated for you by the precompiler. At this stage we also need to distinguish between objects and types.
+In the first example hello_world we ignored the database to keep things simple, but we need to introduce it now. Trad4 uses sqlite - a serverless database written in C. All the tables you need (and some of the data) are generated for you by the precompiler, but you need to provide the data for. 
 
-Types are the trad4 types as described in their .t4 files and calculate function. Objects are the running, instantiated types, described in the database. This discussion is confused by the fact that in this app and hello_world, each type has a single instantiate object, but this will become clearer later as we have multiple objects of particular types.
+At this stage we also need to distinguish between objects and types. Types are the trad4 types as described in their .t4 files and calculate function. Objects are the running, instantiated types, described in the database. This discussion is confused by the fact that in this application and in hello_world, each type has a single instantiated object with type_id=id. This will become clearer later as we have multiple objects of particular types as in bond_risk below.
 
-The main table int the database is the object table, which every object has an entry in. This table is shown below:
+The main table in the database is the object table, in which every object has an entry. This table is shown below:
  
 \begin{verbatim}
 create table object (
@@ -242,7 +245,7 @@ create table object (
 );
 \end{verbatim}
 
-The id is the unique id of this object. The type_id gives the type of the object, as described in the object_types.t4s file described above. The tier gives the tier this object exists on, as objects of the same type can exist on different tiers in certain circumstances as discussed below (IoI). The name field holds the name of the object which we pressed into service in hello_world. The log_level controls the level of logging the object does, and need_reload controls whether of not the object needs to be reloaded when the application receives a reload signal (more on this later).
+The id is the unique id of this object. The type_id gives the type of the object, as described in the object_types.t4s file described above. The tier gives the tier this object exists on, as objects of the same type can exist on different tiers in certain circumstances. The name field holds the name of the object which we pressed into service in hello_world. The log_level controls the level of logging the object does, and need_reload controls whether of not the object needs to be reloaded when the application receives a reload signal (more on this later).
 
 As well as the object table, each type has one or more type-specific tables. In simple_maths this is just one table per type. Below is the table for a (from gen/object/sql):
 
@@ -426,21 +429,23 @@ The first type on T1 is ir_curve. This contains information about the expected f
 
 \subsection{T2: bond}
 
-The second type on T2 is bond. A bond is a financial instrument that you buy for a certain price, and pays you fixed payments or coupons at a certain rate until it matures (say 20 years). Because it pays you money at a fixed rate (say 3\% per year), it will become more or less valuable depending on the current and expected future value of interest rates. A bond that pays 3\% will have a higher price when interest rates are at 1\% then when they are at 5\%.
+The second type on T2 is bond. A bond is a financial instrument that you buy for a certain price, and pays you fixed payments or coupons at a certain rate until it matures (say 20 years). Because it pays you money at a fixed rate (say 3\% per year), it will become more or less valuable depending on the current and expected future value of interest rates. A bond that pays 3\% when interest rates are 3% will be worth 100, but it will have a higher price when interest rates are at 1\% (say 102.8) then when they are at 5\% (say 97.8).
+
+TODO: Real data from worked_example.
 
 \subsection{T3: outright_trade}
 
-The last type on T3 is outright_trade. This trade captures value of the purchase of a bond at a particular time. If you buy a bond with a price of £100 today, and the bond price rises in the future because interest rates have fallen, the present value (pv) of that trade increases. If you sell the bond at that future time you stand to make a profit. This profit or loss (pnl) is calculated by the trade based on the original price of the bond and the bond's current published price.
+The last type on T3 is outright_trade. This trade captures value of the purchase of a bond at a particular time. If you buy a bond with a price of £100 today, and the bond price rises in the future because interest rates fall, the present value (pv) of that trade increases. If you sell the bond at that future time you stand to make a profit. This profit or loss (pnl) is calculated by the original price of the bond and the bond's current published price.
 
-\subsection{Risk: dv10}
+\subsection{Risk: pv01}
 
-In addition to bond's price and outright_trade's pv and pnl, there are other risk measures we can produce for these types, and in this example we're going to focus on s pv01. The pv01 of a bond is the amount the price will change given a small shift - 1 basis point (bp - 100th of a percent) - in interest rates. If a bond has a high pv01 it's price is likely to be very sensitive to interest rate movements and be inherently more risky. A bond with a low pv01 will be less sensitive to interest rates. 
+In addition to bond's price and outright_trade's pv and pnl, there are other risk measures we can produce for these types, and in this example we're going to focus on is pv01. The pv01 of a bond is the amount the price or present value (pv) will change given a small shift - 1 basis point (bp - 100th of a percent) - in interest rates. If a bond has a high pv01 it's price is likely to be very sensitive to interest rate movements and be inherently more risky. A bond with a low pv01 will be less sensitive to interest rates. 
 
-Likewise an outright_trade on a bond with a high pv01 will itself be sensitive to the volatility of the bond, so it will have an indirect sensitivity to interest rates. For an outright_trade we're concerned about the variability of the trade's pv, so the risk measure is known as pv01.
+Likewise an outright_trade on a bond with a high pv01 will itself be sensitive to the volatility of the bond, so it will have an indirect sensitivity to interest rates.
 
-The way pv01 is calculate is that the ir_curve is bumped or perturbed by 1bp and the bond is priced against that perturbed curve. Then then original ir_curve is bumped by -1bp and again the bond is priced. The difference between these two prices is the dv10.
+The way pv01 is calculated is that the ir_curve is bumped or perturbed up by 1bp and the bond is priced against that perturbed curve. Then then original ir_curve is bumped down by 1bp and again the bond is priced. The difference between these two prices is the pv01.
 
-From the perspective of the trad4 architecture this is quite easy to achieve: We just have the ir_curve type also produce bootstrapped curve perturbed up and down by 1bp. Then bond can read the bumped and un-bumped forward rates directly from he ir_curve objects. 
+From the perspective of the trad4 architecture this is quite easy to achieve: We just have the ir_curve type also produce bootstrapped curves perturbed up and down by 1bp. Then bond can read the bumped and un-bumped forward rates directly from the ir_curve objects. 
 
 That's the bulk of the finance bit over for now. We can now discuss the t4 files.
 
@@ -452,23 +457,25 @@ The t4s files are the trad4 system files that you supply as you need the relevan
 
 \subsection{constants.t4s}
 
-The constants.t4s file allows you to define your own constants that will be in scope in all calculate functions. Below, a simplified version of bond_risk's constants.t4s file:
+The constants.t4s file allows you to define your own constants that will be in scope in all calculate functions. Below, bond_risk's constants.t4s file:
 
 
 \begin{verbatim}
 TODAY = 40403            # 13/08/2010
 END_DATE = 47708         # 13/08/2030
 
-NUM_DAYS = END_DATE - TODAY
+NUM_FORWARD_DAYS = END_DATE - TODAY
 
 NUM_INPUT_RATES = 10
+
+YEAR_BASIS = 365.25
 \end{verbatim}
 
-This describes the start and end dates covered by this model, and the number of forward dates are calculated from that data. Also the number of input_rates is set here.
+This describes the start and end dates covered by this model, and the number of forward dates are calculated from that data. Also the number of input_rates is set here, as is the year basis which describes how years are calculated.
 
 \subsection{enums.t4s}
 
-You can define your own enums to use in the t4 files in src/enums.t4s. There's only one enum used in bond_risk, used to indicate the direction of the trade:
+You can define your own enums to use in the t4 files in src/enums.t4s. There's only one enum used in bond_risk, used to indicate the direction of a trade:
 
 \begin{verbatim}
 buy_sell_enum
@@ -495,13 +502,13 @@ rate
     date asof
 \end{verbatim}
 
-Given the above definitions, we can now tackle bond_risk's t4 files.
+Given the above definitions, we can now tackle bond_risk's t4 files. We will look at each type in turn.
 
-\section{The t4 files}
+\section{ir_curve}
+
+\subsection{The t4 files}
 
 The t4 files are divided into three different sections (all of them optional) - there's the sub section, which lists the other types to which this type subscribes, the static section which is driven by the object's database tables, and the pub section where the results of the calculations using it's static and the pub and static sections of the objects to which it subscribes. These will be discussed in more detail below.
-
-\subsection{ir_curve}
 
 \begin{verbatim}
 static
@@ -514,12 +521,21 @@ pub
     double discount_rate_m01[NUM_FORWARD_DAYS]
 \end{verbatim}
 
-
 \subsubsection{The static section}
 
 The static section is populated from the object's database tables. This data is loaded when the object starts, and may be reloaded at run-time. The static section is published to the rest of the world, but it's not touched by the calculate function.
 
 In this section above we can just see the input_rates, which are an array of rates - the structure defined above - of length NUM_INPUT_RATES as defined in constants.. This is an input to our model, as we're going to move interest rates up and down to see how our bond's and trade's price and risk respond. 
+
+\subsubsection{The pub section}
+
+The pub section is where the results of the object's calculate function are published to the rest of the world. The variables in this section are zeroed when the object starts, and are used as intermediate and final results in the calculate function. If you add a variable to the pub section you will not need to modify the database.
+
+In this section we have four arrays of doubles of length NUM_FORWARD_DAYS. The interest_rate_interpol array is used to store the interpolated input_rates. The other three arrays store the discount_rate - calculated form the interpolated input_rates, and the discount_rate perturbed up and down by one basis point ( _p01 and _m01 respectively). This will be used by other objects to calculate their risk as described below.
+
+\subsection{The calculate function}
+
+\subsubsection{The static section}
 
 This static data is available in the calculate function using the provided macros:
 
@@ -587,11 +603,60 @@ Given NUM_FORWARD_DAYS = END_DATE - TODAY, you can use these macros in your calc
     }
 \end{verbatim}
 
+\section{bond}
+
+\subsection{The t4 files}
 
 
-\subsection{bond}
+\begin{verbatim}
+sub
+    ir_curve ir_curve
 
-\subsection{outright_trade}
+static
+    int start_date
+    int maturity_date
+    int coupons_per_year
+    double coupon
+
+pub
+    double price
+    double pv01
+\end{verbatim}
+
+\subsubsection{The sub section}
+
+In the sub section, we can see that bond subscribes to an ir_curve.
+
+\subsubsection{The static section}
+
+In the static section we can see the static data that makes up a simple bond. They have a start_date, the date the bond was issued and is some time in the past. They have a maturity_date when the bond matures - ceases paying out and pays back the 100 you could have bought for at par. The coupons_per_year member describes how often the bond pays, so coupons_per_year=1 pays out once a year and coupons_per_year=4 pays out every quarter. Lastly there's the coupon, which is the rate at which it pays each coupon (e.g. 3% pa).
+
+\subsubsection{The pub section}
+
+The pub section is where the results of bond's calculate function are stored and published. There is the bond's price, calculated form the bond's static and ir_curve's pub section, and pv01 which uses the _p01 and _m01 sections of ir_curve.
+
+\subsection{The calculate function}
+
+\subsubsection{The sub section}
+
+The sub macros available in bond's calculate function pull all the pub and static sections of ir_curve into the scope of the function (from gen/objects/bond_macros.h):
+
+\begin{verbatim}
+sub:
+    id bond_ir_curve
+    rate ir_curve_input_rates[NUM_INPUT_RATES]
+    double ir_curve_input_rates_value( NUM_INPUT_RATES )
+    date ir_curve_input_rates_asof( NUM_INPUT_RATES )
+    double ir_curve_interest_rate_interpol[NUM_FORWARD_DAYS]
+    double ir_curve_discount_rate[NUM_FORWARD_DAYS]
+    double ir_curve_discount_rate_p01[NUM_FORWARD_DAYS]
+    double ir_curve_discount_rate_m01[NUM_FORWARD_DAYS]
+\end{verbatim}
+
+We can use these in the calculate function as follows:
+
+
+\begin{verbatim}
 
 
 
@@ -599,6 +664,21 @@ Given NUM_FORWARD_DAYS = END_DATE - TODAY, you can use these macros in your calc
 
 
 
+
+
+
+
+
+
+
+
+\end{verbatim}
+
+\subsubsection{The static section}
+
+\subsubsection{The pub section}
+
+\section{outright_trade}
 
 
 
