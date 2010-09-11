@@ -429,7 +429,7 @@ The first type on T1 is ir_curve. This contains information about the expected f
 
 \subsection{T2: bond}
 
-The second type on T2 is bond. A bond is a financial instrument that you buy for a certain price, and pays you fixed payments or coupons at a certain rate until it matures (say 20 years). Because it pays you money at a fixed rate (say 3\% per year), it will become more or less valuable depending on the current and expected future value of interest rates. A bond that pays 3\% when interest rates are 3% will be worth 100, but it will have a higher price when interest rates are at 1\% (say 102.8) then when they are at 5\% (say 97.8).
+The second type on T2 is bond. A bond is a financial instrument that you buy for a certain price, and pays you fixed payments or coupons at a certain rate until it matures (say 20 years). Because it pays you money at a fixed rate (say 3\% per year), it will become more or less valuable depending on the current and expected future value of interest rates. A bond that pays 3\% when interest rates are 3% will be worth 100 (they are bought and sold in lots of 100), but it will have a higher price when interest rates are at 1\% (say 102.8) then when they are at 5\% (say 97.8) because they pay out more than that same £100 would in the bank (at 3%).
 
 TODO: Real data from worked_example.
 
@@ -607,14 +607,13 @@ Given NUM_FORWARD_DAYS = END_DATE - TODAY, you can use these macros in your calc
 
 \subsection{The t4 files}
 
-
 \begin{verbatim}
 sub
     ir_curve ir_curve
 
 static
-    int start_date
-    int maturity_date
+    date start_date
+    date maturity_date
     int coupons_per_year
     double coupon
 
