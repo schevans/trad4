@@ -63,10 +63,6 @@ int calculate_body( obj_loc_t obj_loc, int id )
         << ax << "|"
         << ay << endl;
 
-
-if ( body_counter >= MAX_RUNS-1 )
-    exit(0);
-
     return 1;
 }
 
