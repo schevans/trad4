@@ -8,6 +8,7 @@ static
     velocity_struct initial_velocity
 
 pub
-    position_struct position
-    velocity_struct velocity
+    int counter
+    position_struct position[MAX_RUNS]
+    velocity_struct velocity[MAX_RUNS]
 

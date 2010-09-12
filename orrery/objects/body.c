@@ -14,43 +14,58 @@ using namespace std;
 
 int calculate_body( obj_loc_t obj_loc, int id )
 {
+    double r(0.0);
+    double a(0.0);
+    double ax(0.0);
+    double ay(0.0);
+
     if ( !object_init(id) )
     {
-        body_position_x = body_initial_position_x;
-        body_position_y = body_initial_position_y;
+        body_counter = 0;
 
-        body_velocity_x = body_initial_velocity_x;
-        body_velocity_y = body_initial_velocity_y;
+        body_position_x( body_counter ) = body_initial_position_x;
+        body_position_y( body_counter ) = body_initial_position_y;
+
+        body_velocity_x( body_counter ) = body_initial_velocity_x;
+        body_velocity_y( body_counter ) = body_initial_velocity_y;
     }
     else
     {
+        body_counter++;
+
         for ( int i=0 ; i < NUM_OTHER_BODIES ; i++ )
         {
-            double r = sqrt( pow( (body_position_x-other_bodies_position_x(i)), 2 ) + pow( (body_position_y-other_bodies_position_y(i)), 2 ));
+            r = sqrt( pow(( body_position_x( body_counter-1 ) - other_bodies_position_x( i, body_counter-1 )), 2 ) + pow(( body_position_y( body_counter-1 ) - other_bodies_position_y( i, body_counter-1 )), 2 ));
 
-            double a = ( G * other_bodies_mass(i) ) / pow( r, 2 );
+            a = ( G * other_bodies_mass(i) ) / pow( r, 2 );
 
-            double ax = (( body_position_x - other_bodies_position_x(i) ) / r ) * -a;
-            double ay = (( body_position_y - other_bodies_position_y(i) ) / r ) * -a;
+            ax = (( body_position_x( body_counter-1 )  - other_bodies_position_x( i, body_counter-1 ) ) / r ) * -a;
+            ay = (( body_position_y( body_counter-1 )  - other_bodies_position_y( i, body_counter-1 ) ) / r ) * -a;
 
-            body_velocity_x = body_velocity_x + ( ax * DT );
-            body_velocity_y = body_velocity_y + ( ay * DT );
+            body_velocity_x( body_counter ) = body_velocity_x( body_counter-1 ) + ( ax * DT );
+            body_velocity_y( body_counter ) = body_velocity_y( body_counter-1 ) + ( ay * DT );
 
-            body_position_x = body_position_x + ( body_velocity_x * DT );
-            body_position_y = body_position_y + ( body_velocity_y * DT );
+            body_position_x( body_counter ) = body_position_x( body_counter-1 ) + ( body_velocity_x( body_counter-1 ) * DT );
+            body_position_y( body_counter ) = body_position_y( body_counter-1 ) + ( body_velocity_y( body_counter-1 ) * DT );
 
-            cout << setprecision(20) 
-                << object_name(id) << "|"
-                << body_position_x << "|"
-                << body_position_y << "|"
-                << body_velocity_x << "|"
-                << body_velocity_y << "|"
-                << r << "|"
-                << a << "|"
-                << ax << "|"
-                << ay << endl;
         }
     }
+
+    cout << setprecision(20) 
+        << object_name(id) << "|"
+        << body_counter << "|"
+        << body_position_x( body_counter ) << "|"
+        << body_position_y( body_counter ) << "|"
+        << body_velocity_x( body_counter ) << "|"
+        << body_velocity_y( body_counter ) << "|"
+        << r << "|"
+        << a << "|"
+        << ax << "|"
+        << ay << endl;
+
+
+if ( body_counter >= MAX_RUNS-1 )
+    exit(0);
 
     return 1;
 }
