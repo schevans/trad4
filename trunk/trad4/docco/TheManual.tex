@@ -447,7 +447,14 @@ The way pv01 is calculated is that the ir_curve is bumped or perturbed up by 1bp
 
 From the perspective of the trad4 architecture this is quite easy to achieve: We just have the ir_curve type also produce bootstrapped curves perturbed up and down by 1bp. Then bond can read the bumped and un-bumped forward rates directly from the ir_curve objects. 
 
-That's the bulk of the finance bit over for now. We can now discuss the t4 files.
+\section{The Concrete Graph}
+
+In Section ~\ref{sec:The Data} the distinction between types and objects was made. This becomes clearer now as in this data set we will have two ir_curves, five bonds and nine outright_trades. These objects - instantiated types - are shown on the concrete graph represented by ovals containing the object name. This is shown below:
+
+\includegraphics[scale=0.3]{bondriskconcretesmallset.png}
+
+From this we can see the two ir_curves in two different currencies LIBOR.USD and LIBOR.GBP on T1. Then we can see the five bonds on T2, two of which were issued in USD (US01 and US02) which subscribe to LIBOR.USD, and three of which were issued in GBP which subscribe to LIBOR.GBP. Lastly we have the nine outright_trades (OT01 etc.) which subscribe to various bonds.
+
 
 \section{The t4s files}
 
@@ -657,37 +664,130 @@ We can use these in the calculate function as follows:
 
 \begin{verbatim}
 
-
-
-
-
-
-
-
-
-
-
-
-
+    // Get the discount_rate from ir_curve
+    double discount_rate = ir_curve_discount_rate[ir_offset];
 
 
 \end{verbatim}
 
 \subsubsection{The static section}
 
+The macros for the static section look like this:
+
+
+\begin{verbatim}
+
+static:
+    int bond_start_date
+    int bond_maturity_date
+    int bond_coupons_per_year
+    double bond_coupon
+
+\end{verbatim}
+
+These can be used in the calculate function as follows:
+
+\begin{verbatim}
+
+    double coupon_rate_per_period = bond_coupon / bond_coupons_per_year;
+
+\end{verbatim}
+
+
 \subsubsection{The pub section}
+
+The pub section macros are as follows:
+
+\begin{verbatim}
+pub:
+    double bond_price
+    double bond_pv01
+
+\end{verbatim}
+
+Which can be assigned to as follows:
+
+\begin{verbatim}
+    // Use the discount_rate to discount the future coupon payments and sum
+    bond_price = bond_price + ( 100.0 * coupon_rate_per_period * discount_rate );
+\end{verbatim}
 
 \section{outright_trade}
 
+The outright_trade's t4 file is as follows:
 
 
-\section{The Concrete Graph}
+\begin{verbatim}
+sub
+    bond bond
 
-In Section ~\ref{sec:The Data} the distinction between types and objects was made. This becomes clearer now as in this data set we will have two ir_curves, five bonds and nine outright_trades. These objects - instantiated types - are shown on the concrete graph represented by ovals containing the object name. This is shown below:
+static
+    double trade_price
+    int quantity
+    int trade_date
 
-\includegraphics[scale=0.3]{bondriskconcretesmallset.png}
+pub
+    double pv
+    double pv_01
+    double pnl
+\end{verbatim}
 
-From this we can see the two ir_curves in two different currencies LIBOR.USD and LIBOR.GBP on T1. Then we can see the five bonds on T2, two of which were issued in USD (US01 and US02) which subscribe to LIBOR.USD, and three of which were issued in GBP which subscribe to LIBOR.GBP. Lastly we have the nine outright_trades (OT01 etc.) which subscribe to various bonds.
+From this we can see that outright_trade subscribes to a bond. In the static section we can see it has a trade_price - the price at which these bonds were purchased, the quantity of bonds purchased and the date of the transaction.
+
+The macros look like this:
+
+\begin{verbatim}
+sub:
+    id outright_trade_bond
+    date bond_start_date
+    date bond_maturity_date
+    int bond_coupons_per_year
+    double bond_coupon
+    double bond_price
+    double bond_pv01
+
+static:
+    double outright_trade_trade_price
+    int outright_trade_book
+    int outright_trade_quantity
+    date outright_trade_trade_date
+
+pub:
+    double outright_trade_pv
+    double outright_trade_pv_01
+    double outright_trade_pnl
+
+\end{verbatim}
+
+The calculate function for outright_trade is shown below in full.
+
+\begin{verbatim}
+int calculate_outright_trade( obj_loc_t obj_loc, int id )
+{
+    // Calculate the pv - the present value of the trade.
+    outright_trade_pv = ( outright_trade_quantity * bond_price );
+
+    // Calculate the pv01 - the pv's exposure to interest rate movements.
+    outright_trade_pv_01 = ( outright_trade_quantity * bond_pv01 );
+
+    // Calculate the pnl - the profit or loss we would make on the trade if we re-sold these bonds today.
+    outright_trade_pnl = outright_trade_pv - ( outright_trade_quantity * outright_trade_trade_price );
+
+    return 1;
+}
+\end{verbatim}
+
+
+\chapter{Extending bond_risk}
+
+
+
+
+
+
+
+
+
 
 
 
