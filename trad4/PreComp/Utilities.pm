@@ -304,12 +304,11 @@ sub LoadEnums() {
 
         chomp $line;
 
-        if ( !$line or $line =~ /#/ ) {
+        if ( !$line or $line =~ /#/ or $line =~ /^\s+$/ ) {
             next;
         }
 
-
-        if ( $line =~ /^[a-z]/ ) {
+        if ( $line =~ /^[a-zA-Z]/ ) {
 
             $enum = $line;
             next;
