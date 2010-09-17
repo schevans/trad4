@@ -10,7 +10,7 @@ static
     double trade_price
     int book
     int quantity
-    int trade_date
+    date trade_date
 
 pub
     double pv
