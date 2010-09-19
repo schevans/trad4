@@ -418,10 +418,9 @@ If fact in this example they don't as we're running is single threaded mode to k
 
 Now we're going to examine a real world example of the trad4 architecture from the world of finance - bond_risk. This is a model that calculates the risk on two financial instruments - bonds and outright trades - that depend on the expected future values of interest rates. This is explained in more detail below, but first, the abstract graph:
 
-
-
-
 \includegraphics[scale=0.5]{bondriskabstract1.png}
+
+Note that in this chapter we're looking at a simplified version of bond_risk, where we're ignoring the types fx_rate, repo_trade and book for now.
 
 \subsection{T1: ir_curve}
 
@@ -777,9 +776,21 @@ int calculate_outright_trade( obj_loc_t obj_loc, int id )
 }
 \end{verbatim}
 
+\section{Operation}
 
 \chapter{Extending bond_risk}
 
+We'll now introduce and three two new types to the model ­ fx_rate, repo_trades and books. Fx_rates will be 
+familiar to you but repo_trades may not be.
+
+A repo trade is a kind of secured loan, used by investments banks to raise cash. They are sitting on a pile of bonds they have bought, so they can lend these out in exchange for cash collateral which the banks then use for funding. So they have a start date, and end date and a rate at which interest is calculated on the cash. These trades can be cross­currency, meaning you can borrow in a different currency to the one the bond you're using as collateral was issued in. For this reason, the repo_trade must subscribe to the fx_rate. 
+
+Repo trades also need the bond price to calculate their margin, plus a discount rate curve with which to 
+calculate the mark­to­market profit and loss (mtm_pnl).
+
+Trades are grouped into books or portfolios, so all your US-issued bonds might be kept in a book called USBK and your UK-issued ones in a book called UKBK. These books aggregate your risk so you can see overall exposure to particular market force (e.g. US interest rates). There is a book type for each trade type, which gives outright_book and repo_book.
+
+Below, the abstract graph for the enhanced model:
 
 
 
@@ -792,8 +803,7 @@ int calculate_outright_trade( obj_loc_t obj_loc, int id )
 
 
 
-
-
+==> ccy_enum when discussing fx_rate
 
 
 
