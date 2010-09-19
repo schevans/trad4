@@ -2,3 +2,7 @@
 1,1,ir_curve
 2,2,bond
 3,3,outright_trade
+4,1,fx_rate
+5,3,repo_trade
+
+

@@ -4,3 +4,13 @@ buy_sell_enum
     BUY
     SELL
 
+ccy_enum
+    GBP
+    USD
+    EUR
+
+book_enum
+    GBPBK
+    USDBK
+    EURBK
+

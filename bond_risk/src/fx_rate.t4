@@ -2,6 +2,6 @@
 
 static
     double rate
-    int ccy1
-    int ccy2
+    ccy_enum ccy1
+    ccy_enum ccy2
 
