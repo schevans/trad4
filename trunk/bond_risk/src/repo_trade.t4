@@ -5,22 +5,23 @@
 
 sub
     bond bond
-    currency_curves currency_curves
+    ir_curve ir_curve
     fx_rate fx_rate
 
-pub
-    double mtm_pnl
-    double margin  
-
 static
-    double rate
-    int cash_ccy
-    int end_date
-    int book
-    int start_date
-    double cash
+    date start_date
+    date end_date
     int notional
+    double start_cash
+    double rate
+    ccy_enum cash_ccy
+    book_enum book
     buy_sell_enum buy_sell
+
+pub
+    double end_cash
+    double margin  
+    double mtm_pnl
 
 
 
