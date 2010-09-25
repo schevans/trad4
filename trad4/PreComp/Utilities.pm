@@ -1056,8 +1056,19 @@ sub Validate($$) {
 
                     if ( scalar( @{$master_hash->{$type}->{$section}->{order}} ) != scalar keys %{$master_hash->{$type}->{$section}->{data}} )
                     {
-                        print "Error: Type \'$type\' has duplicate variable names in the $section section: \'$var_name\'.\n";
-                        ExitOnError();
+                        my %found;
+                        my $check_var_name;
+
+                        foreach $check_var_name ( @{$master_hash->{$type}->{$section}->{order}} )
+                        {
+                            if ( exists $found{$check_var_name } )
+                            {
+                                print "Error: Type \'$type\' has duplicate variable names in the $section section: \'$check_var_name\'.\n";
+                                ExitOnError();
+                            }
+                    
+                            $found{$check_var_name}++;
+                        }
                     }
                 }
             }
