@@ -558,7 +558,6 @@ static:
 Given NUM_INPUT_RATES=10, you can use these macros to access the static data in your calculate function as follows:
 
 \begin{verbatim}
-
     // Get a copy of the first rate
     rate start_rate = ir_curve_input_rates[0];
     // Get a copy of the last rate
@@ -813,8 +812,229 @@ Below, the abstract graph for the enhanced model:
 \label{sec:Language Features}
 
 
+In this section we'll be discussing some of the features of trad4 in detail. This is intended to serve a reference, but a read through is suggested.
+
+\section{Constants}
+
+Any application-wide constants can be defined in src/constants.t4s. Anything to the right of a hash is considered a comment and discarded. Constants can also be defined in terms of other constants, and scientific notation is supported. Below, some examples from various trade applications.
+
+\begin{verbatim}
+YEAR_BASIS = 365.25     # Number of days in a year
+
+NYQUIST_FREQUENCY = SAMPLE_RATE / 2.0
+
+NUM_BODIES=2
+NUM_OTHER_BODIES=NUM_BODIES-1
+
+G=6.673e-11
+
+\end{verbatim}
+
+Be aware that these will be evaluated by the precompiler. If they are not completely described, the precompiler will throw an error.
+
+\section{Enums}
 
 
+Enums can be defined in src/enums.t4s, e.g.:
+\begin{verbatim}
+buy_sell_enum
+    BUY
+    SELL
+\begin{verbatim}
+
+These will then be available as types within your .t4 file, e.g.:
+\begin{verbatim}
+static
+    buy_sell_enum buy_sell
+\end{verbatim}
+
+
+And then dereferenced in your calculate function with the usual notation:
+\begin{verbatim}
+    if ( repo_trade_buy_sell == BUY ) 
+\end{verbatim}
+
+These will be represented in the database as integers.
+
+\section{Aliases}
+
+Aliases are just typedefs, and can be defined in src/aliases.t4,s e.g.:
+
+\begin{verbatim}
+boolean = int
+date = long int
+\begin{verbatim}
+
+These will then be available as types within your .t4 file, e.g.:
+
+\begin{verbatim}
+static
+    date start_date
+\end{verbatim}
+
+
+
+
+
+\section{Arrays}
+
+Arrays in the t4 file are treated differently depending on whether they appear in the pub, static (which are both treated the same) or sub sections. 
+
+\subsection{Static and pub Arrays}
+
+Arrays in the static and pub section work as you'd expect, using any constants you defined above. E.g., in your .t4 file (from test_app/src/tier1.t4):
+
+\begin{verbatim}
+static
+    double double_array[10]
+\end{verbatim}
+
+The macros for these look as you'd expect:
+
+\begin{verbatim}
+static:
+    double tier1_double_array[10]
+\end{verbatim}
+
+These can be used in your calculate function as follows:
+
+\begin{verbatim}
+    cout << tier1_double_array[0] << endl;   // Output first double
+    cout << tier1_double_array[9] << endl;   // Output last double
+\end{verbatim}
+
+Any static arrays also need to persist in the database, and again the table structure is generated for you 
+by trad4. The database table will look like:
+
+\begin{verbatim}
+create table tier1_double_array (
+    id int,
+    col0 int,
+    col1 int,
+    col2 int,
+    col3 int,
+    col4 int,
+    col5 int,
+    col6 int,
+    col7 int,
+    col8 int,
+    col9 int
+);
+\end{verbatim}
+
+So in this case the data for double_array is laid out in columns, so our data looks like this:
+
+
+\begin {tabular} {| l | l | l | l | l | l | l | l | l | l | l |}
+\hline
+id & col0 & col1 & col2 & col3 & col4 & col5 & col6 & col7 & col8 & col9 \\
+\hline
+1 & 0.14 & 1.14 & 2.14 & 3.14 & 4.14 & 5.14 & 6.14 & 7.14 & 8.14 & 9.14 \\
+\hline
+\end {tabular}
+
+
+\subsection{Sub Arrays}
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{Structures}
+
+Structures can be defined in src/structures.t4s:
+
+\begin{verbatim}
+rate
+    double value
+    int asof
+\end{verbatim}
+
+These will then be available as types within your .t4 file, e.g.:
+
+\begin{verbatim}
+static
+    rate ir_rate
+\end{verbatim}
+
+These structures are expanded in the macros:
+
+\begin{verbatim}
+static:
+    rate ir_curve_input_rates[NUM_INPUT_RATES]
+    double ir_curve_input_rates_value( NUM_INPUT_RATES )
+    date ir_curve_input_rates_asof( NUM_INPUT_RATES )
+\end{verbatim}
+
+So ir_curve_input_rates is an array of rate structures, but ir_curve_input_rates_value and ir_curve_input_rates_asof are function-like macros and return the actual rate or date the rate you're interested in, given it's offset. For example:
+
+\begin{verbatim}
+    // Get a copy of the first rate
+    rate start_rate = ir_curve_input_rates[0];
+
+    // Output the asof date and rate of the start_rate
+    cout << "start_rate.asof: " << start_rate.asof << endl;
+
+    // Loop thought the input rates, outputting the rate and date.
+    for ( int i = 0 ; i < NUM_INPUT_RATES ; i++ )
+    {
+        cout << ir_curve_input_rates_asof( i ) << endl;
+        cout << ir_curve_input_rates_value( i ) << endl;
+    }
+\end{verbatim}
+
+
+Static structures are stored on their own DB tables, so that, assuming that the rate structure above is used in object ir_curve.t4, the associated database table would look like:
+
+\begin{verbatim}
+create table ir_curve_input_rates (
+    id int,
+    ord1 int,
+    value float,
+    asof int
+);
+\end{verbatim}
+
+The id is the unique id of the object that these input_rates refer to. The ord1 column is the index of the rate, so that ord1=0 would be the first rate and ord1=NUM_INPUT_RATES-1 the last. The value and asof columns hold the actual data. So our data might look like:
+
+\begin {tabular} {| l | l | l | l |}
+\hline
+id & ord1 & value & asof \\
+\hline
+1 & 0 & 0.024 & 40403 \\
+\hline
+1 & 1 & 0.025 & 40590 \\
+\hline
+1 & 2 & 0.026 & 40773 \\
+\hline
+1 & 3 & 0.025 & 41138 \\
+\hline
+1 & 4 & 0.025 & 41868 \\
+\hline
+1 & 5 & 0.024 & 42598 \\
+\hline
+1 & 6 & 0.023 & 43328 \\
+\hline
+1 & 7 & 0.023 & 44058 \\
+\hline
+1 & 8 & 0.022 & 45883 \\
+\hline
+1 & 9 & 0.022 & 47708 \\
+\hline
+\end {tabular}
+
+See the next chapter for details on how arrays of structures and nested structures are handled.
+
+
+\chapter{Further Language Features}
 
 
 
