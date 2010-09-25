@@ -16,27 +16,13 @@ int calculate_tier1( obj_loc_t obj_loc, int id )
     T4_TEST( tier1_struct_scalar_rates[ 2 ], 4.2 );
     T4_TEST( tier1_struct_scalar_dates[ 0 ], 5000 );
     T4_TEST( tier1_struct_scalar_dates[ 2 ], 5002 );
-    T4_TEST( tier1_double_array[ 0 ], 1.14 );
-    T4_TEST( tier1_double_array[ 1 ], 2.14 );
-    T4_TEST( tier1_double_array[ 2 ], 3.14 );
-    T4_TEST( tier1_double_array[ 3 ], 4.14 );
-    T4_TEST( tier1_double_array[ 4 ], 5.14 );
+    T4_TEST( tier1_double_array[ 0 ], 0.14 );
+    T4_TEST( tier1_double_array[ 1 ], 1.14 );
+    T4_TEST( tier1_double_array[ 2 ], 2.14 );
+    T4_TEST( tier1_double_array[ 3 ], 3.14 );
+    T4_TEST( tier1_double_array[ 4 ], 4.14 );
 
     tier1_int_out = tier1_struct_scalar_dates[ 0 ] + tier1_struct_scalar_dates[ 1 ] + tier1_struct_scalar_dates[ 2 ];
-/*
-cout << "tier1_double_array( 3 ):" << tier1_double_array( 3 ) << endl;
-cout << "tier1_struct_scalar_rates( 0 ):" << tier1_struct_scalar_rates( 0 ) << endl;
-cout << "tier1_struct_scalar_dates( 0 ):" << tier1_struct_scalar_dates( 0 ) << endl;
-cout << "tier1:" << endl;
-cout << "tier1_int1:" << tier1_int1 << endl;
-cout << "tier1_int2:" << tier1_int2 << endl;
-//cout << "tier1_struct_scalar:" << tier1_struct_scalar << endl;
-cout << "tier1_int_out:" << tier1_int_out << endl;
-cout << "tier1_bool_array( index_20 ):" << tier1_bool_array( index_20 ) << endl;
-//cout << "tier1_struct_vec( index_4 ):" << tier1_struct_vec( index_4 ) << endl;
-cout << "tier1_struct_vec_x( index_4 ):" << tier1_struct_vec_x( index_4 ) << endl;
-cout << "tier1_struct_vec_y( index_4 ):" << tier1_struct_vec_y( index_4 ) << endl;
-*/
 
     return 1;
 }

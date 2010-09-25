@@ -20,7 +20,7 @@ int calculate_tier2( obj_loc_t obj_loc, int id )
     T4_TEST( multi_struct_images_row_col( 0, 8, 8), 0 );
     T4_TEST( multi_struct_images_row_col( 2, 8, 8), 1 );
 
-    T4_TEST( tier1_double_array[ 2 ], 3.14 );
+    T4_TEST( tier1_double_array[ 2 ], 2.14 );
     T4_TEST( tier1_struct_scalar_dates[ 2 ], 5002 );
     T4_TEST( tier1_int_out, 15003 );
 
