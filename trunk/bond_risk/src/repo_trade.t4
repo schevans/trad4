@@ -7,7 +7,6 @@ sub
     calendar calendar
     bond bond
     ir_curve ir_curve
-    fx_rate fx_rate
 
 static
     date start_date
