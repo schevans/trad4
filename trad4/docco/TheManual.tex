@@ -844,16 +844,16 @@ In this section we'll be discussing some of the features of trad4 in detail. Thi
 
 \section{Constants}
 
-Any application-wide constants can be defined in src/constants.t4s. Anything to the right of a hash is considered a comment and discarded. Constants can also be defined in terms of other constants, and scientific notation is supported. Below, some examples from various trade applications.
+Any application-wide constants can be defined in src/constants.t4s. Anything to the right of a hash is considered a comment and discarded. Constants can also be defined in terms of other constants, and scientific notation is supported. Below, some examples from various trad4 applications.
 
 \begin{verbatim}
 YEAR_BASIS = 365.25     # Number of days in a year
 
+SAMPLE_RATE=44100
 NYQUIST_FREQUENCY = SAMPLE_RATE / 2.0
 
 NUM_BODIES=2
 NUM_OTHER_BODIES=NUM_BODIES-1
-
 G=6.673e-11
 
 \end{verbatim}
