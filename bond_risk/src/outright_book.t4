@@ -1,0 +1,11 @@
+
+
+sub
+    outright_trade outright_trades[MAX_TRADES_PER_BOOK]
+
+pub
+    double pv
+    double pv_01
+    double pnl
+
+
