@@ -31,6 +31,8 @@ Features:
 \item 3rd-party library integration (restrictions apply: you have to keep them on the stack)
 \end{itemize}
 
+There are three applications discussed in this document: hello_world, simple_maths and bond_risk. There are other applications available and written up incline.
+
 Time for an example.
 
 \chapter{Example: Hello world!}
@@ -419,11 +421,13 @@ If fact in this example they don't as we're running is single threaded mode to k
 
 \section{Introduction}
 
-Now we're going to examine a real world example of the trad4 architecture from the world of finance - bond_risk. This is a model that calculates the risk on two financial instruments - bonds and outright trades - that depend on the expected future values of interest rates. This is explained in more detail below, but first, the abstract graph:
+Now we're going to examine a real world example of the trad4 architecture from the world of finance - bond_risk. This is a model that calculates the risk on two financial instruments - bonds and outright trades - that depend on the expected future values of interest rates. In this first chapter we'll be examining a cut-down version of the final app. In the next chapter we'll extend the model and examine how it handles under load.
 
-\includegraphics[scale=0.5]{bondriskabstract1.png}
+First, the abstract graph:
 
-Note that in this chapter we're looking at a simplified version of bond_risk, where we're ignoring the types fx_rate, repo_trade and book for now.
+\includegraphics[scale=0.5]{bondrisksimpleabstract.png}
+
+Note that in this chapter we're looking at a simplified version of bond_risk, where we're ignoring the types repo_trade and book for now. TODO - bond_risk_simple
 
 \subsection{T1: ir_curve}
 
@@ -453,7 +457,7 @@ From the perspective of the trad4 architecture this is quite easy to achieve: We
 
 In Section ~\ref{sec:The Data} the distinction between types and objects was made. This becomes clearer now as in this data set we will have two ir_curves, five bonds and nine outright_trades. These objects - instantiated types - are shown on the concrete graph represented by ovals containing the object name. This is shown below:
 
-\includegraphics[scale=0.3]{bondriskconcretesmallset.png}
+\includegraphics[scale=0.3]{bondrisksimpleconcrete.png}
 
 From this we can see the two ir_curves in two different currencies LIBOR.USD and LIBOR.GBP on T1. Then we can see the five bonds on T2, two of which were issued in USD (US01 and US02) which subscribe to LIBOR.USD, and three of which were issued in GBP which subscribe to LIBOR.GBP. Lastly we have the nine outright_trades (OT01 etc.) which subscribe to various bonds.
 
@@ -782,15 +786,19 @@ int calculate_outright_trade( obj_loc_t obj_loc, int id )
 
 \chapter{Extending bond_risk}
 
-We'll now introduce and three two new types to the model - fx_rate, repo_trades and books. Fx_rates will be 
-familiar to you but repo_trades may not be.
+In this chapter we'll extent the model by introducing repo_trades, books and a calendar type.
 
-A repo trade is a kind of secured loan, used by investments banks to raise cash. They are sitting on a pile of bonds they have bought, so they can lend these out in exchange for cash collateral which the banks then use for funding. So they have a start date, and end date and a rate at which interest is calculated on the cash. These trades can be cross-currency, meaning you can borrow in a different currency to the one the bond you're using as collateral was issued in. For this reason, the repo_trade must subscribe to the fx_rate. 
+
+A repo trade is a kind of secured loan, used by investments banks to raise cash. They are sitting on a pile of bonds they have bought, so they can lend these out in exchange for cash collateral which the banks then use for funding. So they have a start date, and end date and a rate at which interest is calculated on the cash.
 
 Repo trades also need the bond price to calculate their margin, plus a discount rate curve with which to 
 calculate the mark-to-market profit and loss (mtm_pnl).
 
 Trades are grouped into books or portfolios, so all your US-issued bonds might be kept in a book called USBK and your UK-issued ones in a book called UKBK. These books aggregate your risk so you can see overall exposure to particular market force (e.g. US interest rates). There is a book type for each trade type, which gives outright_book and repo_book.
+
+TODO: Explain margin/mtm_pnl, but check other layouts.
+
+The calendar type replaces the hard-coded TODAY of bond_risk_simple, and it allows for the date to roll overnight form today to tomorrow. There is only one instantiated calendar object in the system.
 
 Below, the abstract graph for the enhanced model:
 
@@ -798,6 +806,9 @@ Below, the abstract graph for the enhanced model:
 
 
 
+\includegraphics[scale=0.5]{bondriskabstract.png} 
+
+TODO: Fix bondriskabstract.png.
 
 
 
@@ -805,7 +816,10 @@ Below, the abstract graph for the enhanced model:
 
 
 
-==> ccy_enum when discussing fx_rate
+
+
+
+
 
 
 \chapter{Language Features}
@@ -936,6 +950,7 @@ id & col0 & col1 & col2 & col3 & col4 & col5 & col6 & col7 & col8 & col9 \\
 
 \subsection{Sub Arrays}
 
+- Allowed to be null
 
 
 
@@ -1181,6 +1196,8 @@ Next, load the default data set:
 
 \section{Compile the application}
 
+Note that the default_set will only work reliably if you haven't written your calculate functions yet, as the function may de-reference the dummy data and fail. The default_set is there as a guide to setting up your own data, and a way of getting up and running quickly.
+
 To compile the application, just type make:
 
 \begin{verbatim}
@@ -1386,7 +1403,7 @@ Your first instinct might to be to run ten books on each box, just ensuring that
 
 Far better to arrange your data so that objects of the same type share a box with those it's poorly correlated to. One way you'd do this is, as you're working through the trades in a particular book, assign them each to a different box in turn. As you reach the tenth box just start again from box one. In this way you ensure all your sectors are spread evenly across multiple boxes.
 
-This approach does have one disadvantage in that you'll need to run all the ir_curves and fx_rates on every box, but as there are a small number of these (relative to the number of trades) this should not be a problem.
+This approach does have one disadvantage in that you'll need to run all the ir_curves on every box, but as there are a small number of these (relative to the number of trades) this should not be a problem.
 
 \section{Weekly rebalancing}
 
