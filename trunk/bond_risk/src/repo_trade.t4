@@ -4,6 +4,7 @@
 # This code is licenced under the BSD licence. For details see $INSTANCE_ROOT/LICENCE
 
 sub
+    calendar calendar
     bond bond
     ir_curve ir_curve
     fx_rate fx_rate

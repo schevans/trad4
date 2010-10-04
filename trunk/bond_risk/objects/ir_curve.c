@@ -20,11 +20,11 @@ int calculate_ir_curve( obj_loc_t obj_loc, int id )
     // Interpolate the IR first..
     for ( int indx = 0; indx < NUM_INPUT_RATES - 1 ; indx++)
     {
-        current_period_start = ir_curve_input_rates_asof(indx);
-        current_period_end = ir_curve_input_rates_asof(indx+1);
+        current_period_start = ir_curve_input_rates_days_forward(indx);
+        current_period_end = ir_curve_input_rates_days_forward(indx+1);
 
-        gradient = ((  ir_curve_input_rates_value(indx) -  ir_curve_input_rates_value(indx+1) ) / (  ir_curve_input_rates_asof(indx) -  ir_curve_input_rates_asof(indx+1) ) );
-        y_intercept = ir_curve_input_rates_value(indx) - gradient * ir_curve_input_rates_asof(indx);
+        gradient = ((  ir_curve_input_rates_value(indx) -  ir_curve_input_rates_value(indx+1) ) / (  ir_curve_input_rates_days_forward(indx) -  ir_curve_input_rates_days_forward(indx+1) ) );
+        y_intercept = ir_curve_input_rates_value(indx) - gradient * ir_curve_input_rates_days_forward(indx);
 
 /*
         cout << "current_period_start: " << current_period_start 
@@ -36,8 +36,8 @@ int calculate_ir_curve( obj_loc_t obj_loc, int id )
 */
         for ( int i = current_period_start ; i < current_period_end ; i++ )
         {
-            //cout << "\tDate " << i << " index  " << i - TODAY << " rate: " <<(  i*gradient + y_intercept ) << endl;
-            ir_curve_interest_rate_interpol[i - TODAY] = ( i*gradient + y_intercept );
+            //cout << "\tDate " << i << " index  " << i << " rate: " <<(  i*gradient + y_intercept ) << endl;
+            ir_curve_interest_rate_interpol[i] = ( i*gradient + y_intercept );
         }
 
     }

@@ -29,6 +29,10 @@ int calculate_repo_book( obj_loc_t obj_loc, int id )
     }    
 
 cout << "repo_book_mtm_pnl: " << repo_book_mtm_pnl << endl;
+cout << "repo_book_margin: " << repo_book_margin << endl;
+
+T4_TEST( repo_book_mtm_pnl, 252178.81790725165047 );
+T4_TEST( repo_book_margin, -3068.6838366012125334 );
 
     return 1;
 }

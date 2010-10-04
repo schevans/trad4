@@ -7,16 +7,17 @@ then
 fi
 
 ID=$1
-BUMPAGE=$2
+BUMP=$2
 
 TEMP_FILE=/tmp/`basename $0`.$$
 
-MY_SQL="update interest_rate_feed_data set rate = rate + $BUMPAGE where id = $ID;"
+echo $SQLITE
+
+MY_SQL="update ir_curve_input_rates set value = value + $BUMP where id = $ID; update object set need_reload=1 where id=$ID;"
 echo $MY_SQL > $TEMP_FILE
-RESULT=`mysql -u root trad4 < $TEMP_FILE`
+RESULT=`$SQLITE $APP_DB < $TEMP_FILE`
 
-
-$INSTANCE_ROOT/misc/load_interest_rate $ID
+send_reload.sh
 
 echo "Rates bumped"
 

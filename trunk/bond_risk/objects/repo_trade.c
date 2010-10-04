@@ -19,7 +19,7 @@ int calculate_repo_trade( obj_loc_t obj_loc, int id )
     // currenct interest rates.
 
     // First calculate the durateion - the number of days left in the trade.
-    int duration = repo_trade_end_date - TODAY;
+    int duration = repo_trade_end_date - calendar_today;
 
     // Next, calculate the end cash amount. This is a given at the start of the trade, so calculated
     // from it's static.
