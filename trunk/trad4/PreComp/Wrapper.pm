@@ -961,7 +961,7 @@ sub GenerateValidator($$$) {
                 print $FHD "    }\n";
                 print $FHD "\n";
 
-                print $FHD "    if ( ((object_header*)obj_loc[((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]])->implements != $master_hash->{$master_hash->{$var_type}->{implements}}->{type_id}  )\n";
+                print $FHD "    if ( ((object_header*)obj_loc[((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]])->implements != 0 and ((object_header*)obj_loc[((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]])->implements != $master_hash->{$master_hash->{$var_type}->{implements}}->{type_id}  )\n";
                 print $FHD "    {\n";
 
                 print $FHD "        cout << \"Error: Type $type, id \" << id << \" failed validation because a sub object $var_name_stripped"."[$counter], id \" << ((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter] << \" is not of type $master_hash->{$master_hash->{$var_type}->{implements}}->{type_id}.\" << endl;\n";
