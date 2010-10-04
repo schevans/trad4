@@ -1,0 +1,8 @@
+
+sub
+    repo_trade repo_trades[MAX_TRADES_PER_BOOK]
+
+pub
+    double margin  
+    double mtm_pnl
+

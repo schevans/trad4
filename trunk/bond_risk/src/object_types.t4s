@@ -4,5 +4,8 @@
 3,3,outright_trade
 4,1,fx_rate
 5,3,repo_trade
+6,4,outright_book
+7,4,repo_book
+
 
 
