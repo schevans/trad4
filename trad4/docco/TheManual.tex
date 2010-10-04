@@ -786,29 +786,40 @@ int calculate_outright_trade( obj_loc_t obj_loc, int id )
 
 \chapter{Extending bond_risk}
 
-In this chapter we'll extent the model by introducing repo_trades, books and a calendar type.
+\section{Introduction}
 
+In this chapter we'll extend the model by introducing repo_trades, books and a calendar. The types ir_curve, bond and outright_trade behave as before.
+
+Below, the abstract graph for the enhanced model:
+
+\includegraphics[scale=0.5]{bondriskabstract.png} 
+
+TODO: Fix bondriskabstract.png.
+
+\section{repo_trade}
 
 A repo trade is a kind of secured loan, used by investments banks to raise cash. They are sitting on a pile of bonds they have bought, so they can lend these out in exchange for cash collateral which the banks then use for funding. So they have a start date, and end date and a rate at which interest is calculated on the cash.
 
 Repo trades also need the bond price to calculate their margin, plus a discount rate curve with which to 
 calculate the mark-to-market profit and loss (mtm_pnl).
 
+TODO: Explain margin/mtm_pnl, but check other layouts.
+
+- skip t4 files - refer to code
+
+\section{The books}
+
 Trades are grouped into books or portfolios, so all your US-issued bonds might be kept in a book called USBK and your UK-issued ones in a book called UKBK. These books aggregate your risk so you can see overall exposure to particular market force (e.g. US interest rates). There is a book type for each trade type, which gives outright_book and repo_book.
 
-TODO: Explain margin/mtm_pnl, but check other layouts.
+- t4 file and DB example
+
+\section{The calendar}
 
 The calendar type replaces the hard-coded TODAY of bond_risk_simple, and it allows for the date to roll overnight form today to tomorrow. There is only one instantiated calendar object in the system.
 
-Below, the abstract graph for the enhanced model:
+- application should be left up week to week (c.f. living with section)
 
-
-
-
-
-\includegraphics[scale=0.5]{bondriskabstract.png} 
-
-TODO: Fix bondriskabstract.png.
+- won't roll rates unless instructed
 
 
 
@@ -820,6 +831,9 @@ TODO: Fix bondriskabstract.png.
 
 
 
+
+
+\section{Operation}
 
 
 \chapter{Language Features}
