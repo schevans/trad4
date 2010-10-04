@@ -41,10 +41,10 @@ int calculate_bond( obj_loc_t obj_loc, int id )
     
     for ( ; iter != coupon_schedule.end() ; iter++ )
     {
-        if ( *iter >= TODAY )   // Only consider payments today and in the future.
+        if ( *iter >= calendar_today )   // Only consider payments today and in the future.
         {
             // Calculate the offset we need to index into ir_curve
-            int ir_offset = (*iter) - TODAY;
+            int ir_offset = (*iter) - calendar_today;
 
             // Get the discount_rate from ir_curve 
             double discount_rate = ir_curve_discount_rate[ir_offset];
@@ -59,9 +59,9 @@ int calculate_bond( obj_loc_t obj_loc, int id )
     }
 
     // Add in the principal repayment at maturity
-    price = price + ( 100.0 * ir_curve_discount_rate[bond_maturity_date - TODAY] );
-    price_p01 = price_p01 + ( 100.0 * ir_curve_discount_rate_p01[bond_maturity_date - TODAY] );
-    price_m01 = price_m01 + ( 100.0 * ir_curve_discount_rate_m01[bond_maturity_date - TODAY] );
+    price = price + ( 100.0 * ir_curve_discount_rate[bond_maturity_date - calendar_today] );
+    price_p01 = price_p01 + ( 100.0 * ir_curve_discount_rate_p01[bond_maturity_date - calendar_today] );
+    price_m01 = price_m01 + ( 100.0 * ir_curve_discount_rate_m01[bond_maturity_date - calendar_today] );
 
     // And assign the results
     bond_price = price;
