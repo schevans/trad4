@@ -5,12 +5,7 @@ buy_sell_enum
     SELL
 
 ccy_enum
-    GBP
     USD
+    GBP
     EUR
-
-book_enum
-    GBPBK
-    USDBK
-    EURBK
 
