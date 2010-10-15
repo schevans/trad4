@@ -76,7 +76,7 @@ sub Generate($$$$$) {
     GenerateLoaderCallback( $new_master_hash, $name, $FHD );
     GenerateNewLoader( $new_master_hash, $name, $FHD );
     GenerateConcreteGraph( $new_master_hash, $name, $FHD );
-
+    GenerateGetObjectSize( $name, $FHD );
     print $FHD "\n";
 
     PreComp::Utilities::CloseFile();
@@ -1039,6 +1039,18 @@ sub GenerateConcreteGraph($$$) {
     print $FHD "\n";
     print $FHD "}\n";
 
+}
+
+sub GenerateGetObjectSize($$) {
+    my $type = shift;
+    my $FHD = shift;
+
+    print $FHD "\n";
+    print $FHD "extern \"C\" size_t get_object_size()\n";
+    print $FHD "{\n";
+    print $FHD "    return sizeof(t4::$type);\n";
+    print $FHD "}\n";
+    print $FHD "\n";
 }
 
 1;
