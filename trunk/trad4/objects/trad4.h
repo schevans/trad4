@@ -25,6 +25,7 @@ typedef int (*need_refresh_fpointer)( obj_loc_t obj_loc, int id );
 typedef void (*load_objects_fpointer)( obj_loc_t obj_loc, int initial_load );
 typedef int (*validate_fpointer)( obj_loc_t obj_loc, int initial_load );
 typedef void (*print_concrete_graph_fpointer)( obj_loc_t obj_loc, int id, std::ofstream& outfile );
+typedef size_t (*get_object_size_fpointer)();
 
 void run_trad4( int print_graph );
 
@@ -35,6 +36,7 @@ typedef struct {
     load_objects_fpointer load_objects;
     validate_fpointer validate;
     print_concrete_graph_fpointer print_concrete_graph;
+    get_object_size_fpointer get_object_size;
 } object_type_struct_t;
 
 #define DEBUG_ON
