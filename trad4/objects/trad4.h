@@ -90,6 +90,21 @@ typedef struct {
 #define object_implements(index) ((object_header*)obj_loc[index])->implements
 #define object_init(index) ((object_header*)obj_loc[index])->init
 
+// Server stuff. I really should extend the namespace use..
+namespace t4 {
+
+    enum request_type_enum {
+        GET_HEADER,
+        GET_BODY
+    };
+
+    typedef struct {
+        request_type_enum request_type;
+        int id;
+    } request;
+
+}
+
 #define DBG cout << __FILE__ << ": " << __LINE__ << endl;
 
 #endif

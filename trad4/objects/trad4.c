@@ -210,12 +210,10 @@ void run_trad4( int print_graph )
                 cout << endl << "Exiting after first run as BATCH_MODE is set." << endl;
                 exit(0);
             }
-
-
         }
         else
         {
-            usleep(500);
+            usleep(10000);
         }
 
         if ( need_reload )
@@ -492,10 +490,11 @@ void* tcp_sever_loop( void* unused )
         exit(1);
     }
 
-    printf("Server: waiting for connections...\n");
+    printf("Started server. Waiting for connections...\n");
 
     while(1) {  // main accept() loop
         sin_size = sizeof their_addr;
+
         new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);
         if (new_fd == -1) {
             perror("accept");
@@ -507,23 +506,40 @@ void* tcp_sever_loop( void* unused )
         printf("Server: got connection from %s\n", s);
 
         int numbytes;
-        int id;
 
-        if ((numbytes = recv(new_fd, &id, sizeof(int), 0)) == -1) {
+        t4::request header_request;        
+
+        if ((numbytes = recv(new_fd, &header_request, sizeof(t4::request), 0)) == -1) {
             perror("recv");
             exit(1);
         }
 
-        if ( obj_loc[id] )
+        if ( header_request.id != 0 && obj_loc[header_request.id] )
         {
-            size_t object_size = (*object_type_struct[((object_header*)obj_loc[id])->type]->get_object_size)();
 
-            if (send(new_fd, obj_loc[id], object_size, 0) == -1)
+            if (send(new_fd, obj_loc[header_request.id], sizeof(object_header), 0) == -1)
                 perror("send");
+
+            t4::request body_request;        
+
+            if ((numbytes = recv(new_fd, &body_request, sizeof(t4::request), 0)) == -1) {
+                perror("recv");
+                exit(1);
+            }
+
+            size_t object_size = (*object_type_struct[((object_header*)obj_loc[header_request.id])->type]->get_object_size)();
+
+            if (send(new_fd, obj_loc[header_request.id], object_size, 0) == -1)
+            perror("send");
         }
-        else
+        else 
         {
-            std::cerr << "Request for object id " << id << " failed - object not found." << std::endl;
+            std::cerr << "Request for object id " << header_request.id << " failed - object not found." << std::endl;
+            object_header null_header;
+            null_header.id=0;
+
+            if (send(new_fd, &null_header, sizeof(object_header), 0) == -1)
+                perror("send");
         }
 
         close(new_fd);
