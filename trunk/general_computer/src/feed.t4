@@ -1,5 +1,9 @@
 
 
+static
+    double value
+
+
 implements numeric
 
 

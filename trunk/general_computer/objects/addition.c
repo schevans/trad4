@@ -13,15 +13,7 @@ using namespace std;
 
 int calculate_addition( obj_loc_t obj_loc, int id )
 {
-    if ( numeric1_output == 0 ) {
-        
-        addition_output = 1;
-    }
-    else {
-
-        addition_output = numeric1_output + numeric2_output;
-
-    }
+    addition_output = numeric1_output + numeric2_output;
 
     return 1;
 }
