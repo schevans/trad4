@@ -62,7 +62,7 @@ enum logging_level {
 enum e_status {
     OK,
     STALE,
-    GIGO
+    FAILED
 };
 
 // Hack to get the beta out (precomp expects only one string per type)...
