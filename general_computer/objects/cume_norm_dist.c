@@ -15,7 +15,6 @@ using namespace std;
 
 int calculate_cume_norm_dist( obj_loc_t obj_loc, int id )
 {
-
     double x = numeric1_output;
 
     const double b1 =  0.319381530;
@@ -28,17 +27,14 @@ int calculate_cume_norm_dist( obj_loc_t obj_loc, int id )
 
     if ( x >= 0.0 ) 
     {
-
         double t = 1.0 / ( 1.0 + p * x );
         cume_norm_dist_output = (1.0 - c * exp( -x * x / 2.0 ) * t * ( t *( t * ( t * ( t * b5 + b4 ) + b3 ) + b2 ) + b1 ));
     }
     else 
     {
-    
         double t = 1.0 / ( 1.0 - p * x );
         cume_norm_dist_output = ( c * exp( -x * x / 2.0 ) * t * ( t *( t * ( t * ( t * b5 + b4 ) + b3 ) + b2 ) + b1 ));
     }
-
 
     return 1;
 }

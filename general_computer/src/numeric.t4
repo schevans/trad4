@@ -1,12 +1,5 @@
 
 
-sub
-    numeric numeric1
-    numeric numeric2
-
-static
-    double value
-
 pub
     double output
 
