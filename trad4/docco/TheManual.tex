@@ -904,80 +904,6 @@ static
 
 
 
-
-\section{Arrays}
-
-Arrays in the t4 file are treated differently depending on whether they appear in the pub, static (which are both treated the same) or sub sections. 
-
-\subsection{Static and pub Arrays}
-
-Arrays in the static and pub section work as you'd expect, using any constants you defined above. E.g., in your .t4 file (from test_app/src/tier1.t4):
-
-\begin{verbatim}
-static
-    double double_array[10]
-\end{verbatim}
-
-The macros for these look as you'd expect:
-
-\begin{verbatim}
-static:
-    double tier1_double_array[10]
-\end{verbatim}
-
-These can be used in your calculate function as follows:
-
-\begin{verbatim}
-    cout << tier1_double_array[0] << endl;   // Output first double
-    cout << tier1_double_array[9] << endl;   // Output last double
-\end{verbatim}
-
-Any static arrays also need to persist in the database, and again the table structure is generated for you 
-by trad4. The database table will look like:
-
-\begin{verbatim}
-create table tier1_double_array (
-    id int,
-    col0 int,
-    col1 int,
-    col2 int,
-    col3 int,
-    col4 int,
-    col5 int,
-    col6 int,
-    col7 int,
-    col8 int,
-    col9 int
-);
-\end{verbatim}
-
-So in this case the data for double_array is laid out in columns, so our data looks like this:
-
-
-\begin {tabular} {| l | l | l | l | l | l | l | l | l | l | l |}
-\hline
-id & col0 & col1 & col2 & col3 & col4 & col5 & col6 & col7 & col8 & col9 \\
-\hline
-1 & 0.14 & 1.14 & 2.14 & 3.14 & 4.14 & 5.14 & 6.14 & 7.14 & 8.14 & 9.14 \\
-\hline
-\end {tabular}
-
-
-\subsection{Sub Arrays}
-
-- Allowed to be null
-
-
-
-
-
-
-
-
-
-
-
-
 \section{Structures}
 
 Structures can be defined in src/structures.t4s:
@@ -1064,10 +990,183 @@ id & ord1 & value & asof \\
 See the next chapter for details on how arrays of structures and nested structures are handled.
 
 
+
+
+\section{Arrays}
+
+Arrays in the t4 file are treated differently depending on whether they appear in the pub, static (which are both treated the same) or sub sections. 
+
+\subsection{Static and pub Arrays}
+
+Arrays in the static and pub section work as you'd expect, using any constants you defined above. E.g., in your .t4 file (from test_app/src/tier1.t4):
+
+\begin{verbatim}
+static
+    double double_array[10]
+\end{verbatim}
+
+The macros for these look as you'd expect:
+
+\begin{verbatim}
+static:
+    double tier1_double_array[10]
+\end{verbatim}
+
+These can be used in your calculate function as follows:
+
+\begin{verbatim}
+    cout << tier1_double_array[0] << endl;   // Output first double
+    cout << tier1_double_array[9] << endl;   // Output last double
+\end{verbatim}
+
+Any static arrays also need to persist in the database, and again the table structure is generated for you 
+by trad4. The database table will look like:
+
+\begin{verbatim}
+create table tier1_double_array (
+    id int,
+    col0 int,
+    col1 int,
+    col2 int,
+    col3 int,
+    col4 int,
+    col5 int,
+    col6 int,
+    col7 int,
+    col8 int,
+    col9 int
+);
+\end{verbatim}
+
+So in this case the data for double_array is laid out in columns, so our data looks like this:
+
+
+\begin {tabular} {| l | l | l | l | l | l | l | l | l | l | l |}
+\hline
+id & col0 & col1 & col2 & col3 & col4 & col5 & col6 & col7 & col8 & col9 \\
+\hline
+1 & 0.14 & 1.14 & 2.14 & 3.14 & 4.14 & 5.14 & 6.14 & 7.14 & 8.14 & 9.14 \\
+\hline
+\end {tabular}
+
+
+\subsection{Sub Arrays}
+
+Arrays of sub objects look similar to the static and pub arrays in the t4 file, but the macros are more complex. From bond_risk, outright_book:
+
+\begin{verbatim}
+sub
+    outright_trade outright_trades[MAX_TRADES_PER_BOOK]
+\end{verbatim}
+
+The macros give full access to the sub objects, but with an extra parameter to identify their index.
+
+\begin{verbatim}
+sub:
+    id outright_book_outright_trades[MAX_TRADES_PER_BOOK]
+    int outright_trades_quantity( MAX_TRADES_PER_BOOK )
+    double outright_trades_pv( MAX_TRADES_PER_BOOK )
+\end{verbatim}
+
+Which can be used in your calculate function as follows:
+
+\begin{verbatim}
+    double sum_pv(0.0);
+    
+    for ( int i=0 ; i < MAX_TRADES_PER_BOOK ; i++ )
+    {
+        if ( outright_book_outright_trades[i] )
+        {
+            sum_pv += outright_trades_pv(i);
+        }
+    }
+
+    cout << "sum_pv: " << sum_pv << endl;
+\end{verbatim}
+
+You'll note from the above that the array can have empty elements - just set these to 0 and test for them before you dereference.
+
+TODO: DB
+
+If the sub object has structures or arrays of it's own, then this is also handled. Take a simplified example of additive_synth, where a mixer subscribes to a number of samples, and those samples contain an array of ints - a sampled waveform. The the t4 files look like this:
+
+
+\begin{verbatim}
+sample.t4:
+
+pub
+    int wave[SAMPLE_COUNT]
+
+mixer.t4:
+
+sub
+    sample samples[NUM_HARMONICS_PER_MIXER]
+
+pub
+    int wave[SAMPLE_COUNT]
+\end{verbatim}
+
+The macros for mixer then look like this:
+
+\begin{verbatim}
+sub:
+    id mixer_samples[NUM_HARMONICS_PER_MIXER]
+    int samples_wave( NUM_HARMONICS_PER_MIXER, SAMPLE_COUNT )
+
+pub:
+    int mixer_wave[SAMPLE_COUNT]
+\end{verbatim}
+
+As you can see, as with the above example you can access the underlying wave using the offset of the sub object, combined with the index into that sample's wave. These can be used in your calculate function as follows:
+
+\begin{verbatim}
+    for ( int j = 0 ; j < NUM_HARMONICS_PER_MIXER ; j++ )
+    {
+        if ( mixer_samples[j] )
+        {
+            for ( int i = 0 ; i < SAMPLE_COUNT ; i++ )
+            {
+                mixer_wave[i] += samples_wave( j, i );
+            }
+        }
+    }
+\end{verbatim}
+
 \chapter{Further Language Features}
 
+\section{Inheritance of Interface}
 
+Please also see the documentation of the general_computer application online.
 
+Inheritance of interface was introduced to solve a particular problem where you don't know the types of the objects that you will be subscribing to at run­time. Take the following example from simple_maths:
+
+\includegraphics[scale=0.5]{generalcomputerconcretesimple1.png}
+
+We can see that the T2 addition objects subscribe to feed objects but the T3 addition object subscribes to two addition objects. How is this achieved when we hard­code the sub object type in the .t4 file? The answer is inheritance of interface.
+
+Inheritance of interface allows for types with different functions to share the same interface to a base type (analogous to a pure virtual base class in C++). In this model our base type is called 'numeric', and this in turn allows for any type to connect to any other because any derived type 'is a' numeric. So numeric.t4 looks like:
+
+\begin{verbatim}
+sub
+    numeric numeric1
+    numeric numeric2
+static
+    double value
+pub
+    double output
+\end{verbatim}
+
+Then feed.t4 and addition.t4 both look like:
+
+\begin{verbatim}
+implements numeric
+\end{verbatim}
+
+We then get two objects both of which 'is a' numeric and both of which subscribe to two more numerics. Looking again at the example above the graph now holds as addition could subscribe to either feeds or additions.
+
+TODO: Fix with new partial overriding. (Model and text)
+
+- Shared functions
 
 
 \chapter{New Application Walk-through}
@@ -1436,7 +1535,7 @@ If you added new object types at runtime you might want to re-arrange them more 
 
 As trad4 relies wholly on fixed length arrays, running out of space mid-week should be avoided.  Meanwhile, while you need to keep a careful eye on your headroom and adjust your model parameters as necessary. If needs be, throw more hardware at the problem.
 
-\subsection{Dynamic debug}
+\section{Dynamic debug}
 
 Dynamic debug is supported so you can set debug level at run-time on a per-object basis. 
 
@@ -1463,6 +1562,77 @@ $ need_refresh.sh
 \end{verbatim}
 
 Note: For this change to be picked up the object's need_reload flag on the object table will have to be set to 1. This is the default in most data sets in order to simplify the demonstration, but if your debug changes aren't being picked up you should check this flag.
+
+\section{Input and Output}
+
+\subsection{Input}
+
+\subsubsection{Using the Database}
+
+\subsubsection{Other Examples}
+
+\subsection{Input}
+
+\subsubsection{Using the Server}
+
+\subsubsection{Other Examples}
+
+\section{Run-time Validation and States}
+
+Running objects can exist in one of three states.
+
+\begin{itemize}
+\item OK - Everything's fine and other objects can subscribe to these objects as normal.
+\item STALE - The object's published data is sensible, but out of date. 
+\item FAILED - Something's gone wrong with this object and it's published data is not to be touched.
+\end{itemize}
+
+These can get set when the object first starts and is validated, and also at run-time by flagging a failure in the object's calculate function.
+
+\subsubsection{Validation}
+
+When an object first starts or is reloaded, the sub object's are checked to see if they are up and running and of the correct type. If they are, the object is set to OK. If the sub objects are not running or of the correct type (due to a miss-configuration of the database), the object is set to FAILED, as there is no way the calculate function can be run, given that the sub objects are invalid. This object will stay in FAILED state until it is reloaded once the sub objects have started, or once it's sub data is corrected.
+
+Any objects that subscribe to a FAILED object will set to FAILED during initial validation. 
+
+\subsubsection{Run-time}
+
+Once the system has successfully started, bad data can still be introduced to the system causing a failure in the calculate function. This is signalled by returning 0 from the function, which you the user are responsible for. For example:
+
+\begin{verbatim}
+    if ( denominator != 0.0 )
+    {
+        output = numerator / denominator;
+        return 1
+    }
+    else
+    {
+        cerr << "Calculation failed: denominator = 0.0" << endl;
+        return 0;   
+    }
+\end{verbatim}
+
+Or if you're using exceptions:
+
+\begin{verbatim}
+
+    try {
+        // calculate
+    }
+    catch(...) {
+        cerr << "Calculation failed" << endl;
+        return 0;
+    }
+    
+    return 1;
+\end{verbatim}
+
+This will set this object's state to FAILED. In this case, as any objects that subscribe to that objects have already run and have good pub data, these objects don't fire when they are run and the state is set to STALE. This means the pub data is still good, just out of date.
+
+Next, any objects that subscribe to STALE objects can continue to use their data, plus the data from any other OK objects it also subscribes to. In this way these objects can continue to update with a mixture of OK and STALE data. These objects will themselves be set to STALE.
+
+In this way, a trad4 application is very robust - a FAILED object can't bring down the system - it will just cause a ripple of STALE objects up the hierarchy.
+
 
 \chapter{Hardware considerations}
 
