@@ -764,9 +764,9 @@ sub GenerateCalculate($$$) {
     PrintSectionDebug( $master_hash, $master_hash->{$type}->{static}, $type, $FHD );
     print $FHD "\n";
 
-    print $FHD "    if ( object_status(id) == GIGO && ! object_init(id) )\n";
+    print $FHD "    if ( object_status(id) == FAILED && ! object_init(id) )\n";
     print $FHD "    {\n";
-    print $FHD "        cerr << \"Warning: Object \" << id << \" type $type not firing as it hasn't initialised and it's GIGO.\" << endl;\n";
+    print $FHD "        cerr << \"Warning: Object \" << id << \" type $type not firing as it hasn't initialised and it's FAILED.\" << endl;\n";
     print $FHD "        return;\n";
     print $FHD "    }\n";
     print $FHD "\n";
@@ -787,24 +787,24 @@ sub GenerateCalculate($$$) {
 
             while ( $counter < $size ) {
 
-                print $FHD "((((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) and object_status(((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) >= GIGO ) ||\n         ";
+                print $FHD "((((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) and object_status(((t4::$type*)obj_loc[id])->$var_name_stripped"."[$counter]) >= FAILED ) ||\n         ";
                 $counter = $counter+1;
             }
         }
         else {
-            print $FHD "( ((t4::$type*)obj_loc[id])->$var_name != id and object_status(((t4::$type*)obj_loc[id])->$var_name) >= GIGO ) ||\n        ";
+            print $FHD "( ((t4::$type*)obj_loc[id])->$var_name != id and object_status(((t4::$type*)obj_loc[id])->$var_name) >= FAILED ) ||\n        ";
         }
 
     }
 
     print $FHD "0 )\n";
     print $FHD "    {\n";
-    print $FHD "        cerr << \"Warning: Object \" << id << \" not firing as one or more sub objects are GIGO.\" << endl;\n";
+    print $FHD "        cerr << \"Warning: Object \" << id << \" not firing as one or more sub objects are FAILED.\" << endl;\n";
     print $FHD "\n";
     print $FHD "        if ( ! object_init(id) )\n";
     print $FHD "        {\n";
-    print $FHD "            cerr << \"Error: Object \" << id << \" setting to GIGO as one or more sub objects are GIGO and the object hasn't initialised.\" << endl;\n";
-    print $FHD "            object_status(id) = GIGO;\n";
+    print $FHD "            cerr << \"Error: Object \" << id << \" setting to FAILED as one or more sub objects are FAILED and the object hasn't initialised.\" << endl;\n";
+    print $FHD "            object_status(id) = FAILED;\n";
     print $FHD "        }\n";
     print $FHD "        else if ( object_status(id) == OK )\n";
     print $FHD "        {\n";
@@ -822,8 +822,8 @@ sub GenerateCalculate($$$) {
 
     print $FHD "    if ( ! calculate_$type( obj_loc, id ) )\n";
     print $FHD "    {\n";
-    print $FHD "        object_status(id) = GIGO;\n";
-    print $FHD "        cerr << \"Error: Object \" << id << \" is GIGO as it failed calculation.\" << endl;\n";
+    print $FHD "        object_status(id) = FAILED;\n";
+    print $FHD "        cerr << \"Error: Object \" << id << \" is FAILED as it failed calculation.\" << endl;\n";
     print $FHD "    }\n";
     print $FHD "    else\n";
     print $FHD "    {\n";

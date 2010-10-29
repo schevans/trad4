@@ -93,7 +93,7 @@ void run_trad4( int print_graph )
     obj_loc[0] = (unsigned char*)(new object_header);
 
     object_last_published(0) = 0;
-    object_status(0) = GIGO;
+    object_status(0) = FAILED;
     object_type(0) = 0;
     object_tier(0) = 0;
 //    object_name(0) = "Null object";
@@ -704,8 +704,8 @@ void load_objects( int initial_load )
                 }
                 else
                 {
-                    object_status( i ) = GIGO;
-                    cerr << "Error: Object " << i << " is GIGO as it hasn't initilised and it failed validation." << endl;
+                    object_status( i ) = FAILED;
+                    cerr << "Error: Object " << i << " is FAILED as it hasn't initilised and it failed validation." << endl;
                 }
 
                 set_timestamp( obj_loc, i );
