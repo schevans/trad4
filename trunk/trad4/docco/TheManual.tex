@@ -417,7 +417,7 @@ If fact in this example they don't as we're running is single threaded mode to k
 ~/src/simple_maths$ simple_maths
 \end{verbatim}
 
-\chapter{Example: Bond Risk}
+\chapter{Example: bond_risk_simple}
 
 \section{Introduction}
 
@@ -429,13 +429,15 @@ First, the abstract graph:
 
 Note that in this chapter we're looking at a simplified version of bond_risk, where we're ignoring the types repo_trade and book for now. TODO - bond_risk_simple
 
-\subsection{T1: ir_curve}
+\subsection{T1: ir_curve and calendar}
 
-The first type on T1 is ir_curve. This contains information about the expected future value of interest rates. We observe information from the markets to obtain a set of input_rates, and construct a curve starting today and going forward to a set endpoint (say 20 years). This constructed curve has an entry for each day from today to 20 years containing information derived from our input rates, which will be consumed by the T2 bond objects. The key point to note about ir_curves is that they are expensive to construct - the various algorithms used to bootstrap and interpolate the various curves are computationally expensive.
+The first type on T1 is ir_curve. This contains information about the expected future value of interest rates. We observe information from the markets to obtain a set of input_rates, and construct a curve starting today and going forward to a set endpoint (say 10 years). This constructed curve has an entry for each day from today to 10 years containing information derived from our input rates, which will be consumed by the T2 bond objects. The key point to note about ir_curves is that they are expensive to construct - the various algorithms used to bootstrap and interpolate the various curves are computationally expensive.
+
+There's a second type on T1 - the calendar, which gives today's date.
 
 \subsection{T2: bond}
 
-The second type on T2 is bond. A bond is a financial instrument that you buy for a certain price, and pays you fixed payments or coupons at a certain rate until it matures (say 20 years). Because it pays you money at a fixed rate (say 3\% per year), it will become more or less valuable depending on the current and expected future value of interest rates. A bond that pays 3\% when interest rates are 3% will be worth 100 (they are bought and sold in lots of 100), but it will have a higher price when interest rates are at 1\% (say 102.8) then when they are at 5\% (say 97.8) because they pay out more than that same £100 would in the bank (at 3%).
+The second type on T2 is bond. A bond is a financial instrument that you buy for a certain price, and pays you fixed payments or coupons at a certain rate until it matures (say 5 years). Because it pays you money at a fixed rate (say 3\% per year), it will become more or less valuable depending on the current and expected future value of interest rates. A bond that pays 3\% when interest rates are 3% will be worth 100 (they are bought and sold in lots of 100), but it will have a higher price when interest rates are at 1\% (say 102.8) then when they are at 5\% (say 97.8) because they pay out more than that same £100 would in the bank (at 3%).
 
 TODO: Real data from worked_example.
 
@@ -474,14 +476,13 @@ The constants.t4s file allows you to define your own constants that will be in s
 
 
 \begin{verbatim}
-TODAY = 40403            # 13/08/2010
-END_DATE = 47708         # 13/08/2030
-
-NUM_FORWARD_DAYS = END_DATE - TODAY
+NUM_FORWARD_DAYS = 7305  # 10 years
 
 NUM_INPUT_RATES = 10
 
 YEAR_BASIS = 365.25
+
+MAX_TRADES_PER_BOOK = 10
 \end{verbatim}
 
 This describes the start and end dates covered by this model, and the number of forward dates are calculated from that data. Also the number of input_rates is set here, as is the year basis which describes how years are calculated.
@@ -512,7 +513,7 @@ Any structures you require in your t4 files can be described in structures.t4s. 
 \begin{verbatim}
 rate
     double value
-    date asof
+    int days_forward
 \end{verbatim}
 
 Given the above definitions, we can now tackle bond_risk's t4 files. We will look at each type in turn.
@@ -577,7 +578,6 @@ Given NUM_INPUT_RATES=10, you can use these macros to access the static data in 
         cout << ir_curve_input_rates_asof( i ) << endl;
         cout << ir_curve_input_rates_value( i ) << endl;
     }
-
 \end{verbatim}
 
 For those financial professionals among you I should make clear that these input_rates contain the bootstrapped forward rates as I've avoided including a bootstrapper to keep things simple. These rates still require interpolation at a daily granularity and conversion into discount factors.
@@ -602,7 +602,7 @@ Given NUM_FORWARD_DAYS = END_DATE - TODAY, you can use these macros in your calc
 \begin{verbatim}
     // Calculate the interpolated rate
     // For details please see bond_risk/objects/ir_curve.c
-    ir_curve_interest_rate_interpol[i - TODAY] = ( i*gradient + y_intercept );
+    ir_curve_interest_rate_interpol[i] = ( i*gradient + y_intercept );
 
     // Calculate the discount factor, plus the two perturbed discount factors
     for ( int i = 0 ; i < NUM_FORWARD_DAYS ; i++ )
@@ -621,6 +621,7 @@ Given NUM_FORWARD_DAYS = END_DATE - TODAY, you can use these macros in your calc
 
 \begin{verbatim}
 sub
+    calendar calendar
     ir_curve ir_curve
 
 static
@@ -636,7 +637,7 @@ pub
 
 \subsubsection{The sub section}
 
-In the sub section, we can see that bond subscribes to an ir_curve.
+In the sub section, we can see that bond subscribes to an ir_curve and a calendar object.
 
 \subsubsection{The static section}
 
@@ -654,10 +655,13 @@ The sub macros available in bond's calculate function pull all the pub and stati
 
 \begin{verbatim}
 sub:
+    id bond_calendar
+    date calendar_today
+
     id bond_ir_curve
     rate ir_curve_input_rates[NUM_INPUT_RATES]
     double ir_curve_input_rates_value( NUM_INPUT_RATES )
-    date ir_curve_input_rates_asof( NUM_INPUT_RATES )
+    int ir_curve_input_rates_days_forward( NUM_INPUT_RATES )
     double ir_curve_interest_rate_interpol[NUM_FORWARD_DAYS]
     double ir_curve_discount_rate[NUM_FORWARD_DAYS]
     double ir_curve_discount_rate_p01[NUM_FORWARD_DAYS]
@@ -666,13 +670,9 @@ sub:
 
 We can use these in the calculate function as follows:
 
-
 \begin{verbatim}
-
     // Get the discount_rate from ir_curve
     double discount_rate = ir_curve_discount_rate[ir_offset];
-
-
 \end{verbatim}
 
 \subsubsection{The static section}
@@ -681,13 +681,11 @@ The macros for the static section look like this:
 
 
 \begin{verbatim}
-
 static:
     int bond_start_date
     int bond_maturity_date
     int bond_coupons_per_year
     double bond_coupon
-
 \end{verbatim}
 
 These can be used in the calculate function as follows:
@@ -721,7 +719,6 @@ Which can be assigned to as follows:
 
 The outright_trade's t4 file is as follows:
 
-
 \begin{verbatim}
 sub
     bond bond
@@ -729,7 +726,8 @@ sub
 static
     double trade_price
     int quantity
-    int trade_date
+    date trade_date
+    buy_sell_enum buy_sell
 
 pub
     double pv
@@ -737,7 +735,7 @@ pub
     double pnl
 \end{verbatim}
 
-From this we can see that outright_trade subscribes to a bond. In the static section we can see it has a trade_price - the price at which these bonds were purchased, the quantity of bonds purchased and the date of the transaction.
+From this we can see that outright_trade subscribes to a bond. In the static section we can see it has a trade_price - the price at which these bonds were purchased, the quantity of bonds purchased and the date of the transaction. The direction of the trade - whether the trade was a buy or a sell of the bonds.
 
 The macros look like this:
 
@@ -761,7 +759,6 @@ pub:
     double outright_trade_pv
     double outright_trade_pv_01
     double outright_trade_pnl
-
 \end{verbatim}
 
 The calculate function for outright_trade is shown below in full.
@@ -769,14 +766,17 @@ The calculate function for outright_trade is shown below in full.
 \begin{verbatim}
 int calculate_outright_trade( obj_loc_t obj_loc, int id )
 {
+    // Get multiplier for trade direction.
+    double direction = ( outright_trade_buy_sell == BUY ? 1.0 : -1.0 );
+
     // Calculate the pv - the present value of the trade.
-    outright_trade_pv = ( outright_trade_quantity * bond_price );
+    outright_trade_pv = ( outright_trade_quantity * bond_price ) * direction;
 
     // Calculate the pv01 - the pv's exposure to interest rate movements.
-    outright_trade_pv_01 = ( outright_trade_quantity * bond_pv01 );
+    outright_trade_pv_01 = ( outright_trade_quantity * bond_pv01 ) * direction;
 
     // Calculate the pnl - the profit or loss we would make on the trade if we re-sold these bonds today.
-    outright_trade_pnl = outright_trade_pv - ( outright_trade_quantity * outright_trade_trade_price );
+    outright_trade_pnl = outright_trade_pv - ( outright_trade_quantity * outright_trade_trade_price ) * direction;
 
     return 1;
 }
@@ -793,8 +793,6 @@ In this chapter we'll extend the model by introducing repo_trades, books and a c
 Below, the abstract graph for the enhanced model:
 
 \includegraphics[scale=0.5]{bondriskabstract.png} 
-
-TODO: Fix bondriskabstract.png.
 
 \section{repo_trade}
 
