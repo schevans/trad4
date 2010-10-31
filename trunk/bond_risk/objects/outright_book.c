@@ -32,6 +32,10 @@ int calculate_outright_book( obj_loc_t obj_loc, int id )
 
 cout << "outright_book_pv: " << outright_book_pv << endl;
 
+T4_TEST( outright_book_pv_01, -78.7914 );
+T4_TEST( outright_book_pnl, 476.868 );
+
+
     return 1;
 }
 
