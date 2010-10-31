@@ -108,12 +108,7 @@ sub generate_ir_curve_input_rates() {
     my $id;
     foreach $id ( @ir_curve_ids ) {
 
-
-
-
         my $basis = (( $id / 10 ) - 1 ) / 10;
-
-print "ID $id $basis\n";
 
         print FILE "insert into ir_curve_input_rates values ( $id, 0, ".(0.024+$basis).", 0 );\n";
         print FILE "insert into ir_curve_input_rates values ( $id, 1, ".(0.025+$basis).", 187 );\n";
