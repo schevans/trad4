@@ -8,7 +8,6 @@ sub
 
 static
     double trade_price
-    int book
     int quantity
     date trade_date
     buy_sell_enum buy_sell

@@ -15,7 +15,6 @@ static
     double start_cash
     double rate
     ccy_enum cash_ccy
-    int book
     buy_sell_enum buy_sell
 
 pub
