@@ -7,6 +7,8 @@
 use warnings;
 use strict;
 
+#srand(1);
+
 use PreComp::AppConstants;
 use PreComp::Utilities;
 
@@ -72,8 +74,8 @@ generate_ir_curve_input_rates();
 
 # small_set
 generate_bonds( 5 );
-generate_outright_trades( 9 );
-generate_repo_trades( 7 );
+generate_outright_trades( 40 );
+generate_repo_trades( 40 );
 generate_outright_books();
 generate_repo_books();
 
@@ -317,7 +319,7 @@ sub generate_outright_books() {
         my @trades;
 
         print FILE "insert into object values (  $id, 6, 4, \"$name\", $log_level, 1 );\n";
-        print FILE "insert into outright_book values ( $id );";
+        print FILE "insert into outright_book values ( $id );\n";
         print FILE "insert into outright_book_outright_trades values (  $id";
 
         my $bond;
@@ -335,17 +337,17 @@ sub generate_outright_books() {
                         push @trades, $outright_trade;
                         print FILE ", $outright_trade";
 
-                        if ( scalar( @trades ) >= $MAX_TRADES_PER_BOOK ) {
+                        if ( scalar( @trades ) == $MAX_TRADES_PER_BOOK ) {
 
                             print FILE " );\n";
                            
                             $book_number++; 
                             $id = get_next_id();
                             $name = "OUTRIGHT_".$ir_curve_name{$ir_curve}."_BK$book_number";
-                            @trades = [];
+                            undef( @trades );
 
                             print FILE "insert into object values ( $id, 6, 4, \"$name\", $log_level, 1 );\n";
-                            print FILE "insert into outright_book values ( $id );";
+                            print FILE "insert into outright_book values ( $id );\n";
                             print FILE "insert into outright_book_outright_trades values ( $id";
 
                         }
@@ -355,7 +357,7 @@ sub generate_outright_books() {
             }
         }
 
-        while ( scalar( @trades ) < $MAX_TRADES_PER_BOOK ) {
+        while ( scalar( @trades ) != $MAX_TRADES_PER_BOOK ) {
 
             push @trades, 0;
             print FILE ", 0";
@@ -389,7 +391,7 @@ sub generate_repo_books() {
         my @trades;
 
         print FILE "insert into object values (  $id, 7, 4, \"$name\", $log_level, 1 );\n";
-        print FILE "insert into repo_book values ( $id );";
+        print FILE "insert into repo_book values ( $id );\n";
         print FILE "insert into repo_book_repo_trades values (  $id";
 
         my $bond;
@@ -407,17 +409,17 @@ sub generate_repo_books() {
                         push @trades, $repo_trade;
                         print FILE ", $repo_trade";
 
-                        if ( scalar( @trades ) >= $MAX_TRADES_PER_BOOK ) {
+                        if ( scalar( @trades ) == $MAX_TRADES_PER_BOOK ) {
 
                             print FILE " );\n";
                            
                             $book_number++; 
                             $id = get_next_id();
                             $name = "REPO_".$ir_curve_name{$ir_curve}."_BK$book_number";
-                            @trades = [];
+                            undef( @trades );
 
                             print FILE "insert into object values ( $id, 7, 4, \"$name\", $log_level, 1 );\n";
-                            print FILE "insert into repo_book values ( $id );";
+                            print FILE "insert into repo_book values ( $id );\n";
                             print FILE "insert into repo_book_repo_trades values ( $id";
 
                         }
@@ -427,7 +429,7 @@ sub generate_repo_books() {
             }
         }
 
-        while ( scalar( @trades ) < $MAX_TRADES_PER_BOOK ) {
+        while ( scalar( @trades ) != $MAX_TRADES_PER_BOOK ) {
 
             push @trades, 0;
             print FILE ", 0";
@@ -440,6 +442,7 @@ sub generate_repo_books() {
 
     close FILE;
 }
+
 sub get_next_id() {
 
     return $current_id++;
