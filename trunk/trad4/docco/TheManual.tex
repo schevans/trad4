@@ -461,8 +461,9 @@ In Section ~\ref{sec:The Data} the distinction between types and objects was mad
 
 \includegraphics[scale=0.3]{bondrisksimpleconcrete.png}
 
-From this we can see the two ir_curves in two different currencies LIBOR.USD and LIBOR.GBP on T1. Then we can see the five bonds on T2, two of which were issued in USD (US01 and US02) which subscribe to LIBOR.USD, and three of which were issued in GBP which subscribe to LIBOR.GBP. Lastly we have the nine outright_trades (OT01 etc.) which subscribe to various bonds.
+TODO: Fix graph
 
+From this we can see the two ir_curves in two different currencies LIBOR.USD and LIBOR.GBP on T1. Then we can see the five bonds on T2, two of which were issued in USD (prefixed with US) which subscribe to LIBOR.USD, and three of which were issued in GBP (prefixed with UK) which subscribe to LIBOR.GBP. Lastly we have the nine outright_trades (their trade ticket numbers prefixed with O for outright)) which subscribe to various bonds.
 
 \section{The t4s files}
 
@@ -783,6 +784,129 @@ int calculate_outright_trade( obj_loc_t obj_loc, int id )
 \end{verbatim}
 
 \section{Operation}
+
+We'll now run the application, first using data/worked_example with log_level=1 for the ir_curve (as it publishes arrays so the debug is verbose), and log_level=2 for the rest of the objects, which will output the static and pub data for each object.
+
+\subsection{worked_example}
+ 
+\begin{verbatim}
+$ rt4
+Creating new type bond, type_id: 3
+Creating new type outright_trade, type_id: 4
+Creating new type ir_curve, type_id: 2
+Creating new type calendar, type_id: 1
+Loading objects...
+Loading bond..
+Loading outright_trade..
+Loading ir_curve..
+        load_ir_curve_input_rates()
+Loading calendar..
+
+\end{verbatim}
+
+First you can see the types being created and the objects being loaded. As we're using data/worked_example there's only
+
+\begin{verbatim}
+Validating objects...
+
+Num objects on T1: 2
+Num objects on T2: 1
+Num objects on T3: 1
+
+Running in single-threaded mode.
+\end{verbatim}
+
+Next, the objects are validated and a report produced on how many objects are on each tier. As we're using data/worked_example there's one object per type. 
+
+Lastly the number of threads being used for this run is reported.
+
+\begin{verbatim}
+Tier 1 running.
+calculate_calendar( calendar )
+static:
+    calendar_today: 40403
+pub:
+
+calculate_ir_curve( LIBOR-GBP )
+Tier 1 ran 2 objects in 0.00102782 seconds.
+\end{verbatim}
+
+Text, T1 runs. The first object is the singleton calendar object, which just publishes the valuation date - 13th August 2010\footnote{More or less, depending on your view on leap years...} in julian format.
+
+The next object is the ir_curve, which calculates and interpolates the discount factors as discussed above.
+
+\begin{verbatim}
+Tier 2 running.
+calculate_bond( US81823453 )
+static:
+    bond_start_date: 39814
+    bond_maturity_date: 43467
+    bond_coupons_per_year: 1
+    bond_coupon: 0.028
+pub:
+    bond_price: 105.177
+    bond_pv01: -0.0787914
+
+Tier 2 ran 1 objects in 5.79357e-05 seconds.
+\end{verbatim}
+
+Next, the bond on T2 runs. You can see it output it's static data it's got from the database, and the pub data that it's calculated and published, derived from the calendar and ir_curve objects it subscribes to.
+
+\begin{verbatim}
+Tier 3 running.
+calculate_outright_trade( O38273 )
+static:
+    outright_trade_trade_price: 104.7
+    outright_trade_quantity: 1000
+    outright_trade_trade_date: 40323
+    outright_trade_buy_sell: 0
+pub:
+    outright_trade_pv: 105177
+    outright_trade_pv_01: -78.7914
+    outright_trade_pnl: 476.868
+
+Tier 3 ran 1 objects in 2.69413e-05 seconds.
+
+All tiers ran 4 objects in 0.00114417 seconds.
+
+Exiting after first run as BATCH_MODE is set.
+\end{verbatim}
+
+Lastly the outright_trade on T3 runs, and again you can see both it's static and pub data, and the total time for all tiers displayed. Lastly, the application exits as the environment variable BATCH_MODE is set.
+
+Next, we'll run the application with data/small_set and log_level=1 for all objects.
+
+\subsection{small_set}
+
+\begin{verbatim}
+Tier 1 running.
+calculate_calendar( calendar )
+calculate_ir_curve( LIBOR.USD )
+calculate_ir_curve( LIBOR.GBP )
+Tier 1 ran 3 objects in 0.00203395 seconds.
+
+Tier 2 running.
+calculate_bond( UK312894725 )
+calculate_bond( UK298671424 )
+calculate_bond( UK34158410 )
+calculate_bond( US235632480 )
+calculate_bond( US915766195 )
+Tier 2 ran 5 objects in 8.39233e-05 seconds.
+
+Tier 3 running.
+calculate_outright_trade( 0218847 )
+calculate_outright_trade( 0331682 )
+calculate_outright_trade( 0921660 )
+calculate_outright_trade( 0481677 )
+calculate_outright_trade( 0897310 )
+calculate_outright_trade( 0122687 )
+calculate_outright_trade( 0609115 )
+calculate_outright_trade( 0755361 )
+calculate_outright_trade( 0372878 )
+Tier 3 ran 9 objects in 2.21729e-05 seconds.
+\end{verbatim}
+
+In this case all the objects on each tier will run concurrently, given enough threads.
 
 \chapter{Extending bond_risk}
 
