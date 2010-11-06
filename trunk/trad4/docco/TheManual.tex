@@ -1260,11 +1260,11 @@ As you can see, as with the above example you can access the underlying wave usi
 
 Please also see the documentation of the general_computer application online.
 
-Inheritance of interface was introduced to solve a particular problem where you don't know the types of the objects that you will be subscribing to at run­time. Take the following example from simple_maths:
+Inheritance of interface was introduced to solve a particular problem where you don't know the types of the objects that you will be subscribing to at run-time. Take the following example from simple_maths:
 
 \includegraphics[scale=0.5]{generalcomputerconcretesimple1.png}
 
-We can see that the T2 addition objects subscribe to feed objects but the T3 addition object subscribes to two addition objects. How is this achieved when we hard­code the sub object type in the .t4 file? The answer is inheritance of interface.
+We can see that the T2 addition objects subscribe to feed objects but the T3 addition object subscribes to two addition objects. How is this achieved when we hard-code the sub object type in the .t4 file? The answer is inheritance of interface.
 
 Inheritance of interface allows for types with different functions to share the same interface to a base type (analogous to a pure virtual base class in C++). In this model our base type is called 'numeric', and this in turn allows for any type to connect to any other because any derived type 'is a' numeric. So numeric.t4 looks like:
 
@@ -1761,6 +1761,294 @@ In this way, a trad4 application is very robust - a FAILED object can't bring do
 \appendix
 
 \chapter{How trad4 works}
+
+In this appendix we discuss how trad4 does what it does on a technical level. This is solely a discussion on the internals of trad4 - you may organise your calculate functions as you see fit.  First a brief introduction to the kinds of data structures you will see. 
+
+Trad4 only uses fixed length arrays. This is because these will be optimised away by the compiler to some integer arithmetic and a jump or two, and hence are very efficient. I realise you have to ensure these are sufficiently big to hold all the data you might need, and therefore waste RAM, but as you should be running on a chunky 64-bit host this shouldn't be a problem. As an example bond_risk_440k - a data set with 440k bond_risk objects takes up around 120 MB of RAM. 
+
+Internally, trad4 uses these fixed length arrays in two different ways.  Firstly, there is the 1-based model used by the objloc - each object uses it's unique id to index into the objloc, and as there are no objects with id=0, the array is 1-based.
+
+Secondly there is the 0-based model as used by the tier_manager but this time treating them as stacks - using the value at 0 to track the number of elements in the array, adding to and removing from the end.
+
+\section{The trad4 structures}
+
+\subsection{The objloc}
+
+\begin{verbatim}
+void* obj_loc[NUM_OBJECTS+1]
+\end{verbatim}
+
+The objloc is an array of void*. It is used by the threads to locate the objects and the objects to locate each other. When the system is starting, each object is loaded which involves newing off a struct of it's type and placing a pointer to this struct into the objloc using it's id as the offset.  In this way, if bond US1 has an id of 6,
+
+\begin{verbatim}
+bond* myBondUS1 = (bond*)obj_loc[6];
+\end{verbatim}
+
+We can then read or write to US1's struct using just it's id and a pointer to the objloc.
+
+Likewise, when a thread is assigned an object, it is assigned by passing in the object id it's supposed to run. It first locates the object's struct using the method above, then it locates the pointer to that object's 
+calculate function by looking it up on the object's struct. This is discussed further below.
+
+The way the master thread handles these heterogeneous objects is by using the header. The structs of all object types start with the same size and shaped header. This means the master thread can examine the timestamps on the objects by casting the void* it gets back to the objloc into a struct of type object_header, like so:
+
+\begin{verbatim}
+((object_header*)obj_loc[id])->last_published
+\end{verbatim}
+
+\subsection{The thread_controller}
+
+\begin{verbatim}
+int thread_controller[NUM_THREADS+1]
+\end{verbatim}
+
+The thread_controller is used by the master and worker threads to communicate. Each thread has it's own id which is used to index into this array. The contents of the thread_controller for a particular thread is the id of the object that the thread is currently associated with. 
+
+When the master thread finds an object that need to fire if finds a free thread by traversing the thread_controller and finding one where
+
+\begin{verbatim}
+thread_controller[i] == 0
+\end{verbatim}
+
+This means that thread i is idle. The master thread then writes the id of the object it wants thread i to work on to thread_controller[i]. The master is now done and can continue traversing the tier it's working on looking for more objects to run. 
+
+\subsection{The object_type_struct}
+
+\begin{verbatim}
+object_type_struct_t* object_type_struct[MAX_TYPES+1];
+\end{verbatim}
+
+Where
+
+\begin{verbatim}
+typedef struct {
+    void* lib_handle;
+    calculate_fpointer calculate;
+    need_refresh_fpointer need_refresh;
+    load_objects_fpointer load_objects;
+    validate_fpointer validate;
+    print_concrete_graph_fpointer print_concrete_graph;
+    get_object_size_fpointer get_object_size;
+} object_type_struct_t;
+\end{verbatim}
+
+The object_type_struct is where the type-specific information is stored. Every type (e.g. bond, outright_trade) is dynamically loaded from it's own library. Pointers to the functions every trad4 object must have are stored on the object_type_struct, as well as a pointer to the library itself.  
+
+\begin{enumerate}
+\item lib_handle is a pointer to the object's dynamically loaded .so.
+\item The calculate_fpointer is a function pointer to the object's calculate function. Run by the worker 
+threads.
+\item The need_refresh_fpointer is a function pointer to the object's need_refresh function. Run by the master thread.
+\item The load_objects_fpointer is a function pointer to the object's load_objects function. This will (re)load all objects of this type that need it. Run by the master thread.
+\item The validate_fpointer is a function pointer to the object's validate function. This checks if the subscribed-to objects are of the correct type and in the correct state.
+\item The print_concrete_graph_fpointer is a function pointer to the print_concrete_graph function, used to generate the concrete graph of a particular application.
+\item the get_object_size_fpointer is a function pointer to the get_object_size function, used as part of the TCP/IP server to retrieve objects from a running application.
+\end{enumerate}
+
+\subsection{The object header}
+
+\begin{verbatim}
+typedef struct {
+    // Header
+    long long last_published;
+    int id;
+    e_status status;
+    int type;
+    int tier;
+    char name[OBJECT_NAME_LEN];
+    int log_level;
+    int implements;
+    int init;
+} object_header;
+\end{verbatim}
+
+The object header forms the first part of every object's struct. Because it is common to all objects, heterogeneous objects can be handled generically through this header.
+
+
+\begin{enumerate}
+\item The last_published member gives when the object was last published, and is used to decide weather objects that subscribe to this objects need to be re-run.
+\item The id is the object's unique id.
+\item The status gives the object status - OK, STALE or FAILED.
+\item The type is the object's type id.
+\item The name is the object's name.
+\item The log_level is the object's log level.
+\item The implements member is used for inheritance of interface, and gives the type id of the type it's inheriting from. This is used for validation.
+\item The init flag gives weather the object has just started or reloaded. Useful if your types need any special initialisation handling.
+\end{enumerate}
+
+\subsection{The object struct}
+
+For this example we'll look at a bond from bond_risk. This struct is generated from the.t4 file, and all an object's data is stored here. You'll see the common header takes up the first part of the struct, and the rest comes from the .t4 file.
+
+\begin{verbatim}
+typedef struct {
+    // header
+    long_long last_published;
+    int id;
+    e_status status;
+    int type;
+    int tier;
+    char name[OBJECT_NAME_LEN];
+    int log_level;
+    int implements;
+    int init;
+
+    // sub
+    int calendar;
+    int ir_curve;
+
+    // static
+    date start_date;
+    date maturity_date;
+    int coupons_per_year;
+    double coupon;
+
+    // pub
+    double price;
+    double pv01;
+} bond;
+\end{verbatim}
+
+The sub section gives the id's of the objects o which it subscribes. The static section is where the data from the DB is loaded and stored. The pub section is where the result of the calculate function is published.
+
+\section{The threads}
+
+Trad4 uses the master-worker thread model.
+
+TODO: XP with DB reloads (no need for trigger objects?) (test)
+
+From a steady-state, the master thread loops through the T1 objects. If a send_reload signal has been sent, some of one or more object's data been reloaded from the DB . If the master thread finds a T1 object that's updated it will pick a thread out of the thread pool and associate it with that object that needs to fire. The thread then runs the object. 
+
+The master thread then continues through the rest of the T1 objects and in the event of any more of them having been updated it will fire these as well.
+
+Trad4 now knows there's change afoot. It waits for all the threads running T1 objects to complete and moves onto the T2 objects. It runs through all the T2 objects, checking the T2 objects timestamp against the T1 object to which they subscribe. If any are found that need to fire, the master thread again associates that object with a thread and continues through all the T2 objects. Again it waits for the threads working on the T2 objects to complete before moving on to the T3 objects.  This process continues until all the tiers are run. When that's done, the master thread goes back to looping through the T1 objects looking for change.  
+
+If, during the master thread's traversal it finds an object that needs to fire but there are no spare threads, is simply sleeps for a short, adjustable time until one becomes available.
+
+\subsection{The worker threads}
+
+The worker threads all sit in a loop, sleeping and checking to see if their thread_controller[i] has been set to an object id by the master thread. if it has been set, the thread can then call that object's calculate 
+function by, for thread N:
+
+a) Locating the object's struct:
+\begin{verbatim}
+void* my_object = obj_loc[thread_controller[N]];
+\end{verbatim}
+
+b) Finding this object's type by casting it's void* into an object_header* and dereferencing:
+\begin{verbatim}
+int my_type_id = ((object_header*)my_object)->type  
+\end{verbatim}
+
+c) Using that type_id to index into the object_type_struct and finding that type's calculate_fpointer:
+\begin{verbatim}
+void* my_calculate_fpointer = (*object_type_struct[my_type_id])->calculate
+\end{verbatim}
+
+d) Call that function, which takes the objloc and the object id (which is still given by thread_controller[N]) as the arguments:
+\begin{verbatim}
+(my_calculate_fpointer)(obj_loc, thread_controller[N]);
+\end{verbatim}
+
+Again this is done more concisely in the code.
+
+\section{The generated functions}
+
+These are the more interesting functions generated for you by trad4. They are all found in bond_risk/gen/objects/*_wrapper.c.
+
+\subsection{The need_refresh function}
+
+\begin{verbatim}
+int bond_need_refresh( obj_loc_t obj_loc, int id )
+\end{verbatim}
+
+To illustrate how it works we'll again look at a bond with id 'id'.  First the thread locates the struct of the object it's working on as discussed above:
+
+\begin{verbatim}
+bond* my_bond = (bond*)my_object;
+\end{verbatim}
+
+The thread can then find the timestamp of this object:
+\begin{verbatim}
+int my_timestamp =  my_bond->last_published;
+\end{verbatim}
+
+Next the bond needs to locate the timestamp of the object to which it subscribes - in this case, the 
+currency curve. It does this by:
+
+a) First looking up the id of the currency_curve it subscribed to by:
+\begin{verbatim}
+int cc_id = my_bond->currency_curves;
+\end{verbatim}
+
+b) Using the currency curve id to index into the objloc to find the void* to it's struct:
+\begin{verbatim}
+void* sub_object = obj_loc[cc_id];
+\end{verbatim}
+
+c) Casting that to a pointer of the right type:
+\begin{verbatim}
+currency_curves* sub_currency_curves = (currency_curves*)sub_object;
+\end{verbatim}
+
+d) Find the currency curves' last_published timestamp:
+    
+\begin{verbatim}
+int sub_currency_curves_timestamp = sub_currency_curves->last_published;
+\end{verbatim}
+
+e) Compare the two and return the result:
+\begin{verbatim}
+return ( my_timestamp < sub_currency_curves_timestamp );
+\end{verbatim}
+
+This is complicated when an object subscribes to more than one object, but in practise the various results are just ORed together. 
+
+\subsection{The calculate function wrapper}
+
+\begin{verbatim}
+void calculate( obj_loc_t obj_loc, int id )
+\end{verbatim}
+
+The calculate wrapper calls the various debug macros (if enabled) before and after calling the user-
+supplied calculate function:
+
+\begin{verbatim}
+DEBUG_FINE( "\tbond_coupon: " << bond_coupon );
+...
+calculate_bond( obj_loc, id );
+...
+DEBUG( "\tbond_dv01: " << bond_dv01 );
+\end{verbatim}
+
+Some of the state management is also handled in the calculate function wrapper.
+
+\subsection{The calculate function}
+
+\begin{verbatim}
+int calculate_bond( obj_loc_t obj_loc, int id )
+\end{verbatim}
+
+This is the function that the user supplies that transforms the object's inputs and static into the outputs.  The calculate function is supplied with macros that abstract away the complex lookups and casts from the user. In this way the calculate function of the outright trade looks like:
+
+\begin{verbatim}
+outright_trade_pv = ( outright_trade_quantity * bond_price );
+\end{verbatim}
+
+
+\section{The macros}
+
+These work as follows: outright_trade_pv actually looks like:
+
+\begin{verbatim}
+#define outright_trade_pv ((outright_trade*)obj_loc[id])->pv
+\end{verbatim}
+
+And within the outright_trade's calculate function, bond_price looks like:
+
+\begin{verbatim}
+#define bond_price ((bond*)obj_loc[((outright_trade*)obj_loc[id])->bond])->price
+\end{verbatim}
+
 
 \end{document}
 
