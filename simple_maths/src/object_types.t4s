@@ -1,3 +1,6 @@
+# Copyright (c) Steve Evans 2010
+# schevans@users.sourceforge.net
+# This code is released under the BSD licence. For details see $INSTANCE_ROOT/LICENCE
 #type_id, tier, name
 1,1,a
 2,1,b
