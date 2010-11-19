@@ -16,12 +16,15 @@ using namespace std;
 
 int calculate_outright_book( obj_loc_t obj_loc, int id )
 {
+    // Reset the accumulators
     outright_book_pv=0;
     outright_book_pv_01=0;
     outright_book_pnl=0;    
 
+    // Note the counter from 0 to < MAX_TRADES_PER_BOOK
     for ( int i=0 ; i < MAX_TRADES_PER_BOOK ; i++ )
     {
+        // Note the test to see if this objects exists before de-referencing
         if ( outright_book_outright_trades[i] )
         {
             outright_book_pv += outright_trades_pv(i);
