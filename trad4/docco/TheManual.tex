@@ -35,7 +35,7 @@ There are three applications discussed in this document: hello_world, simple_mat
 
 Time for an example.
 
-\chapter{Example: Hello world!}
+\chapter{Hello world!}
 
 \section{Introduction}
 
@@ -43,10 +43,11 @@ The first trad4 application we'll examine is the venerable "Hello world!".
 
 \includegraphics[scale=0.5]{helloworldabstract.png}
 
-The above application is a directed acyclic graph, and it shows three types. Two on tier1 (T1) - hello and world, and one on T2 - hello_world. The T2 hello_world object subscribes to the two T1 objects. The hello_world object simply concatenates the names of the two objects and prints them out.
+The above application is a directed acyclic graph, and it shows three types. Two on tier1 (T1) - hello and world, and one on T2 - hello_world. The T2 hello_world type subscribes to the two T1 type. The hello_world type simply concatenates the names of the two type and prints them out.
+
+In this example each type will be instantiated by a running object, as there is one object per type. This will become clearer later on when we introduce multiple objects of the same type.
 
 What will happen when the application starts is that the T1 objects will run concurrently (they do nothing in this simple example), then the T2 object will run. This will read the names of the T1 objects and concatenate them and print the result. The output is below.
-
 
 \begin{verbatim}
 ~/src/hello_world$ hello_world
@@ -106,7 +107,7 @@ Each type must also have an entry in the object_types.t4s file (the 's' stands f
 
 The type_id must be unique. From this we can see type hello has an type_id of 1 and exists on tier 1 and world has an type_id of 2 and also exists on tier 1. The hello_world type has an type_id of 3 and exists on tier 2.
 
-\section{The Calculate Function}
+\section{The calculate function}
 
 Now we have described the type, we must specify what is does, in this case concatenating the names of the two objects and printing it out.
 
@@ -115,7 +116,10 @@ A stub calculate function is generated for you by trad4, and is found in the obj
 \begin{verbatim}
 int calculate_hello_world( obj_loc_t obj_loc, int id )
 {
-    cout << object_name(hello_world_hello) << " " << object_name(hello_world_world) << "!" << endl;
+    cout << object_name(hello_world_hello) 
+        << " " 
+        << object_name(hello_world_world) 
+        << "!" << endl;
 
     return 1;
 }
@@ -133,7 +137,7 @@ sub:
 
 So this shows that within calculate_hello_world there's a variable hello_world_hello in scope that will return the id of the hello object. Likewise there's a variable hello_world_world that will return the id of the world object. These id's we can use in the trad4 object_name function to return the name of the object, which is exactly what calculate_hello_world does above.
 
-\chapter{Example: Simple Maths}
+\chapter{Simple maths}
 
 \section{Introduction}
 
@@ -141,15 +145,15 @@ We're going to move on to a more complex example in order to demonstrate the con
 
 \begin{math}
   \begin{array}{ l c }
-        & z = x + y   \\
+        & z = x * y   \\
         where         \\
         & x = a + b   \\
-        & y = c + d   \\
+        & y = c - d   \\
         and           \\
         & a = 7       \\
         & b = 14      \\
-        & c = 6       \\
-        & b = 27      \\
+        & c = 27      \\
+        & d = 11      \\
   \end{array} 
 \end{math}
 
@@ -161,7 +165,7 @@ From this we can see that should a, b, c, and d all change we can run x and y at
 
 \section{The .t4 Files}
 
-In this example the .t4 files are a little more interesting. Below, a.t4:
+In this example the .t4 files are a little more interesting than before. Below, a.t4:
 
 \begin{verbatim}
 static
@@ -170,7 +174,7 @@ static
 
 Here type a has only one member, it's in the static section and it's an int called out. It's in the static section as the data is stored in the database. More on this below.
 
-The .t4 file for b, c and d are identical to a's and not shown. The .t4 file for x is shown below:
+The .t4 file for b, c and d are identical to a's and are not shown. The .t4 file for x is shown below:
 
 \begin{verbatim}
 sub
@@ -181,25 +185,15 @@ pub
     int out
 \end{verbatim}
 
-Here type x has three members. The first two are in the sub section and shows x subscribes to a type a called a, and a type b of name b. It also has an int called out in the pub section, where the result of \(a + b\) will be stored to be consumed by z.
+Here type x has three members. The first two are in the sub section and shows x subscribes to a type a called a, and a type b called b. It also has an int called out in the pub section, where the result of \(a + b\) will be stored to be consumed by z.
 
-The .t4 files for y and z are similar to x's and not shown. In fact there's a more concise way to arrange similar t4 types using inheritance of interface (IoI), as discussed in general_computer below.
+The .t4 files for y and z are similar to x's and not shown.
 
 \section{The Calculate Function}
 
-The calculate functions for a, b, c and d do nothing, as the types consist entirely of a single static member which is just published to to the world at large without any processing. The calculate_x function is shown below:
+The calculate functions for a, b, c and d do nothing, as the types consist entirely of a single static member which is just published to to the world at large without any processing. 
 
-\begin{verbatim}
-int calculate_x( obj_loc_t obj_loc, int id )
-{
-    x_out = a_out + b_out;
-
-    return 1;
-}
-\end{verbatim}
-
-Again these variables are provided by macros (from gen/objects/x_macros.h):
-
+This information is made available in x's calculate function by the macros (from gen/objects/x_macros.h):
 
 \begin{verbatim}
 sub:
@@ -215,14 +209,23 @@ pub:
     int x_out
 \end{verbatim}
 
-Here you can see for each sub member two variables are provided, in a's case these are x_a which provides it's id, and a_out where a will publish it's static data. Also in the pub section is the int x_out, where the result of  \(a + b\) is published. So calculate_x takes the published a_out and b_out variables, adds them and publishes the result in x_out.
+Here you can see for each sub member two variables are provided, in a's case these are x_a which provides it's id, and a_out where a will publish it's static data. Also in the pub section is the int x_out, where the result of  \(a + b\) is published. So calculate_x takes the published a_out and b_out variables, adds them and publishes the result in x_out (from objects/x.c):
 
-The calculate functions for y is very similar to that of x, but z's includes some output:
+\begin{verbatim}
+int calculate_x( obj_loc_t obj_loc, int id )
+{
+    x_out = a_out + b_out;
+
+    return 1;
+}
+\end{verbatim}
+
+The calculate function for y is very similar to that of x, but it subtracts c_out and d_out. The calculate function for z is shown below, as it includes some output:
 
 \begin{verbatim}
 int calculate_z( obj_loc_t obj_loc, int id )
 {
-    z_out = x_out + y_out;
+    z_out = x_out * y_out;
 
     cout << "z_out: " << z_out << endl;
 
@@ -230,12 +233,12 @@ int calculate_z( obj_loc_t obj_loc, int id )
 }
 \end{verbatim}
 
-\section{The Data}
-\label{sec:The Data}
+\section{The data}
+\label{sec:The data}
 
-In the first example hello_world we ignored the database to keep things simple, but we need to introduce it now. Trad4 uses sqlite - a serverless database written in C. All the tables you need (and some of the data) are generated for you by the precompiler, but you need to provide the data for. 
+In the first example hello_world we ignored the database to keep things simple, but we need to introduce it now. Trad4 uses sqlite - a serverless database written in C. All the tables you need (and some of the data) are generated for you by the precompiler, but you need to provide the data for.
 
-At this stage we also need to distinguish between objects and types. Types are the trad4 types as described in their .t4 files and calculate function. Objects are the running, instantiated types, described in the database. This discussion is confused by the fact that in this application and in hello_world, each type has a single instantiated object with type_id=id. This will become clearer later as we have multiple objects of particular types as in bond_risk below.
+At this stage we also need to further distinguish between objects and types. Types are the trad4 types as described in their .t4 files and calculate function, and they describe the structure of the database tables. Objects are the running instansiated types, and they each have entries in the database tables which are loaded at startup.
 
 The main table in the database is the object table, in which every object has an entry. This table is shown below:
  
@@ -321,18 +324,18 @@ Tier 2 ran 2 objects in 4.60148e-05 seconds.
 
 Tier 3 running.
 calculate_z( z )
-z_out: 54
+z_out: 336
 Tier 3 ran 1 objects in 3.60012e-05 seconds.
 
 All tiers ran 7 objects in 0.000287056 seconds.
 
 \end{verbatim}
 
-As in the previous example you can see the types being created and the objects being loaded and validated. Then from the report you can see we have 4 objects in T1, 2 on T2 and 1 on T3, as expected. Then the tiers are run as before, with z producing the output 54.
+As in the previous example you can see the types being created and the objects being loaded and validated. Then from the report you can see we have 4 objects in T1, 2 on T2 and 1 on T3, as expected. Then the tiers are run as before, with z producing the output 336.
 
 \section{Feeding in change}
 
-In this case the applications doesn't terminate after the first time all the tiers are run, but loops over the objects on T1 looking for change. We introduce change as follows:
+In this case the applications doesn't terminate after the first time all the tiers are run, waits for change. We introduce change as follows:
 
 \begin{enumerate}
 
@@ -373,12 +376,14 @@ Tier 2 ran 1 objects in 3.91006e-05 seconds.
 
 Tier 3 running.
 calculate_z( z )
-z_out: 66
+z_out: 528
 Tier 3 ran 1 objects in 4.19617e-05 seconds.
 
 \end{verbatim}
 
-Notice only a, x and z fired, the minimum needed to recalculate z given that only a had changed. Next we'll update b and c (ids 2 and 3):
+Notice only a, x and z fired, the minimum needed to recalculate z given that only a had changed. 
+
+Next we'll update b and c (ids 2 and 3):
 
 \begin{verbatim}
 
@@ -386,7 +391,7 @@ Notice only a, x and z fired, the minimum needed to recalculate z given that onl
 sqlite> update b set out=23 where id=2;
 sqlite> update c set out=46 where id=3;
 sqlite> update object set need_reload=1 where id in ( 2, 3 );
-
+~/src/simple_maths$ send_reload.sh
 \end{verbatim}
 
 This produces the following output:
@@ -404,7 +409,7 @@ Tier 2 ran 2 objects in 3.60012e-05 seconds.
 
 Tier 3 running.
 calculate_z( z )
-z_out: 115
+z_out: 1470
 Tier 3 ran 1 objects in 2.69413e-05 seconds.
 \end{verbatim}
 
@@ -413,11 +418,11 @@ From this you can see both b and c on T1 and x and y on T2 both run concurrently
 If fact in this example they don't as we're running is single threaded mode to keep the output orderly, but this is easily set with the environment variable NUM_THREADS, e.g.:
 
 \begin{verbatim}
-~/src/simple_maths$ export NUM_THREADS=64
+~/src/simple_maths$ export NUM_THREADS=16
 ~/src/simple_maths$ simple_maths
 \end{verbatim}
 
-\chapter{Example: bond_risk_simple}
+\chapter{Bond risk simple}
 
 \section{Introduction}
 
@@ -908,7 +913,7 @@ Tier 3 ran 9 objects in 2.21729e-05 seconds.
 
 In this case all the objects on each tier will run concurrently, given enough threads.
 
-\chapter{Extending bond_risk}
+\chapter{Bond risk}
 
 \section{Introduction}
 
