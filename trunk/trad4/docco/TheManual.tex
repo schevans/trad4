@@ -10,9 +10,17 @@
 
 \begin{document}
 
-\title{The Manual}
+\title{The Manual \\
+{\large \textbf{trad4 version 3.3}}}
+
 \author{Steve Evans}
+
+\date{Document version beta01 \\
+\today}
+
 \maketitle
+
+
 
 \setcounter{tocdepth}{1}
 \tableofcontents
@@ -238,7 +246,7 @@ int calculate_z( obj_loc_t obj_loc, int id )
 
 In the first example hello_world we ignored the database to keep things simple, but we need to introduce it now. Trad4 uses sqlite - a serverless database written in C. All the tables you need (and some of the data) are generated for you by the precompiler, but you need to provide the data for.
 
-At this stage we also need to further distinguish between objects and types. Types are the trad4 types as described in their .t4 files and calculate function, and they describe the structure of the database tables. Objects are the running instansiated types, and they each have entries in the database tables which are loaded at startup.
+At this stage we also need to further distinguish between objects and types. Types are the trad4 types as described in their .t4 files and calculate function, and they describe the structure of the database tables. Objects are the running instantiated types, and they each have entries in the database tables which are loaded at startup.
 
 The main table in the database is the object table, in which every object has an entry. This table is shown below:
  
@@ -426,25 +434,21 @@ If fact in this example they don't as we're running is single threaded mode to k
 
 \section{Introduction}
 
-Now we're going to examine a real world example of the trad4 architecture from the world of finance - bond_risk. This is a model that calculates the risk on two financial instruments - bonds and outright trades - that depend on the expected future values of interest rates. In this first chapter we'll be examining a cut-down version of the final app. In the next chapter we'll extend the model and examine how it handles under load.
+Now we're going to examine a real world example of the trad4 architecture from the world of finance - bond_risk. This is a model that calculates the risk on two financial instruments - bonds and outright trades - that depend on the expected future values of interest rates. In this first chapter we'll be examining a cut-down version of the final app - bond_risk_simple, in fact a branch of bond_risk. In the next chapter we'll extend this model and examine how it handles under load.
 
 First, the abstract graph:
 
 \includegraphics[scale=0.5]{bondrisksimpleabstract.png}
 
-Note that in this chapter we're looking at a simplified version of bond_risk, where we're ignoring the types repo_trade and book for now. TODO - bond_risk_simple
-
 \subsection{T1: ir_curve and calendar}
 
 The first type on T1 is ir_curve. This contains information about the expected future value of interest rates. We observe information from the markets to obtain a set of input_rates, and construct a curve starting today and going forward to a set endpoint (say 10 years). This constructed curve has an entry for each day from today to 10 years containing information derived from our input rates, which will be consumed by the T2 bond objects. The key point to note about ir_curves is that they are expensive to construct - the various algorithms used to bootstrap and interpolate the various curves are computationally expensive.
 
-There's a second type on T1 - the calendar, which gives today's date.
+There's a second type on T1 - the calendar, which gives today's date. Trad4 applications are designed to stay up during the week, and date rolls are handled by updating the calendar.
 
 \subsection{T2: bond}
 
 The second type on T2 is bond. A bond is a financial instrument that you buy for a certain price, and pays you fixed payments or coupons at a certain rate until it matures (say 5 years). Because it pays you money at a fixed rate (say 3\% per year), it will become more or less valuable depending on the current and expected future value of interest rates. A bond that pays 3\% when interest rates are 3% will be worth 100 (they are bought and sold in lots of 100), but it will have a higher price when interest rates are at 1\% (say 102.8) then when they are at 5\% (say 97.8) because they pay out more than that same £100 would in the bank (at 3%).
-
-TODO: Real data from worked_example.
 
 \subsection{T3: outright_trade}
 
@@ -464,9 +468,7 @@ From the perspective of the trad4 architecture this is quite easy to achieve: We
 
 In Section ~\ref{sec:The Data} the distinction between types and objects was made. This becomes clearer now as in this data set we will have two ir_curves, five bonds and nine outright_trades. These objects - instantiated types - are shown on the concrete graph represented by ovals containing the object name. This is shown below:
 
-\includegraphics[scale=0.3]{bondrisksimpleconcrete.png}
-
-TODO: Fix graph
+\includegraphics[scale=0.25]{bondrisksimpleconcrete.png}
 
 From this we can see the two ir_curves in two different currencies LIBOR.USD and LIBOR.GBP on T1. Then we can see the five bonds on T2, two of which were issued in USD (prefixed with US) which subscribe to LIBOR.USD, and three of which were issued in GBP (prefixed with UK) which subscribe to LIBOR.GBP. Lastly we have the nine outright_trades (their trade ticket numbers prefixed with O for outright)) which subscribe to various bonds.
 
@@ -487,8 +489,6 @@ NUM_FORWARD_DAYS = 7305  # 10 years
 NUM_INPUT_RATES = 10
 
 YEAR_BASIS = 365.25
-
-MAX_TRADES_PER_BOOK = 10
 \end{verbatim}
 
 This describes the start and end dates covered by this model, and the number of forward dates are calculated from that data. Also the number of input_rates is set here, as is the year basis which describes how years are calculated.
@@ -502,7 +502,6 @@ buy_sell_enum
     BUY
     SELL
 \end{verbatim}
-
 
 \subsection{aliases.t4s}
 
@@ -615,9 +614,12 @@ Given NUM_FORWARD_DAYS = END_DATE - TODAY, you can use these macros in your calc
     {
         num_years = i / YEAR_BASIS;
 
-        ir_curve_discount_rate[i] = exp( -ir_curve_interest_rate_interpol[i] * num_years );
-        ir_curve_discount_rate_p01[i] = exp( -(ir_curve_interest_rate_interpol[i] +0.0001) * num_years );
-        ir_curve_discount_rate_m01[i] = exp( -(ir_curve_interest_rate_interpol[i] -0.0001) * num_years );
+        ir_curve_discount_rate[i] = 
+            exp( -ir_curve_interest_rate_interpol[i] * num_years );
+        ir_curve_discount_rate_p01[i] = 
+            exp( -(ir_curve_interest_rate_interpol[i] +0.0001) * num_years );
+        ir_curve_discount_rate_m01[i] = 
+            exp( -(ir_curve_interest_rate_interpol[i] -0.0001) * num_years );
     }
 \end{verbatim}
 
@@ -718,7 +720,8 @@ Which can be assigned to as follows:
 
 \begin{verbatim}
     // Use the discount_rate to discount the future coupon payments and sum
-    bond_price = bond_price + ( 100.0 * coupon_rate_per_period * discount_rate );
+    bond_price = bond_price + 
+        ( 100.0 * coupon_rate_per_period * discount_rate );
 \end{verbatim}
 
 \section{outright_trade}
@@ -779,10 +782,13 @@ int calculate_outright_trade( obj_loc_t obj_loc, int id )
     outright_trade_pv = ( outright_trade_quantity * bond_price ) * direction;
 
     // Calculate the pv01 - the pv's exposure to interest rate movements.
-    outright_trade_pv_01 = ( outright_trade_quantity * bond_pv01 ) * direction;
+    outright_trade_pv_01 = 
+        ( outright_trade_quantity * bond_pv01 ) * direction;
 
-    // Calculate the pnl - the profit or loss we would make on the trade if we re-sold these bonds today.
-    outright_trade_pnl = outright_trade_pv - ( outright_trade_quantity * outright_trade_trade_price ) * direction;
+    // Calculate the pnl - the profit or loss we would make on the trade if we 
+    // re-sold these bonds today.
+    outright_trade_pnl = outright_trade_pv - 
+        ( outright_trade_quantity * outright_trade_trade_price ) * direction;
 
     return 1;
 }
@@ -913,11 +919,13 @@ Tier 3 ran 9 objects in 2.21729e-05 seconds.
 
 In this case all the objects on each tier will run concurrently, given enough threads.
 
+TODO: BATCH_MODE off, updates and bunp_interest_rates.sh
+
 \chapter{Bond risk}
 
 \section{Introduction}
 
-In this chapter we'll extend the model by introducing repo_trades, books and a calendar. The types ir_curve, bond and outright_trade behave as before.
+In this chapter we'll extend the model by introducing repo_trades and books - collections of trades. The types ir_curve, calendar, bond and outright_trade behave as before.
 
 Below, the abstract graph for the enhanced model:
 
@@ -925,42 +933,117 @@ Below, the abstract graph for the enhanced model:
 
 \section{repo_trade}
 
+An understanding of the repo_trade is not vital to the rest of this document, so if you choose to skip this section suffice to say a repo_trade is another type which is more computationally expensive than an outright_trade, with a dependency on ir_curve, calender and bond. 
+
 A repo trade is a kind of secured loan, used by investments banks to raise cash. They are sitting on a pile of bonds they have bought, so they can lend these out in exchange for cash collateral which the banks then use for funding. So they have a start date, and end date and a rate at which interest is calculated on the cash.
 
 Repo trades also need the bond price to calculate their margin, plus a discount rate curve with which to 
-calculate the mark-to-market profit and loss (mtm_pnl).
+calculate the mark-to-market profit and loss (mtm_pnl) - which is a measure of how much cheaper it was to raise this cash using the repo trade than it would have been to borrow on the open markets.
 
-TODO: Explain margin/mtm_pnl, but check other layouts.
+Repo trades also have a margin, which is part of the settlement details of a repo trade and sets the amount of collateral held with a third-party clearing house. It's the difference between the cash we borrowed and the value of the bond collateral - if our margin drops below a certain level we may have to make a margin payment to top up the collateral.
 
-- skip t4 files - refer to code
+The .t4 files and calculate functions can be found in the source distribution, as there's nothing in there you haven't seen already. 
 
 \section{The books}
 
-Trades are grouped into books or portfolios, so all your US-issued bonds might be kept in a book called USBK and your UK-issued ones in a book called UKBK. These books aggregate your risk so you can see overall exposure to particular market force (e.g. US interest rates). There is a book type for each trade type, which gives outright_book and repo_book.
-
-- t4 file and DB example
-
-\section{The calendar}
-
-The calendar type replaces the hard-coded TODAY of bond_risk_simple, and it allows for the date to roll overnight form today to tomorrow. There is only one instantiated calendar object in the system.
-
-- application should be left up week to week (c.f. living with section)
-
-- won't roll rates unless instructed
+Trades are grouped into books (a.k.a portfolios), so all your outright_trades against US-issued bonds might be kept in a book called OUTRIGHT_USD and your UK-issued ones in a book called OUTRIGHT_GBP. These books aggregate your risk so you can see overall exposure to particular market force (e.g. US interest rates). There is a book type for each trade type, which gives outright_book and repo_book.
 
 
+\subsection{The .t4 files}
+
+The books subscribe to multiple objects of the same type. This is done in the .t4 as shown below (from bond_risk/src/outright_book.t4):
+
+\begin{verbatim}
+sub
+    outright_trade outright_trades[MAX_TRADES_PER_BOOK]
+
+pub
+    double pv
+    double pv_01
+    double pnl
+\end{verbatim}
+
+The sub section shows the syntax for sub arrays. This array will contain the id's of all the outright_trades to which this object subscribes. You'll notice the pub section has the same profile as the outright_trades.
+
+A new constant has also been introduced - MAX_TRADES_PER_BOOK. Set to 10 in this document to keep the code blocks small, but will be set larger when testing under load.
+
+\subsection{The calculate function}
+
+The way this works in the calculate section is as follows. The sub macros look like this:
+
+\begin{verbatim}
+sub:
+    id outright_book_outright_trades[MAX_TRADES_PER_BOOK]
+    double outright_trades_trade_price( MAX_TRADES_PER_BOOK )
+    int outright_trades_quantity( MAX_TRADES_PER_BOOK )
+    date outright_trades_trade_date( MAX_TRADES_PER_BOOK )
+    buy_sell_enum outright_trades_buy_sell( MAX_TRADES_PER_BOOK )
+    double outright_trades_pv( MAX_TRADES_PER_BOOK )
+    double outright_trades_pv_01( MAX_TRADES_PER_BOOK )
+    double outright_trades_pnl( MAX_TRADES_PER_BOOK )
+\end{verbatim}
+
+The first five macros offer up the static data for each object, with the last three the pub data.
+
+It's important to note that the index used as an argument to these macros isn't the sub object's id - it's the index into the array of outright_trades. The other thing to note is that the array need not be fully populated - in which case the id at that index is set to 0. Given this, this works as follows (from bond_risk/objects/outright_book.c):
+
+\begin{verbatim}
+int calculate_outright_book( obj_loc_t obj_loc, int id )
+{
+    // Reset the accumulators
+    outright_book_pv=0;
+    outright_book_pv_01=0;
+    outright_book_pnl=0;
+
+    // Note the counter from 0 to < MAX_TRADES_PER_BOOK
+    for ( int i=0 ; i < MAX_TRADES_PER_BOOK ; i++ )
+    {
+        // Note the test to see if this objects exists before de-referencing
+        if ( outright_book_outright_trades[i] )
+        {
+            outright_book_pv += outright_trades_pv(i);
+            outright_book_pv_01 += outright_trades_pv_01(i);
+            outright_book_pnl += outright_trades_pnl(i);
+        }
+    }
+
+    return 1;
+}
+\end{verbatim}
+
+\subsection{The database}
+
+The database structure for outright_book is similar to what we've seen before - each object has a row in the object and outright_book tables, but is also has a row in outright_book_outright_trades, the structure of which is as follows (from bond_risk/gen/sql/outright_book_outright_trades.table):
+
+
+\begin{verbatim}
+create table outright_book_outright_trades (
+    id int,
+    col0 int,
+    col1 int,
+    col2 int,
+    col3 int,
+    col4 int,
+    col5 int,
+    col6 int,
+    col7 int,
+    col8 int,
+    col9 int
+);
+\end{verbatim}
+
+The data in worked_example looks like this (from bond_risk/data/worked_example/outright_book_outright_trades.sql):
+
+\begin{verbatim}
+insert into outright_book_outright_trades values ( 6, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
+\end{verbatim}
+
+In this case, there's only one trade (id = 4) subscribed to by this book (id = 6), as there's only a single outright_trade in this data set. We'll ramp up the data set sizes in the next section.
+
+\section{Operation under load}
 
 
 
-
-
-
-
-
-
-
-
-\section{Operation}
 
 
 \chapter{Language Features}
