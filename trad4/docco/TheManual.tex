@@ -919,7 +919,7 @@ Tier 3 ran 9 objects in 2.21729e-05 seconds.
 
 In this case all the objects on each tier will run concurrently, given enough threads.
 
-TODO: BATCH_MODE off, updates and bunp_interest_rates.sh
+TODO: BATCH_MODE off, updates and bump_interest_rates.sh
 
 \chapter{Bond risk}
 
@@ -1346,37 +1346,129 @@ As you can see, as with the above example you can access the underlying wave usi
 
 \section{Inheritance of Interface}
 
-Please also see the documentation of the general_computer application online.
-
 Inheritance of interface was introduced to solve a particular problem where you don't know the types of the objects that you will be subscribing to at run-time. Take the following example from simple_maths:
 
-\includegraphics[scale=0.5]{generalcomputerconcretesimple1.png}
+\begin{math}
+  \begin{array}{ l c }
+        & z = x * y   \\
+        where         \\
+        & x = a + b   \\
+        & y = c - d   \\
+        and           \\
+        & a = 7       \\
+        & b = 14      \\
+        & c = 27      \\
+        & d = 11      \\
+  \end{array}
+\end{math}
 
-We can see that the T2 addition objects subscribe to feed objects but the T3 addition object subscribes to two addition objects. How is this achieved when we hard-code the sub object type in the .t4 file? The answer is inheritance of interface.
+And the abstract graph is as follows:
 
-Inheritance of interface allows for types with different functions to share the same interface to a base type (analogous to a pure virtual base class in C++). In this model our base type is called 'numeric', and this in turn allows for any type to connect to any other because any derived type 'is a' numeric. So numeric.t4 looks like:
+\includegraphics[scale=0.5]{simplemathsabstract.png}
+
+Now the problem with this arrangement is that type x is hard-coded in x.t4 to only subscribe to types a and b, and sun the two. Likewise z is hard-coded to only subscribe to types z and y, and multiply the two. This means the system is not configurable - the behaviour of the system is hard coded in the t4 files.
+
+What we need to be able to do is allow any operation to subscribe to any other operation, so we can configure the behaviour at run-time. The answer to this is inheritance of interface (IoI), which is demonstrated by the trad4 application general_computer.
+
+\subsection{general_computer}
+
+The plan is to create a series of objects that perform primitive mathematical functions - plus, minus, natural_log, cume_norm_dist etc., and configure the relationship between these objects to solve a particular problem. The interesting thing about this approach is that once we've created the application, we can configure the relationship between the objects at run-time by manipulating data in the database. 
+
+Below, the concrete diagram for the data set worked_example. You'll notice we've switched from the abstract diagram of simple_maths (which shows the hard-coded types) to the concrete diagram of general_computer (which shows the relationship between the running objects), but the functionality remains the same. This frees us of the hard-coded limitations discussed above.
+
+\includegraphics[scale=0.5]{generalcomputerworkedexample.png}
+
+What we do is create a base type 'numeric' (analogous to a pure virtual base class in C++) that every other type inherits the interface (i.e. the pub section) of. In this way, an 'addition' type could subscribe to a 'multiplication' type or another addition type, as both \emph{isa} numeric.
+
+\subsubsection{The t4 files}
+
+The base type numeric is defined as follows (from general_computer/src/numeric.t4):
+
+\begin{verbatim}
+pub
+    double output
+\end{verbatim}
+
+The only member numeric has is a double called output in the pub section. This is the only thing every other numeric has in common - they all produce an output.
+
+Now let's take a look at addition.t4:
 
 \begin{verbatim}
 sub
     numeric numeric1
     numeric numeric2
-static
-    double value
-pub
-    double output
-\end{verbatim}
 
-Then feed.t4 and addition.t4 both look like:
-
-\begin{verbatim}
 implements numeric
 \end{verbatim}
 
-We then get two objects both of which 'is a' numeric and both of which subscribe to two more numerics. Looking again at the example above the graph now holds as addition could subscribe to either feeds or additions.
+This type subscribes to two numerics and implements numeric (i.e. inherited the pub member output). The t4 files for the rest of the binary (two-inputs) types like multiplication etc. look the same, as they all subscribe to two numerics and perform an operation on them.
 
-TODO: Fix with new partial overriding. (Model and text)
+The unary types (natural_log, square_root etc.) only have one input:
 
-- Shared functions
+\begin{verbatim}
+sub
+    numeric numeric
+
+implements numeric
+\end{verbatim}
+
+The feeds - the way we're feeding numbers into whatever system we configure - don't subscribe to any types but do have a static section where the data from the database is published:
+
+
+\begin{verbatim}
+static
+    double value
+
+implements numeric
+\end{verbatim}
+
+The abstract diagram for the cut-down set of operators we need for the above example from simple_maths is shown below:
+
+\includegraphics[scale=0.4]{generalcomputerabstractsimple.png}
+
+This shows a feed that exist on any tier, the binary operators which must subscribe to two objects on a tier below them, and the bast type numeric.
+
+\subsubsection{The calculate function}
+
+The calculate functions work as usual. So for example a binary function (general_computer/objects/addition.c):
+
+\begin{verbatim}
+int calculate_addition( obj_loc_t obj_loc, int id )
+{
+    addition_output = numeric1_output + numeric2_output;
+
+    return 1;
+}
+\end{verbatim}
+
+A unary function (general_computer/objects/natural_log.c):
+
+\begin{verbatim}
+int calculate_natural_log( obj_loc_t obj_loc, int id )
+{
+    natural_log_output = log( numeric_output );
+
+    return 1;
+}
+\end{verbatim}
+
+And the feed, which just copies the static data to it's output (general_computer/objects/feed.c):
+
+\begin{verbatim}
+int calculate_feed( obj_loc_t obj_loc, int id )
+{
+    feed_output = feed_value;
+
+    return 1;
+}
+\end{verbatim}
+
+
+
+
+
+
+
 
 
 \chapter{New Application Walk-through}
