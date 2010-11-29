@@ -15,7 +15,7 @@ using namespace std;
 
 int calculate_cume_norm_dist( obj_loc_t obj_loc, int id )
 {
-    double x = numeric1_output;
+    double x = numeric_output;
 
     const double b1 =  0.319381530;
     const double b2 = -0.356563782;

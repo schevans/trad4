@@ -14,7 +14,7 @@ using namespace std;
 
 int calculate_natural_log( obj_loc_t obj_loc, int id )
 {
-    natural_log_output = log( numeric1_output );
+    natural_log_output = log( numeric_output );
 
     return 1;
 }
