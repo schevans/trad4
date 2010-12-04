@@ -27,6 +27,9 @@
 
 \chapter{Introduction}
 
+Trad4 is a declarative language where you describe types (mapped to C structures), define the relationship between the types (in a db), and define what the objects do when they fire.
+
+
 Trad4 is a programming language with which you describe the relationship and behaviour of a set of object of different types. 
 
 Features:
@@ -51,7 +54,7 @@ The first trad4 application we'll examine is the venerable "Hello world!".
 
 \includegraphics[scale=0.5]{helloworldabstract.png}
 
-The above application is a directed acyclic graph, and it shows three types. Two on tier1 (T1) - hello and world, and one on T2 - hello_world. The T2 hello_world type subscribes to the two T1 type. The hello_world type simply concatenates the names of the two type and prints them out.
+The above application is a directed acyclic graph, and it shows three types. Two on tier1 (T1) - hello and world, and one on T2 - hello_world. The T2 hello_world type subscribes to the two T1 types. The hello_world type simply concatenates the names of the two type and prints them out.
 
 In this example each type will be instantiated by a running object, as there is one object per type. This will become clearer later on when we introduce multiple objects of the same type.
 
@@ -101,7 +104,7 @@ sub
 
 The .t4 files are split into three sections. The sub section as shown above describes the type and name of the other trad4 types to which this this type subscribes. In this case hello_world subscribes to two types, the first being a hello object called hello, and the second a world object called world.
 
-The other two sections are static - where the object keeps it's static data which is loaded from the database, and the pub section - where the intermediate and final values of the object's calculate function are stores and published to the world. Neither of these two sections are used in this simple model.
+The other two sections are static - where the object keeps it's static data which is loaded from the database, and the pub section - where the intermediate and final values of the object's calculate function are stored and published to the world. Neither of these two sections are used in this simple model.
 
 Each type must also have an entry in the object_types.t4s file (the 's' stands for system). This is shown below:
 
@@ -1366,7 +1369,7 @@ And the abstract graph is as follows:
 
 \includegraphics[scale=0.5]{simplemathsabstract.png}
 
-Now the problem with this arrangement is that type x is hard-coded in x.t4 to only subscribe to types a and b, and sun the two. Likewise z is hard-coded to only subscribe to types z and y, and multiply the two. This means the system is not configurable - the behaviour of the system is hard coded in the t4 files.
+Now the problem with this arrangement is that type x is hard-coded in x.t4 to only subscribe to types a and b, and sum the two. Likewise z is hard-coded to only subscribe to types x and y, and multiply the two. This means the system is not configurable - the behaviour of the system is hard coded in the t4 files.
 
 What we need to be able to do is allow any operation to subscribe to any other operation, so we can configure the behaviour at run-time. The answer to this is inheritance of interface (IoI), which is demonstrated by the trad4 application general_computer.
 
@@ -1627,7 +1630,7 @@ application. You can run it now if you like.
     simple_maths$ bin/simple_maths
 \end{verbatim}
 
-You should see the types being created, then the load functions being called and the objects being created (there's a one-to-one correspondence between the types and objects in this simple model). The objects are then validated and a short report is produced. The tiers are then run in turn and all the calculate functions being called, but they won't do anything yet as the logic hasn't yet been provided.
+You should see the types being created, then the load functions being called and the objects being created (there's a one-to-one correspondence between the types and objects in the default_set). The objects are then validated and a short report is produced. The tiers are then run in turn and all the calculate functions being called, but they won't do anything yet as the logic hasn't yet been provided.
 
 The application should then exit as BATCH_MODE is set as default, which caused the application to exit after the first run.
 
@@ -1721,6 +1724,10 @@ int calculate_bond( obj_loc_t obj_loc, int id )
     return 1;
 }
 \end{verbatim}
+
+You may well wonder why this error wasn't logged. The answer is, if you've got a million objects all running on the same host that subscribe to a single object (like a calendar) that goes bonkers, you don't want them all trying to write to stderr at the same time...
+
+
 
 \subsection{Common functions}
 It is possible to share code between heterogeneous objects. For example, you might require a function that interpolates curves in more than one object in your hierarchy. While there's no formal support for this in trad4 currently, there's nothing stopping you for defining your function in objects/my_func.c, and then doing a crafty:
