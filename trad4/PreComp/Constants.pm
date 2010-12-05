@@ -9,7 +9,7 @@ package PreComp::Constants;
 sub SqlRoot { return "$ENV{APP_ROOT}/gen/sql/"; }
 sub GenObjRoot { return "$ENV{APP_ROOT}/gen/objects/"; }
 sub ObjRoot { return "$ENV{APP_ROOT}/objects/"; }
-sub DoccoRoot { return "$ENV{APP_ROOT}/docco/"; }
+sub DoccoRoot { return "$ENV{APP_ROOT}/documentation/"; }
 
 sub CommomHeader { 
 
