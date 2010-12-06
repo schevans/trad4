@@ -1044,9 +1044,7 @@ In this case, there's only one trade (id = 4) subscribed to by this book (id = 6
 
 \section{Operation under load}
 
-
-
-
+For now please see the section on-line: http://trad4.sourceforge.net/bond_risk/analysis.html
 
 \chapter{Language Features}
 \label{sec:Language Features}
@@ -1753,6 +1751,16 @@ CXXFLAGS contain the compilation flags. Default is "-c -Wall -fPIC". Append with
 T4_3RD_PARTY_LIBS contains the colon-separated paths to any third-party libraries you're using.
 
 T4_3RD_PARTY_HEADER_PATH contains the colon-separated paths to any third-party headers you need to include.
+
+\subsection{The T4_TEST macro}
+
+There's a macro defined in trad4.h that compares two numbers for closeness (to within 0.1). You can use it in your calculate function as follows:
+
+\begin{verbatim}
+T4_TEST( addition_output, 10.055 );
+\end{verbatim}
+
+It's useful for locking down the numbers while you make changes. It's specfic to data sets so it's only really useful in development, but it's also used in test_app as there's only one data set.
 
 \chapter{Living with trad4}
 
