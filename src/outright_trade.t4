@@ -1,0 +1,19 @@
+# Copyright (c) Steve Evans 2010
+# schevans@users.sourceforge.net
+# This code is released under the BSD licence. For details see $INSTANCE_ROOT/LICENCE
+
+
+sub
+    bond bond
+
+static
+    double trade_price
+    int quantity
+    date trade_date
+    buy_sell_enum buy_sell
+
+pub
+    double pv
+    double pv_01
+    double pnl
+
