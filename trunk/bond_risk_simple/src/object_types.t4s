@@ -1,0 +1,11 @@
+# Copyright (c) Steve Evans 2010
+# schevans@users.sourceforge.net
+# This code is released under the BSD licence. For details see $INSTANCE_ROOT/LICENCE
+#type_id, tier, name
+1,1,calendar
+2,1,ir_curve
+3,2,bond
+4,3,outright_trade
+
+
+
