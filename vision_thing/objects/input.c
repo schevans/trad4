@@ -1,6 +1,6 @@
 // Copyright (c) Steve Evans 2009
 // steve@topaz.myzen.co.uk
-// This code is licenced under the BSD licence. For details see $INSTANCE_ROOT/LICENCE
+// This code is licenced under the BSD licence. For details see $APP_ROOT/LICENCE
 
 // Please see the comment at the top of vision_thing/gen/objects/input_macros.h
 //  to see what's in-scope.

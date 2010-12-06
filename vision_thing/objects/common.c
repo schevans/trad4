@@ -1,6 +1,6 @@
 // Copyright (c) Steve Evans 2010
 // steve@topaz.myzen.co.uk
-// This code is licenced under the BSD licence. For details see $INSTANCE_ROOT/LICENCE
+// This code is licenced under the BSD licence. For details see $APP_ROOT/LICENCE
 
 // This is a hack simply to get round the lack of support for strings in trad4.
 // There are various workarounds, from (in the static section) char my_name[MAX_NAMES], but this 
