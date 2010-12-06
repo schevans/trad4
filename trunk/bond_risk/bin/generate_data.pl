@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 
-# Copyright (c) Steve Evans 2007
-# steve@topaz.myzen.co.uk
-# This code is licenced under the BSD licence. For details see $INSTANCE_ROOT/LICENCE
+// Copyright (c) Steve Evans 2010
+// schevans@users.sourceforge.net
+// This code is released under the BSD licence. For details see $INSTANCE_ROOT/LICENCE
 
 use warnings;
 use strict;
