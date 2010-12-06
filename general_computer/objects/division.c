@@ -1,6 +1,7 @@
-// Copyright (c) Steve Evans 2009
-// steve@topaz.myzen.co.uk
+// Copyright (c) Steve Evans 2010
+// schevans@users.sourceforge.net
 // This code is released under the BSD licence. For details see $APP_ROOT/LICENCE
+
 
 // Please see the comment at the top of general_computer/gen/objects/division_macros.c
 //  to see what's in-scope.
