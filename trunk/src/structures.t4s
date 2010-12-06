@@ -1,7 +1,0 @@
-# Copyright (c) Steve Evans 2010
-# schevans@users.sourceforge.net
-# This code is released under the BSD licence. For details see $INSTANCE_ROOT/LICENCE
-
-rate
-    double value
-    int days_forward
