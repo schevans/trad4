@@ -169,49 +169,44 @@ void run_trad4( int print_graph )
         get_timestamp( start_time );
         get_timestamp( tier_start_time );
 
-        num_object_run_this_tier = run_tier( 1 );
+        num_objects_run = 0;
 
-        if ( num_object_run_this_tier > 0 )
+        for ( int tier=1 ; tier < num_tiers+1 ; tier++ )
         {
+            if ( tier_manager[tier][0] <= 1 )
+            {
+                continue;
+            }
+
+            get_timestamp( tier_start_time );
+
+            num_object_run_this_tier = run_tier( tier );
+
             get_timestamp( tier_end_time );
 
-            num_objects_run = num_object_run_this_tier;
+            num_objects_run = num_objects_run + num_object_run_this_tier;
 
-            if ( timing_debug )
-                cout << setprecision(6) << "Tier " << 1 << " ran " << num_object_run_this_tier << " objects in " << tier_end_time - tier_start_time << " seconds." << endl;
-
-            for ( int tier=2 ; tier < num_tiers+1 ; tier++ )
+            if ( timing_debug && num_object_run_this_tier ) 
             {
-                if ( tier_manager[tier][0] <= 1 )
-                {
-                    continue;
-                }
-
-                get_timestamp( tier_start_time );
-
-                num_object_run_this_tier = run_tier( tier );
-
-                get_timestamp( tier_end_time );
-
-                num_objects_run = num_objects_run + num_object_run_this_tier;
-
-                if ( timing_debug ) 
-                    cout << setprecision(6) << "Tier " << tier << " ran " << num_object_run_this_tier << " objects in " << tier_end_time - tier_start_time << " seconds." << endl;
-
+                cout << setprecision(6) << "Tier " << tier << " ran " << num_object_run_this_tier << " objects in " << tier_end_time - tier_start_time << " seconds." << endl;
             }
 
-            get_timestamp( end_time );
-
-            if ( timing_debug ) 
-                cout << endl << "All tiers ran " << num_objects_run << " objects in " << end_time-start_time << " seconds." << endl;
-
-            if ( batch_mode )
-            {
-                cout << endl << "Exiting after first run as BATCH_MODE is set." << endl;
-                exit(0);
-            }
         }
-        else
+
+        get_timestamp( end_time );
+
+        if ( timing_debug && num_object_run_this_tier ) 
+        {
+            cout << endl << "All tiers ran " << num_objects_run << " objects in " << end_time-start_time << " seconds." << endl;
+        }
+
+        if ( batch_mode )
+        {
+            cout << endl << "Exiting after first run as BATCH_MODE is set." << endl;
+            exit(0);
+        }
+
+        if ( num_objects_run == 0 )
         {
             usleep(10000);
         }
@@ -232,7 +227,6 @@ void get_timestamp( double& out_time )
     timeval tim;
     gettimeofday(&tim, NULL);
     out_time = tim.tv_sec + ( tim.tv_usec / 1000000.0 );
-
 }
 
 int run_tier( int tier ) {
