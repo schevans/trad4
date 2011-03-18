@@ -10,9 +10,10 @@
 \begin{document}
 
 \title{The Manual \\
-{\large \textbf{trad4 version 3.3}}}
+{\large \textbf{trad4 version 3.3beta01}}}
 
-\author{Steve Evans}
+%\author{Steve Evans \\ Steve has a B.Sc. in Anthropology \\ and an M.Sc. in Computer Science, both from UCL. \\ He is currently working as a Credit Quant Developer at Royal Bank of Scotland. \\ He lives in London.}
+\author{Steve Evans \\\\ Steve has a B.Sc. in Anthropology \\ and an M.Sc. in Computer Science, both from UCL. \\ He is currently working as a Credit Quant Developer \\ at Royal Bank of Scotland. He lives in London.}
 
 \date{Document version beta01 \\
 \today}
@@ -26,13 +27,35 @@
 
 \chapter{Introduction}
 
+A trad4 application is basically a directed graph of running objects. Take the following example where a, b, c and d are feeds into the system from some external sensor or data feed, x and y are functions of a,b and c,d respectively and z is a function of x and y:
 
-Trad4 is a declarative language where you describe types (mapped to C structures), define the relationship between the types (in a db), and define what the objects do when they fire.
+\includegraphics[scale=0.5]{simplemathsabstract.png}
 
+These objects are held on tiers, so a, b, c and d are on Tier 1 (T1). Objects x and y are on T2 and z is on T3. 
 
-Trad4 is a programming language with which you describe the relationship and behaviour of a set of object of different types. 
+Change is fed into this graph and ripples it's way upward. In the above example, should b change on T1, when T2 is run x will fire but y will not. Then when T3 is run z will fire using the new data from x and the old (but still valid) data from y. Should b and c change then when T2 runs both x and  y will run concurrently. Then z will run as usual on T3.
 
-Features:
+This brings us us some immediate advantages. 
+
+Firstly, we get the concurrency of x and y should they both need to fire. This becomes particularly useful when there are large numbers of objects. Because this concurrency is restricted to one tier at a time sequentially we have no need for any mutex locks in the system - we know that when running Tn concurrently, all the objects they depend on and read data from are on T($<$n) and won't change during Tn's run.
+
+Second, should b change we don't need to recalculate y - y's object stays in memory throughout the life of the application and will only update if d or c fire, so z object can continue to re-use the results of y which was only calculated once at start-up.. This is particularly useful if y is computationally expensive.
+
+Trad4 applications are supposed to stay up indefinitely - once y has been calculated that's the last time y needs to fire until the application is halted (unless of course c or d change). In practise of course you should stop them occasionally for maintenance - more on this in section 9.
+
+We'll see late how it's possible to decompose arbitrary equations to run as concurrent trad4 applications.
+
+\subsubsection{Programming in trad4}
+
+Trad4 is quite a different kind of programming you may be used to. It has three phases of development.
+
+Firstly, you describe your types\footnote{The terms 'type' and 'object' will be conflated (but used correctly) until section 4, but an object is just an instantiated type. In the above example z is both a type and an object, as there is only one object of type z and that object is called z.}. This information describes both the internal structure of a type (e.g. any doubles ints or arrays it contains), and it's relationship to other types. This relationship is one of subscription - in the above example x subscribes to a and b. Object z subscribes to x and y, but not to the T1 objects.
+
+Then you describe (in C++) what each type does - how it combines it's own data and the data of the objects to which it subscribes into it's published results. This is done in the object's calculate function which has both the object's data and the objects to which it subscribes' data pulled in-scope by trad4. You access this data and publish the results through macro accessors provided for you by trad4.
+
+Lastly, you specify the data for each object in the database. This will include the object name, id, any static data and the ids of the other objects to which this object subscribes.
+
+\subsubsection{Features}
 
 \begin{itemize}
 \item add and remove objects at run time
@@ -42,9 +65,22 @@ Features:
 \item 3rd-party library integration (restrictions apply: you have to keep them on the stack)
 \end{itemize}
 
-There are three applications discussed in this document: hello_world, simple_maths and bond_risk. There are other applications available and written up online.
+\subsubsection{About this document}
 
-Time for an example.
+The next four sections are supposed to be read alongside a downloaded, build-able, run-able copy of the source (any v3.3 distribution will at a minimum contain all applications referred to in this document).
+
+In the next section we're going to dive straight in with an example - the venerable Hello World! While this example suppresses a lot of the interesting things about trad4, it will still be a pretty steep learning curve.
+
+The next three sections introduce applications of increasing complexity and introduces new aspects of the trad4 world: Section three covers the above example in more detail; Section four introduces a cut-down example from the world of finance; Section five expands on section four .
+
+Sections six and seven are a reference of language features it's recommended you at least read through.
+
+Section eight describes step-by-step how you go about creating your own trad4 application.
+
+Section nine describes how you would live with a trad4 application on a day-to-day basis.
+
+Lastly, Appendix A describes in detail how trad4 actually works.
+
 
 \chapter{Hello world!}
 
@@ -249,7 +285,7 @@ int calculate_z( obj_loc_t obj_loc, int id )
 
 In the first example hello_world we ignored the database to keep things simple, but we need to introduce it now. Trad4 uses sqlite - a serverless database written in C. All the tables you need (and some of the data) are generated for you by the precompiler, but you need to provide the data for.
 
-At this stage we also need to further distinguish between objects and types. Types are the trad4 types as described in their .t4 files and calculate function, and they describe the structure of the database tables. Objects are the running instantiated types, and they each have entries in the database tables which are loaded at startup.
+At this stage we also need to further distinguish between objects and types. Types are the trad4 types as described in their .t4 files and calculate function, and they describe the structure of the database tables. Objects are the running instantiated types, and they each have entries in the database tables which are loaded at start-up.
 
 The main table in the database is the object table, in which every object has an entry. This table is shown below:
  
@@ -1761,7 +1797,7 @@ There's a macro defined in trad4.h that compares two numbers for closeness (to w
 T4_TEST( addition_output, 10.055 );
 \end{verbatim}
 
-It's useful for locking down the numbers while you make changes. It's specfic to data sets so it's only really useful in development, but it's also used in test_app as there's only one data set.
+It's useful for locking down the numbers while you make changes. It's specific to data sets so it's only really useful in development, but it's also used in test_app as there's only one data set.
 
 \chapter{Living with trad4}
 
@@ -1949,9 +1985,6 @@ This will set this object's state to FAILED. In this case, as any objects that s
 Next, any objects that subscribe to STALE objects can continue to use their data, plus the data from any other OK objects it also subscribes to. In this way these objects can continue to update with a mixture of OK and STALE data. These objects will themselves be set to STALE.
 
 In this way, a trad4 application is very robust - a FAILED object can't bring down the system - it will just cause a ripple of STALE objects up the hierarchy.
-
-
-\chapter{Hardware considerations}
 
 \appendix
 
