@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 
-// Copyright (c) Steve Evans 2010
-// schevans@users.sourceforge.net
-// This code is released under the BSD licence. For details see $APP_ROOT/LICENCE
+# Copyright (c) Steve Evans 2010
+# schevans@users.sourceforge.net
+# This code is released under the BSD licence. For details see $APP_ROOT/LICENCE
 
 use warnings;
 use strict;
@@ -23,7 +23,7 @@ sub generate_outright_books();
 sub generate_repo_books();
 
 my $current_id = 201;
-my $log_level = 1;
+my $log_level = 0;
 
 my %discount_rate_ids;
 my @outright_agg;
@@ -72,17 +72,26 @@ generate_calendar();
 generate_ir_curve();
 generate_ir_curve_input_rates();
 
-# small_set
-generate_bonds( 5 );
-generate_outright_trades( 40 );
-generate_repo_trades( 40 );
+# 50k
+generate_bonds( 2000 );
+generate_outright_trades( 24000 );
+generate_repo_trades( 24000 );
 generate_outright_books();
-generate_repo_books();
+generate_outright_books();
 
 # 220k
 #generate_bonds( 20000 );
 #generate_outright_trades( 100000 );
 #generate_repo_trades( 100000 );
+#generate_outright_books();
+#generate_outright_books();
+
+# 440k
+#generate_bonds( 40000 );
+#generate_outright_trades( 200000 );
+#generate_repo_trades( 200000 );
+#generate_outright_books();
+#generate_outright_books();
 
 sub generate_calendar() {
 
@@ -285,11 +294,12 @@ sub generate_repo_trades($) {
         my $notional = 1000 * int( rand( 100  ));
         my $start_cash = $notional * int( sprintf("%.2f", 95.0 + (rand( 10 ))));
         my $rate = sprintf("%.2f", (rand( 8 - 2 ) + 2));
+        my $cash_ccy = int(rand(3));
         my $buy_sell = int(rand(2));
         my $bond = $bond_ids[ int( rand( @bond_ids )) ];
         my $ir_curve = $bond_to_ir_curve{$bond};
 
-        print FILE "insert into repo_trade values ( $id, $start_date, $end_date, $notional, $start_cash, $rate, $buy_sell, 1, $bond, $ir_curve );\n";
+        print FILE "insert into repo_trade values ( $id, $start_date, $end_date, $notional, $start_cash, $rate, $cash_ccy, $buy_sell, 1, $bond, $ir_curve );\n";
 
         $repo_trade_to_bond{$id} = $bond;
     }
@@ -351,7 +361,6 @@ sub generate_outright_books() {
                             print FILE "insert into outright_book_outright_trades values ( $id";
 
                         }
-
                     }
                 }
             }
