@@ -72,26 +72,42 @@ generate_calendar();
 generate_ir_curve();
 generate_ir_curve_input_rates();
 
-# 50k
-generate_bonds( 2000 );
-generate_outright_trades( 24000 );
-generate_repo_trades( 24000 );
-generate_outright_books();
-generate_outright_books();
+my $preset = "1M";
 
-# 220k
-#generate_bonds( 20000 );
-#generate_outright_trades( 100000 );
-#generate_repo_trades( 100000 );
-#generate_outright_books();
-#generate_outright_books();
+if ( $preset eq "50k" ) {
 
-# 440k
-#generate_bonds( 40000 );
-#generate_outright_trades( 200000 );
-#generate_repo_trades( 200000 );
-#generate_outright_books();
-#generate_outright_books();
+    generate_bonds( 2000 );
+    generate_outright_trades( 24000 );
+    generate_repo_trades( 24000 );
+    generate_outright_books();
+    generate_outright_books();
+}
+elsif ( $preset eq "220k" ) {
+
+    generate_bonds( 20000 );
+    generate_outright_trades( 100000 );
+    generate_repo_trades( 100000 );
+    # Books omitted for large sets as they run quickly but take ages to generate.
+}
+elsif ( $preset eq "440k" ) {
+
+    generate_bonds( 40000 );
+    generate_outright_trades( 200000 );
+    generate_repo_trades( 200000 );
+    # Books omitted for large sets as they run quickly but take ages to generate.
+}
+elsif ( $preset eq "1M" ) {
+
+    generate_bonds( 80000 );
+    generate_outright_trades( 460000 );
+    generate_repo_trades( 460000 );
+    # Books omitted for large sets as they run quickly but take ages to generate.
+}
+else {
+
+    print "Unknow preset $preset. No data generated.\n";
+    exit(0);
+}
 
 sub generate_calendar() {
 
@@ -173,6 +189,7 @@ sub generate_ir_curve()
     push @ir_curve_ids, $id;
     $ir_curve_name{$id} = $name;
 
+#??
 print FILE "COMMIT;\n";
 return;
 
@@ -455,6 +472,5 @@ sub generate_repo_books() {
 sub get_next_id() {
 
     return $current_id++;
-
 }
 
