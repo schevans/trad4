@@ -72,9 +72,17 @@ generate_calendar();
 generate_ir_curve();
 generate_ir_curve_input_rates();
 
-my $preset = "1M";
+my $preset = "100";
 
-if ( $preset eq "50k" ) {
+if ( $preset eq "100" ) {
+
+    generate_bonds( 30 );
+    generate_outright_trades( 30 );
+    generate_repo_trades( 30 );
+    generate_outright_books();
+    generate_outright_books();
+}
+elsif ( $preset eq "50k" ) {
 
     generate_bonds( 2000 );
     generate_outright_trades( 24000 );
