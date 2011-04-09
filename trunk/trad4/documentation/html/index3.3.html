@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+  <!DOCTYPE html
+            PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+            "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+ 
+     <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  
+     <head>
+ 
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <link rel="stylesheet" type="text/css" href="./gcc.css" />
+
+  
+<title>
+trad4 - parallelise your problems
+</title>
+<style type="text/css">
+  h2 { font-size: 1.2em; }
+</style>
+   </head>
+ 
+
+
+<body bgcolor="#FFFFFF" text="#000000" link="#1F00FF" alink="#FF0000" vlink="#9900DD">
+
+  <table border="0" cellspacing="0" cellpadding="2">
+  <tr>
+
+  <td bgcolor="white" valign="top" width="99%">           <!-- main frame -->
+
+<table>
+<tr> 
+<td>
+
+<h1 align="center">
+trad4 - parallelise your problems
+</h1>
+
+<p>
+
+Trad4 is a fully concurrent, thread safe, graph-based programming language that scales linearly on multiple cores. It is initially intended for deployment in the financial industry to model real-time risk.
+</p>
+<p>
+Trad4 is proposed as an alternative to the Von Neumann model of computer architecture.
+</p>
+</td>
+<td>
+<img src="./logo1.png" alt="" align="right" />
+</td>
+</tr>
+</table>
+</p>
+
+<hr />
+<!-- ==================================================================== -->
+
+
+<table><tr>
+
+
+
+  <td valign="top" style="padding-right: 36px;">            <!-- nav frame -->
+  <table border="0" cellspacing="0" cellpadding="2" width="10em">
+
+  
+
+  
+
+  <tr><td><table cellspacing="0" width="100%">
+  <tr><td class="td_title"  >
+  <b>Documentation</b>
+  </td></tr>
+  <tr><td class="td_con"  >
+  <a href="https://sourceforge.net/project/downloading.php?group_id=202177&filename=trad4v3_The_Manual.pdf&a=23808027">The Manual (beta)</a><br />
+
+
+  </td></tr>
+  </table></td></tr>
+ 
+  <tr><td><table cellspacing="0" width="100%">
+  <tr><td class="td_title"  >
+  <b>Downloads</b>
+  </td></tr>
+  <tr><td class="td_con"  >
+  <a href="https://sourceforge.net/project/downloading.php?group_id=202177&filename=trad4_v3_0.tar.gz&a=45202500">Version 3.3 (beta)</a><br />
+  </td></tr>
+  </table></td></tr>
+
+  <tr><td><table cellspacing="0" width="100%">
+  <tr><td class="td_title"  >
+  <b>Analysis</b>
+  </td></tr>
+  <tr><td class="td_con"  >
+  <a href="http://trad4.sourceforge.net/bond_risk/analysis.html">bond_risk (v3.0)</a><br />
+  </td></tr>
+  </table></td></tr>
+
+  </table>
+
+  </td>                                             <!-- end of nav frame -->
+
+<td style="width: 50%; padding-right: 8px;" valign="top">
+
+
+
+<h2 style="margin-top:0pt;">What is trad4?</h2>
+
+<dl class="resources">
+
+<p> 
+Trad4 comprises of a library and a precompiler. You specify your objects using a simple syntax and run the precompiler. Trad4 produces a handful of C files for each object, including a stub file - the calculate method. This gets called each time the object needs to fire, and you need to supply the logic for. Trad4 pulls all the information that object needs to calculate itself into the scope of this function. 
+</p>
+ 
+ 
+<p> 
+These source files are then compiled and together with libtrad4.so are linked into an executable. This then starts against a database. 
+</p>
+ 
+ 
+<p> 
+Change is then fed into the system, and trad4 manages that change up through your graph and keeps the tree up to date in real time. 
+</p>
+ 
+ 
+<p> 
+Trad4 is a new way of arranging programs in memory and a new style of flow-of-control. 
+</p>
+ 
+<h2 style="margin-top:0pt;">Why use trad4?</h2>
+ 
+<p> 
+<b>It's very easy to use.</b> To build a trad4 application to model your problem you need just a good understanding of your problem and knowledge of a small subset of the C programming language. 
+</p>
+ 
+ 
+<p> 
+<b>It's very fast.</b> As you decompose your problem into separate objects, this allows multiple threads to execute different parts of your problem at the same time, so a trad4 application scales linearly on multiple cores. Trad4 itself has very little overhead - there are very few instructions between an object needing to be run and it's calculate function being called. 
+</p>
+ 
+ 
+<p> 
+<b>It's very efficient.</b> As you break your problem out into separate objects, you can arrange your graph in such a way that each individual calculation gets done only once within the application. Other objects that depend on the result of that calculation will read the result from that object. 
+</p>
+ 
+ 
+<p> 
+<b>It's very safe.</b> While trad4 provides full concurrency, it is entirely lock-free. This means you never have to worry about obscure race conditions or deadlocks. 
+</p>
+ 
+ 
+<p> 
+<b>It's very free.</b> Trad4 is released under the LGPL. This is the same licence gcc & glibc use, and it allows you to link trad4 to a proprietary system and release that proprietary system under any licence you choose. 
+</p>
+ 
+</dl>
+
+</td><td style="width: 50%; padding-left: 12px; border-left: #3366cc thin solid;" valign="top">
+
+
+<h2 style="margin-top:0pt;">Resources</h2>
+<dl class="resources">
+
+<dt><strong>The Manual:</strong>
+</dt><dd>
+  <a href="https://sourceforge.net/project/downloading.php?group_id=202177&filename=trad4v3_The_Manual.pdf&a=23808027">The manual </a>
+    is the place to start if you'd like more information. This is the manual for the programming language itself, but a basic trad4 application is discussed in this document - bond_risk - an application for tracking risk on certain kinds of bond trades. <br/>
+
+  <br />
+
+</dd>
+
+
+  </td>                                            <!-- end of main frame -->
+  </tr>
+  </table>
+ 
+
+<!-- ==================================================================== -->
+
+<div align="center" class="copyright">
+Copyright (c) Steve Evans 2011
+</div>
+
+<!-- ==================================================================== -->
+
+<br />
+<!-- Piwik -->
+<script type="text/javascript">
+var pkBaseURL = (("https:" == document.location.protocol) ? "https://sourceforge.net/apps/piwik/trad4/" : "http://sourceforge.net/apps/piwik/trad4/");
+document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+</script><script type="text/javascript">
+try {
+var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
+piwikTracker.trackPageView();
+piwikTracker.enableLinkTracking();
+} catch( err ) {}
+</script><noscript><p><img src="http://sourceforge.net/apps/piwik/trad4/piwik.php?idsite=1" style="border:0" alt=""/></p></noscript>
+<!-- End Piwik Tag -->
+</body>
+
+     </html>
+  
+ 
+
