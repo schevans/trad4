@@ -1690,6 +1690,27 @@ You will then see all the objects triggering in the order you expect. All the ca
 
 Note that the dummy_data set created for you has need_reload=1 for all objects.
 
+\section{Environment variables}
+In this section some useful environment variables are listed. You can either export them locally from your shell or set them in your .conf file.
+
+NUM_THREADS controls the number of worker threads used. The maximum is set to a rather unreasonable 4096. If you set it to 0 this will activate the single-threaded mode where the master thread runs the calculate function - useful for benchmarking, and stepping through the operation without getting a headache.
+
+BATCH_MODE if set to 1 will terminate the application after the first run through. Useful during the early staged of development and benchmarking.
+
+TIMING_DEBUG controls whether the tier-level timing is displayed. Generally you'll want it off  (0) if you're doing multiple iterations and on (1) if you're doing intensive calculations per-tier.
+
+APP_DB points to the current sqlite .db file. The default is data/app_name.db
+
+CXX gives the path to the g++ compiler
+
+CC gives the path to the gcc compiler
+
+CXXFLAGS contain the compilation flags. Default is "-Wall -fPIC -m32". Append with your own e.g. -O3, -g.
+
+T4_3RD_PARTY_LIBS contains the colon-separated paths to any third-party libraries you're using.
+
+T4_3RD_PARTY_HEADER_PATH contains the colon-separated paths to any third-party headers you need to include.
+
 \section{Tips and Tricks}
 
 \subsection{Keep it simple at first}
@@ -1771,23 +1792,6 @@ It is possible to share code between heterogeneous objects. For example, you mig
 \end{verbatim}
 
 In each object's calculate file that needs it. Your function will have to be trad4-compliant, i.e. there should be no use of the heap etc. 
-
-\subsection{Environment variables}
-In this section some useful environment variables are listed. You can either export them locally from your shell or set them in your .conf file.
-
-NUM_THREADS controls the number of worker threads used. The maximum is set to a rather unreasonable 4096. If you set it to 0 this will activate the single-threaded mode where the master thread runs the calculate function - useful for benchmarking, and stepping through the operation without getting a headache.
-
-BATCH_MODE if set to 1 will terminate the application after the first run through. Useful during the early staged of development and benchmarking.
-
-TIMING_DEBUG controls whether the tier-level timing is displayed. Generally you'll want it off  (0) if you're doing multiple iterations and on (1) if you're doing intensive calculations per-tier.
-
-APP_DB points to the current sqlite .db file. The default is data/<application>.db
-
-CXXFLAGS contain the compilation flags. Default is "-c -Wall -fPIC". Append with your own e.g.  -O3, -g.
-
-T4_3RD_PARTY_LIBS contains the colon-separated paths to any third-party libraries you're using.
-
-T4_3RD_PARTY_HEADER_PATH contains the colon-separated paths to any third-party headers you need to include.
 
 \subsection{The T4_TEST macro}
 
