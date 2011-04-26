@@ -9,7 +9,7 @@ trad4.o: trad4.c
 	$(COMPILE) -c trad4.c -o trad4.o -I.
 
 libtrad4.so: trad4.o
-	$(COMPILE) -shared -Wl,-soname,libtrad4.so -o libtrad4.so trad4.o
+	$(COMPILE) -shared -o libtrad4.so trad4.o
 	cp libtrad4.so $(APP_ROOT)/lib/.
 
 sqlite3.o : sqlite3.c
