@@ -1707,9 +1707,9 @@ CC gives the path to the gcc compiler
 
 CXXFLAGS contain the compilation flags. Default is "-Wall -fPIC -m32". Append with your own e.g. -O3, -g.
 
-T4_3RD_PARTY_LIBS contains the space-separated full paths to any third-party libraries you're using, e.g. (from vision_thing) "$APP_ROOT/lib/3rd_party/libjpeg.so $APP_ROOT/lib/3rd_party/libgd.so"
+T4_3RD_PARTY_LIBS contains the space-separated full paths to any third-party libraries you're using, e.g. (from vision_thing) "\$APP_ROOT/lib/3rd_party/libjpeg.so \$APP_ROOT/lib/3rd_party/libgd.so". Don't forget to set LD_LIBRARY_PATH to pick these up at runtime.
 
-T4_3RD_PARTY_HEADER_PATH contains the colon-separated paths to any third-party headers you need to include, e.g. "$APP_ROOT/lib/3rd_party"
+T4_3RD_PARTY_HEADER_PATH contains the colon-separated paths to any third-party headers you need to include, e.g. "\$APP_ROOT/lib/3rd_party"
 
 Note: If you change any of the compiler/linker environment variables above you should re-run the precompiler specifying -a (clean then precompile).
 
