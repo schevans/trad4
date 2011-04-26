@@ -161,8 +161,8 @@ void run_trad4( int print_graph )
     double end_time;
     double tier_start_time; 
     double tier_end_time;
-    int num_objects_run;
-    int num_object_run_this_tier;
+    int num_objects_run = 0;
+    int num_object_run_this_tier = 0;
 
     while (1)
     {
