@@ -40,7 +40,7 @@ sub generate_top_lvl_make($) {
     print $FHD "all: objs $ENV{APP}\n";
     print $FHD "\n";
     print $FHD "$ENV{APP}: objects/main.o\n";
-    print $FHD "	g++ objects/main.o \$(TRAD4_ROOT)/objects/sqlite3.o -o bin/$ENV{APP} -ltrad4 -L\$(TRAD4_ROOT)/objects -lpthread -ldl -L\$(APP_ROOT)/lib \$(T4_3RD_PARTY_LIBS)\n";
+    print $FHD "	\$(COMPILE) objects/main.o \$(TRAD4_ROOT)/objects/sqlite3.o -o bin/$ENV{APP} -ltrad4 -L\$(TRAD4_ROOT)/objects -lpthread -ldl -L\$(APP_ROOT)/lib \$(T4_3RD_PARTY_LIBS)\n";
     print $FHD "\n";
     print $FHD "objs:\n";
 
@@ -81,13 +81,13 @@ sub generate_object_make($) {
     print $FHD "\n";
     print $FHD "\n";
     print $FHD "main.o: main.c\n";
-    print $FHD "	\$(COMPILE) main.c -I\$(TRAD4_ROOT)/objects\n";
+    print $FHD "	\$(COMPILE) -c main.c -I\$(TRAD4_ROOT)/objects\n";
     print $FHD "\n";
 
     foreach $type ( keys %{$obj_hash} ) {
 
         print $FHD "$type.o: $type.c ../gen/objects/$type"."_wrapper.c\n";
-        print $FHD "	\$(COMPILE) -I\$(APP_ROOT)/objects -I\$(APP_ROOT)/gen/objects -I\$(TRAD4_ROOT)/objects";
+        print $FHD "	\$(COMPILE) -c -I\$(APP_ROOT)/objects -I\$(APP_ROOT)/gen/objects -I\$(TRAD4_ROOT)/objects";
         if ( $ENV{T4_3RD_PARTY_HEADER_PATH} ) {
 
             print $FHD " -I\$(T4_3RD_PARTY_HEADER_PATH)";
@@ -135,7 +135,7 @@ sub generate_lib_make($) {
         $name = $obj_hash->{$type}->{name};
 
         print $FHD "libt4$name.so: ../objects/$type.c ../gen/objects/$type"."_wrapper.c\n";
-        print $FHD "	g++ -shared -Wl,-soname,libt4$name.so -o libt4$name.so \$(TRAD4_ROOT)/objects/sqlite3.o ../objects/$type.o\n";
+        print $FHD "	\$(COMPILE) -shared -Wl,-soname,libt4$name.so -o libt4$name.so \$(TRAD4_ROOT)/objects/sqlite3.o ../objects/$type.o\n";
         print $FHD "\n";
     
     }
