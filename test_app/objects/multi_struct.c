@@ -10,7 +10,7 @@
 
 using namespace std;
 
-int calculate_multi_struct( obj_loc_t obj_loc, int id )
+int calculate_multi_struct( obj_loc_t obj_loc, long id )
 {
 
     for ( int row = 0 ; row < NUM_ROWS ; row++ )

@@ -10,7 +10,7 @@
 
 using namespace std;
 
-int calculate_tier2( obj_loc_t obj_loc, int id )
+int calculate_tier2( obj_loc_t obj_loc, long id )
 {
 
 //cout << "tier2_struct3_nested_scalar_my_struct1_x: " << tier2_struct3_nested_scalar_my_struct1_x << endl;

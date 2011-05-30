@@ -10,7 +10,7 @@
 
 using namespace std;
 
-int calculate_tier1( obj_loc_t obj_loc, int id )
+int calculate_tier1( obj_loc_t obj_loc, long id )
 {
     T4_TEST( tier1_struct_scalar_rates[ 0 ], 4.0 );
     T4_TEST( tier1_struct_scalar_rates[ 2 ], 4.2 );

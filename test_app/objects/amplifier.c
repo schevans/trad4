@@ -10,7 +10,7 @@
 
 using namespace std;
 
-int calculate_amplifier( obj_loc_t obj_loc, int id )
+int calculate_amplifier( obj_loc_t obj_loc, long id )
 {
     for ( int i = 0 ; i < SAMPLE_COUNT ; i++ )
     {

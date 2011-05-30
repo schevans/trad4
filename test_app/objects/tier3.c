@@ -10,7 +10,7 @@
 
 using namespace std;
 
-int calculate_tier3( obj_loc_t obj_loc, int id )
+int calculate_tier3( obj_loc_t obj_loc, long id )
 {
     T4_TEST( my_tier2_p_int, 14965 );
     T4_TEST( my_tier1_int_out - my_tier2_p_int, 38 );

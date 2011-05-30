@@ -10,7 +10,7 @@
 
 using namespace std;
 
-int calculate_harmonic( obj_loc_t obj_loc, int id )
+int calculate_harmonic( obj_loc_t obj_loc, long id )
 {
     harmonic_level = harmonic_factor;
 

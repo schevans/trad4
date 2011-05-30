@@ -10,7 +10,7 @@
 
 using namespace std;
 
-int calculate_addition( obj_loc_t obj_loc, int id )
+int calculate_addition( obj_loc_t obj_loc, long id )
 {
     addition_output = numeric1_output + numeric2_output;
 
