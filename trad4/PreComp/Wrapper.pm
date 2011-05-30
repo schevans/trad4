@@ -572,7 +572,7 @@ sub GenerateLoaderCallback($$$$) {
     print $FHD "    object_status(id) = OK;\n";
     print $FHD "\n";
     print $FHD "    ((t4::$type*)obj_loc[id])->id = id;\n";
-    print $FHD "    memcpy( ((t4::$type*)obj_loc[id])->name, row[1], 32 );\n";
+    print $FHD "    memcpy( ((t4::$type*)obj_loc[id])->name, row[1], 64 );\n";
     print $FHD "    object_tier(id) = atoi(row[2]);\n";
     print $FHD "    object_log_level(id) =  atoi(row[3]);\n";
     print $FHD "\n";
