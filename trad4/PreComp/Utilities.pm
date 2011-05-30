@@ -143,6 +143,44 @@ sub OpenFile($) {
 
 }
 
+sub OpenObjectFile($) {
+    my $file = shift;
+
+    $current_obj = $file;
+
+    my @path_array = split /\//, $file;
+
+    pop( @path_array );
+
+    my $current_path = "";
+
+    foreach $dir ( @path_array ) {
+
+        $current_path = $current_path.$dir."/";
+
+        if ( ! -d $current_path ) {
+
+            print "Creating directory $current_path\n";
+
+            mkdir( $current_path );
+        }
+    }
+
+
+    my $comment_start = "//";
+
+    open $current_file, ">$file.t4t" or die "Can't open file $file";
+
+    foreach $line ( @licence_header_array ) {
+
+        chomp( $line );
+
+        print $current_file "$comment_start $line\n";
+    }
+
+    return $current_file;
+}
+
 sub CloseFile() {
 
     close $current_file;

@@ -22,7 +22,7 @@ sub Generate($) {
        return;
     } 
 
-    my $FHD = PreComp::Utilities::OpenFile( PreComp::Constants::ObjRoot()."$name.c" );
+    my $FHD = PreComp::Utilities::OpenObjectFile( PreComp::Constants::ObjRoot()."$name.c" );
     if( ! $FHD ) { return; }
 
     print $FHD "\n";
