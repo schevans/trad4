@@ -790,6 +790,11 @@ sub Type2GenDataValue($$) {
         $type = $master_hash->{aliases}->{data}->{$type};
     }
 
+    if ( exists $master_hash->{enums}->{$type} ) {
+
+        $type = "int";
+    }
+
     if ( $type =~ 'double' ) {
         $ret_val = 3.14;
     }
@@ -800,7 +805,7 @@ sub Type2GenDataValue($$) {
         $ret_val = 3.14;
     }
     elsif ( $type =~ 'int' || $type =~ 'long') {
-        $ret_val = "999";
+        $ret_val = "314";
     }
     elsif ( exists $master_hash->{$type} ) {
         $ret_val = $master_hash->{$type}->{type_id};
@@ -810,8 +815,6 @@ sub Type2GenDataValue($$) {
         print "Error: Unrecognised typed $type.\n";
         ExitOnError()
     }
-
-    
 }
 
 sub ExitOnError() {

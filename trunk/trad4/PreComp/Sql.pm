@@ -193,7 +193,8 @@ sub GenerateDummyData($$) {
         $var_type = $master_hash->{$type}->{static}->{data}->{$var_name};
         
         if ( not ( exists $master_hash->{structures}->{data}->{$var_type} or PreComp::Utilities::IsArray( $var_name )) ) {
-                print $FHD ", $PI";
+
+            print $FHD ", ".PreComp::Utilities::Type2GenDataValue( $master_hash, $var_type )
         } 
     }
 
