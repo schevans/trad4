@@ -10,7 +10,7 @@
 
 using namespace std;
 
-int calculate_repo_trade( obj_loc_t obj_loc, int id )
+int calculate_repo_trade( obj_loc_t obj_loc, long id )
 {
     // First calculate the margin - the difference between the cash we borrowed and the value
     // of the bond collateral.
