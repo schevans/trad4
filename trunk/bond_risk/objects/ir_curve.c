@@ -10,7 +10,7 @@
 
 using namespace std;
 
-int calculate_ir_curve( obj_loc_t obj_loc, int id )
+int calculate_ir_curve( obj_loc_t obj_loc, long id )
 {
     int current_period_start(0);
     int current_period_end(0);

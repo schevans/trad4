@@ -11,7 +11,7 @@
 
 using namespace std;
 
-int calculate_bond( obj_loc_t obj_loc, int id )
+int calculate_bond( obj_loc_t obj_loc, long id )
 {
     // Generate the coupon schedule - the dates of the coupon payments.
     // This is a bit fiddly, as always.

@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
 
     freeaddrinfo(servinfo); // all done with this structure
 
-    int id=atoi(argv[1]);
+    long id=atoi(argv[1]);
 
     // Create and send header_request
     t4::request header_request;

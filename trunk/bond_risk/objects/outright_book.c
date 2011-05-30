@@ -12,7 +12,7 @@
 
 using namespace std;
 
-int calculate_outright_book( obj_loc_t obj_loc, int id )
+int calculate_outright_book( obj_loc_t obj_loc, long id )
 {
     // Reset the accumulators
     outright_book_pv=0;

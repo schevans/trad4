@@ -12,7 +12,7 @@
 
 using namespace std;
 
-int calculate_repo_book( obj_loc_t obj_loc, int id )
+int calculate_repo_book( obj_loc_t obj_loc, long id )
 {
     // Reset the accumulators
     repo_book_margin=0;
