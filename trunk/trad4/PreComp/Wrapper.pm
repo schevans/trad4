@@ -53,7 +53,7 @@ sub Generate($$$$$) {
     print $FHD "#include <sqlite3.h>\n";
     print $FHD "\n";
 
-    print $FHD "int calculate_$obj_hash->{name}( obj_loc_t obj_loc, int id );\n";
+    print $FHD "int calculate_$obj_hash->{name}( obj_loc_t obj_loc, long id );\n";
 
     print $FHD "\n";
     print $FHD "using namespace std;\n";
@@ -186,7 +186,7 @@ sub PrintArrayLoaderCallback($$) {
     print $FHD "static int $function_name(void *obj_loc_v, int argc, char **row, char **azColName)\n";
     print $FHD "{\n";
     print $FHD "    unsigned char** obj_loc = (unsigned char**)obj_loc_v;\n";
-    print $FHD "    int id = atoi(row[0]);\n";
+    print $FHD "    long id = atoi(row[0]);\n";
 
     my $counter = 1;
 
@@ -254,7 +254,7 @@ sub PrintExtraLoaderCallback($$) {
     print $FHD "static int $function_name(void *obj_loc_v, int argc, char **row, char **azColName)\n";
     print $FHD "{\n";
     print $FHD "    unsigned char** obj_loc = (unsigned char**)obj_loc_v;\n";
-    print $FHD "    int id = atoi(row[0]);\n";
+    print $FHD "    long id = atoi(row[0]);\n";
 
     my $counter = 1;
 
@@ -560,7 +560,7 @@ sub GenerateLoaderCallback($$$$) {
     print $FHD "{\n";
     print $FHD "    void** obj_loc = (void**)obj_loc_v;\n";
     print $FHD "\n";
-    print $FHD "    int id = atoi(row[0]);\n";
+    print $FHD "    long id = atoi(row[0]);\n";
     print $FHD "\n";
     print $FHD "\n";
     print $FHD "    if ( !obj_loc[id] ) \n";
@@ -640,7 +640,7 @@ sub GenerateNeedRefresh($$$) {
     my $type = shift;
     my $FHD = shift;
 
-    print $FHD "extern \"C\" int need_refresh( obj_loc_t obj_loc, int id )\n";
+    print $FHD "extern \"C\" int need_refresh( obj_loc_t obj_loc, long id )\n";
     print $FHD "{\n";
 
     print $FHD "    DEBUG_LOADS( \"$type"."_need_refresh( \" << id << \")\" );\n";
@@ -754,7 +754,7 @@ sub GenerateCalculate($$$) {
     my $type = shift;
     my $FHD = shift;
     
-    print $FHD "extern \"C\" void calculate( obj_loc_t obj_loc, int id )\n";
+    print $FHD "extern \"C\" void calculate( obj_loc_t obj_loc, long id )\n";
     print $FHD "{\n";
     print $FHD "\n";
     print $FHD "    DEBUG( \"calculate_$type( \" << ((t4::$type*)obj_loc[id])->name << \" )\" );\n";
@@ -933,7 +933,7 @@ sub GenerateValidator($$$) {
     my $type = shift;
     my $FHD = shift;
 
-    print $FHD "extern \"C\" int validate( obj_loc_t obj_loc, int id )\n";
+    print $FHD "extern \"C\" int validate( obj_loc_t obj_loc, long id )\n";
     print $FHD "{\n";
     print $FHD "    int retval = 1;\n";
 
@@ -1006,7 +1006,7 @@ sub GenerateConcreteGraph($$$) {
     my $type = shift;
     my $FHD = shift;
 
-    print $FHD "extern \"C\" void print_concrete_graph( obj_loc_t obj_loc, int id, ofstream& outfile )\n";
+    print $FHD "extern \"C\" void print_concrete_graph( obj_loc_t obj_loc, long id, ofstream& outfile )\n";
     print $FHD "{\n";
     print $FHD "    cout << \"Printing $type..\" << std::endl;\n";
 
