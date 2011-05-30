@@ -1,5 +1,5 @@
 # Copyright (c) Steve Evans 2008
-# steve@topaz.myzen.co.uk
+# schevans@users.sourceforge.net
 #
 
 package PreComp::SqlCommon;
