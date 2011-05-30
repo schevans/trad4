@@ -15,7 +15,7 @@
 #define MAX_TYPES 32
 
 
-#define OBJECT_NAME_LEN 32
+#define OBJECT_NAME_LEN 64
 
 typedef void* obj_loc_t[MAX_OBJECTS+1];
 typedef int tier_manager_t[MAX_TIERS+1][MAX_OBJECTS+1];
