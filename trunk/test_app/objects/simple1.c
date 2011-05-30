@@ -12,7 +12,7 @@ using namespace std;
 
 #define simple2_s2_int ((simple2*)obj_loc[id])->s2_int
 
-int calculate_simple1( obj_loc_t obj_loc, int id )
+int calculate_simple1( obj_loc_t obj_loc, long id )
 {
     // pub:
     simple1_s1_float = 3.45;

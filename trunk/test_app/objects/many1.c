@@ -10,7 +10,7 @@
 
 using namespace std;
 
-int calculate_many1( obj_loc_t obj_loc, int id )
+int calculate_many1( obj_loc_t obj_loc, long id )
 {
     T4_TEST( many1_d9, 9.0 );
     T4_TEST( many1_my_struct1_x, id );

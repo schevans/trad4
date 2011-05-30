@@ -10,7 +10,7 @@
 
 using namespace std;
 
-int calculate_feed( obj_loc_t obj_loc, int id )
+int calculate_feed( obj_loc_t obj_loc, long id )
 {
     feed_output = feed_value;
 

@@ -10,7 +10,7 @@
 
 using namespace std;
 
-int calculate_simple2( obj_loc_t obj_loc, int id )
+int calculate_simple2( obj_loc_t obj_loc, long id )
 {
 
     simple2_s2_float = simple2_s2_int / simple1_s1_float;
