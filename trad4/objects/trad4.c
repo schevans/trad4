@@ -46,9 +46,9 @@ int num_threads_fired(0);
 bool need_reload(false);
 char* timing_debug = 0;
 char* batch_mode = 0;
-void set_timestamp( obj_loc_t obj_loc, int id );
+void set_timestamp( obj_loc_t obj_loc, long id );
 
-bool fire_object( int id );
+bool fire_object( long id );
 void* thread_loop( void* thread_id );
 void start_threads();
 void get_timestamp( double& out_time );
@@ -303,7 +303,7 @@ int run_tier( int tier ) {
     return num_objects_fired;
 }
 
-bool fire_object( int id )
+bool fire_object( long id )
 {
     //std::cout << "fire_object " << id << std::endl;
 
@@ -346,7 +346,7 @@ bool fire_object( int id )
     return fired;
 }
 
-void set_timestamp( obj_loc_t obj_loc, int id )
+void set_timestamp( obj_loc_t obj_loc, long id )
 {
     //for ( int i=0 ; i < 1000000000 ; i++ );   // Simulate long calculations
 

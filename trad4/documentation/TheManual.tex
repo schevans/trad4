@@ -161,7 +161,7 @@ Now we have described the type, we must specify what is does, in this case conca
 A stub calculate function is generated for you by trad4, and is found in the objects directory. Again, hello and world do nothing but hello_world's calculate function is shown below:
 
 \begin{verbatim}
-int calculate_hello_world( obj_loc_t obj_loc, int id )
+int calculate_hello_world( obj_loc_t obj_loc, long id )
 {
     cout << object_name(hello_world_hello) 
         << " " 
@@ -259,7 +259,7 @@ pub:
 Here you can see for each sub member two variables are provided, in a's case these are x_a which provides it's id, and a_out where a will publish it's static data. Also in the pub section is the int x_out, where the result of  \(a + b\) is published. So calculate_x takes the published a_out and b_out variables, adds them and publishes the result in x_out (from objects/x.c):
 
 \begin{verbatim}
-int calculate_x( obj_loc_t obj_loc, int id )
+int calculate_x( obj_loc_t obj_loc, long id )
 {
     x_out = a_out + b_out;
 
@@ -270,7 +270,7 @@ int calculate_x( obj_loc_t obj_loc, int id )
 The calculate function for y is very similar to that of x, but it subtracts c_out and d_out. The calculate function for z is shown below, as it includes some output:
 
 \begin{verbatim}
-int calculate_z( obj_loc_t obj_loc, int id )
+int calculate_z( obj_loc_t obj_loc, long id )
 {
     z_out = x_out * y_out;
 
@@ -812,7 +812,7 @@ pub:
 The calculate function for outright_trade is shown below in full.
 
 \begin{verbatim}
-int calculate_outright_trade( obj_loc_t obj_loc, int id )
+int calculate_outright_trade( obj_loc_t obj_loc, long id )
 {
     // Get multiplier for trade direction.
     double direction = ( outright_trade_buy_sell == BUY ? 1.0 : -1.0 );
@@ -1027,7 +1027,7 @@ The first five macros offer up the static data for each object, with the last th
 It's important to note that the index used as an argument to these macros isn't the sub object's id - it's the index into the array of outright_trades. The other thing to note is that the array need not be fully populated - in which case the id at that index is set to 0. Given this, this works as follows (from bond_risk/objects/outright_book.c):
 
 \begin{verbatim}
-int calculate_outright_book( obj_loc_t obj_loc, int id )
+int calculate_outright_book( obj_loc_t obj_loc, long id )
 {
     // Reset the accumulators
     outright_book_pv=0;
@@ -1470,7 +1470,7 @@ This shows a feed that exist on any tier, the binary operators which must subscr
 The calculate functions work as usual. So for example a binary function (general_computer/objects/addition.c):
 
 \begin{verbatim}
-int calculate_addition( obj_loc_t obj_loc, int id )
+int calculate_addition( obj_loc_t obj_loc, long id )
 {
     addition_output = numeric1_output + numeric2_output;
 
@@ -1481,7 +1481,7 @@ int calculate_addition( obj_loc_t obj_loc, int id )
 A unary function (general_computer/objects/natural_log.c):
 
 \begin{verbatim}
-int calculate_natural_log( obj_loc_t obj_loc, int id )
+int calculate_natural_log( obj_loc_t obj_loc, long id )
 {
     natural_log_output = log( numeric_output );
 
@@ -1492,7 +1492,7 @@ int calculate_natural_log( obj_loc_t obj_loc, int id )
 And the feed, which just copies the static data to it's output (general_computer/objects/feed.c):
 
 \begin{verbatim}
-int calculate_feed( obj_loc_t obj_loc, int id )
+int calculate_feed( obj_loc_t obj_loc, long id )
 {
     feed_output = feed_value;
 
@@ -1746,7 +1746,7 @@ The STL  can be used in your calculate functions, as long as you keep them on th
 \begin{verbatim}
 #include <vector>
 
-int calculate_bond( obj_loc_t obj_loc, int id )
+int calculate_bond( obj_loc_t obj_loc, long id )
 {
     std::vector<date> coupon_schedule;
     coupon_schedule.push_back( bond_start_date );
@@ -1766,7 +1766,7 @@ int calculate_bond( obj_loc_t obj_loc, int id )
 As discussed in the section on State Management, it's important that the user flags any problems in the calculate function if there's any danger that the pub data has been corrupted. This includes exceptions thrown by external libraries. If there's any doubt that the pub data has been corrupted just return 0 from the calculate function. For example:
 
 \begin{verbatim}
-int calculate_bond( obj_loc_t obj_loc, int id )
+int calculate_bond( obj_loc_t obj_loc, long id )
 {
     try {
 
@@ -2084,7 +2084,7 @@ threads.
 typedef struct {
     // Header
     long long last_published;
-    int id;
+    long id;
     e_status status;
     int type;
     int tier;
@@ -2117,7 +2117,7 @@ For this example we'll look at a bond from bond_risk. This struct is generated f
 typedef struct {
     // header
     long_long last_published;
-    int id;
+    long id;
     e_status status;
     int type;
     int tier;
@@ -2192,7 +2192,7 @@ These are the more interesting functions generated for you by trad4. They are al
 \subsection{The need_refresh function}
 
 \begin{verbatim}
-int bond_need_refresh( obj_loc_t obj_loc, int id )
+int bond_need_refresh( obj_loc_t obj_loc, long id )
 \end{verbatim}
 
 To illustrate how it works we'll again look at a bond with id 'id'.  First the thread locates the struct of the object it's working on as discussed above:
@@ -2240,7 +2240,7 @@ This is complicated when an object subscribes to more than one object, but in pr
 \subsection{The calculate function wrapper}
 
 \begin{verbatim}
-void calculate( obj_loc_t obj_loc, int id )
+void calculate( obj_loc_t obj_loc, long id )
 \end{verbatim}
 
 The calculate wrapper calls the various debug macros (if enabled) before and after calling the user-
@@ -2259,7 +2259,7 @@ Some of the state management is also handled in the calculate function wrapper.
 \subsection{The calculate function}
 
 \begin{verbatim}
-int calculate_bond( obj_loc_t obj_loc, int id )
+int calculate_bond( obj_loc_t obj_loc, long id )
 \end{verbatim}
 
 This is the function that the user supplies that transforms the object's inputs and static into the outputs.  The calculate function is supplied with macros that abstract away the complex lookups and casts from the user. In this way the calculate function of the outright trade looks like:

@@ -20,11 +20,11 @@
 typedef void* obj_loc_t[MAX_OBJECTS+1];
 typedef int tier_manager_t[MAX_TIERS+1][MAX_OBJECTS+1];
 
-typedef void (*calculate_fpointer)( obj_loc_t obj_loc, int id );
-typedef int (*need_refresh_fpointer)( obj_loc_t obj_loc, int id );
+typedef void (*calculate_fpointer)( obj_loc_t obj_loc, long id );
+typedef int (*need_refresh_fpointer)( obj_loc_t obj_loc, long id );
 typedef void (*load_objects_fpointer)( obj_loc_t obj_loc, int initial_load );
 typedef int (*validate_fpointer)( obj_loc_t obj_loc, int initial_load );
-typedef void (*print_concrete_graph_fpointer)( obj_loc_t obj_loc, int id, std::ofstream& outfile );
+typedef void (*print_concrete_graph_fpointer)( obj_loc_t obj_loc, long id, std::ofstream& outfile );
 typedef size_t (*get_object_size_fpointer)();
 
 void run_trad4( int print_graph );
@@ -71,7 +71,7 @@ enum e_status {
 typedef struct {
     // Header
     long long last_published;
-    int id;
+    long id;
     e_status status;
     int type;
     int tier;
@@ -100,7 +100,7 @@ namespace t4 {
 
     typedef struct {
         request_type_enum request_type;
-        int id;
+        long id;
     } request;
 
 }
