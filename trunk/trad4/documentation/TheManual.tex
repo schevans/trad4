@@ -27,7 +27,15 @@
 
 \chapter{Introduction}
 
-A trad4 application is basically a directed graph of running objects. Take the following example where a, b, c and d are feeds into the system from some external sensor or data feed, x and y are functions of a,b and c,d respectively and z is a function of x and y:
+Trad4 is a hybrid between dataflow and imperative programming. A trad4 application is composed of nodes which connect to each other in a directed graph but each node has some imperative code (written in C++) that does something complex with the outputs of the nodes to which is subscribes.
+
+These nodes are arranged in tiers with each tier run one after another from the bottom up. As we know that the nodes on each tier cannot affect one another and that the nodes below are effectively read-only, we can run all the nodes on a particular tier in parallel.
+
+Furthermore, trad4 keeps track of whether a particular node's antecedents have changed since the node last fired and only fires the node if they have.
+
+Each node is of a particular user-defined type. When the type is instantiated it is referred to as an object of that type.
+
+Time for an example.
 
 \includegraphics[scale=0.5]{simplemathsabstract.png}
 
