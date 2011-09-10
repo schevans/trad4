@@ -1129,6 +1129,21 @@ sub Validate($$) {
 
             if ( $var_type !~ /^int$|^double$|^float$|^long$|^char$/ )
             {
+                if ( exists $master_hash->{enums}->{$var_type} )
+                {
+                    next;
+                }
+
+                if ( exists $master_hash->{aliases}->{data}->{$var_type} )
+                {
+                    next;
+                }
+
+                if ( $section =~ "pub" ) 
+                {
+                    $var_type =~ s/\*$//g;
+                }
+
                 if ( exists $master_hash->{structures}->{data}->{$var_type} )
                 {
                     if ( $var_name eq $var_type ) {
@@ -1137,16 +1152,6 @@ sub Validate($$) {
                         ExitOnError();
                     } 
 
-                    next;
-                }
-
-                if ( exists $master_hash->{enums}->{$var_type} )
-                {
-                    next;
-                }
-
-                if ( exists $master_hash->{aliases}->{data}->{$var_type} )
-                {
                     next;
                 }
 
