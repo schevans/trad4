@@ -15,7 +15,7 @@
 
 using namespace std;
 
-int calculate_standard_risk( obj_loc_t obj_loc, int id )
+int calculate_standard_risk( obj_loc_t obj_loc, long id )
 {
     standard_risk_pv = s_contingent_leg_pv - s_fee_leg_pv;
 

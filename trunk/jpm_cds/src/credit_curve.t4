@@ -19,6 +19,6 @@ static
     int icalendar
 
 pub
-    TCurve pTCurve
+    TCurve* pTCurve
 
  

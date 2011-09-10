@@ -11,6 +11,6 @@ static
     observables st_observables
 
 pub
-    TCurve pTCurve
+    TCurve* pTCurve
 
 

@@ -1,15 +1,2 @@
 delete from credit_curve_couponRates;
-insert into credit_curve_couponRates values ( 2, 0, 0.05 );
-insert into credit_curve_couponRates values ( 2, 1, 0.05 );
-insert into credit_curve_couponRates values ( 2, 2, 0.05 );
-insert into credit_curve_couponRates values ( 2, 3, 0.05 );
-insert into credit_curve_couponRates values ( 2, 4, 0.05 );
-insert into credit_curve_couponRates values ( 2, 5, 0.05 );
-insert into credit_curve_couponRates values ( 2, 6, 0.05 );
-insert into credit_curve_couponRates values ( 2, 7, 0.05 );
-insert into credit_curve_couponRates values ( 2, 8, 0.05 );
-insert into credit_curve_couponRates values ( 2, 9, 0.05 );
-insert into credit_curve_couponRates values ( 2, 10, 0.05 );
-insert into credit_curve_couponRates values ( 2, 11, 0.05 );
-insert into credit_curve_couponRates values ( 2, 12, 0.05 );
-insert into credit_curve_couponRates values ( 2, 13, 0.05 );
+insert into credit_curve_couponRates values ( 2, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05 );

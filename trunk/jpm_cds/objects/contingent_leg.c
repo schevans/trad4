@@ -29,7 +29,7 @@
 
 using namespace std;
 
-int calculate_contingent_leg( obj_loc_t obj_loc, int id )
+int calculate_contingent_leg( obj_loc_t obj_loc, long id )
 {
     int result = JpmcdsCdsContingentLegPV(
         s_trade_today,
@@ -37,8 +37,8 @@ int calculate_contingent_leg( obj_loc_t obj_loc, int id )
         s_trade_startDate,
         s_trade_endDate,
         s_trade_notional,
-        &s_ir_curve_pTCurve,
-        &s_credit_curve_pTCurve,
+        s_ir_curve_pTCurve,
+        s_credit_curve_pTCurve,
         s_trade_recoveryRate,
         s_trade_protectStart,
         &contingent_leg_pv
