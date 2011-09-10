@@ -513,7 +513,7 @@ From the perspective of the trad4 architecture this is quite easy to achieve: We
 
 \section{The Concrete Graph}
 
-In Section ~\ref{sec:The Data} the distinction between types and objects was made. This becomes clearer now as in this data set we will have two ir_curves, five bonds and nine outright_trades. These objects - instantiated types - are shown on the concrete graph represented by ovals containing the object name. This is shown below:
+In Section ~\ref{sec:The data} the distinction between types and objects was made. This becomes clearer now as in this data set we will have two ir_curves, five bonds and nine outright_trades. These objects - instantiated types - are shown on the concrete graph represented by ovals containing the object name. This is shown below:
 
 \includegraphics[scale=0.25]{bondrisksimpleconcrete.png}
 
@@ -1715,7 +1715,9 @@ CC gives the path to the gcc compiler
 
 CXXFLAGS contain the compilation flags. Default is "-Wall -fPIC -m32". Append with your own e.g. -O3, -g.
 
-T4_3RD_PARTY_LIBS contains the space-separated full paths to any third-party libraries you're using, e.g. (from vision_thing) "\$APP_ROOT/lib/3rd_party/libjpeg.so \$APP_ROOT/lib/3rd_party/libgd.so". Don't forget to set LD_LIBRARY_PATH to pick these up at runtime.
+T4_3RD_PARTY_LIBS contains the space-separated full paths to any third-party shared libraries you're using, e.g. (from vision_thing) "\$APP_ROOT/lib/3rd_party/libjpeg.so \$APP_ROOT/lib/3rd_party/libgd.so". Don't forget to set LD_LIBRARY_PATH to pick these up at runtime.
+
+T4_3RD_PARTY_AR contains the space-separated full paths to any third-party static libraries you're using, e.g. (from jpm_cds) "\$APP_ROOT/objects/isda_cds_model_c_v1.7/lib/build/lib/linux/cds.a"
 
 T4_3RD_PARTY_HEADER_PATH contains the colon-separated paths to any third-party headers you need to include, e.g. "\$APP_ROOT/lib/3rd_party"
 
@@ -1726,10 +1728,6 @@ Note: If you change any of the compiler/linker environment variables above you s
 \subsection{Keep it simple at first}
 
 Keep it simple for now and restrict yourself to two or three types when you're starting a new application.
-
-\subsection{Don't use the heap}
-
-If you feel you need to use the heap you're doing it wrong. If you're convinced you need the heap and you're sure you're not doing it wrong I'd like to hear from you.
 
 \subsection{The init flag}
 
@@ -1813,35 +1811,90 @@ T4_TEST( addition_output, 10.055 );
 
 It's useful for locking down the numbers while you make changes. It's specific to data sets so it's only really useful in development, but it's also used in test_app as there's only one data set.
 
+\chapter{Library integration}
+
+Firstly, in previous versions of this document I maintained that in order to use your existing application with trad4 you were looking at a port. \textbf{This is not the case} - you can call into your existing libraries although you might need some minor modifications.
+
+Two different library use cases exist. The first case is when you need some service from a third-party library like writing to a .png (see vision_thing/create_animation), or writing a .wav file (see additive_synth/write_wav_file). In these cases we need to call into the library to do one specific thing - the library doesn't have any internal state. We'll call this a stack-based library as we can keep the call to the library on the stack and pop them off once we're done.
+
+The second case we'll call a heap-based library where we're expecting the library to maintain a state through the lifetime of the trad4 application. This is the approach you'd take if you had an existing risk library with internal caches and states that were required for your library to operate.
+
+The first case is pretty straightforward, the second case will almost certainly require some modification to your caching mechanism. I'll deal with these both in turn.
+
+\section{Stack-based library integration}
+
+Stack-based library integration is pretty straightforward as you just use the library as a service and you don't worry about any internal state it might have. To use a library in this way just do as follows (taken from vision_thing):
+
+\begin{enumerate}
+
+\item Set T4_3RD_PARTY_LIBS if you're using a shared library or T4_3RD_PARTY_AR if you're using static one:
+\begin{verbatim}
+export T4_3RD_PARTY_LIBS="$APP_ROOT/lib/3rd_party/libgd.so"
+\end{verbatim}
+
+\item Set T4_3RD_PARTY_HEADER_PATH to where the header includes are to be found:
+\begin{verbatim}
+export T4_3RD_PARTY_HEADER_PATH=$APP_ROOT/lib/3rd_party
+\end{verbatim}
+
+\item Include the header for the function you need in your object file:
+\begin{verbatim}
+#include "gd.h"
+\end{verbatim}
+
+\item Call the function as normal:
+\begin{verbatim}
+gdImagePtr master_img = gdImageCreate(master_img_width, master_img_height);
+\end{verbatim}
+
+\end{enumerate}
+
+\section{Heap-based library integration}
+
+Heap-based library integration is achieved with a similar procedure but one important difference: \emph{You are handing over the responsibility for object creation and deletion to the library itself.}
+
+Up till now all the memory a trad4 app uses - described in the .t4 files - has been created by trad4 as described in the .t4 files. The static structures are created from the DB, the pub structures are populated from the calculate functions etc. 
+
+By using heap-based libraries you're calling into the library through an api and the library handles the creation of it's internal data structures.
+
+Now you're now calling this library from a multi-threaded client - you trad4 app. Is your library thread-safe? The answer is probably yes with some minor modifications.
+
+Thread-safety isn't an objective thing. You don't write thread safe code, you write code that's tread safe in a particular threading context. Trad4 is a multi-threaded environment, but the calls into the library are single threaded. Just as multiple threads can rattle through a trad4 calculate function at the same time as they all have their own stack, so the single threaded calls can rattle round the library without any trouble, newing and deleting things as needed.
+
+There are two potential problems though. The first is any internal caches used. The chances are they will have at their heart some kind of hash:
+
+\begin{verbatim}
+std::hash< key, object > objectCache;
+\end{verbatim}
+
+ This is all well and good in true single threaded mode but won't work in multi (specifically the periodic resizing of the hash by one of the threads will invalidate the handles the rest of the threads have to the hash. The solution is to remove the hash and replace it with a dumb array, using the trad4 id as the key:
+
+\begin{verbatim}
+object objectCache[MAX_OBJECTS]
+\end{verbatim}
+
+Where MAX_OBJECTS is defined in trad4.h.
+
+As the trad4 approach is to load and keep all the objects we can be sure that a) we know how much memory will be used in advance and b) that MAX_OBJECTS will never be exceeded.
+
+The second potential problem is you may have already made an attempt at making your library thread-safe though a liberal sprinkling of mutex locks. Wherever you see a mutex lock you should consider why it was introduced and if the problem it was introduced to solve is relevant in this context (e.g. writing to a log file) or not (protecting your now-replaced hash). If you have to keep them re-think if the functionality is required in the trad4 context. If you can remove them then do - they can severely degrade your system's performance and chances are they are not required in a trad4 context.
+
+Of course, this is all hypothetical and I'm making some quite large assumption about your architecture and YMMV, but I'm available at very resonable rates to take a closer look...
+
+
+
+
+
+
+
+
+
+
 \chapter{Living with trad4}
 
 In this section we'll look at some of the issues that will arise in real-world deployments.
 
-\subsection{Porting your existing applications to trad4}
-
-And now, the bad news: To port your existing applications to the trad4 architecture you're looking at a re-write. There are several reasons for this:
-
-Firstly, because even if the application or library you were porting was thread-safe, it would likely be thread safe in the classical sense with locks and such, so you'd be introducing all the downsides of a classical multi-threaded program (complexity, deadlocks, difficulty debugging etc.) by using the library as it stands.
-
-The second reason is your existing data structures would likely be incompatible with the trad4 
-layout.
-
-Lastly, your existing application is likely to make extensive use of the heap. The lack of support for the heap in trad4 would also probably break any caching mechanism you currently use.
-
-TODO: jpm_cds
-
-The news is not all bad, though as the port is likely to be mostly a cut-and-paste job. Here this discussion gets difficult as I can only try and imagine your application, but take once again the example of bond_risk.
-
-Somewhere in your conventionally architectured bond_risk application will be some code to price a bond. It will use different data structures but it's actual operation will be the same in both systems. Any 
-switches based on day-count conventions for example, should be able to be copied across without much modification.
-
-Likewise you'll already have the code to bootstrap interest rate curves. Again you'll have to find/replace the accessors used, but the logic of the functions should be the same.
-
-The other bit of good news is that at the end of the day, your numbers in both systems should match, so as a result of the port your risk numbers shouldn't move.
-
-That's the bad news over with.
-
-\subsection{Adding, removing and correcting objects at run-time}
+\section{Adding, removing and correcting objects at run-time}
 
 Trad4 object should not change their identity during run-time. That means while it's fine to correct a bond's maturity date if it was first entered in error, but it would be inappropriate to change the identity of a bond from one to another. If a trade is attached to the wrong bond you don't update the bond, you update the trade to point to the correct bond.
 
@@ -1956,13 +2009,13 @@ Running objects can exist in one of three states.
 
 These can get set when the object first starts and is validated, and also at run-time by flagging a failure in the object's calculate function.
 
-\subsubsection{Validation}
+\subsection{Validation}
 
 When an object first starts or is reloaded, the sub object's are checked to see if they are up and running and of the correct type. If they are, the object is set to OK. If the sub objects are not running or of the correct type (due to a miss-configuration of the database), the object is set to FAILED, as there is no way the calculate function can be run, given that the sub objects are invalid. This object will stay in FAILED state until it is reloaded once the sub objects have started, or once it's sub data is corrected.
 
 Any objects that subscribe to a FAILED object will set to FAILED during initial validation. 
 
-\subsubsection{Run-time}
+\subsection{Run-time}
 
 Once the system has successfully started, bad data can still be introduced to the system causing a failure in the calculate function. This is signalled by returning 0 from the function, which you the user are responsible for. For example:
 
