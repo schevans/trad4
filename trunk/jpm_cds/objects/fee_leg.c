@@ -1,5 +1,5 @@
 // Copyright (c) Steve Evans 2009
-// steve@topaz.myzen.co.uk
+// schevans@users.sourceforge.net
 // This code is released under the BSD licence. For details see $APP_ROOT/LICENCE
 //
 // This application is based on the ISDA CDS Standard Model (version 1.7),  
@@ -12,50 +12,36 @@
 
 #include "fee_leg_wrapper.c"
 
-#include "isda_cds_model_c_v1.7/lib/include/isda/version.h"
-#include "isda_cds_model_c_v1.7/lib/include/isda/macros.h"
-#include "isda_cds_model_c_v1.7/lib/include/isda/cerror.h"
-#include "isda_cds_model_c_v1.7/lib/include/isda/tcurve.h"
-#include "isda_cds_model_c_v1.7/lib/include/isda/cdsone.h"
-#include "isda_cds_model_c_v1.7/lib/include/isda/convert.h"
-#include "isda_cds_model_c_v1.7/lib/include/isda/zerocurve.h"
-#include "isda_cds_model_c_v1.7/lib/include/isda/cds.h"
-#include "isda_cds_model_c_v1.7/lib/include/isda/cxzerocurve.h"
-#include "isda_cds_model_c_v1.7/lib/include/isda/dateconv.h"
-#include "isda_cds_model_c_v1.7/lib/include/isda/date_sup.h"
-#include "isda_cds_model_c_v1.7/lib/include/isda/busday.h"
-#include "isda_cds_model_c_v1.7/lib/include/isda/ldate.h"
-
+#include "cds.h"
 
 using namespace std;
 
 int calculate_fee_leg( obj_loc_t obj_loc, long id )
 {
-    char* calendar = "NONE";
+    char* calendar = (char*)"NONE";
 
     int result = JpmcdsCdsFeeLegPV(
-            s_trade_today,
-            s_trade_valueDate,
-            s_trade_stepinDate,
-            s_trade_startDate,
-            s_trade_endDate,
-            s_trade_payAccOnDefault,
-            NULL,
-            &s_trade_stubType,
-            s_trade_notional,
-            s_trade_couponRate,
-            s_trade_paymentDcc,
-            s_trade_badDayConv,
-            calendar,
-            s_ir_curve_pTCurve,
-            s_credit_curve_pTCurve,
-            s_trade_protectStart,
-            s_trade_isPriceClean,
-            &fee_leg_pv
-        );
+        s_trade_today,
+        s_trade_valueDate,
+        s_trade_stepinDate,
+        s_trade_startDate,
+        s_trade_endDate,
+        s_trade_payAccOnDefault,
+        NULL,
+        &s_trade_stubType,
+        s_trade_notional,
+        s_trade_couponRate,
+        s_trade_paymentDcc,
+        s_trade_badDayConv,
+        calendar,
+        s_ir_curve_pTCurve,
+        s_credit_curve_pTCurve,
+        s_trade_protectStart,
+        s_trade_isPriceClean,
+        &fee_leg_pv
+    );
 
 cout << "calculate_fee_leg result: " << result << endl;
-
 
     return 1;
 }

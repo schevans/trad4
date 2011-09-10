@@ -1,5 +1,5 @@
 // Copyright (c) Steve Evans 2009
-// steve@topaz.myzen.co.uk
+// schevans@users.sourceforge.net
 // This code is released under the BSD licence. For details see $APP_ROOT/LICENCE
 //
 // This application is based on the ISDA CDS Standard Model (version 1.7),  
@@ -12,26 +12,13 @@
 
 #include "credit_curve_wrapper.c"
 
-#include "isda_cds_model_c_v1.7/lib/include/isda/version.h"
-#include "isda_cds_model_c_v1.7/lib/include/isda/macros.h"
-#include "isda_cds_model_c_v1.7/lib/include/isda/cerror.h"
-#include "isda_cds_model_c_v1.7/lib/include/isda/tcurve.h"
-#include "isda_cds_model_c_v1.7/lib/include/isda/cdsone.h"
-#include "isda_cds_model_c_v1.7/lib/include/isda/convert.h"
-#include "isda_cds_model_c_v1.7/lib/include/isda/zerocurve.h"
-#include "isda_cds_model_c_v1.7/lib/include/isda/cds.h"
-#include "isda_cds_model_c_v1.7/lib/include/isda/cxzerocurve.h"
-#include "isda_cds_model_c_v1.7/lib/include/isda/dateconv.h"
-#include "isda_cds_model_c_v1.7/lib/include/isda/date_sup.h"
-#include "isda_cds_model_c_v1.7/lib/include/isda/busday.h"
-#include "isda_cds_model_c_v1.7/lib/include/isda/ldate.h"
+#include "cds.h"
 
 using namespace std;
 
 int calculate_credit_curve( obj_loc_t obj_loc, long id )
 {
-
-    char* calendar = "NONE";
+    char* calendar = (char*)"NONE";
 
     credit_curve_pTCurve = (JpmcdsCleanSpreadCurve(
         credit_curve_today,
@@ -50,7 +37,6 @@ int calculate_credit_curve( obj_loc_t obj_loc, long id )
         &credit_curve_stubType,
         (long)credit_curve_badDayConv,
         calendar ));
-
 
     return 1;
 }

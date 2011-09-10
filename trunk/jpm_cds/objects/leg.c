@@ -1,5 +1,5 @@
 // Copyright (c) Steve Evans 2009
-// steve@topaz.myzen.co.uk
+// schevans@users.sourceforge.net
 // This code is released under the BSD licence. For details see $APP_ROOT/LICENCE
 //
 // This application is based on the ISDA CDS Standard Model (version 1.7),  
@@ -16,7 +16,7 @@ using namespace std;
 
 int calculate_leg( obj_loc_t obj_loc, long id )
 {
-    // Write me.
+    // Does nothing - pure virtual base type
 
     return 1;
 }
