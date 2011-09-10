@@ -14,7 +14,7 @@
 
 using namespace std;
 
-int calculate_trade( obj_loc_t obj_loc, int id )
+int calculate_trade( obj_loc_t obj_loc, long id )
 {
     // Does nothing
 

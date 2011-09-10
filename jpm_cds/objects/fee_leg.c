@@ -29,7 +29,7 @@
 
 using namespace std;
 
-int calculate_fee_leg( obj_loc_t obj_loc, int id )
+int calculate_fee_leg( obj_loc_t obj_loc, long id )
 {
     char* calendar = "NONE";
 
@@ -47,8 +47,8 @@ int calculate_fee_leg( obj_loc_t obj_loc, int id )
             s_trade_paymentDcc,
             s_trade_badDayConv,
             calendar,
-            &s_ir_curve_pTCurve,
-            &s_credit_curve_pTCurve,
+            s_ir_curve_pTCurve,
+            s_credit_curve_pTCurve,
             s_trade_protectStart,
             s_trade_isPriceClean,
             &fee_leg_pv

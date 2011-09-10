@@ -28,14 +28,14 @@
 
 using namespace std;
 
-int calculate_credit_curve( obj_loc_t obj_loc, int id )
+int calculate_credit_curve( obj_loc_t obj_loc, long id )
 {
 
     char* calendar = "NONE";
 
-    credit_curve_pTCurve = *(JpmcdsCleanSpreadCurve(
+    credit_curve_pTCurve = (JpmcdsCleanSpreadCurve(
         credit_curve_today,
-        &s_ir_curve_pTCurve,
+        s_ir_curve_pTCurve,
         credit_curve_startDate,
         credit_curve_stepinDate,
         credit_curve_cashSettleDate,

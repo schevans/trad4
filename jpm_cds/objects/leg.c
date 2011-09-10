@@ -14,7 +14,7 @@
 
 using namespace std;
 
-int calculate_leg( obj_loc_t obj_loc, int id )
+int calculate_leg( obj_loc_t obj_loc, long id )
 {
     // Write me.
 
