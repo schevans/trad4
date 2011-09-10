@@ -135,7 +135,7 @@ sub generate_lib_make($) {
         $name = $obj_hash->{$type}->{name};
 
         print $FHD "libt4$name.so: ../objects/$type.c ../gen/objects/$type"."_wrapper.c\n";
-        print $FHD "	\$(COMPILE) -shared -o libt4$name.so \$(TRAD4_ROOT)/objects/sqlite3.o ../objects/$type.o\n";
+        print $FHD "	\$(COMPILE) -shared -o libt4$name.so \$(TRAD4_ROOT)/objects/sqlite3.o ../objects/$type.o \$(T4_3RD_PARTY_AR)\n";
         print $FHD "\n";
     
     }
