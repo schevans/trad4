@@ -76,20 +76,20 @@ The model is very similar to that of bond_risk, discussed at length in the trad4
 <h2><a name="implementation">Implementation</a></h2>
 <h3>The abstract diagram</h3>
 <p>
-<img src="abstract.jpeg" alt="Abstract Diagram"/>
+<img src="abstract.png" alt="Abstract Diagram"/>
 </p>
 <p>
 From the abstract diagram we can see that the two legs are valued concurrently, and their pvs are aggregated in standard_risk.
 </p>
 <h3>The concrete diagram</h3>
 <p>
-<img src="concrete.jpeg" alt="Concrete Diagram"/>
+<img src="concrete.png" alt="Concrete Diagram"/>
 </p>
 <p>
-We can see the advantages of the trad4 approach more clearly in the concrete diagram. This shows one ir_curve (GBP), two credit_curves (Tesco and Diageo) and three trades against those curves, two against Tesco (T01 and T02 - trade or ticket numbers) and one against Diegeo (T03). T01f and T01c are the fee and contingent legs corresponding to T01, and T01sr is the standard_risk (aka pv) of T01. In practise you would have a handfull of ir_curves, hundreds of credit_curves and thousands of trades.
+We can see the advantages of the trad4 approach more clearly in the concrete diagram. This shows one ir_curve (LIBOR.GBP), two credit_curves (Safeway and Vodafone) and three trades against those curves, two against Safeway (trade_1 and trade_2) and one against Vodafone (trade_3). The objects fee_leg_1 and contingent_leg_1 are the fee and contingent legs corresponding to trade_1, and standard_risk_1 is the standard_risk (aka pv) of trade_1. In practise you would have a handfull of ir_curves, hundreds of credit_curves and thousands of trades.
 </p>
 <p>
-From this we can see that should the Tesco credit_curve move (or 'be marked' in the parlance) then the Tesco curve would need to be re-calculated once, the T01f, T01c, T02f and T02c would all run concurrently. Lastly T01sr and T02sr would fire, producing the new pvs of these trades.
+From this we can see that should the Safeway credit_curve move (or 'be marked' in the parlance) then the Safeway curve would need to be re-calculated once, the fee_leg_1, contingent_leg_1, fee_leg_2 and contingent_leg_2 would all run concurrently. Lastly standard_risk_1 and standard_risk_2 would fire, producing the new pvs of these trades.
 </p>
 <p>
 
@@ -189,8 +189,9 @@ Copyright (c) Steve Evans 2009
 <!-- ==================================================================== -->
 <br />
 <center>
+<!--
 <a href="http://sourceforge.net/projects/trad4"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=202177&type=16" width="150" height="40" border="0" alt="Get trad4 at SourceForge.net. Fast, secure and Free Open Source software downloads" /></a>
 </center>
-
+--!>
 </body>
 </html>
