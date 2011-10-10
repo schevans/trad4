@@ -49,8 +49,10 @@ jpm_cds
 
 <ul>
 <li><a href="#introduction">Introduction</a></li>
-<li><a href="#the_model">The Model</a></li>
+<li><a href="#the_model">The model</a></li>
 <li><a href="#implementation">Implementation</a></li>
+<li><a href="#porting">Porting</a></li>
+<li><a href="#extending">Extending the model</a></li>
 <li><a href="#usage">Usage</a></li>
 </ul>
 
@@ -61,15 +63,12 @@ jpm_cds
 This application is based on the ISDA CDS Standard Model (version 1.7), developed and supported in collaboration with Markit Group Ltd. The original code is available here: <a href="http://www.cdsmodel.com/">http://www.cdsmodel.com/</a>
 </p>
 <p>
-The jpm_cds application is a port of the ISDA application to the trad4 architecture.
-</p>
-<p>
-This release (v1.0) represents Phase1 of this project and is simply a trad4 wrapper around the ISDA function calls. Phase2 will represent a full port, where all the underlying structures and functions become fully intergrated into jpm_cds.
+This application is simply a set of wrappers round the ISDA function calls. This library never intended for this purpose and was actually released as a reference CDS implementation to facilitate the so-called SNAC convention which allowed credit default swaps to be netted in clearing houses after the 2007 crisis. As such, it presents us with a couple of problems in this context - specifically with thread-safety and memory management. This will be discussed below in the section Porting, and is required reading for anyone considering the trad4/imperaflow way.
 </p>
 <p>
 
 </p>
-<h2><a name="the_model">The Model</a></h2>
+<h2><a name="the_model">The model</a></h2>
 <p>
 The model is very similar to that of bond_risk, discussed at length in the trad4 manual. The idea is to get the computationally expensive parts of pricing a trade (in this case the ir and credit curve bootstrapping) to persist so that any objects that depend on this result can re-use them. Also, this being trad4, different parts of the problem can run concurrently.
 </p>
@@ -98,34 +97,54 @@ From this we can see that should the Safeway credit_curve move (or 'be marked' i
 <p>
 The t4 files are available <a href="t4_files.html">here</a>
 </p>
-<h2><a name="phase2">Phase2</a></h2>
+<h2><a name="porting">Porting</a></h2>
+
 <p>
-As mentioned above, this Phase1 release simply hooks into the ISDA functions. There are many problems with this approach. It might be worth you re-reading the section entitled "Porting your existing applications to trad4" of the manual to refresh your memory on the kinds of issues faced when porting a classically-architectured application to trad4. I'll step through some of these issues here in relation to this port.
-</p>
-<h4>Thread Safety</h4>
-<p>
-Firstly, we have no guarantee the ISDA model is thread-safe. Even if it were thread-safe in the classical sense (with mutex locks round shared resources) this still wouldn't fit with the trad4 model of thread-safety where we know no two objects will be writing to the same thing at the same time, and likewise we know no object will be being written to while it's being read from.
+Now assume the ISDA code is that of an existing library which we want to port to trad4. We have our model and method, now what of practicalities?
 </p>
 <p>
-In fact from what I've seen of the codebase I think the IDSA code is thread-safe and Phase1 would scale across thousands of trades and scores of threads. One exception is the error handling - the JpmcdsErrMsg mechanism - which writes to a global buffer which is written to a file on exit. This might not cause any catastrophic problems but would result in a garbled log file.
+The first issue we'll look at is thread safety - can we safely call a random 3rd party lib through the api and expect it to be thread safe? The answer is a qualified Yes. 
 </p>
 <p>
-There also seem to be some caches used (for holiday calenders). These seem to be read-only, but we'd still need a mechanism for adding a new holiday intra-day.
+The second issue is memory management. The way most of the api calls behave is to new-off the relevant structure and hands a pointer back to the calculate function. This involves handing over heap management to the 3rd party library which - while not part of the trad4 philosophy until recently - rewards the leap of faith.
+</p>
+<h3>Thread Safety</h3>
+<p>
+So, the first thing you ask when you've just hooked up your library to a trad4 calling framework is: Is this going to be thread-safe? The answer is: There's no such thing as thread-safe code, only code that's thread-safe in a particular threading context.
+</p>
+
+<p>
+Let's first look at two different threading contexts that might apply to a 3rd party lib. 
+</p>
+<h4>Spins up a bunch of threads for certain problems</h4>
+<p>
+In this case your lib might do matrix operations that spin up threads internally to the library and invisible to the api. These must be avoided in a trad4 app for the same reason they should be avoided for grid based HPC - you'll loose control of which threads are doing what.
 </p>
 <p>
-All the same, short of stepping through each function call we can't be 100% certain that the underlying functions are going to behave the way we expect.
+Solution: Compile/runtime switch to single-thread your lib.
 </p>
-<h4>Persistence</h4>
+<h4>Proudly proclaims thread-safety</h4>
 <p>
-Another issue with Phase1 is that the ISDA code news-off the required structures and returns a pointer to the calling function. For example, the TCurve structure which hold the bootstrapped curves and makes up the pub section of ir_ and credit_curve is newed-off in the ISDA internals. While this approach 'works' as far as we're concerned (we assign this pointer to the pub struct) it creates an obvious memory leak. Each call to JpmcdsBuildIRZeroCurve will new-off an new TCurve and pass the result back. We discard any reference to the old TCurve struct when we assign the new one.
-</p>
-<p>
-While we could just manage the memory better by deleting the old one, it would be better to have the one structure persist. The reason we would want to do that is, if only the last IR mark changed (e.g. that corresponding to date 151943), we wouldn't need to re-bootstrap the whole curve - only the last period.
+In this case, the architect of the library (or, more likely, multiple architects at various stages of enlightenment) have tried to anticipate our threading context. This usually means mutex locks scattered liberally about whenever a resource looks a bit shared. These mutexes are insidious because they assume every threading contexts, and in my experience serve none.
 </p>
 <p>
-Likewise consider the two legs - fee_leg and contingent_leg - with their respective calls to JpmcdsCdsFeeLegPV and JpmcdsCdsContingentLegPV. Both of these ISDA calls construct the respective leg, price it, and delete it. This is not in keeping with the trad4 philosophy. While both legs do need to be constructed, they don't need to be reconstructed each time an IR rate moves - the IR rate move has no bearing on the leg itself, only on the value of that leg, so let the legs persist between the two valuations. The only time we need change the leg is when the trade to which it subscribes changes, for example in the case of a start date correction.
+Solution: Remove all existing mutex locks before you proceed. Note where they were.
 </p>
-<h4>Adding other risk measures</h4>
+<h4>Back to jpm_cds</h4>
+<p>
+Now, how does any of this apply to us here? The answer is none of it, as this lib makes no claim of thread safety. As discussed above, this is a good thing.
+</p>
+<p>
+So is jpm_cds thread-safe in a trad4 threading context? The answer is: Why wouldn't it be? By calling the api through a trad4 application you are sure you'll never be reading from and writing to the same object at the same time.
+</p>
+<p>
+However, there are cases where you'll find threading problems in the trad4 context. The first is a practical one from jpm_cds - 
+JpmcdsErrMsg mechanism - which writes to a global buffer which is written to a file on exit. Beyond a garbled log file this isn't a big deal, but it's illustrative.
+</p>
+<p>
+A more common problem you'll encounter is with any internal caching your lib uses. A common cashing mechanism has at it's heart a hash. Hashes are great and are perfectly thread-safe in a trad4 context, until they are resized, in which case they become neither. Best to replace the hash with a lock-free array of pointers, say about MAX_OBJECTS long? (#defined in trad4.h). Again we're sure of a) the trad4 calling convention where no two objects will be simultaneously read from and written to and b) we know how many objects are expected for this application, and we'll want to keep them in memory so we'll know in advance how big a cache we'll need.
+</p>
+<h2><a name="extending">Extending the model</a></h2>
 <p>
 The IDSA model only produced pv. As we're already bootstrapping the credit_curve, there's little overhead of also bootstrapping the credit_curve perturbed by +-1bp and using these curves to calculate the cr01 (cr01 being the shift in pv given a +-1bp shift in the credit_curve). This would involve extending the TCurve structure to add:
 </p>
