@@ -27,7 +27,7 @@
 
 \chapter{Introduction}
 
-Trad4 is a hybrid between dataflow and imperative programming. A trad4 application is composed of nodes which connect to each other in a directed graph but each node has some imperative code (written in C++) that does something complex with the outputs of the nodes to which is subscribes.
+Trad4 is a hybrid between dataflow and imperative programming ('imperaflow' programming). A trad4 application is composed of nodes which connect to each other in a directed graph but each node has some imperative code (written in C++) that does something complex with the outputs of the nodes to which is subscribes.
 
 These nodes are arranged in tiers with each tier run one after another from the bottom up. As we know that the nodes on each tier cannot affect one another and that the nodes below are effectively read-only, we can run all the nodes on a particular tier in parallel.
 
