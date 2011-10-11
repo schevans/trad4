@@ -100,13 +100,13 @@ The t4 files are available <a href="t4_files.html">here</a>
 <h2><a name="porting">Porting</a></h2>
 
 <p>
-Now assume the ISDA code is that of an existing library which we want to port to trad4. We have our model and method, now what of practicalities?
+Now assume the ISDA code is that of an existing library which we want to port to trad4. We have our model and method, now what of the practicalities?
 </p>
 <p>
 The first issue we'll look at is thread safety - can we safely call a random 3rd party lib through the api and expect it to be thread safe? The answer is a qualified Yes. 
 </p>
 <p>
-The second issue is memory management. The way most of the api calls behave is to new-off the relevant structure and hands a pointer back to the calculate function. This involves handing over heap management to the 3rd party library which - while not part of the trad4 philosophy until recently - rewards the leap of faith.
+The second issue is memory management. The way most of the ISDA api calls behave is to new-off the relevant structure and hands a pointer back to the calculate function. This involves handing over heap management to the 3rd party library which - while not part of the trad4 philosophy until recently - rewards the leap of faith.
 </p>
 <h3>Thread Safety</h3>
 <p>
@@ -118,14 +118,14 @@ Let's first look at two different threading contexts that might apply to a 3rd p
 </p>
 <h4>Spins up a bunch of threads for certain problems</h4>
 <p>
-In this case your lib might do matrix operations that spin up threads internally to the library and invisible to the api. These must be avoided in a trad4 app for the same reason they should be avoided for grid based HPC - you'll loose control of which threads are doing what.
+In this case your lib might do matrix operations that spin up threads internally to the library and invisible to the api. These must be avoided in a trad4 app for the same reason they should be avoided for grid based HPC - you'll lose control of which threads are doing what.
 </p>
 <p>
 Solution: Compile/runtime switch to single-thread your lib.
 </p>
 <h4>Proudly proclaims thread-safety</h4>
 <p>
-In this case, the architect of the library (or, more likely, multiple architects at various stages of enlightenment) have tried to anticipate our threading context. This usually means mutex locks scattered liberally about whenever a resource looks a bit shared. These mutexes are insidious because they assume every threading contexts, and in my experience serve none.
+In this case, the architect of the library (or, more likely, multiple architects at various stages of enlightenment) have tried to anticipate our threading context. This usually means mutex locks scattered liberally about whenever a resource looks a bit shared. These mutexes are insidious because they assume every threading context, and in my experience serve none.
 </p>
 <p>
 Solution: Remove all existing mutex locks before you proceed. Note where they were.
@@ -138,11 +138,31 @@ Now, how does any of this apply to us here? The answer is none of it, as this li
 So is jpm_cds thread-safe in a trad4 threading context? The answer is: Why wouldn't it be? By calling the api through a trad4 application you are sure you'll never be reading from and writing to the same object at the same time.
 </p>
 <p>
-However, there are cases where you'll find threading problems in the trad4 context. The first is a practical one from jpm_cds - 
+However, there are cases where you will find threading problems in the trad4 context. The first is a practical one from jpm_cds - 
 JpmcdsErrMsg mechanism - which writes to a global buffer which is written to a file on exit. Beyond a garbled log file this isn't a big deal, but it's illustrative.
 </p>
 <p>
 A more common problem you'll encounter is with any internal caching your lib uses. A common cashing mechanism has at it's heart a hash. Hashes are great and are perfectly thread-safe in a trad4 context, until they are resized, in which case they become neither. Best to replace the hash with a lock-free array of pointers, say about MAX_OBJECTS long? (#defined in trad4.h). Again we're sure of a) the trad4 calling convention where no two objects will be simultaneously read from and written to and b) we know how many objects are expected for this application, and we'll want to keep them in memory so we'll know in advance how big a cache we'll need.
+</p>
+<h3>Memory management</h3>
+<p>
+Previously, all memory management was handled by trad4. The space required for each object was described by the t4 files, and these were newed-off and populated (in the case of static and sub) or zeroed (in the case of pub). In fact in older versions of The Manual I explicitly stated that if you feel the need to use the heap you're doing it wrong. This meant any 3rd party lib required re-implementation in terms of trad4. While noble purity has it's place (not that I've ever found it), pragmatism wins every time.
+</p>
+<p>
+By handing over memory management to a library that already does memory management, you can use that library (almost) unchanged. The almost covers caches and logging and such which might need a tweak, but reusing existing libraries without the requirement of a re-write makes life far more exiting.
+</p>
+<p>
+Now this takes a fair amount of trust in your 3rd party lib, but if you're <i>already</i> relying on it for memory management you already have that trust.
+</p>
+<p>
+Now let's look at how this affects jpm_cds. We'll start with the pub section of ir_curve.t4:
+</p>
+<blockquote><pre>
+pub
+    TCurve* pTCurve
+</pre></blockquote>
+<p>
+
 </p>
 <h2><a name="extending">Extending the model</a></h2>
 <p>
