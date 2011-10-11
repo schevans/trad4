@@ -20,6 +20,11 @@ int calculate_ir_curve( obj_loc_t obj_loc, long id )
 {
     char *local_holidays = (char*)"None";
 
+    if ( ir_curve_pTCurve )
+    {
+        free( ir_curve_pTCurve ); // malloced on line 34 of isda_cds_model_c_v1/lib/src/cmemory.c
+    }
+
     ir_curve_pTCurve = (JpmcdsBuildIRZeroCurve(
         ir_curve_baseDate,
         ir_curve_st_observables_types,
