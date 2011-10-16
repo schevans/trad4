@@ -20,6 +20,11 @@ int calculate_credit_curve( obj_loc_t obj_loc, long id )
 {
     char* calendar = (char*)"NONE";
 
+    if ( credit_curve_pTCurve )
+    {
+        free( credit_curve_pTCurve ); // malloced on line 34 of isda_cds_model_c_v1/lib/src/cmemory.c
+    }
+
     credit_curve_pTCurve = (JpmcdsCleanSpreadCurve(
         credit_curve_today,
         s_ir_curve_pTCurve,
