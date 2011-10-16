@@ -31,8 +31,6 @@ int calculate_contingent_leg( obj_loc_t obj_loc, long id )
         &contingent_leg_pv
     );
 
-cout << "calculate_contingent_leg result: " << result << endl;
-
     return 1;
 }
 

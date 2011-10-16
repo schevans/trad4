@@ -41,8 +41,6 @@ int calculate_fee_leg( obj_loc_t obj_loc, long id )
         &fee_leg_pv
     );
 
-cout << "calculate_fee_leg result: " << result << endl;
-
     return 1;
 }
 
