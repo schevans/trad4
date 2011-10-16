@@ -162,7 +162,33 @@ pub
     TCurve* pTCurve
 </pre></blockquote>
 <p>
+Here's the calculate function:
+</p>
+<blockquote><pre>
+    if ( ir_curve_pTCurve )
+    {
+        free( ir_curve_pTCurve ); // malloced on line 34 of isda_cds_model_c_v1/lib/src/cmemory.c
+    }
 
+    ir_curve_pTCurve = (JpmcdsBuildIRZeroCurve(
+        ir_curve_baseDate,
+        ir_curve_st_observables_types,
+        ir_curve_st_observables_dates,
+        ir_curve_st_observables_rates,
+        NUM_RATES,
+        ir_curve_mmDCC,
+        ir_curve_fixedSwapFreq,
+        ir_curve_floatSwapFreq,
+        ir_curve_fixedSwapDCC,
+        ir_curve_floatSwapDCC,
+        ir_curve_badDayConv,
+        local_holidays));
+</pre></blockquote>
+<p>
+So you can see JpmcdsBuildIRZeroCurve news off the structure then handed over to the objects to which this r_curve subscribes. If the pointer in question - ir_curve_pTCurve - is pointing to another structure from a previous run it gets deleted.
+</p>
+<p>
+This may not be the ideal arrangement - object construction and destruction is unnecessary expensive when the object hasn't fundamentally changed, but that's how this 3rd party lib works, so we have to go with it. The point is it works.
 </p>
 <h2><a name="extending">Extending the model</a></h2>
 <p>
