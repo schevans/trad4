@@ -363,8 +363,6 @@ void set_timestamp( obj_loc_t obj_loc, long id )
 
 void* thread_loop( void* thread_id ) 
 {
-    bool thread_fired(false);
-
     while (1) {
 
         //cout << "thread_contoller[(long long)thread_id] = " << thread_contoller[(long long)thread_id] << endl;
@@ -379,7 +377,6 @@ void* thread_loop( void* thread_id )
             set_timestamp( obj_loc, thread_contoller[(long long)thread_id] );
 
             //cout << "Thread #" << (long long)thread_id << " done." << endl;
-            thread_fired=true;
 
             thread_contoller[(long long)thread_id] = 0;
 
