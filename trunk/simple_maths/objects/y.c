@@ -12,7 +12,7 @@
 
 using namespace std;
 
-int calculate_y( obj_loc_t obj_loc, int id )
+int calculate_y( obj_loc_t obj_loc, long id )
 {
     y_out = c_out - d_out;
 
