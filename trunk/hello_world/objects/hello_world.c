@@ -11,7 +11,7 @@
 
 using namespace std;
 
-int calculate_hello_world( obj_loc_t obj_loc, int id )
+int calculate_hello_world( obj_loc_t obj_loc, long id )
 {
     cout << object_name(hello_world_hello) << " " << object_name(hello_world_world) << "!" << endl;
 
