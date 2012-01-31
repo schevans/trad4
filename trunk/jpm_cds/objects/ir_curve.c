@@ -20,6 +20,11 @@ int calculate_ir_curve( obj_loc_t obj_loc, long id )
 {
     char *local_holidays = (char*)"None";
 
+    if ( !object_init( id ) )
+    {
+        ir_curve_pTCurve = 0;
+    }
+
     if ( ir_curve_pTCurve )
     {
         free( ir_curve_pTCurve ); // malloced on line 34 of isda_cds_model_c_v1/lib/src/cmemory.c
