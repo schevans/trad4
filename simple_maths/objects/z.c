@@ -12,7 +12,7 @@
 
 using namespace std;
 
-int calculate_z( obj_loc_t obj_loc, int id )
+int calculate_z( obj_loc_t obj_loc, long id )
 {
     z_out = x_out * y_out;
 

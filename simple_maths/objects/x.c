@@ -12,7 +12,7 @@
 
 using namespace std;
 
-int calculate_x( obj_loc_t obj_loc, int id )
+int calculate_x( obj_loc_t obj_loc, long id )
 {
     x_out = a_out + b_out;
 

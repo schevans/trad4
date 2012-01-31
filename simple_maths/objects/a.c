@@ -12,7 +12,7 @@
 
 using namespace std;
 
-int calculate_a( obj_loc_t obj_loc, int id )
+int calculate_a( obj_loc_t obj_loc, long id )
 {
     // Does nothing.
 
