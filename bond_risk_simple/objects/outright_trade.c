@@ -12,7 +12,7 @@
 
 using namespace std;
 
-int calculate_outright_trade( obj_loc_t obj_loc, int id )
+int calculate_outright_trade( obj_loc_t obj_loc, long id )
 {
     // Get multiplier for trade direction.
     double direction = ( outright_trade_buy_sell == BUY ? 1.0 : -1.0 );

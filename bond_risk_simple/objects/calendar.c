@@ -12,7 +12,7 @@
 
 using namespace std;
 
-int calculate_calendar( obj_loc_t obj_loc, int id )
+int calculate_calendar( obj_loc_t obj_loc, long id )
 {
     // Does nothing.
 
