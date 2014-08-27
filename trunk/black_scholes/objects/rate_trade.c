@@ -9,7 +9,7 @@
 
 using namespace std;
 
-int calculate_rate_trade( obj_loc_t obj_loc, int id )
+int calculate_rate_trade( obj_loc_t obj_loc, long id )
 {
     rate_trade_rT = risk_free_rate_r * option_T;
 
