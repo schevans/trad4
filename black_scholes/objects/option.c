@@ -9,7 +9,7 @@
 
 using namespace std;
 
-int calculate_option( obj_loc_t obj_loc, int id )
+int calculate_option( obj_loc_t obj_loc, long id )
 {
     option_RtT = sqrt( option_T );
 

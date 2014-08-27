@@ -8,7 +8,7 @@
 
 using namespace std;
 
-int calculate_theta( obj_loc_t obj_loc, int id )
+int calculate_theta( obj_loc_t obj_loc, long id )
 {
     if ( option_call_or_put == CALL )
     {
